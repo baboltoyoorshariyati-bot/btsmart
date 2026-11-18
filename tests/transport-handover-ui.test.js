@@ -112,3 +112,19 @@ test('فاکتور پخش، متن تحویل را تمام‌عرض نگه می
  assert.match(invoiceCss,/\.inv38-compact\.inv38-distribution \.inv38-distribution-meta>\.inv38-distribution-contacts\{[^}]*grid-template-columns:minmax\(0,1\.25fr\) minmax\(0,1fr\)/);
  assert.match(invoiceCss,/\.inv38-compact\.inv38-distribution \.inv38-distribution-meta>\.inv38-distribution-contacts\{[^}]*grid-column:1\/\-1/);
 });
+test('سربرگ برگه ارسال پخش مو‌به‌مو همان سربرگ فاکتور پخش است',()=>{
+ const ctx=vm.createContext({esc:escape,fa:x=>x,qty:x=>x,money:x=>String(x),dt:()=>'۱۴۰۳/۰۱/۰۱ ۱۰:۰۰'});
+ vm.runInContext(fragment('function transportDeliverySignatureHtml(','async function transportDraftPreview(id){'),ctx);
+ vm.runInContext(fragment('function transportShipmentNoteHtml(','async function transportShipmentNotePrint(id){'),ctx);
+ const invoice={invoiceNumber:'456',customerName:'<مشتری>',customerPhone:'0912',driverName:'راننده',createdAt:'2024-01-01',priceLines:[{productName:'کالا',deliveredKg:2,unitPrice:1000,amount:2000}],subtotalAmount:2000,discountAmount:0,additionsAmount:0,totalAmount:2000};
+ const order={orderNo:'123',dispatchPlace:'مقصد <نمونه>',customer:{name:'مشتری',phone:'0912'},transportInvoice:invoice,transportHandovers:{'0':{driverName:'راننده',vehicleType:'کامیون',vehiclePlate:'۱۱ب۲۲۲',document:{warehouseDocumentNo:'W-9',items:[]}}}};
+ const note=ctx.transportShipmentNoteHtml(order),invoiceHtml=ctx.transportDraftInvoiceHtml(order,invoice);
+ const headerOf=html=>html.slice(html.indexOf('<div class="inv38-head">'),html.indexOf('<div class="inv38-rule">'));
+ assert.equal(headerOf(note),headerOf(invoiceHtml));
+ for(const label of ['نام مشتری','شماره تماس','محل ارسال','شماره سفارش','شماره فاکتور','تاریخ'])assert(note.includes(`<span>${label}</span>`),label);
+ assert.match(note,/inv38-sheet inv38-compact inv38-distribution/);
+ assert.doesNotMatch(note,/inv38-brand|<img/);
+ assert.match(note,/برگه ارسال پخش/);
+ assert.match(note,/W-9/);
+ assert.doesNotMatch(note,/قیمت|ریال/);
+});

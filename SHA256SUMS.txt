@@ -2,7 +2,7 @@
 9a011b494122d2717740da986d159affee1ea6ee7c44db6770fb249e3e453fec  ./.github/workflows/ci.yml
 1bd57d4d8e439aca6eb9d360b9e3ef036c1494ad8f936fbd5e10b919fedf8778  ./.github/workflows/release.yml
 45a4a240ad89728268c09abcd811ed7e16ef5a4feb3103d89a445ce82e9d5e9b  ./.gitignore
-dc17d7e8c0ba762dd52c43ac45d310df111a4f4a58ea92202d614a653968e308  ./CHANGELOG.md
+4f3b1c8e8f4daf63c5496a10fa47115a8b38a106426cc2c0b455769f18e2b8b2  ./CHANGELOG.md
 cf5db6b7c699488e4f4fbb243af67205f640173bce553f01a8d9d20414eff31b  ./NOTICE.txt
 b474294960becd1c82657b15ab1fc4eb0e4cdbf830f7da53b614017de2719494  ./README.md
 3e1ee924f1c80a1a1ebcd4f7ad4bebd26a86f8834cf65d953690b7a115d8513e  ./RELEASE-1.0.0-fa.md
@@ -252,7 +252,7 @@ dad9e3a7a6a848ec16537af8c3791f7953a7b3930129b4d78b13321897a83901  ./public/style
 1c3c8acb1737d78bfe539fa704a14b3256b4c298a0eebea9f40702fb0ff6e090  ./public/transport-resources.css
 e8e2e4411bb9197e5a1959f21252abf359260fa3ec8d550a6bc0bc39b3b5ad9c  ./public/transport-resources.js
 76d033745f0f2c81f43397aefcbbe49174eee07982df15cfee4ca4d976f3c4d2  ./public/ui-polish.js
-8e4adc14d74b244bc40342f4c6c19edc23aa1ca3c802efb5dd75c4a92633b7b0  ./public/ui2.js
+535133259eaa0ee1c5c88405cf9236fbe3b1e7eb3fe5285a2988aecbfaf9780a  ./public/ui2.js
 4e880225ffbbb1902744190fb7d4ff7629ff2ca77ffd8467d631299910cb6246  ./public/warehouse-document.css
 4b269249e5f812b46eddbff935cd736332a3c9b597c0c3380fad2bddb36213ba  ./scripts/arena-release-build.py
 b7e67493ccf5bf21eba5721eea612c4236ee6a7f271d34f5a68818ca1c120ab4  ./scripts/backup-db.js
@@ -446,7 +446,7 @@ c346c7709e811dbf49eb72c0d242e7c7151a3ab391be120810442007f123fe9b  ./tests/tls-ma
 87d265a8e7d96b6a0a0adb1c0a2afcc327b09c5364bd3ccabded78e84a5c38e3  ./tests/transport-financial-layout-browser.test.js
 f139635a0a3c60bde65e85b5b9f2048b91d655ca2369cfd1232dc41ef5b9a65d  ./tests/transport-fleet-assignment-api.test.js
 d863ab4511d7a6a8bea37759edb9888f46e2c31540b895d93d121a7384afe08f  ./tests/transport-handover-browser.test.js
-a9696459f5342a779e74df8e47ce6ade0c16dda4ddcc4f5e47d842d67af5d5aa  ./tests/transport-handover-ui.test.js
+0b3a86c979965ff854a4ff76cdd3f71169050bcf2c9cd6c1a33a6d65126b5171  ./tests/transport-handover-ui.test.js
 836478e81af2e979e3de2aed4972a20c4bc5d26c3d734987f0d3f99594d9acec  ./tests/transport-nav-selection.test.js
 bcb07b718ff8f248d4eb51adcb8088a85f00575f9018d0009aa047755d4b3b51  ./tests/transport-planning.test.js
 ffbe1ad3367f87a81413513b4c83c9b6ec9fc5c02ac38ab2927c22b3e6b4bb31  ./tests/transport-plans-api.test.js
@@ -503,7 +503,7 @@ fbf0b453c6720ac585e4d61a42e7f9788405b172d4122f7a9868cdbbcdf013e4  ./ui-src/ui2/0
 385ce6b2f88f841c72d72e8c75e173b7cf20c47d6784a0e76786ec00ed17841e  ./ui-src/ui2/05-warehouse.js
 abc8c46c9bb3bed4eae426db7aab8662f5f176b8a07b3767bd52a86141f725d6  ./ui-src/ui2/06-store-services.js
 aa522800999201e723f17616f8b5d0b503029b549cc7240af720247a6bf9fe30  ./ui-src/ui2/07-dashboard-reports.js
-b57e8abac7d054637a8f2d163b5b87aa973cd103f9abd463282c46c3f1b3f9d4  ./ui-src/ui2/08-transport-invoices.js
+6dd0ba1d5099597be04dc2dec6ada7e038fe211960f32c0b01d3e4e28c241283  ./ui-src/ui2/08-transport-invoices.js
 cbe0548f44f0278831f81de32b00453c7a47f5dd268a7b7b1f52432150c4efe9  ./vendor/acme/README.md
 39d3a3a7217c520f52370a6421bfeb06902ad08a3b6f19f5331963595e6fd45b  ./vendor/acme/THIRD-PARTY-LICENSES.txt
 14fa0bd54ccc2d15bf3c4f1d6b64e63914503ada596cb8b5fc8f4bebcd6d89b8  ./vendor/acme/acme-client.cjs
