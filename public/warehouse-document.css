@@ -1,0 +1,120 @@
+/* Warehouse document: the same compact table language as the sales invoice. */
+.whd-doc{color:#1d222a;font-family:'Vazirmatn',Tahoma,sans-serif;box-sizing:border-box;direction:rtl;line-height:1.4}
+.whd-doc *{box-sizing:border-box}
+.whd-head{display:flex;direction:rtl;align-items:stretch;gap:5px;min-height:50px;margin-bottom:4px;break-inside:avoid}
+.whd-document-number{flex:0 0 148px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px 5px;min-width:0;border:1px solid #e3e6ea;border-radius:6px;padding:5px 7px;text-align:center;font-size:11.5px;font-weight:700}
+.whd-document-number span{flex:0 1 auto;min-width:0;white-space:normal;overflow-wrap:anywhere}.whd-document-number b{font-size:15px;line-height:1.35;white-space:nowrap;unicode-bidi:isolate}
+.whd-meta{display:grid;flex:1;min-width:0;grid-template-columns:1.25fr 1.2fr 1.05fr 1.5fr;gap:5px;font-size:11px}
+.whd-meta>span{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px 4px;min-width:0;padding:5px 6px;border:1px solid #e3e6ea;border-radius:6px;overflow-wrap:anywhere;text-align:center}
+.whd-meta .whd-label{flex:0 0 auto;white-space:nowrap}
+.whd-meta>span b{font-size:12px;font-weight:700;min-width:0;overflow-wrap:anywhere}
+.whd-meta>span b[dir=ltr]{white-space:nowrap;overflow-wrap:normal;unicode-bidi:isolate}
+.whd-store-meta{grid-template-columns:1.3fr 1.3fr 1.1fr 1.5fr .7fr}
+.whd-store-meta>span{flex-wrap:wrap}
+.whd-table-scroll{max-width:100%;overflow-x:auto}
+.whd-doc table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;border:1px solid #e3e6ea;border-radius:6px;font-size:11px}
+.whd-col-number{width:34px}.whd-col-product{width:24%}.whd-col-tares{width:50%}.whd-col-weight{width:auto}
+.whd-doc th,.whd-doc td{line-height:1.4;vertical-align:middle;overflow-wrap:anywhere;text-align:right}
+.whd-doc th{background:#f6f7f9;color:#67707d;font-size:10px;padding:4px 6px;border-bottom:1px solid #e3e6ea}
+.whd-doc td{font-size:11px;padding:3px 6px;border-bottom:1px solid #eef0f3}
+.whd-doc tbody tr:last-child td{border-bottom:0}
+.whd-doc th:first-child,.whd-number{text-align:center!important;padding-right:1px!important;padding-left:1px!important;white-space:nowrap}
+.whd-doc th:last-child,.whd-doc td.whd-quantity{text-align:center}
+.whd-doc thead{display:table-header-group}.whd-doc tr{break-inside:avoid;page-break-inside:avoid}
+.whd-acknowledgement{break-inside:avoid;page-break-inside:avoid;margin-top:15px}
+.whd-declaration{margin:0;white-space:normal;overflow-wrap:anywhere;font-size:12px;font-weight:700;line-height:1.8}
+.whd-signature{margin-right:auto;margin-top:32px;display:flex;flex-direction:column;gap:2px;align-items:center;text-align:center;width:220px;max-width:100%;font-size:11px;overflow-wrap:anywhere}
+@media screen and (max-width:700px){
+ .whd-head{flex-wrap:wrap}.whd-document-number{flex:0 0 auto}
+ .whd-meta{flex:1 0 100%;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .whd-meta>span{justify-content:flex-start;flex-wrap:wrap}
+ .whd-doc table{min-width:600px}
+}
+@media print{
+ .whd-doc{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ .whd-table-scroll{overflow:visible}.whd-doc table{min-width:0}
+}
+/* Tare boxes belong to the product row; empty types and gross-weight columns are omitted. */
+.whd-doc .whd-products th{color:#394455}
+.whd-doc .whd-products td{padding-top:7px;padding-bottom:7px}
+.whd-product b{font-size:12px}
+.whd-tare-list{display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:flex-start}
+.whd-tare-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;border:1px solid #c9d4df;border-radius:5px;padding:3px 6px;background:#f7f9fb;color:#34465a;font-size:10px;line-height:1.5;white-space:nowrap}
+.whd-tare-chip b{color:#172b40;font-weight:700}
+.whd-tare-empty,.whd-tare-unknown{font-size:10px;color:#687685}
+.whd-net{font-size:12px!important;font-weight:700;color:#173b50}
+.whd-total{margin:10px 0 0 auto;display:flex;justify-content:space-between;align-items:center;gap:16px;width:245px;max-width:100%;padding:8px 12px;border:1px solid #a9bbc9;border-radius:7px;background:#f3f7f9;font-size:12px;break-inside:avoid;page-break-inside:avoid}
+.whd-total strong{font-size:13px;color:#173b50;white-space:nowrap}
+
+/* Interactive detail is grouped by weighing; paper has only product and net weight. */
+.whd-tare-scroll{max-width:100%;overflow-x:auto}
+.whd-tare-batch{display:flex;flex-wrap:nowrap;white-space:nowrap;width:max-content;gap:4px 8px;align-items:center;font-size:10px;margin:3px 0}
+.whd-tare-batch .whd-tare-list{display:flex;flex:0 0 auto;flex-wrap:nowrap}
+.whd-print-products .whd-col-product{width:auto}
+.whd-print-products .whd-col-weight{width:30%}
+
+/* Only the printed store handover is compact; ordinary customer documents and
+   the interactive tare details retain their existing layout. */
+@media print{
+ .whd-store-print .whd-head{gap:3px;margin-bottom:3px}
+ .whd-store-print .whd-document-number{padding:3px 4px}
+ .whd-store-print .whd-meta{gap:3px}
+ .whd-store-print .whd-meta>span{padding:3px 5px}
+ .whd-store-print .whd-products th{padding:2px 4px;line-height:1.2}
+ .whd-store-print .whd-products td{padding:2px 4px;line-height:1.2}
+ .whd-store-print .whd-total{margin-top:4px;padding:3px 8px;font-size:10px}
+ .whd-store-print .whd-total strong{font-size:11px}
+ .whd-store-print .whd-acknowledgement{margin-top:5px}
+ .whd-store-print .whd-declaration{font-size:10px;line-height:1.3}
+ .whd-store-print .whd-signature{margin-top:4px;padding-top:12px;gap:0;font-size:10px;line-height:1.25}
+}
+
+/* Store handover: keep each label and its value together, and use the full
+   header width rather than narrow fixed columns. Unusually long values can
+   wrap without being clipped; on small screens the boxes flow to another row. */
+.whd-store-doc .whd-head{flex-wrap:wrap;align-items:stretch;gap:3px}
+.whd-store-doc .whd-document-number{flex:1 0 auto;max-width:100%;padding:2px 4px}
+.whd-store-doc .whd-store-meta{display:contents}
+.whd-store-doc .whd-store-meta>span{flex:1 0 max-content;max-width:100%;flex-wrap:nowrap;justify-content:center;gap:4px;padding:4px 6px}
+.whd-store-doc .whd-store-meta>span b{white-space:normal;overflow-wrap:anywhere}
+.whd-store-doc .whd-total{margin-left:0;margin-right:auto}
+@media print{
+ .whd-store-print .whd-head{margin-bottom:3px}
+ .whd-store-print .whd-document-number,.whd-store-print .whd-store-meta>span{padding:3px 4px}
+}
+
+/* Net total is the physical-left weight cell of the RTL product table. */
+.whd-products tfoot td{border-top:1px solid #a9bbc9;background:#f3f7f9;padding:6px;text-align:center;break-inside:avoid}
+.whd-products tfoot .whd-total-label{text-align:left;font-weight:700}
+.whd-products tfoot .whd-total{margin:0!important;width:auto;max-width:none;padding:0!important;border:0;background:none;justify-content:center}
+/* Six ordered header cells share a single print row; long values wrap inside it. */
+.whd-store-print .whd-head{display:grid!important;grid-template-columns:minmax(0,1.4fr) minmax(0,1.1fr) minmax(0,1.2fr) minmax(0,.9fr) minmax(0,1fr) minmax(0,1.3fr);align-items:stretch}
+.whd-store-print .whd-store-meta>span{min-width:0;max-width:100%;flex-wrap:wrap;padding:4px 6px;overflow-wrap:anywhere}
+.whd-store-print .whd-store-meta>span b{font-size:11.5px}
+/* متن بزرگ‌تر نباید از کادر بیرون بزند: برچسب و شمارهٔ سند در چاپ می‌توانند به خط دوم بروند. */
+.whd-store-print .whd-document-number{flex-wrap:wrap}
+.whd-store-print .whd-document-number span{white-space:normal;flex-shrink:1;text-align:center;line-height:1.25}
+.whd-store-print .whd-meta>span .whd-label{white-space:normal}
+
+/* Remote-order documents: keep the requested field order on one row with a
+   50px header height for clearer separation. */
+.whd-remote-head{display:flex!important;align-items:center;min-height:50px;direction:rtl;margin:0 0 4px;padding:4px;background:#f4f7fb;border:1px solid #cbd5e1;border-radius:5px}
+.whd-remote-meta{display:grid;flex:1 1 auto;grid-template-columns:var(--whd-remote-columns,repeat(5,minmax(0,1fr)));align-items:center;gap:2px;min-width:0;min-height:40px;font-size:var(--whd-remote-font,10px);line-height:1.15}
+.whd-remote-group{min-width:0;min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 6px;border:1px solid #dfe4e9;border-radius:3px;background:#fbfcfd;white-space:normal;overflow:hidden}
+.whd-remote-pair{min-width:0;max-width:100%;display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:1px 3px;white-space:normal}
+.whd-remote-label{flex:none;color:#475569;font-size:.9em;font-weight:600;white-space:nowrap}
+.whd-remote-pair>b{flex:0 1 auto;min-width:0;max-width:100%;color:#0f172a;font-size:1em;line-height:1.15;font-weight:800;white-space:normal;overflow-wrap:anywhere}
+.whd-remote-pair>b[dir=ltr]{direction:ltr;unicode-bidi:isolate}
+@media screen and (max-width:700px){
+ .whd-remote-head{padding:1px}
+ .whd-remote-meta{gap:1px;font-size:min(var(--whd-remote-font,10px),6.4px)}
+ .whd-remote-group{gap:1px;padding:1px}
+ .whd-remote-pair{gap:1px}
+}
+@media screen and (max-width:340px){.whd-remote-meta{font-size:min(var(--whd-remote-font,10px),5.6px)}}
+@media print{
+ .whd-remote-head{margin-bottom:3px;padding:1px 2px}
+ .whd-remote-meta{gap:1px 2px;line-height:1}
+ .whd-remote-group{gap:2px;padding:2px 3px;background:#fff}
+ .whd-remote-pair{gap:1px}
+}

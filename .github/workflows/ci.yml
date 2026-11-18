@@ -1,0 +1,79 @@
+name: Quality checks
+on:
+  pull_request:
+  push:
+    branches: [main, 'arena/**']
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+      - run: python3 scripts/update-checksums.py --check
+      - run: npm run check:ui
+      - run: npm test
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+      - run: npm install --no-save --package-lock=false playwright-core@1.56.1 @sparticuz/chromium@141.0.0
+      - name: Prepare Chromium and run browser regressions
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const path = require('node:path');
+          const chromium = require('@sparticuz/chromium');
+          const entry = require.resolve('@sparticuz/chromium');
+          const { inflate } = require(path.join(path.dirname(entry), 'lambdafs.cjs'));
+          (async () => {
+            await chromium.executablePath();
+            await inflate(path.resolve(path.dirname(entry), '../../bin/al2023.tar.br'));
+          })().catch((error) => {
+            console.error(error);
+            process.exitCode = 1;
+          });
+          NODE
+          CHROME=/tmp/chromium
+          test -x "$CHROME"
+          set +e
+          LD_LIBRARY_PATH="/tmp/al2023/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+            BT_CHROMIUM_PATH="$CHROME" node --test --test-concurrency=1 tests/*browser*.test.js > /tmp/browser-tests.tap 2>&1
+          test_status=$?
+          set -e
+          cat /tmp/browser-tests.tap
+          if [ "$test_status" -ne 0 ]; then
+            while IFS= read -r line; do
+              case "$line" in
+                "not ok "*|"  location: "*|"  error: "*|"  name: "*|"  code: "*)
+                  printf '::error title=Browser regression diagnostic::%s\n' "$line"
+                  ;;
+              esac
+            done < /tmp/browser-tests.tap
+          fi
+          exit "$test_status"
+  windows-installer:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+      - run: node --test tests/windows-installer.test.js tests/release-version.test.js
+      - name: Parse installer with Windows PowerShell
+        shell: powershell
+        run: |
+          $tokens = $null
+          $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD 'windows-installer/Install-BabolToyor.ps1'), [ref]$tokens, [ref]$errors)
+          if ($errors.Count) { $errors | Format-List; exit 1 }

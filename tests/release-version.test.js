@@ -1,0 +1,40 @@
+'use strict';
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = path.join(__dirname, '..');
+const read = p => fs.readFileSync(path.join(root,p),'utf8');
+test('public release version, installer, UI and release notes stay in sync', () => {
+  const version = read('RELEASE_VERSION.txt').trim();
+  assert.match(version, /^\d+\.\d+\.\d+$/);
+  assert.ok(fs.existsSync(path.join(root,`RELEASE-${version}-fa.md`)));
+  const installer = read('windows-installer/Install-BabolToyor.ps1');
+  const appZipUrl = installer.match(/\[string\]\$AppZipUrl = '([^']+)'/);
+  assert.ok(appZipUrl, 'installer must define AppZipUrl');
+  assert.match(appZipUrl[1], /^https:\/\/drive\.google\.com\/uc\?export=download&id=[A-Za-z0-9_-]+$/);
+  assert.ok(read('docs/deployment-windows-server-2025.md').includes(appZipUrl[1]), 'deployment guide must use the installer bootstrap URL');
+  assert.ok(read(`RELEASE-${version}-fa.md`).includes(appZipUrl[1]), 'release notes must use the installer bootstrap URL');
+  assert.equal(read('VERSION.txt').trim(), '37.6.0');
+  assert.equal(JSON.parse(read('package.json')).version, '37.6.0');
+  assert.ok(installer.includes(`Babol Toyor ${version} - Windows Server`));
+  assert.ok(read('public/index.html').includes(`id="releaseVersion" dir="ltr">${version}</span>`));
+  assert.ok(read('CHANGELOG.md').includes(`نسخهٔ انتشار ${version}`));
+  assert.ok(read('README.md').includes(`RELEASE-${version}-fa.md`));
+  const setupCmd = read('windows-installer/BabolToyor-Setup.cmd');
+  assert.ok(setupCmd.includes(`title Babol Toyor ${version} Setup - Windows Server 2025`));
+  const releaseNote=read(`RELEASE-${version}-fa.md`);
+  const folder=releaseNote.match(/https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+/)?.[0];
+  assert.ok(folder,'release note must identify its public Drive folder');
+  assert.ok(read('README.md').includes(folder));
+  for (const guide of ['windows-installer/INSTALL-STEPS-fa.md', 'windows-installer/INSTALL-STEPS-fa.html']) {
+    const content = read(guide);
+    assert.ok(content.includes(folder));
+    assert.ok(content.includes(`BabolToyor-Windows-Setup-${version}.zip`));
+    assert.ok(content.includes(`BabolToyor-Setup-${version}.cmd`));
+    assert.ok(!content.includes('github.com/baboltoyoorbazargani-pixel/baboltoyoor/releases/download/v'+version));
+    assert.ok(!content.includes('drive.google.com/drive/folders/1CPBXD_q7BbJNaR8uWk21VpP66MYgh8na'));
+    assert.ok(!content.includes('1.0.86'));
+    assert.ok(!content.includes('v37.43.0'));
+  }
+});

@@ -1,0 +1,2060 @@
+/* ====================================================================
+   بابل طیور — لایهٔ یکپارچه‌ساز طراحی v37.3 «Babol Ops»
+   --------------------------------------------------------------------
+   این فایل آخرین stylesheet است و مرجع نهایی ظاهر سامانه است.
+   هدف: یک زبان طراحی واحد روی لایه‌های قبلی (styles → design → mobile)
+   بدون تغییر در گردش‌کار، شناسه‌ها یا data-actionها.
+
+   فهرست:
+     ۰) توکن‌ها (رنگ، فاصله، شعاع، سایه، تایپوگرافی)
+     ۱) پایه
+     ۲) ستون ناوبری (rail)
+     ۳) هدر صفحه
+     ۴) کارت‌ها و سربرگ کارت
+     ۵) تب‌ها (یک الگو برای همهٔ کارتابل‌ها)
+     ۶) دکمه‌ها، ورودی‌ها، نشان‌ها
+     ۷) داشبورد
+     ۸) فهرست‌های مدیریتی (کاربران، محصولات، تاریخچه، رانندگان)
+     ۹) حالت خالی، اعلان کوچک (toast)، مودال
+    ۱۰) واکنش‌گرایی (تبلت و موبایل)
+   ==================================================================== */
+
+/* ---------- ۰) توکن‌ها ---------- */
+:root{
+  --bt-brand:#b40f23;
+  --bt-brand-600:#9d0c1e;
+  --bt-brand-700:#7d0918;
+  --bt-brand-50:#fdf2f3;
+  --bt-brand-100:#fbe3e6;
+  --bt-brand-200:#f5c3ca;
+
+  --bt-ink:#171b22;
+  --bt-ink-2:#343c48;
+  --bt-muted:#69717e;
+  --bt-muted-2:#9aa1ac;
+  --bt-line:#e6e8ec;
+  --bt-line-2:#d7dbe2;
+  --bt-bg:#f4f5f7;
+  --bt-panel:#ffffff;
+  --bt-panel-2:#f9fafb;
+  --bt-soft:#eef0f3;
+
+  --bt-green:#0f7a4e;  --bt-green-bg:#e8f6ef;
+  --bt-blue:#2457a6;   --bt-blue-bg:#edf3fd;
+  --bt-amber:#975f00;  --bt-amber-bg:#fff4dc;
+  --bt-purple:#6b3fbf; --bt-purple-bg:#f3eefc;
+  --bt-red:#b4232d;    --bt-red-bg:#fdeef0;
+
+  --bt-rail-bg:#171a21;
+  --bt-rail-bg-2:#1e222b;
+  --bt-rail-text:#a9b0bc;
+  --bt-rail-w:240px;
+
+  --bt-r-sm:8px;
+  --bt-r:12px;
+  --bt-r-lg:16px;
+
+  --bt-sh-xs:0 1px 2px rgba(16,24,40,.05);
+  --bt-sh-sm:0 1px 3px rgba(16,24,40,.07),0 1px 2px rgba(16,24,40,.04);
+  --bt-sh-md:0 8px 24px rgba(16,24,40,.08);
+  --bt-sh-lg:0 24px 60px rgba(16,24,40,.18);
+  --bt-ring:0 0 0 3px rgba(180,15,35,.14);
+
+  --bt-fs-xs:11.5px;
+  --bt-fs-sm:12.5px;
+  --bt-fs:14px;
+  --bt-fs-md:15.5px;
+  --bt-fs-lg:17px;
+  --bt-fs-xl:21px;
+  --bt-fs-2xl:26px;
+
+  /* هم‌ترازی متغیرهای لایه‌های قبلی با توکن‌های جدید */
+  --brand:var(--bt-brand); --brand-dark:var(--bt-brand-600); --brand-deep:var(--bt-brand-700);
+  --brand-050:var(--bt-brand-50); --brand-100:var(--bt-brand-100); --brand-200:var(--bt-brand-200);
+  --ink:var(--bt-ink); --ink-2:var(--bt-ink-2); --muted:var(--bt-muted); --muted-2:var(--bt-muted-2);
+  --bg:var(--bt-bg); --panel:var(--bt-panel); --panel-2:var(--bt-panel-2);
+  --line:var(--bt-line); --line-strong:var(--bt-line-2);
+  --r-sm:var(--bt-r-sm); --r:var(--bt-r); --r-md:var(--bt-r); --r-lg:var(--bt-r-lg); --r-xl:var(--bt-r-lg);
+  --rail:var(--bt-rail-w);
+  --font:"B Yekan","B Yekan+","BYekan","Vazirmatn",Tahoma,Arial,sans-serif;
+}
+
+/* ---------- ۱) پایه ---------- */
+body{background:var(--bt-bg)!important;color:var(--bt-ink);font-size:var(--bt-fs);line-height:1.75}
+#appView h1,#appView h2,#appView h3{color:var(--bt-ink);letter-spacing:0}
+#appView ::-webkit-scrollbar{width:10px;height:8px}
+#appView ::-webkit-scrollbar-thumb{background:#cfd4dc;border-radius:999px;border:2px solid transparent;background-clip:padding-box}
+#appView ::-webkit-scrollbar-track{background:transparent}
+:focus-visible{outline:none}
+#appView button:focus-visible,#appView a:focus-visible,#appView [tabindex]:focus-visible{box-shadow:var(--bt-ring)!important}
+
+/* ---------- ۲) ستون ناوبری ---------- */
+#appView .rail{
+  width:var(--bt-rail-w)!important;
+  background:linear-gradient(180deg,var(--bt-rail-bg-2) 0%,var(--bt-rail-bg) 100%)!important;
+  color:#fff;
+  border-radius:0!important;
+  box-shadow:none!important;
+  border-left:1px solid rgba(255,255,255,.04);
+  display:flex!important;flex-direction:column!important;
+  height:100vh!important;height:100dvh!important;
+  overflow:hidden!important;
+  padding:18px 14px 14px!important;
+}
+#appView .rail::before{
+  /* هالهٔ قرمز ملایم پشت لوگو — امضای بصری برند */
+  content:"";position:absolute;inset:-120px -80px auto auto;width:320px;height:260px;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(180,15,35,.38),rgba(180,15,35,0));
+}
+#appView .rail-top{position:relative;display:flex!important;align-items:center;gap:12px;padding:2px 6px 18px!important;margin:0 0 10px!important;border-bottom:1px solid rgba(255,255,255,.07)!important;flex:0 0 auto}
+#appView .rail-logo{width:46px!important;height:46px!important;min-width:46px;border-radius:14px!important;background:#fff!important;padding:4px!important;box-shadow:0 6px 18px rgba(0,0,0,.28)!important;display:grid;place-items:center;overflow:hidden}
+#appView .rail-logo img{width:100%;height:100%;object-fit:contain}
+#appView .rail-brand strong{font-size:var(--bt-fs-lg)!important;font-weight:900;color:#fff!important;line-height:1.3}
+#appView .rail-brand span{display:none!important}
+
+#appView #railNav{
+  position:relative;
+  display:flex!important;flex-direction:column!important;gap:2px!important;
+  flex:1 1 auto!important;min-height:0!important;
+  overflow-y:auto!important;overflow-x:hidden!important;
+  padding:2px 0!important;margin:0!important;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent;
+}
+#appView #railNav > button{
+  position:relative!important;
+  display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;
+  width:100%!important;min-height:44px!important;height:auto!important;
+  padding:0 14px!important;margin:0!important;
+  border:0!important;border-radius:10px!important;
+  background:transparent!important;color:var(--bt-rail-text)!important;
+  font-size:var(--bt-fs)!important;font-weight:700!important;
+  box-shadow:none!important;transform:none!important;
+  transition:background .15s ease,color .15s ease;
+}
+#appView #railNav > button:hover{background:rgba(255,255,255,.06)!important;color:#fff!important}
+#appView #railNav > button.active,
+#appView #railNav > button[aria-current="page"]{background:rgba(255,255,255,.09)!important;color:#fff!important;font-weight:800!important}
+#appView #railNav > button.active::before{
+  content:"";position:absolute;right:0;top:10px;bottom:10px;width:3px;border-radius:3px 0 0 3px;background:var(--bt-brand);
+  box-shadow:0 0 12px rgba(230,40,60,.55);
+}
+#appView #railNav .nav-icon{width:22px!important;min-width:22px!important;height:22px!important;display:grid!important;place-items:center!important;color:inherit!important;background:none!important;border-radius:0!important}
+#appView #railNav > button.active .nav-icon{color:#ff6b7a!important}
+#appView #railNav .nav-icon .svg{width:20px!important;height:20px!important;stroke-width:1.8!important}
+#appView #railNav .nav-label{font-size:inherit!important;line-height:1.4!important;white-space:nowrap!important}
+#appView #railNav .nav-count,#appView #railNav .tab-count,#appView #railNav b{margin-inline-start:auto}
+
+/* ---------- ۳) هدر صفحه ---------- */
+#appView .workspace{margin-right:var(--bt-rail-w)!important;padding:0 28px!important;min-height:100vh}
+#appView .workspace-header{
+  position:sticky!important;top:0!important;z-index:40!important;
+  margin:0 -28px!important;padding:14px 28px!important;min-height:74px;width:auto!important;max-width:none!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:16px!important;
+  background:rgba(255,255,255,.88)!important;backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);
+  border-bottom:1px solid var(--bt-line)!important;box-shadow:none!important;border-radius:0!important;
+}
+#appView .header-kicker{display:none!important}
+#appView .header-main{min-width:0}
+#appView .header-main h1{font-size:var(--bt-fs-xl)!important;font-weight:900!important;line-height:1.35!important;margin:0!important;color:var(--bt-ink)!important}
+#appView .header-main p{font-size:var(--bt-fs-sm)!important;color:var(--bt-muted)!important;margin:2px 0 0!important;line-height:1.6!important}
+#appView .header-actions{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:nowrap!important}
+#appView .header-actions > *{flex:0 0 auto}
+/* ترتیب منطقی از راست به چپ: تاریخ ← اعلان‌ها ← حساب کاربری */
+#appView .header-date{order:1}
+#appView .notification-btn{order:2}
+#appView .header-profile{order:3}
+
+#appView .header-date{
+  display:flex!important;align-items:center!important;gap:8px!important;height:40px;padding:0 14px!important;
+  border:1px solid var(--bt-line)!important;border-radius:10px!important;background:var(--bt-panel)!important;box-shadow:none!important;min-height:0!important
+}
+#appView .header-date span{font-size:var(--bt-fs-xs)!important;color:var(--bt-muted)!important;font-weight:700}
+#appView .header-date span::after{content:"";display:inline-block;width:1px;height:14px;background:var(--bt-line-2);margin-inline-start:8px;vertical-align:middle}
+#appView .header-date strong{font-size:var(--bt-fs-sm)!important;font-weight:800!important;color:var(--bt-ink)!important;white-space:nowrap}
+
+#appView .icon-btn,#appView .notification-btn{
+  width:40px!important;height:40px!important;min-width:40px;min-height:40px!important;padding:0!important;
+  display:grid!important;place-items:center!important;position:relative;
+  border:1px solid var(--bt-line)!important;border-radius:10px!important;background:var(--bt-panel)!important;color:var(--bt-ink-2)!important;box-shadow:none!important
+}
+#appView .icon-btn:hover,#appView .notification-btn:hover{background:var(--bt-panel-2)!important;border-color:var(--bt-line-2)!important;color:var(--bt-brand)!important}
+#appView .notification-btn .notification-label{display:none!important}
+#appView .notification-btn .bell-icon .svg{width:19px;height:19px}
+#appView #bellCount{position:absolute!important;top:-6px!important;left:-6px!important;right:auto!important;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--bt-brand)!important;color:#fff!important;font-size:11px!important;font-weight:900;display:grid;place-items:center;border:2px solid #fff;line-height:1}
+#appView #bellCount.hidden{display:none!important}
+
+#appView .header-profile{
+  display:flex!important;align-items:center!important;gap:10px!important;height:48px;padding:4px 6px 4px 6px!important;
+  border:1px solid var(--bt-line)!important;border-radius:12px!important;background:var(--bt-panel)!important;box-shadow:none!important
+}
+#appView .header-avatar{width:36px!important;height:36px!important;min-width:36px;border-radius:10px!important;background:linear-gradient(135deg,var(--bt-brand),var(--bt-brand-700))!important;color:#fff!important;display:grid!important;place-items:center!important;font-weight:900!important;font-size:15px!important}
+#appView .header-profile-text{display:flex!important;flex-direction:column;line-height:1.35;min-width:0;padding-inline-end:4px}
+#appView .header-profile-text strong{font-size:var(--bt-fs-sm)!important;font-weight:800;color:var(--bt-ink)!important;white-space:nowrap}
+#appView .header-profile-text span{font-size:var(--bt-fs-xs)!important;color:var(--bt-muted)!important;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+#appView .header-profile .header-pass{width:34px!important;height:34px!important;min-width:34px;min-height:34px!important;border-radius:9px!important;border-color:transparent!important;background:var(--bt-soft)!important}
+#appView .header-profile .header-pass:hover{background:var(--bt-brand-50)!important}
+#appView .header-profile .header-logout{height:34px!important;min-height:34px!important;padding:0 12px!important;border-radius:9px!important;gap:6px!important;font-size:var(--bt-fs-sm)!important}
+#appView .header-status{display:none!important}
+
+#appView .content{padding:24px 0 48px!important;max-width:1480px;margin:0 auto}
+
+/* ---------- ۴) کارت‌ها ---------- */
+#appView .sd-panel,#appView .card,#appView .panel,#appView .adm-panel{
+  background:var(--bt-panel)!important;border:1px solid var(--bt-line)!important;border-radius:var(--bt-r-lg)!important;box-shadow:var(--bt-sh-xs)!important
+}
+#appView .sd-head{padding:18px 20px!important;gap:14px!important;border-bottom:1px solid var(--bt-line)!important;align-items:center!important}
+#appView .sd-head-main{gap:14px!important;align-items:center!important;min-width:0}
+#appView .sd-head-ico{width:40px!important;height:40px!important;min-width:40px;border-radius:12px!important;background:var(--bt-brand-50)!important;color:var(--bt-brand)!important;display:grid!important;place-items:center!important;box-shadow:none!important;border:0!important}
+#appView .sd-head-ico .svg{width:19px!important;height:19px!important}
+#appView .sd-head h2,#appView .sd-panel h2{font-size:var(--bt-fs-md)!important;font-weight:900!important;line-height:1.5!important;margin:0!important}
+#appView .sd-head p,#appView .sd-pad > p{font-size:var(--bt-fs-sm)!important;color:var(--bt-muted)!important;line-height:1.7!important;margin:2px 0 0!important}
+#appView .sd-pad{padding:18px 20px!important}
+
+/* شمارندهٔ کنار عنوان کارت: یک قرص فشرده به‌جای جعبهٔ بزرگ */
+#appView .sd-count{
+  display:inline-flex!important;flex-direction:row!important;align-items:baseline!important;gap:6px!important;
+  min-width:0!important;width:auto!important;height:auto!important;padding:6px 12px!important;
+  border:1px solid var(--bt-line)!important;border-radius:999px!important;background:var(--bt-panel-2)!important;box-shadow:none!important;flex:0 0 auto
+}
+#appView .sd-count strong{font-size:var(--bt-fs-md)!important;line-height:1!important;color:var(--bt-brand)!important;font-weight:900}
+#appView .sd-count span{font-size:var(--bt-fs-xs)!important;color:var(--bt-muted)!important;line-height:1!important}
+
+/* یادداشت زنده */
+#appView .sd-live-note{border-radius:10px!important;font-size:var(--bt-fs-sm)!important;padding:8px 12px!important;background:var(--bt-green-bg)!important;color:var(--bt-green)!important;border:1px solid #cdebdc!important}
+
+/* کارت مسیر سفارش: بدون نوار رنگی کناری ناهماهنگ */
+#appView .sd-flow-card{border-right:1px solid var(--bt-line)!important;border-left:1px solid var(--bt-line)!important}
+#appView .sd-flow-card::before,#appView .sd-flow-card::after{display:none!important}
+
+/* ---------- ۵) تب‌ها: یک الگو برای همهٔ کارتابل‌ها ---------- */
+#appView .sd-tabs,#appView .wh38-tabs,#appView .v26-sales-tabs,#appView .v33-wh-tabs{
+  display:flex!important;flex-wrap:nowrap!important;gap:4px!important;
+  grid-template-columns:none!important;
+  padding:4px!important;margin:0 0 20px!important;
+  background:var(--bt-soft)!important;border:1px solid var(--bt-line)!important;border-radius:14px!important;box-shadow:none!important;
+  overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none;
+  scroll-snap-type:x proximity;
+}
+#appView .sd-tabs::-webkit-scrollbar,#appView .wh38-tabs::-webkit-scrollbar,#appView .v26-sales-tabs::-webkit-scrollbar{display:none}
+#appView .sd-tab,#appView .wh38-tab,#appView .v26-sales-tab{
+  flex:1 0 auto!important;min-width:max-content!important;max-width:none!important;width:auto!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;
+  min-height:52px!important;height:auto!important;padding:8px 16px!important;margin:0!important;
+  border:0!important;border-radius:10px!important;background:transparent!important;color:var(--bt-muted)!important;
+  box-shadow:none!important;transform:none!important;text-align:right!important;
+  scroll-snap-align:center;position:relative;
+}
+#appView .sd-tab:hover,#appView .wh38-tab:hover,#appView .v26-sales-tab:hover{background:rgba(255,255,255,.6)!important;color:var(--bt-ink-2)!important}
+#appView .sd-tab.active,#appView .wh38-tab.active,#appView .v26-sales-tab.active{background:var(--bt-panel)!important;color:var(--bt-ink)!important;box-shadow:var(--bt-sh-sm)!important;outline:0!important;border:0!important}
+/* شماره‌های «۰۱، ۰۲…» اطلاعات تازه‌ای نمی‌دهند و عرض تب را هدر می‌دهند */
+#appView .sd-tab-index,#appView .wh38-tab-idx,#appView .v26-tab-index,#appView .v33-wh-tab-index{display:none!important}
+#appView .sd-tab-ico,#appView .wh38-tab > span:not(.wh38-tab-idx),#appView .v26-tab-icon{
+  width:32px!important;height:32px!important;min-width:32px!important;border-radius:9px!important;display:grid!important;place-items:center!important;
+  background:rgba(255,255,255,.7)!important;color:inherit!important;border:0!important;box-shadow:none!important
+}
+#appView .sd-tab.active .sd-tab-ico,#appView .wh38-tab.active > span:not(.wh38-tab-idx),#appView .v26-sales-tab.active .v26-tab-icon{background:var(--bt-brand-50)!important;color:var(--bt-brand)!important}
+#appView .sd-tab-ico .svg,#appView .wh38-tab .svg{width:17px!important;height:17px!important}
+#appView .sd-tab-copy,#appView .wh38-tab > div,#appView .v26-tab-copy{display:flex!important;flex-direction:column!important;min-width:0!important;line-height:1.35!important;overflow:visible!important}
+#appView .sd-tab-copy strong,#appView .wh38-tab > div b,#appView .v26-tab-copy strong{
+  font-size:13.5px!important;font-weight:800!important;color:inherit!important;
+  white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important
+}
+#appView .sd-tab-copy small,#appView .wh38-tab > div small,#appView .v26-tab-copy small{
+  font-size:var(--bt-fs-xs)!important;font-weight:500!important;color:var(--bt-muted)!important;
+  white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important
+}
+#appView .sd-tab-count,#appView .wh38-tab > em,#appView .v26-tab-count{
+  min-width:22px!important;height:22px!important;padding:0 7px!important;border-radius:999px!important;
+  background:var(--bt-brand)!important;color:#fff!important;font-size:11.5px!important;font-style:normal!important;font-weight:900!important;
+  display:none!important;place-items:center!important;line-height:1!important;position:static!important;margin:0!important;box-shadow:none!important
+}
+#appView .sd-tab-count.show,#appView .v26-tab-count.show{display:inline-grid!important}
+#appView .wh38-tab > em:not(:empty){display:inline-grid!important}
+#appView .wh38-tab > em.is-zero,#appView .sd-tab-count.is-zero,#appView .v26-tab-count.is-zero{display:none!important}
+#appView .wh38-tab:not(.active) > em{background:var(--bt-line-2)!important;color:var(--bt-ink-2)!important}
+
+/* ---------- ۶) دکمه‌ها، ورودی‌ها، نشان‌ها ---------- */
+#appView .btn,#modal .btn{min-height:40px;height:auto;border-radius:10px!important;padding:0 16px;font-size:var(--bt-fs)!important;font-weight:800!important;gap:7px!important;transform:none!important;line-height:1.2}
+#appView .btn-sm,#modal .btn-sm{min-height:32px!important;padding:0 12px!important;font-size:var(--bt-fs-sm)!important;border-radius:8px!important}
+#appView .btn-lg,#modal .btn-lg{min-height:48px!important;padding:0 22px!important;font-size:var(--bt-fs-md)!important}
+#appView .btn-primary,#modal .btn-primary{background:var(--bt-brand)!important;border-color:var(--bt-brand)!important;color:#fff!important;box-shadow:0 1px 2px rgba(125,9,24,.25)!important}
+#appView .btn-primary:hover,#modal .btn-primary:hover{background:var(--bt-brand-600)!important;border-color:var(--bt-brand-600)!important}
+#appView .btn-secondary,#modal .btn-secondary{background:var(--bt-panel)!important;border:1px solid var(--bt-line-2)!important;color:var(--bt-ink-2)!important;box-shadow:var(--bt-sh-xs)!important}
+#appView .btn-secondary:hover,#modal .btn-secondary:hover{background:var(--bt-panel-2)!important;border-color:#c5cbd4!important;color:var(--bt-ink)!important}
+#appView .btn-ghost{background:transparent!important;border:1px solid transparent!important;color:var(--bt-muted)!important;box-shadow:none!important}
+#appView .btn-ghost:hover{background:var(--bt-soft)!important;color:var(--bt-ink)!important}
+
+#appView .input-shell,#modal .input-shell{min-height:44px!important;border-radius:10px!important;border:1px solid var(--bt-line-2)!important;background:var(--bt-panel)!important;box-shadow:none!important}
+#appView .input-shell:focus-within,#modal .input-shell:focus-within{border-color:var(--bt-brand)!important;box-shadow:var(--bt-ring)!important}
+#appView .field > label,#modal .field > label,#appView .cust-field > span,#modal .cust-field > span{font-size:13px!important;font-weight:800!important;color:var(--bt-ink-2)!important}
+#appView select,#appView .adm-select{border-radius:10px}
+
+/* ورودی تاریخ شمسی که جایگزین تقویم میلادی مرورگر شد */
+#appView .ui-jdate{height:40px;min-width:120px;padding:0 12px 0 34px;border:1px solid var(--bt-line-2);border-radius:10px;background:var(--bt-panel) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2369717e' stroke-width='1.8' stroke-linecap='round'%3E%3Crect x='4' y='5' width='16' height='15' rx='2'/%3E%3Cpath d='M8 3v4M16 3v4M4 10h16'/%3E%3C/svg%3E") no-repeat left 10px center;font:inherit;font-size:var(--bt-fs);color:var(--bt-ink);text-align:right;cursor:pointer}
+#appView .ui-jdate:focus{border-color:var(--bt-brand);box-shadow:var(--bt-ring);outline:0}
+#appView .ui-jdate.invalid{border-color:var(--bt-red);background-color:var(--bt-red-bg)}
+#appView .adm-date{display:inline-flex!important;align-items:center!important;gap:8px!important}
+
+/* نشان‌ها: یک اندازه، یک شکل */
+#appView .badge,#modal .badge{
+  display:inline-flex!important;align-items:center!important;justify-content:center;gap:5px;
+  min-height:24px!important;height:auto!important;padding:2px 10px!important;border-radius:999px!important;
+  font-size:var(--bt-fs-xs)!important;font-weight:800!important;line-height:1.5!important;
+  white-space:nowrap!important;max-width:100%;border:1px solid transparent!important;box-shadow:none!important
+}
+#appView .badge.green{background:var(--bt-green-bg)!important;color:var(--bt-green)!important;border-color:#cdebdc!important}
+#appView .badge.blue{background:var(--bt-blue-bg)!important;color:var(--bt-blue)!important;border-color:#d4e2fa!important}
+#appView .badge.orange,#appView .badge.amber,#appView .badge.yellow{background:var(--bt-amber-bg)!important;color:var(--bt-amber)!important;border-color:#f1dfb0!important}
+#appView .badge.red,#appView .badge.danger{background:var(--bt-red-bg)!important;color:var(--bt-red)!important;border-color:#f5ccd2!important}
+#appView .badge.purple{background:var(--bt-purple-bg)!important;color:var(--bt-purple)!important;border-color:#e2d6f7!important}
+#appView .badge.gray{background:var(--bt-soft)!important;color:var(--bt-ink-2)!important;border-color:var(--bt-line)!important}
+
+/* کلید «بدون وسیله» در فرم نگهبانی: قرص یک‌خطی */
+#appView .gt-switch{display:inline-flex!important;align-items:center!important;gap:8px!important;white-space:nowrap!important;height:36px!important;min-height:36px!important;width:auto!important;padding:0 14px!important;border:1px solid var(--bt-line-2)!important;border-radius:999px!important;background:var(--bt-panel)!important;font-size:var(--bt-fs-sm)!important;font-weight:800!important;color:var(--bt-ink-2)!important;cursor:pointer;flex:0 0 auto;aspect-ratio:auto!important}
+#appView .gt-switch input{width:16px!important;height:16px!important;margin:0!important;accent-color:var(--bt-brand)}
+
+/* ---------- ۷) داشبورد ---------- */
+/* تاریخ در هدر هست؛ تکرار آن در بنر داشبورد حذف می‌شود */
+#appView .db38-date{display:none!important}
+#appView .db38-hero{
+  position:relative;overflow:hidden;
+  border:1px solid var(--bt-line)!important;border-radius:var(--bt-r-lg)!important;box-shadow:var(--bt-sh-xs)!important;
+  background:
+    radial-gradient(600px 180px at 100% 0%,rgba(180,15,35,.07),transparent 70%),
+    var(--bt-panel)!important;
+  padding:20px 22px!important;margin-bottom:18px!important;align-items:center!important
+}
+#appView .db38-hero h2{font-size:var(--bt-fs-lg)!important;font-weight:900!important;margin:0!important}
+#appView .db38-hero p{font-size:var(--bt-fs-sm)!important;color:var(--bt-muted)!important;margin:2px 0 0!important}
+#appView .db38-logo{width:44px!important;height:44px!important;border-radius:12px!important;background:var(--bt-brand)!important;color:#fff!important;box-shadow:0 6px 16px rgba(180,15,35,.25)!important}
+
+#appView .mg38-kpis{gap:14px!important;margin-bottom:18px!important}
+#appView .mg38-kpi{
+  border:1px solid var(--bt-line)!important;border-top:1px solid var(--bt-line)!important;border-radius:var(--bt-r-lg)!important;
+  background:var(--bt-panel)!important;box-shadow:var(--bt-sh-xs)!important;padding:16px!important;gap:14px!important;
+  align-items:flex-start!important;position:relative
+}
+#appView .mg38-kpi::before,#appView .mg38-kpi::after{display:none!important}
+#appView .mg38-ico{width:40px!important;height:40px!important;min-width:40px;border-radius:12px!important;display:grid!important;place-items:center!important}
+#appView .mg38-kpi.t-red .mg38-ico{background:var(--bt-brand-50)!important;color:var(--bt-brand)!important}
+#appView .mg38-kpi.t-blue .mg38-ico{background:var(--bt-blue-bg)!important;color:var(--bt-blue)!important}
+#appView .mg38-kpi.t-orange .mg38-ico{background:var(--bt-amber-bg)!important;color:var(--bt-amber)!important}
+#appView .mg38-kpi.t-green .mg38-ico{background:var(--bt-green-bg)!important;color:var(--bt-green)!important}
+#appView .mg38-kpi.t-purple .mg38-ico{background:var(--bt-purple-bg)!important;color:var(--bt-purple)!important}
+#appView .mg38-lbl{font-size:var(--bt-fs-sm)!important;font-weight:800!important;color:var(--bt-ink-2)!important}
+#appView .mg38-val{font-size:var(--bt-fs-2xl)!important;font-weight:900!important;line-height:1.2!important;color:var(--bt-ink)!important;margin:4px 0 2px!important;display:block}
+#appView .mg38-copy small{font-size:var(--bt-fs-xs)!important;color:var(--bt-muted)!important}
+
+#appView .db38-grid{gap:18px!important;margin-top:0!important}
+#appView .db38-flow{align-items:flex-start!important}
+#appView .db38-flow-item{align-items:start!important;justify-items:center!important;text-align:center}
+#appView .db38-flow-item > div{min-height:52px}
+#appView .db38-fno{background:var(--bt-brand-50)!important;color:var(--bt-brand)!important;border:1px solid var(--bt-brand-100)!important;font-weight:900!important}
+#appView .db38-fico{border:1px solid var(--bt-line)!important;background:var(--bt-panel-2)!important;border-radius:12px!important;box-shadow:none!important}
+
+/* ---------- ۸) فهرست‌های مدیریتی ---------- */
+#appView .adm-toolbar{padding:16px 20px!important;gap:10px!important;border-bottom:1px solid var(--bt-line);margin:0!important}
+#appView .adm-toolbar .input-shell{flex:1 1 auto}
+/* فهرست به‌صورت یک جدول واحد با خط جداکننده، به‌جای ده‌ها کارت جدا */
+#appView .adm-list{display:block!important;padding:0!important;gap:0!important}
+#appView .adm-list > .adm-row{
+  margin:0!important;border:0!important;border-bottom:1px solid var(--bt-line)!important;border-radius:0!important;
+  box-shadow:none!important;background:transparent!important;padding:12px 20px!important;min-height:0!important;
+  align-items:center!important;column-gap:18px!important
+}
+#appView .adm-list > .adm-row:last-child{border-bottom:0!important}
+#appView .adm-list > .adm-row:hover{background:var(--bt-panel-2)!important}
+#appView .adm-cell{gap:1px!important;min-width:0}
+#appView .adm-cell > small{font-size:11px!important;color:var(--bt-muted-2)!important;font-weight:600!important;line-height:1.5}
+#appView .adm-cell > b{font-size:var(--bt-fs)!important;font-weight:800!important;color:var(--bt-ink)!important;line-height:1.55}
+#appView .adm-cell > span{font-size:var(--bt-fs-xs)!important;color:var(--bt-muted)!important}
+#appView .adm-cell .adm-code{font-family:ui-monospace,Consolas,monospace;font-size:10.5px!important;color:var(--bt-muted-2)!important;letter-spacing:.2px}
+#appView .adm-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:6px!important;flex-wrap:wrap}
+#appView .cust-code{display:inline-grid!important;place-items:center;min-width:38px;height:28px;padding:0 8px!important;border-radius:8px!important;background:var(--bt-brand-50)!important;color:var(--bt-brand)!important;border:1px solid var(--bt-brand-100)!important;font-size:13px!important;font-weight:900!important;font-family:ui-monospace,Consolas,monospace}
+
+/* محصولات: ستون‌های ثابت تا قیمت‌ها و دکمه‌ها زیر هم تراز شوند */
+@media (min-width:1025px){
+  #appView .adm-row-prod{display:grid!important;grid-template-columns:76px minmax(220px,1fr) minmax(260px,320px) auto!important}
+  #appView .adm-row-prod .adm-cell:first-child > small,
+  #appView .adm-row-prod .adm-cell:nth-child(2) > small{display:none!important}
+}
+#appView .adm-price{display:flex!important;gap:6px!important;align-items:center!important}
+#appView .adm-price input{height:36px!important;min-height:36px!important;border:1px solid var(--bt-line-2)!important;border-radius:8px!important;padding:0 10px!important;font:inherit;font-size:var(--bt-fs)!important;flex:1 1 auto;min-width:0;background:var(--bt-panel)!important}
+#appView .adm-price input:focus{border-color:var(--bt-brand)!important;box-shadow:var(--bt-ring)!important;outline:0}
+
+/* تاریخچه فعالیت‌ها (details/summary) */
+#appView .adm-act > summary{list-style:none;cursor:pointer;align-items:center!important}
+@media (min-width:1025px){
+  #appView .adm-act > summary{display:grid!important;grid-template-columns:minmax(150px,1fr) minmax(150px,1fr) minmax(200px,1.5fr) minmax(130px,1fr)!important;grid-template-rows:auto!important;column-gap:18px!important}
+}
+#appView .adm-toolbar{flex-wrap:wrap!important;align-items:center!important}
+#appView .adm-toolbar .adm-select{min-width:150px;height:42px;padding:0 12px;border:1px solid var(--bt-line-2);background:var(--bt-panel);font:inherit;font-size:var(--bt-fs);color:var(--bt-ink)}
+#appView .adm-toolbar .adm-search{flex:1 1 220px!important;min-width:200px}
+#appView .adm-count{padding:10px 20px!important;font-size:var(--bt-fs-sm)!important;color:var(--bt-muted)!important;border-bottom:1px solid var(--bt-line);background:var(--bt-panel-2)}
+#appView .adm-act > summary::-webkit-details-marker{display:none}
+#appView .adm-act[open]{background:var(--bt-panel-2)!important}
+#appView .adm-detail{border-top:1px dashed var(--bt-line-2)!important;margin-top:10px!important;padding-top:10px!important}
+#appView .adm-detail pre,#appView .adm-detail code{font-size:11.5px!important;background:var(--bt-soft)!important;border-radius:8px!important;padding:6px 8px!important}
+
+/* ---------- ۹) حالت خالی، toast، مودال ---------- */
+#appView .sd-empty{padding:40px 20px!important;gap:6px!important;border:0!important;background:transparent!important}
+#appView .sd-empty > div:first-child{width:56px!important;height:56px!important;border-radius:50%!important;border:0!important;background:var(--bt-soft)!important;color:var(--bt-muted)!important;display:grid!important;place-items:center!important;margin:0 auto 8px!important}
+#appView .sd-empty strong{font-size:var(--bt-fs-md)!important;font-weight:900!important;color:var(--bt-ink)!important}
+#appView .sd-empty span{font-size:var(--bt-fs-sm)!important;color:var(--bt-muted)!important}
+
+.toast{border-radius:12px!important;background:var(--bt-ink)!important;color:#fff!important;box-shadow:var(--bt-sh-lg)!important;font-size:var(--bt-fs)!important;font-weight:700!important;padding:12px 18px!important}
+
+#modal .modal-card{border-radius:18px!important;border:1px solid var(--bt-line)!important;box-shadow:var(--bt-sh-lg)!important}
+#modal .modal-head,#modal .modal-header{border-bottom:1px solid var(--bt-line)!important}
+
+.jalali-calendar-popover{border-radius:14px!important;border:1px solid var(--bt-line)!important;box-shadow:var(--bt-sh-lg)!important}
+
+/* برچسب‌های انگلیسی تزئینی (ORDER LINES، REMOTE ORDERS، …) در رابط فارسی ناهماهنگ‌اند */
+#appView .eyebrow,#modal .eyebrow{display:none!important}
+
+/* چک‌باکس‌های فرم مدیریتی: کادر و متن در یک خط */
+#modal .adm-check,#appView .adm-check{display:flex!important;flex-direction:row!important;align-items:center!important;gap:10px!important;padding:10px 12px!important;border:1px solid var(--bt-line)!important;border-radius:10px!important;background:var(--bt-panel-2)!important;font-size:var(--bt-fs)!important;font-weight:700!important;color:var(--bt-ink-2)!important;cursor:pointer}
+#modal .adm-check input,#appView .adm-check input{width:18px!important;height:18px!important;min-height:0!important;margin:0!important;flex:0 0 auto;accent-color:var(--bt-brand)}
+
+/* ---------- ورود ---------- */
+.login-card .input-shell{border-radius:12px!important}
+.login-card .btn-primary,.login-card .btn{border-radius:12px!important}
+
+/* ---------- ۱۰) واکنش‌گرایی ---------- */
+@media (max-width:1280px){
+  #appView .header-profile-text{display:none!important}
+}
+/* تبلت و موبایل: ستون باریک کناری (الگوی مستند پروژه) با ظاهر جدید */
+@media (max-width:1024px){
+  :root{--bt-rail-w:var(--mobile-rail-width,68px)}
+  #appView .rail{width:var(--mobile-rail-width)!important;padding:8px 4px!important;padding-top:calc(8px + env(safe-area-inset-top,0px))!important;z-index:160!important}
+  #appView .rail::before{inset:-80px -120px auto auto;width:220px;height:200px}
+  #appView .rail-top{display:none!important}
+  #appView #railNav{gap:4px!important}
+  #appView #railNav > button{flex-direction:column!important;justify-content:center!important;gap:3px!important;min-height:56px!important;padding:6px 2px!important;font-size:9.5px!important;text-align:center!important}
+  #appView #railNav > button.active::before{right:0;top:14px;bottom:14px;width:3px}
+  #appView #railNav .nav-label{white-space:normal!important;font-size:9.5px!important;line-height:1.2!important;max-width:100%}
+  #appView .workspace{margin-right:var(--mobile-rail-width)!important;padding:0 14px!important}
+  #appView .workspace-header{margin:0 -14px!important;padding:10px 14px!important;flex-wrap:wrap!important;min-height:0;width:auto!important;max-width:none!important}
+  #appView .header-main h1{font-size:var(--bt-fs-lg)!important}
+  #appView .header-date{display:none!important}
+  #appView .content{padding:16px 0 32px!important}
+  #appView .sd-tab-copy small,#appView .wh38-tab > div small,#appView .v26-tab-copy small{display:none!important}
+  #appView .sd-tab,#appView .wh38-tab,#appView .v26-sales-tab{min-height:44px!important;padding:6px 12px!important;flex:0 0 auto!important}
+}
+@media (max-width:768px){
+  #appView .workspace-header{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important}
+  #appView .header-main p{display:none!important}
+  #appView .header-main{grid-column:1!important;grid-row:1!important}
+  #appView .header-actions{gap:6px!important;grid-column:2!important;grid-row:1!important;width:auto!important;justify-self:end!important;direction:rtl!important}
+  #appView .header-main h1{font-size:15.5px!important;line-height:1.4!important;overflow-wrap:normal}
+  #appView .header-profile{height:44px;padding:3px!important;gap:4px!important}
+  #appView .header-avatar{width:32px!important;height:32px!important;min-width:32px}
+  #appView .header-profile .header-logout span{display:none}
+  #appView .header-profile .header-logout{width:34px!important;padding:0!important;justify-content:center!important}
+  #appView .header-actions .header-profile{flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:none!important}
+  #appView .header-actions .notification-btn{flex:0 0 40px!important;width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important;display:grid!important;grid-template-rows:none!important;padding:0!important;border:1px solid var(--bt-line)!important;border-radius:10px!important;background:var(--bt-panel)!important;color:var(--bt-ink-2)!important;box-shadow:none!important}
+  #appView .header-actions .notification-btn .notification-label{display:none!important}
+  #appView .header-profile .header-logout{min-width:34px!important;min-height:34px!important}
+  #appView .sd-head{padding:14px 14px!important;flex-wrap:wrap!important}
+  #appView .sd-pad{padding:14px!important}
+  #appView .sd-head .badge{white-space:normal!important;text-align:center}
+  #appView .db38-hero{flex-wrap:wrap!important;gap:12px!important;padding:16px!important}
+  #appView .db38-hero-left{width:100%;justify-content:flex-start!important;flex-wrap:wrap;gap:8px}
+  #appView .mg38-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  #appView .mg38-kpi{padding:12px!important;gap:10px!important;flex-direction:column!important}
+  #appView .mg38-val{font-size:22px!important}
+  #appView .adm-toolbar{padding:12px 14px!important;flex-wrap:wrap!important}
+  #appView .adm-list > .adm-row{padding:12px 14px!important;row-gap:8px!important}
+  #appView .tab-scroll-hint{display:block}
+  .toast{left:12px!important;right:calc(var(--mobile-rail-width,68px) + 12px)!important;bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;text-align:center}
+}
+@media (max-width:420px){
+  #appView .mg38-kpis{grid-template-columns:1fr 1fr!important}
+  #appView .mg38-copy small{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){
+  #appView *{transition:none!important;scroll-behavior:auto!important}
+}
+@media print{
+  #appView .rail,#appView .workspace-header{display:none!important}
+  #appView .workspace{margin:0!important;padding:0!important}
+}
+
+/* چک‌باکس‌های انتخاب ستون گزارش: سبک و فشرده (بدون قاب جداگانه برای هر گزینه) */
+#appView .adm-checks{gap:2px 12px!important}
+#appView .adm-checks label,#appView .adm-checks .adm-check{display:flex!important;align-items:center!important;gap:8px!important;padding:5px 2px!important;border:0!important;background:transparent!important;font-size:var(--bt-fs-sm)!important;font-weight:700!important;color:var(--bt-ink-2)!important;white-space:nowrap}
+#appView .adm-checks input[type=checkbox]{width:16px!important;height:16px!important;margin:0!important;accent-color:var(--bt-brand)}
+
+/* عنوان بخش وسیله در نگهبانی: عنوان + کلید «بدون وسیله» در یک ردیف، راهنما در ردیف دوم */
+#appView .gt-fieldset-title{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:6px 8px!important}
+#appView .gt-fieldset-title>small{order:3;flex:1 1 100%;min-width:0;white-space:normal;font-weight:500;color:var(--bt-ink-3)}
+#appView .gt-fieldset-title>.gt-switch{order:2;margin-inline-start:auto!important}
+
+/* ---------- v37.3.1 — انتخاب‌گر تاریخ و ساعت (سفارش روزهای آتی و ویرایش زمان) ---------- */
+/* فلش ماه: در راست‌به‌چپ، دکمهٔ راست = ماه قبل (→) و دکمهٔ چپ = ماه بعد (←) */
+.jalali-cal-nav .is-next svg{transform:scaleX(-1)}
+/* پاپ‌آپ هرگز از صفحه بیرون نمی‌زند؛ دکمه‌های تأیید/انصراف همیشه در دسترس‌اند */
+#dateTimePopover.datetime-popover{max-height:calc(100vh - 24px)!important;overflow:auto!important;overscroll-behavior:contain;padding:14px!important;border-radius:var(--bt-r-lg)!important;box-shadow:var(--bt-sh-lg)!important;border:1px solid var(--bt-line)!important}
+#dateTimePopover .datetime-actions{position:sticky;bottom:-14px;background:var(--bt-panel);padding:10px 0 4px;margin-top:10px!important;z-index:2}
+#dateTimePopover .jalali-cal-day{min-height:36px}
+#dateTimePopover .jalali-cal-day.is-selected{background:var(--bt-brand)!important;color:#fff!important;border-color:var(--bt-brand)!important}
+/* صفحه‌های پهن: تقویم و ساعت کنار هم (ارتفاع ~۴۵۰px به‌جای ~۷۶۰px) */
+@media (min-width:760px){
+  #dateTimePopover.datetime-popover{width:660px!important;max-width:calc(100vw - 24px)!important}
+  #dateTimePopover .dt-body{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:start}
+  #dateTimePopover .dt-time{border-inline-start:1px dashed var(--bt-line);padding-inline-start:18px}
+  #dateTimePopover .datetime-time-section{margin-top:0!important;padding-top:0!important;border-top:0!important}
+  #dateTimePopover .analog-clock{--size:210px!important;margin-inline:auto}
+}
+/* موبایل: برگهٔ پایین صفحه با عرض کامل */
+@media (max-width:759px){
+  #dateTimePopover.datetime-popover{left:8px!important;right:8px!important;width:auto!important;max-width:none!important;top:auto!important;bottom:8px!important;max-height:calc(100dvh - 16px)!important}
+  #dateTimePopover .analog-clock{--size:200px!important;margin-inline:auto}
+}
+#dateTimePopover .jalali-today-btn,#jalaliCalendarPopover .jalali-today-btn{border:1px solid var(--bt-brand-100)!important;background:var(--bt-brand-50)!important;color:var(--bt-brand)!important;border-radius:999px!important;padding:5px 12px!important;font:inherit;font-size:11.5px!important;font-weight:800;cursor:pointer}
+
+/* v37.3.1 — محصولات و قیمت‌ها: بازخورد ثبت قیمت و ردیف غیرفعال */
+#appView .adm-row-prod{transition:background-color .4s ease}
+#appView .adm-row-prod.is-saved{background:var(--bt-green-bg)!important}
+#appView .adm-row-prod.is-saved [data-price-for]{border-color:var(--bt-green)!important}
+#appView .adm-row-prod.is-inactive .adm-cell b{color:var(--bt-muted)}
+#appView .adm-row-prod.is-inactive .cust-code{opacity:.6}
+
+/* ---------- v37.3.2 — فرم «سفارش روزهای آتی»: فشرده و هم‌ردیف ----------
+   ردیف ۱: نام مشتری | شماره تماس      ردیف ۲: زمان ورود به انبار (کوتاه) | محل ارسال
+   حذف فاصله‌ها و متن‌های تکراری برای کوتاه شدن ارتفاع کل فرم. */
+#content .fx-body-compact{padding:14px 18px 16px!important}
+#content .fx-body-compact .fx-intro{margin:0 0 12px;font-size:12px;line-height:1.7;color:var(--bt-muted)}
+#content .fx-body-compact .fx-intro b{color:var(--bt-ink-2)}
+#futureOrderFormV25.fx-form-compact{display:flex!important;flex-direction:column;gap:0!important}
+#futureOrderFormV25 .fx-top-grid{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr))!important;gap:10px 12px!important;margin:0!important}
+#futureOrderFormV25 .fx-top-grid>.field{grid-column:span 6!important;margin:0!important;min-width:0}
+#futureOrderFormV25 .fx-top-grid>.jalali-datetime-field{grid-column:span 5!important}
+#futureOrderFormV25 .fx-top-grid>.fx-addr-field{grid-column:span 7!important}
+#futureOrderFormV25 .field>label{margin-bottom:5px!important;font-size:12.5px}
+/* برچسب قرمز تکراری و راهنمای زیر کادر تاریخ در این فرم لازم نیست (عنوان کادر همین را می‌گوید) */
+#futureOrderFormV25 .jalali-datetime-field label .subtle,
+#futureOrderFormV25 .jalali-datetime-field .field-hint{display:none!important}
+#futureOrderFormV25 .jalali-datetime-shell,
+#futureOrderFormV25 .fx-addr-field .input-shell{height:48px;min-height:48px}
+#futureOrderFormV25 .jalali-datetime-shell .datetime-display{font-size:13.5px!important}
+/* اقلام */
+#futureOrderFormV25 .fx-lines-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 0 8px!important;margin:12px 0 0!important;border-top:1px solid var(--bt-line);border-bottom:0!important}
+#futureOrderFormV25 .fx-lines-head h3{font-size:13.5px;margin:0}
+#futureOrderFormV25 #future-lines .sd-line{padding:10px 12px!important}
+#futureOrderFormV25 #future-lines .sd-picked.none{display:none!important}
+#futureOrderFormV25 .fx-lines-add{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px}
+#futureOrderFormV25 .fx-lines-add small{font-size:11px;color:var(--bt-muted)}
+/* یادداشت: یک خط، قابل بزرگ‌کردن */
+#futureOrderFormV25 .fx-note{margin-top:12px!important}
+#futureOrderFormV25 .fx-note textarea{min-height:44px!important;height:44px;padding:11px 12px!important;resize:vertical;line-height:1.6}
+#futureOrderFormV25 .fx-foot-compact{display:flex;align-items:center;gap:10px;margin-top:12px!important;padding-top:12px!important;border-top:1px solid var(--bt-line)}
+/* تبلت باریک و موبایل: همهٔ کادرها زیر هم */
+@media (max-width:620px){
+  #futureOrderFormV25 .fx-top-grid>.field,
+  #futureOrderFormV25 .fx-top-grid>.jalali-datetime-field,
+  #futureOrderFormV25 .fx-top-grid>.fx-addr-field{grid-column:1/-1!important}
+  #content .fx-body-compact{padding:12px 14px 14px!important}
+  #futureOrderFormV25 .fx-foot-compact .btn{flex:1 1 0}
+}
+/* خلاصهٔ اقلام: قرص‌های کوچک هم‌ردیف با عنوان؛ جملهٔ «هنوز قلمی…» تکراری است (ردیف خالی همین را نشان می‌دهد) */
+#futureOrderFormV25 #future-summary{display:flex!important;flex-wrap:wrap;align-items:center;gap:6px!important;margin:0!important;padding:0!important;background:none!important;border:0!important}
+#futureOrderFormV25 #future-summary .mini-stat{display:inline-flex!important;flex-direction:row!important;align-items:center;gap:6px;padding:3px 10px!important;min-height:0!important;border-radius:999px!important;border:1px solid var(--bt-line)!important;background:var(--bt-panel-2)!important;font-size:11px!important}
+#futureOrderFormV25 #future-summary .mini-stat span{font-size:11px!important;color:var(--bt-muted)}
+#futureOrderFormV25 #future-summary .mini-stat strong{font-size:12px!important;color:var(--bt-ink)}
+#futureOrderFormV25 #future-summary .summary-lines:has(.compact-empty){display:none!important}
+#futureOrderFormV25 .btn svg{flex:0 0 auto}
+@media (max-width:620px){
+  /* ردیف قلم در موبایل: (شماره، محصول، حذف) | (مقدار + واحد با عرض کامل) | توضیحات با عرض کامل */
+  #futureOrderFormV25 #future-lines .sd-line{display:grid!important;grid-template-columns:28px minmax(0,1fr) minmax(0,1fr) 32px!important;grid-template-areas:"no prod prod del" "qty qty unit unit" "desc desc desc desc"!important;gap:8px!important;align-items:end}
+  #futureOrderFormV25 #future-lines .sd-line-no{grid-area:no!important;align-self:start}
+  #futureOrderFormV25 #future-lines .cell-product{grid-area:prod!important}
+  #futureOrderFormV25 #future-lines .cell-qty{grid-area:qty!important}
+  #futureOrderFormV25 #future-lines .cell-unit{grid-area:unit!important}
+  #futureOrderFormV25 #future-lines .cell-desc{grid-area:desc!important}
+  #futureOrderFormV25 #future-lines .sd-line-del{grid-area:del!important;align-self:start}
+  #futureOrderFormV25 #future-lines .sd-line-cell{width:auto!important;min-width:0!important;max-width:none!important}
+  #futureOrderFormV25 #future-lines .sd-line-cell .input-shell{width:100%!important}
+  #futureOrderFormV25 #future-lines .sd-line-cell label{margin-bottom:4px!important}
+}
+
+/* ====================================================================
+   v37.3.3 — ستون کناری قرمز هم‌رنگ لوگو، ساعت و تاریخ زیر لوگو،
+   و انتقال زنگ اعلان‌ها به داخل کپسول حساب کاربری
+   ==================================================================== */
+:root{
+  --bt-rail-red:#e30613;       /* هم‌خانوادهٔ قرمز خالص لوگو (#f80000) */
+  --bt-rail-red-2:#c4000f;
+  --bt-rail-red-3:#9c0010;
+  --bt-rail-bg:var(--bt-rail-red-3);
+  --bt-rail-bg-2:var(--bt-rail-red);
+  --bt-rail-text:rgba(255,255,255,.86);
+}
+#appView .rail{
+  background:linear-gradient(180deg,var(--bt-rail-red) 0%,var(--bt-rail-red-2) 46%,var(--bt-rail-red-3) 100%)!important;
+  border-left:0!important;
+  box-shadow:-1px 0 0 rgba(120,0,10,.35), 6px 0 28px rgba(156,0,16,.16)!important;
+}
+#appView .rail::before{
+  /* هالهٔ روشن پشت لوگو روی زمینهٔ قرمز */
+  background:radial-gradient(closest-side,rgba(255,255,255,.22),rgba(255,255,255,0))!important;
+}
+#appView .rail::after{
+  /* بافت ظریف مورب برای عمق، بدون مزاحمت برای خوانایی */
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px);
+}
+#appView .rail > *{position:relative;z-index:1}
+#appView .rail-top{border-bottom:1px solid rgba(255,255,255,.2)!important;margin-bottom:12px!important}
+#appView .rail-logo{box-shadow:0 8px 20px rgba(90,0,8,.38), 0 0 0 3px rgba(255,255,255,.22)!important}
+#appView .rail-brand strong{text-shadow:0 1px 2px rgba(90,0,8,.35)}
+
+/* ساعت و تاریخ زیر لوگو */
+#appView .rail-clock{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:0 0 14px;padding:11px 14px;border-radius:12px;
+  background:rgba(70,0,6,.22);border:1px solid rgba(255,255,255,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+  color:#fff;direction:rtl;flex:0 0 auto;
+}
+#appView .rail-clock-date{display:flex;flex-direction:column;min-width:0;line-height:1.45;text-align:right}
+#appView .rail-clock-date span{font-size:var(--bt-fs-xs);font-weight:700;color:rgba(255,255,255,.78)}
+#appView .rail-clock-date b{font-size:var(--bt-fs-sm);font-weight:800;color:#fff;white-space:nowrap}
+#appView .rail-clock-time{
+  font-size:26px;font-weight:900;line-height:1;letter-spacing:.02em;color:#fff;
+  direction:ltr;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";
+  text-shadow:0 2px 6px rgba(80,0,8,.35);
+}
+
+/* منو روی زمینهٔ قرمز */
+#appView #railNav{scrollbar-color:rgba(255,255,255,.35) transparent}
+#appView #railNav > button{color:var(--bt-rail-text)!important}
+#appView #railNav > button:hover{background:rgba(255,255,255,.14)!important;color:#fff!important}
+#appView #railNav > button.active,
+#appView #railNav > button[aria-current="page"]{
+  background:#fff!important;color:var(--bt-rail-red-2)!important;font-weight:900!important;
+  box-shadow:0 6px 16px rgba(90,0,8,.28)!important;
+}
+#appView #railNav > button.active::before{display:none!important}
+#appView #railNav > button.active .nav-icon{color:var(--bt-rail-red)!important}
+#appView #railNav .nav-badge{background:#fff!important;color:var(--bt-rail-red-2)!important;border:0!important;box-shadow:0 1px 3px rgba(80,0,8,.3)!important}
+#appView #railNav > button.active .nav-badge{background:var(--bt-rail-red)!important;color:#fff!important}
+#appView #railNav > button:focus-visible{outline:2px solid #fff!important;outline-offset:2px}
+
+/* زنگ اعلان‌ها داخل کپسول حساب کاربری — هم‌شکل دکمهٔ تغییر رمز */
+#appView .header-profile .notification-btn{
+  order:0!important;flex:0 0 34px!important;
+  width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;
+  border-radius:9px!important;border:1px solid transparent!important;background:var(--bt-soft)!important;color:var(--bt-ink-2)!important;
+}
+#appView .header-profile .notification-btn:hover{background:var(--bt-brand-50)!important;color:var(--bt-brand)!important}
+#appView .header-profile .notification-btn .bell-icon .svg{width:18px;height:18px}
+#appView .header-profile #bellCount{top:-7px!important;left:-7px!important;min-width:18px;height:18px;font-size:10.5px!important}
+#appView .header-profile-text + .notification-btn{margin-inline-start:2px}
+
+@media (max-width:1024px){
+  /* ستون باریک: ساعت فشرده بالای منو (لوگو در این اندازه پنهان است) */
+  #appView .rail-clock{flex-direction:column-reverse;justify-content:center;gap:3px;margin:2px 0 8px;padding:8px 2px;border-radius:10px;text-align:center}
+  #appView .rail-clock-time{font-size:15px;letter-spacing:0}
+  #appView .rail-clock-date{align-items:center;text-align:center}
+  #appView .rail-clock-date span{display:none}
+  #appView .rail-clock-date b{font-size:9.5px;font-weight:800;white-space:normal;line-height:1.35}
+}
+@media (max-width:768px){
+  #appView .header-actions .header-profile .notification-btn{
+    flex:0 0 34px!important;width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;
+    border:1px solid transparent!important;border-radius:9px!important;background:var(--bt-soft)!important;
+  }
+}
+#appView .rail-clock-date b span{font:inherit;color:inherit}
+@media (max-width:1024px){
+  #appView .rail-clock-date b .rc-dm,#appView .rail-clock-date b .rc-y{display:block;white-space:nowrap}
+  #appView .rail-clock-date b .rc-y{opacity:.85;font-size:9px}
+}
+/* تبلت: پس از حذف تاریخ و زنگ از هدر، کپسول حساب به اندازهٔ محتوا و در همان ردیف عنوان */
+@media (min-width:769px) and (max-width:1024px){
+  #appView .workspace-header{flex-wrap:nowrap!important;align-items:center!important;gap:12px!important}
+  #appView .header-main{flex:1 1 auto!important;min-width:0!important}
+  #appView .header-actions{width:auto!important;flex:0 0 auto!important;margin:0!important}
+  #appView .header-actions .header-profile{flex:0 0 auto!important;width:auto!important;max-width:none!important}
+}
+
+/* ====================================================================
+   v37.3.4 — رانندگان: شماره تماس + نام بانک کنار پایانه پوز
+            انبار: سربرگ «سوابق و گزارش»
+   ==================================================================== */
+#appView .drv-row{grid-template-columns:minmax(120px,1.1fr) minmax(110px,.8fr) minmax(90px,.8fr) auto minmax(150px,1.1fr) minmax(270px,auto)!important}
+#appView .drv-phone{font-weight:800;font-size:13px;color:var(--bt-ink)!important;text-decoration:none;white-space:nowrap;font-variant-numeric:tabular-nums}
+#appView a.drv-phone:hover{color:var(--bt-brand)!important;text-decoration:underline}
+#appView .drv-phone.is-empty{color:var(--bt-amber)!important;font-weight:700;font-size:12px}
+#appView .drv-pos{display:inline-flex!important;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;white-space:normal!important;overflow:visible!important}
+#appView .drv-pos-term{font-family:ui-monospace,Consolas,monospace;font-size:12px!important;font-weight:700;color:var(--bt-ink)!important;background:var(--bt-soft);border:1px solid var(--bt-line);border-radius:7px;padding:1px 7px}
+#appView .drv-pos-bank{display:inline-flex;align-items:center;font-size:11.5px!important;font-weight:800;color:var(--bt-blue)!important;background:var(--bt-blue-bg);border-radius:999px;padding:2px 9px;white-space:nowrap}
+#appView .drv-pos.is-empty{color:var(--bt-muted-2)}
+/* کارت راننده در کارتابل پخش: تماس + پوز/بانک در پایین کارت */
+#appView .dsp-roster-foot{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px;padding:8px 10px;border:1px dashed var(--bt-line-2);border-radius:10px;background:var(--bt-panel-2)}
+#appView .dsp-roster-foot > span{display:flex;align-items:center;gap:6px;flex:1 1 auto;min-width:0}
+#appView .dsp-roster-foot small{font-size:10.5px;color:var(--bt-muted);font-weight:700;white-space:nowrap}
+#appView .dsp-roster-foot .drv-phone{font-size:12px}
+#appView .dsp-roster-foot .drv-pos-term{font-size:11px!important;padding:0 6px}
+#appView .dsp-roster-foot .drv-pos-bank{font-size:10.5px!important;padding:1px 8px}
+@media (max-width:1180px){
+  #appView .drv-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;row-gap:10px}
+  #appView .drv-row .adm-actions{grid-column:1/-1;justify-content:flex-start!important;flex-wrap:wrap!important}
+}
+@media (max-width:620px){ #appView .drv-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important} }
+
+/* ---------- انبار: سوابق و گزارش ---------- */
+#appView .wh38-tab-history .wh38-tab-idx{background:var(--bt-blue-bg)!important;color:var(--bt-blue)!important}
+#appView .whh{display:grid;gap:16px}
+#appView .whh-toolbar{display:flex!important;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px!important}
+#appView .whh-ranges{display:inline-flex;gap:3px;padding:3px;background:var(--bt-soft);border:1px solid var(--bt-line);border-radius:11px}
+#appView .whh-range{height:34px;padding:0 13px;border:0;border-radius:8px;background:transparent;color:var(--bt-ink-2);font:inherit;font-size:var(--bt-fs-sm);font-weight:800;cursor:pointer;white-space:nowrap}
+#appView .whh-range:hover{background:var(--bt-panel);color:var(--bt-brand)}
+#appView .whh-range.active{background:var(--bt-panel);color:var(--bt-brand);box-shadow:var(--bt-sh-xs)}
+#appView .whh-toolbar .adm-date{font-size:var(--bt-fs-sm);font-weight:800;color:var(--bt-muted)}
+#appView .whh-toolbar .adm-date input{width:122px;height:40px;text-align:center}
+#appView .whh-toolbar .adm-select{height:40px;min-width:170px}
+#appView .whh-search{flex:1 1 200px;min-width:180px;height:40px}
+#appView .whh-search input{height:38px}
+#appView .whh-print{margin-inline-start:auto;height:40px;white-space:nowrap}
+#appView .whh-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+#appView .whh-kpi{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--bt-line);border-radius:var(--bt-r);background:var(--bt-panel)}
+#appView .whh-kpi-ico{width:38px;height:38px;min-width:38px;border-radius:10px;display:grid;place-items:center;background:var(--bt-brand-50);color:var(--bt-brand)}
+#appView .whh-kpi small{display:block;font-size:var(--bt-fs-xs);color:var(--bt-muted);font-weight:700;line-height:1.4}
+#appView .whh-kpi b{display:block;font-size:20px;font-weight:900;color:var(--bt-ink);line-height:1.35;white-space:nowrap}
+#appView .whh-kpi b em{font-style:normal;font-size:var(--bt-fs-xs);color:var(--bt-muted);font-weight:700}
+#appView .whh-kpi.is-warn{border-color:#f3c3c8;background:var(--bt-red-bg)}
+#appView .whh-kpi.is-warn .whh-kpi-ico{background:#fff;color:var(--bt-red)}
+#appView .whh-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+#appView .whh-side{display:grid;gap:16px}
+#appView .whh-list{display:grid}
+#appView .whh-day-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 18px;background:var(--bt-panel-2);border-top:1px solid var(--bt-line);border-bottom:1px solid var(--bt-line);position:sticky;top:0;z-index:1}
+#appView .whh-day-head b{font-size:var(--bt-fs-sm);font-weight:900}
+#appView .whh-day-head span{font-size:var(--bt-fs-xs);color:var(--bt-muted);font-weight:700}
+#appView .whh-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto minmax(110px,auto);gap:6px 16px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--bt-line)}
+#appView .whh-row:last-child{border-bottom:0}
+#appView .whh-time{display:grid;justify-items:center;padding:6px 0;border-radius:10px;background:var(--bt-soft)}
+#appView .whh-time b{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;direction:ltr}
+#appView .whh-time small,#appView .whh-by small,#appView .whh-figs small{font-size:10.5px;color:var(--bt-muted);font-weight:700}
+#appView .whh-main{min-width:0}
+#appView .whh-main h4{margin:5px 0 1px;font-size:var(--bt-fs);font-weight:900;color:var(--bt-ink)}
+#appView .whh-main p{margin:0;font-size:var(--bt-fs-xs);color:var(--bt-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#appView .whh-figs{display:flex;gap:6px}
+#appView .whh-figs span{display:grid;justify-items:center;min-width:62px;padding:5px 8px;border:1px solid var(--bt-line);border-radius:9px}
+#appView .whh-figs b{font-size:14px;font-weight:900}
+#appView .whh-figs .is-warn{border-color:#f3c3c8;background:var(--bt-red-bg);color:var(--bt-red)}
+#appView .whh-by{display:grid;line-height:1.45}
+#appView .whh-by b{font-size:var(--bt-fs-sm);font-weight:800}
+#appView .whh-details{grid-column:2/-1}
+#appView .whh-details summary{cursor:pointer;font-size:var(--bt-fs-xs);font-weight:800;color:var(--bt-brand);width:max-content}
+#appView .whh-details .table-wrap{margin-top:8px}
+#appView .whh-items tr.is-oos td{background:var(--bt-red-bg)}
+#appView .whh-prod td,#appView .whh-prod th,#appView .whh-items td,#appView .whh-items th{font-size:var(--bt-fs-xs)!important;padding:8px 12px!important}
+#appView .whh-side .table-wrap{border:0;border-radius:0}
+#appView .whh-returns{list-style:none;margin:0;padding:0}
+#appView .whh-returns li{padding:11px 16px;border-top:1px solid var(--bt-line)}
+#appView .whh-returns li div{display:flex;align-items:center;gap:8px}
+#appView .whh-returns li b{font-size:var(--bt-fs-sm)}
+#appView .whh-returns li p{margin:4px 0 2px;font-size:var(--bt-fs-xs);color:var(--bt-ink-2)}
+#appView .whh-returns li small{font-size:10.5px;color:var(--bt-muted)}
+#appView .whh-none{margin:0;padding:16px;font-size:var(--bt-fs-xs);color:var(--bt-muted);border-top:1px solid var(--bt-line)}
+#appView .whh-loading{padding:28px;text-align:center;color:var(--bt-muted);font-size:var(--bt-fs-sm)}
+@media (max-width:1280px){ #appView .whh-kpis{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:1180px){ #appView .whh-grid{grid-template-columns:minmax(0,1fr)} #appView .whh-side{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:768px){
+  #appView .whh-toolbar{padding:10px!important;gap:8px}
+  #appView .whh-ranges{width:100%;overflow-x:auto}
+  #appView .whh-range{flex:1 0 auto;padding:0 10px}
+  #appView .whh-toolbar .adm-date{flex:1 1 calc(50% - 4px)}
+  #appView .whh-toolbar .adm-date input{width:100%;flex:1}
+  #appView .whh-toolbar .adm-select,#appView .whh-search{flex:1 1 100%;min-width:0}
+  #appView .whh-print{flex:1 1 100%;margin:0;justify-content:center}
+  #appView .whh-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #appView .whh-kpi{padding:10px;gap:8px}
+  #appView .whh-kpi-ico{width:32px;height:32px;min-width:32px}
+  #appView .whh-kpi b{font-size:17px}
+  #appView .whh-side{grid-template-columns:minmax(0,1fr)}
+  #appView .whh-row{grid-template-columns:54px minmax(0,1fr);padding:12px}
+  #appView .whh-figs,#appView .whh-by{grid-column:2}
+  #appView .whh-by{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+  #appView .whh-details{grid-column:1/-1}
+  #appView .whh-day-head{padding:8px 12px}
+}
+/* v37.3.4 — پرداخت سوابق انبار: جدول فشرده، نوار ابزار یک‌ردیفه، تاریخ‌های کامل در موبایل */
+#appView .whh-grid{grid-template-columns:minmax(0,1fr) 400px}
+#appView .whh-toolbar .adm-select{min-width:150px}
+#appView .whh-search{flex:1 1 150px;min-width:140px}
+#appView .whh-table{width:100%;border-collapse:collapse}
+#appView .whh-table th{background:var(--bt-panel-2);font-size:var(--bt-fs-xs);font-weight:800;color:var(--bt-muted);text-align:right;padding:8px 10px;border-bottom:1px solid var(--bt-line);white-space:nowrap}
+#appView .whh-table td{font-size:var(--bt-fs-xs);padding:8px 10px;border-bottom:1px solid var(--bt-line);vertical-align:middle;line-height:1.55}
+#appView .whh-table tr:last-child td{border-bottom:0}
+#appView .whh-table td:not(:first-child),#appView .whh-table th:not(:first-child){text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+#appView .whh-table .code-pill{margin-inline-end:4px}
+#appView .whh-details .table-wrap{border:1px solid var(--bt-line);border-radius:10px;overflow:auto}
+@media (max-width:1180px){ #appView .whh-grid{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:768px){
+  #appView .whh-toolbar .adm-date{flex-direction:column!important;align-items:stretch!important;gap:3px!important;font-size:11px}
+  #appView .whh-toolbar .adm-date input{width:100%!important;min-width:0;font-size:13px;padding:0 8px}
+  #appView .whh-table th,#appView .whh-table td{padding:7px 6px;font-size:11px}
+}
+#appView #whhBody{display:grid;gap:16px}
+@media (max-width:768px){
+  #appView .whh-kpi b{white-space:normal;line-height:1.25}
+  #appView .whh-kpi b em{display:block;margin-top:1px}
+  #appView .whh-kpi > div{min-width:0}
+  #appView .whh-table td:first-child,#appView .whh-table th:first-child{width:58%}
+  #appView .whh-table th:not(:first-child){white-space:normal;line-height:1.3}
+}
+@media (max-width:768px){
+  #appView .whh-prod{table-layout:fixed}
+  #appView .whh-prod th:nth-child(2),#appView .whh-prod td:nth-child(2){width:15%}
+  #appView .whh-prod th:nth-child(3),#appView .whh-prod td:nth-child(3){width:17%}
+  #appView .whh-prod th:nth-child(4),#appView .whh-prod td:nth-child(4){width:14%}
+}
+@media (max-width:768px){
+  #appView .whh-prod th:nth-child(2),#appView .whh-prod td:nth-child(2){width:13%}
+  #appView .whh-prod th:nth-child(4),#appView .whh-prod td:nth-child(4){width:18%}
+  #appView .whh-prod th:not(:first-child){padding:7px 2px;font-size:10.5px}
+}
+@media (max-width:480px){
+  #appView .whh-prod th:nth-child(2),#appView .whh-prod td:nth-child(2){display:none}
+  #appView .whh-prod th:nth-child(3),#appView .whh-prod td:nth-child(3){width:24%}
+  #appView .whh-prod th:nth-child(4),#appView .whh-prod td:nth-child(4){width:20%}
+}
+
+/* ====================================================================
+   v37.3.5 — داشبورد مدیریت: نمودارهای فروش / سفارش / تحویل انبار به تفکیک محصول
+   (جایگزین بخش «جریان عملیات»)
+   ==================================================================== */
+#appView .db38-grid.db38-grid-single{grid-template-columns:minmax(0,1fr)!important}
+#appView .dbc-section{display:grid;gap:14px;padding:18px;border:1px solid var(--bt-line);border-radius:var(--bt-r-lg);background:var(--bt-panel)}
+#appView .dbc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#appView .dbc-head h2{margin:0;font-size:var(--bt-fs-lg);font-weight:900}
+#appView .dbc-head p{margin:2px 0 0;font-size:var(--bt-fs-xs);color:var(--bt-muted)}
+#appView .dbc-ranges{display:inline-flex;gap:3px;padding:3px;background:var(--bt-soft);border:1px solid var(--bt-line);border-radius:11px}
+#appView .dbc-range{height:34px;padding:0 14px;border:0;border-radius:8px;background:transparent;color:var(--bt-ink-2);font:inherit;font-size:var(--bt-fs-sm);font-weight:800;cursor:pointer;white-space:nowrap}
+#appView .dbc-range:hover{background:var(--bt-panel);color:var(--bt-brand)}
+#appView .dbc-range.active{background:var(--bt-panel);color:var(--bt-brand);box-shadow:var(--bt-sh-xs)}
+#appView .dbc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#appView .dbc-card{--c:var(--bt-brand);--c-bg:var(--bt-brand-50);--c2:#ff5a5f;
+  display:flex;flex-direction:column;gap:12px;min-width:0;padding:16px;border:1px solid var(--bt-line);border-radius:var(--bt-r);background:linear-gradient(180deg,var(--c-bg) 0,var(--bt-panel) 120px);position:relative;overflow:hidden}
+#appView .dbc-card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--c2),var(--c))}
+#appView .dbc-card.t-orders{--c:var(--bt-blue);--c-bg:var(--bt-blue-bg);--c2:#5b8def}
+#appView .dbc-card.t-warehouse{--c:var(--bt-green);--c-bg:var(--bt-green-bg);--c2:#34b67a}
+#appView .dbc-card-head{display:flex;align-items:center;gap:10px}
+#appView .dbc-ico{width:36px;height:36px;min-width:36px;border-radius:10px;display:grid;place-items:center;background:var(--bt-panel);color:var(--c);box-shadow:var(--bt-sh-xs)}
+#appView .dbc-card-head h3{margin:0;font-size:var(--bt-fs);font-weight:900;color:var(--bt-ink);line-height:1.4}
+#appView .dbc-card-head small{display:block;font-size:11px;color:var(--bt-muted);line-height:1.5}
+#appView .dbc-total{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px dashed var(--bt-line-2)}
+#appView .dbc-total b{font-size:24px;font-weight:900;color:var(--c);line-height:1.2;white-space:nowrap}
+#appView .dbc-total b em{font-style:normal;font-size:var(--bt-fs-xs);font-weight:800;color:var(--bt-muted)}
+#appView .dbc-total span{font-size:var(--bt-fs-xs);color:var(--bt-muted);font-weight:700}
+#appView .dbc-bars{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+#appView .dbc-bar{display:grid;gap:4px}
+#appView .dbc-bar-top{display:flex;align-items:center;gap:7px;min-width:0}
+#appView .dbc-rank{width:20px;height:20px;min-width:20px;border-radius:6px;display:grid;place-items:center;background:var(--bt-soft);color:var(--bt-muted);font-size:10.5px;font-weight:900}
+#appView .dbc-bar:first-child .dbc-rank{background:var(--c);color:#fff}
+#appView .dbc-name{flex:1 1 auto;min-width:0;font-size:var(--bt-fs-sm);font-weight:800;color:var(--bt-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#appView .dbc-name .code-pill{margin-inline-end:5px;transform:translateY(-1px)}
+#appView .dbc-val{font-size:var(--bt-fs-sm);font-weight:900;color:var(--bt-ink);white-space:nowrap}
+#appView .dbc-track{position:relative;height:10px;border-radius:999px;background:var(--bt-soft);margin-inline-start:27px;overflow:visible}
+#appView .dbc-track i{display:block;height:100%;border-radius:999px;background:linear-gradient(270deg,var(--c2),var(--c));transition:width .5s cubic-bezier(.2,.8,.2,1)}
+#appView .dbc-track em{position:absolute;left:0;top:50%;transform:translate(-2px,-50%);font-style:normal;font-size:10px;font-weight:800;color:var(--bt-muted);background:var(--bt-panel);padding:0 4px;border-radius:4px;line-height:1.4}
+#appView .dbc-sub{margin-inline-start:27px;font-size:10.5px;color:var(--bt-muted);font-weight:700;line-height:1.4}
+#appView .dbc-bar.is-other .dbc-name{color:var(--bt-muted)}
+#appView .dbc-bar.is-other .dbc-track i{background:var(--bt-line-2)}
+#appView .dbc-empty{display:grid;justify-items:center;gap:4px;padding:26px 10px;text-align:center;color:var(--bt-muted);border:1.5px dashed var(--bt-line-2);border-radius:12px;background:var(--bt-panel)}
+#appView .dbc-empty b{font-size:var(--bt-fs-sm);color:var(--bt-ink-2)}
+#appView .dbc-empty span{font-size:var(--bt-fs-xs)}
+#appView .dbc-card.is-loading{min-height:300px}
+#appView .dbc-skel{height:14px;border-radius:7px;background:linear-gradient(90deg,var(--bt-soft),#f8f9fb,var(--bt-soft));background-size:200% 100%;animation:dbcShimmer 1.2s linear infinite}
+#appView .dbc-skel:first-child{width:55%;height:20px}
+#appView .dbc-skel:nth-child(2){width:80%}
+@keyframes dbcShimmer{to{background-position:-200% 0}}
+@media (max-width:1280px){ #appView .dbc-grid{grid-template-columns:repeat(2,minmax(0,1fr))} #appView .dbc-card.t-warehouse{grid-column:1/-1} }
+@media (max-width:900px){ #appView .dbc-grid{grid-template-columns:minmax(0,1fr)} #appView .dbc-card.t-warehouse{grid-column:auto} }
+@media (max-width:768px){
+  #appView .dbc-section{padding:12px;gap:12px}
+  #appView .dbc-ranges{width:100%}
+  #appView .dbc-range{flex:1 1 0;padding:0 6px}
+  #appView .dbc-card{padding:13px}
+  #appView .dbc-total b{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){ #appView .dbc-track i{transition:none} #appView .dbc-skel{animation:none} }
+/* v37.3.5 — پرداخت نمودارها: درصد بیرون از میله، جمع‌شدن ردیف‌ها در عرض کارت */
+#appView .dbc-bars,#appView .dbc-bar,#appView .dbc-bar-top{min-width:0}
+#appView .dbc-track{margin-inline-end:38px}
+#appView .dbc-track em{left:-38px;width:34px;transform:translateY(-50%);text-align:left;background:none;padding:0}
+@media (max-width:480px){
+  #appView .dbc-name{font-size:12px}
+  #appView .dbc-val{font-size:12px}
+  #appView .dbc-name .code-pill{display:none}
+}
+#appView .dbc-val{flex:0 0 auto}
+/* Cartable navigation redesign: compact, single-line labels in the red right rail. */
+#appView .rail-nav{display:flex;flex-direction:column;align-items:stretch;gap:5px;overflow-y:auto;overflow-x:hidden;padding:2px 0 14px;scrollbar-width:thin}
+#appView .cartable-nav-title{font-size:11px;font-weight:900;color:rgba(255,255,255,.68);padding:8px 11px 5px;white-space:nowrap}
+#appView .rail-nav .cartable-nav-item{width:100%;min-height:43px;height:43px;display:flex;flex-direction:row;justify-content:flex-start;align-items:center;gap:10px;padding:0 11px;border:1px solid transparent;border-radius:12px;background:transparent;color:#fff;text-align:right;white-space:nowrap;overflow:hidden}
+#appView .rail-nav .cartable-nav-item .nav-icon{width:23px;min-width:23px;display:grid;place-items:center;opacity:.92}
+#appView .rail-nav .cartable-nav-item .nav-icon .svg{width:19px;height:19px}
+#appView .rail-nav .cartable-nav-item .nav-label{display:block;min-width:0;flex:1;font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#appView .rail-nav .cartable-nav-item.active{background:#fff;color:#9f0b20;box-shadow:0 5px 15px rgba(67,0,10,.2)}
+#appView .rail-nav .cartable-nav-item:hover:not(.active){background:rgba(255,255,255,.13)}
+.role-dash{display:grid;gap:20px;padding:4px 0}.role-dash-heading{padding:24px 28px;border-radius:20px;background:linear-gradient(115deg,#fff 0%,#fff8f8 100%);border:1px solid #f0dadd;box-shadow:0 8px 25px rgba(105,12,29,.05)}.role-dash-heading h2{margin:5px 0;font-size:26px;color:#292d35}.role-dash-heading p{margin:0;color:#777f89;font-size:14px}.role-dash-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.role-dash-card{position:relative;min-height:155px;padding:18px 18px 16px;border:1px solid #e9ebee;border-radius:17px;background:#fff;text-align:right;display:flex;flex-direction:column;align-items:flex-start;gap:8px;cursor:pointer;box-shadow:0 5px 16px rgba(25,31,41,.035);transition:.18s}.role-dash-card:hover{transform:translateY(-2px);border-color:#d99aa3;box-shadow:0 10px 24px rgba(117,11,29,.1)}.role-dash-num{font-size:10px;font-weight:900;color:#b30f28;background:#fff0f2;border-radius:8px;padding:4px 8px}.role-dash-label{font-size:13px;font-weight:800;color:#606a76}.role-dash-card strong{font-size:28px;line-height:1;color:#242a33}.role-dash-card small{font-size:11px;color:#a30f25;font-weight:800}.role-dash-foot{display:flex;justify-content:space-between;align-items:center;padding:13px 17px;border:1px solid #eceef0;border-radius:13px;background:#fff;color:#77808a;font-size:12px}.role-report-note{padding:20px;border:1px solid #eee;border-radius:14px;background:#fff;color:#606a76}
+@media(max-width:1200px){.role-dash-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:750px){.role-dash-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.role-dash-card{min-height:132px;padding:13px}.role-dash-heading{padding:18px}.role-dash-heading h2{font-size:21px}.role-dash-foot{align-items:flex-start;flex-direction:column;gap:6px}}
+#appView .store-delivery-view{grid-column:1/-1;width:100%}
+.store-delivery-tabs{display:flex;gap:8px;align-items:center;margin:14px 0 12px;padding:5px;border:1px solid #eceef0;border-radius:13px;background:#f8f9fa}.store-delivery-tabs button{min-height:40px;display:flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:7px 12px;border:1px solid transparent;border-radius:9px;background:transparent;color:#626c78;font:inherit;font-size:13px;font-weight:850;white-space:nowrap;cursor:pointer}.store-delivery-tabs button.active{background:#fff;color:#a90e26;border-color:#efcdd2;box-shadow:0 3px 10px #9c102010}.store-delivery-tabs button b{min-width:23px;height:23px;display:grid;place-items:center;padding:0 5px;border-radius:7px;background:#f3e6e8;color:#a90e26;font-size:11px}
+/* v37.7.6: role-rail navigation is authoritative for these cartables, including admin's role view. */
+#appView[data-cartable-page="gate"] #content>.unit-tabs,#appView[data-cartable-page="gate"] #content>nav.sd-tabs,
+#appView[data-cartable-page="sales"] #content>nav.v26-sales-tabs,#appView[data-cartable-page="sales"] #content>nav.sd-sales-tabs,
+#appView[data-cartable-page="warehouse"] #content>.unit-tabs,#appView[data-cartable-page="warehouse"] #content>.wh38-tabs,#appView[data-cartable-page="warehouse"] #content>nav.wh38-tabs,
+#appView[data-cartable-page="drivers"] #content>nav.adm-tabs.drv-tabs{display:none!important}
+#appView[data-cartable-page="dispatch"] #content nav.dsp-tabs{display:flex!important}
+#appView .store-delivery-panel{padding:20px;display:grid;gap:13px}.store-delivery-heading h2{margin:0;font-size:22px}.store-delivery-heading p{margin:5px 0 0;color:var(--muted);font-size:13px}.store-delivery-tabs{display:flex;gap:8px;align-items:center;margin:2px 0 4px;padding:5px;border:1px solid #eceef0;border-radius:13px;background:#f8f9fa}.store-delivery-tabs button{min-height:42px;display:flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:7px 12px;border:1px solid transparent;border-radius:9px;background:transparent;color:#626c78;font:inherit;font-size:13px;font-weight:850;white-space:nowrap;cursor:pointer}.store-delivery-tabs button.active{background:#fff;color:#a90e26;border-color:#efcdd2;box-shadow:0 3px 10px #9c102010}.store-delivery-tabs button b{min-width:23px;height:23px;display:grid;place-items:center;padding:0 5px;border-radius:7px;background:#f3e6e8;color:#a90e26;font-size:11px}.st38-delivery-list{display:grid;gap:11px;min-width:0}.gate-dispatch-guide-list{padding:12px 28px 22px;line-height:2.2;color:#46515e}.gate-dispatch-guide-list li{padding:3px 0}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-focus{max-width:100%}
+@media(max-width:700px){.store-delivery-panel{padding:12px}.store-delivery-tabs button{font-size:12px;padding:7px 6px}.gate-dispatch-guide-list{padding-inline:22px}}
+#appView .rail-nav .cartable-nav-home{width:100%;min-height:39px;display:flex;align-items:center;gap:9px;padding:0 10px;border:1px solid rgba(255,255,255,.18);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;text-align:right;white-space:nowrap;cursor:pointer}.cartable-nav-home .nav-label{font-size:11px;font-weight:850}.cartable-nav-title.admin-root-title{padding-top:8px}
+
+/* Gate tab content is intentionally isolated from the sales-pane layout. */
+.gate-workspace-content{width:100%;min-width:0;margin-top:18px}
+.gate-tab-context{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.gate-tab-context>p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.gate-tab-context .sd-count{flex:0 0 auto}
+
+/* Guard: four role-rail entries; driver delivery uses three horizontal peer tabs and one vertical list. */
+#appView[data-cartable-page="gate"] .gate-dispatch-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 14px;padding:6px;border:1px solid #e6e9ed;border-radius:14px;background:#f7f8fa}
+#appView[data-cartable-page="gate"] .gate-dispatch-tabs [role="tab"]{min-width:0;min-height:50px;padding:9px 12px;border:1px solid transparent;border-radius:10px;background:transparent;color:#515b68;font:inherit;font-size:13px;font-weight:850;line-height:1.5;text-align:center;cursor:pointer;white-space:normal}
+#appView[data-cartable-page="gate"] .gate-dispatch-tabs [role="tab"].active{background:#fff;color:#a90e26;border-color:#edc9cf;box-shadow:0 3px 10px rgba(156,16,32,.08)}
+#appView[data-cartable-page="gate"] .gate-dispatch-vertical-list{display:flex;flex-direction:column;align-items:stretch;gap:12px;min-width:0}
+#appView[data-cartable-page="gate"] .gate-dispatch-vertical-list>.dsp-card{width:100%;min-width:0}
+@media(max-width:600px){#appView[data-cartable-page="gate"] .gate-dispatch-tabs{gap:4px;padding:4px}#appView[data-cartable-page="gate"] .gate-dispatch-tabs [role="tab"]{padding:8px 5px;font-size:11px}}
+
+/* v37.7.8 — compact vertical order headers in Sales > Stores */
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .sd-store-list-v40{display:flex;flex-direction:column;align-items:stretch;gap:10px}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .sd-store-card-v42{display:flex;flex-direction:column;gap:10px;padding:14px 16px}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .sd-store-top-v42{display:block;width:100%;padding:0;margin:0;border:0}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .sd-store-identity-v42{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .sd-store-identity-v42 h3{order:0;margin:0;font-size:15px;line-height:1.7}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .sd-store-identity-v42 .order-code{order:1}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .sd-store-identity-v42 small{order:2;color:var(--muted);font-size:12px}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .sd-store-foot{width:100%;margin:0;padding-top:9px;border-top:1px solid var(--line)}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .store-receipt-sales-list{display:flex;flex-direction:column;gap:8px}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .store-receipt-sales-row-v42{display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:12px 14px}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .sales-section-title-v25{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+#appView[data-cartable-page="sales"] .sales-store-pane-v42 .sales-section-count{align-self:flex-start;display:flex;align-items:center;gap:7px}
+
+/* v37.7.9 — Sales > Stores: four dedicated vertical sections */
+#appView[data-cartable-page="sales"] .sales-store-pane-v43{display:grid;grid-template-columns:minmax(150px,205px) minmax(0,1fr);align-items:start;gap:16px}
+#appView[data-cartable-page="sales"] .sales-store-tabs-v43{display:flex;flex-direction:column;gap:7px;position:sticky;top:12px;padding:8px;border:1px solid var(--line);border-radius:14px;background:#f8f9fb}
+#appView[data-cartable-page="sales"] .sales-store-tab-v43{width:100%;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--ink);font:inherit;font-size:14px;font-weight:850;text-align:right;cursor:pointer}
+#appView[data-cartable-page="sales"] .sales-store-tab-v43.active{background:#fff;border-color:#e9c8ce;color:#a90e26;box-shadow:0 3px 12px rgba(156,16,32,.07)}
+#appView[data-cartable-page="sales"] .sales-store-tab-v43 b{min-width:26px;height:25px;display:grid;place-items:center;padding:0 6px;border-radius:8px;background:#eef0f3;color:#596272;font-size:11px}
+#appView[data-cartable-page="sales"] .sales-store-tab-v43.active b{background:#f8e9ec;color:#a90e26}
+#appView[data-cartable-page="sales"] .sales-store-subpanels-v43{min-width:0}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[hidden]{display:none!important}
+#appView[data-cartable-page="sales"] .sales-store-subhead-v43{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin:0 0 12px;padding:2px 0 10px;border-bottom:1px solid var(--line)}
+#appView[data-cartable-page="sales"] .sales-store-subhead-v43 h2{margin:0;font-size:19px}
+#appView[data-cartable-page="sales"] .sales-store-subhead-v43>span{color:var(--muted);font-size:12px}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43 .sr-ship-panel{margin-bottom:12px}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43 .sd-store-list-v40{display:flex;flex-direction:column;gap:9px}
+@media(max-width:700px){#appView[data-cartable-page="sales"] .sales-store-pane-v43{grid-template-columns:minmax(0,1fr);gap:10px}#appView[data-cartable-page="sales"] .sales-store-tabs-v43{position:static}#appView[data-cartable-page="sales"] .sales-store-tab-v43{min-height:40px}}
+
+/* v37.8.0 — Sales > Stores tabs match Guard cartable: four horizontal peers */
+#appView[data-cartable-page="sales"] .sales-store-pane-v43{grid-template-columns:minmax(0,1fr);gap:12px}
+#appView[data-cartable-page="sales"] .sales-store-tabs-v43{position:static;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:6px}
+#appView[data-cartable-page="sales"] .sales-store-tab-v43{min-width:0;min-height:48px;justify-content:center;text-align:center;white-space:normal}
+@media(max-width:700px){#appView[data-cartable-page="sales"] .sales-store-tabs-v43{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px}#appView[data-cartable-page="sales"] .sales-store-tab-v43{min-height:44px;flex-direction:column;gap:3px;padding:5px 3px;font-size:12px;line-height:1.3}#appView[data-cartable-page="sales"] .sales-store-tab-v43 b{min-width:21px;height:19px;font-size:10px}}
+
+/* v37.9.0 — Warehouse > Stores: horizontal tabs like Guard/Sales, forms vertical below,
+   and a one-line summarized order header with minimum vertical height */
+#appView[data-cartable-page="warehouse"] .wh38-store-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:5px;border:1px solid var(--line);border-radius:14px;background:#f8f9fb}
+#appView[data-cartable-page="warehouse"] .wh38-store-tab{min-width:0;min-height:42px;display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--ink);font:inherit;font-size:13.5px;font-weight:850;text-align:center;white-space:normal;cursor:pointer}
+#appView[data-cartable-page="warehouse"] .wh38-store-tab.active{background:#fff;border-color:#e9c8ce;color:#a90e26;box-shadow:0 3px 12px rgba(156,16,32,.07)}
+#appView[data-cartable-page="warehouse"] .wh38-store-tab b{min-width:24px;height:22px;display:grid;place-items:center;padding:0 6px;border-radius:7px;background:#eef0f3;color:#596272;font-size:11px}
+#appView[data-cartable-page="warehouse"] .wh38-store-tab.active b{background:#f8e9ec;color:#a90e26}
+#appView[data-cartable-page="warehouse"] .wh38-store-panel{min-width:0}
+#appView[data-cartable-page="warehouse"] .wh38-store-list{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin-top:10px}
+#appView[data-cartable-page="warehouse"] .wh38-store-card{grid-template-columns:28px minmax(0,1fr);gap:9px;padding:8px 11px;border-radius:12px}
+#appView[data-cartable-page="warehouse"] .wh38-store-card .wh38-no{width:28px;height:28px;border-radius:8px;font-size:12px}
+#appView[data-cartable-page="warehouse"] .wh38-store-card-main{min-width:0}
+#appView[data-cartable-page="warehouse"] .wh38-store-head{display:flex;align-items:center;gap:7px;min-width:0;min-height:26px;line-height:1.4}
+#appView[data-cartable-page="warehouse"] .wh38-store-head .order-code{flex:0 0 auto}
+#appView[data-cartable-page="warehouse"] .wh38-store-name{flex:0 1 auto;min-width:0;font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#appView[data-cartable-page="warehouse"] .wh38-store-meta{flex:1 1 auto;min-width:0;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#appView[data-cartable-page="warehouse"] .wh38-store-head .badge{flex:0 0 auto}
+#appView[data-cartable-page="warehouse"] .wh38-store-card .wh38-items{gap:4px;margin-top:6px}
+#appView[data-cartable-page="warehouse"] .wh38-store-card .wh38-items>div{padding:4px 8px;gap:7px;border-radius:8px;font-size:12px;min-width:0}
+#appView[data-cartable-page="warehouse"] .wh38-store-card .wh38-actions{margin-top:6px;padding-top:6px}
+#appView[data-cartable-page="warehouse"] .wh38-store-card .wh38-actions .btn{height:36px;min-height:36px;padding:0 14px;font-size:12px}
+#appView[data-cartable-page="warehouse"] .wh38-store-sheet-head{display:block;padding:7px 12px}
+#appView[data-cartable-page="warehouse"] .wh38-sheet .sr38-items{display:flex;flex-direction:column;align-items:stretch}
+@media(max-width:700px){
+  #appView[data-cartable-page="warehouse"] .wh38-store-tabs{gap:4px;padding:4px}
+  #appView[data-cartable-page="warehouse"] .wh38-store-tab{min-height:40px;padding:5px 4px;font-size:12px;line-height:1.3}
+  #appView[data-cartable-page="warehouse"] .wh38-store-tab b{min-width:21px;height:19px;font-size:10px}
+  #appView[data-cartable-page="warehouse"] .wh38-store-meta{font-size:10.5px}
+  #appView[data-cartable-page="warehouse"] .wh38-store-card .wh38-actions .btn{height:44px;min-height:44px}
+}
+
+/* ====================================================================
+   v37.10.0 — داشبورد مدرن سازمانیِ زندهٔ همهٔ واحدها + آیکن موضوعی ریل
+   --------------------------------------------------------------------
+   فقط لایهٔ نمایش: گرادیان ملایم قرمز برند، کارت‌های نرمِ سایه‌دار با
+   گوشهٔ گردتر، نوار پیشرفت، انیمیشن ورود پلکانی و hover روان.
+   هیچ منطق، داده یا گردش‌کاری تغییر نکرده است.
+   ==================================================================== */
+@keyframes btDashIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes btBarGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes btLivePulse{0%{box-shadow:0 0 0 0 rgba(46,204,113,.5)}70%{box-shadow:0 0 0 7px rgba(46,204,113,0)}100%{box-shadow:0 0 0 0 rgba(46,204,113,0)}}
+
+/* پالت لهجهٔ کارت‌ها (داشبورد مدیریت و داشبورد واحدها) */
+#appView .t-red,#appView .tone-red{--tn:#d21f33;--tn2:#8f0c1c;--tn-bg:#fdeef0}
+#appView .t-blue,#appView .tone-blue{--tn:#3b78d6;--tn2:#1d4390;--tn-bg:#edf3fd}
+#appView .t-orange,#appView .tone-orange{--tn:#ef8f00;--tn2:#a35b00;--tn-bg:#fff4dc}
+#appView .t-green,#appView .tone-green{--tn:#12a15f;--tn2:#07663f;--tn-bg:#e8f6ef}
+#appView .t-purple,#appView .tone-purple{--tn:#7c4dff;--tn2:#4b2a99;--tn-bg:#f3eefc}
+#appView .t-teal,#appView .tone-teal{--tn:#0e9aa7;--tn2:#066873;--tn-bg:#e6f7f9}
+
+/* ---------- ریل: کاشی آیکن موضوعی برای هر بخش ---------- */
+#appView #railNav .nav-icon{
+  width:34px!important;min-width:34px!important;height:34px!important;border-radius:10px!important;
+  background:rgba(255,255,255,.13)!important;border:1px solid rgba(255,255,255,.12);
+  transition:background .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+#appView #railNav > button:hover .nav-icon{background:rgba(255,255,255,.24)!important;transform:scale(1.07)}
+#appView #railNav > button.active .nav-icon,
+#appView #railNav > button[aria-current="page"] .nav-icon{
+  background:linear-gradient(135deg,var(--bt-brand),var(--bt-brand-700))!important;color:#fff!important;
+  border-color:rgba(255,255,255,.35)!important;box-shadow:0 6px 14px rgba(70,0,8,.35);
+}
+#appView #railNav > button{transition:background .2s ease,color .2s ease,box-shadow .2s ease,transform .2s ease!important}
+#appView #railNav > button:hover{transform:translateX(-2px)}
+#appView .rail-logo{border-radius:50%!important;padding:2px!important}
+#appView .rail-logo img{border-radius:50%}
+
+/* ---------- قهرمان داشبورد مدیریت و گزارش‌ها ---------- */
+#appView .db38-hero{
+  border:0!important;border-radius:22px!important;color:#fff!important;
+  background:
+    radial-gradient(560px 240px at 88% -30%,rgba(255,255,255,.20),transparent 62%),
+    radial-gradient(420px 200px at 4% 120%,rgba(255,120,130,.35),transparent 60%),
+    linear-gradient(130deg,#d92337 0%,var(--bt-brand) 52%,var(--bt-brand-700) 100%)!important;
+  box-shadow:0 18px 38px rgba(125,9,24,.28)!important;
+  padding:24px 26px!important;animation:btDashIn .45s ease both;
+}
+#appView .db38-hero::before{
+  content:"";position:absolute;width:340px;height:340px;border-radius:50%;
+  border:56px solid rgba(255,255,255,.055);left:-130px;top:-190px;pointer-events:none;
+}
+#appView .db38-hero::after{
+  content:"";position:absolute;width:210px;height:210px;left:150px;bottom:-120px;pointer-events:none;opacity:.07;
+  background:url("/logo.png") center/contain no-repeat;
+}
+#appView .db38-hero > *{position:relative;z-index:1}
+#appView .db38-hero h2{color:#fff!important;font-size:22px!important}
+#appView .db38-hero p{color:rgba(255,255,255,.84)!important;font-size:13px!important}
+#appView .db38-logo.db38-logo-img{
+  width:58px!important;height:58px!important;min-width:58px;border-radius:50%!important;
+  background:#fff!important;padding:4px!important;box-shadow:0 10px 22px rgba(70,0,8,.35)!important;
+  display:grid!important;place-items:center!important;
+}
+#appView .db38-logo.db38-logo-img img{width:100%;height:100%;object-fit:contain;border-radius:50%;display:block}
+#appView .db38-live{
+  display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);
+  color:#fff;font-size:11.5px;font-weight:800;white-space:nowrap;
+}
+#appView .db38-live i,.role-dash-live i,.role-dash-foot-live i{
+  width:8px;height:8px;min-width:8px;border-radius:50%;background:#2ecc71;animation:btLivePulse 1.8s ease-out infinite;
+}
+#appView .db38-hero .btn-primary{background:#fff!important;color:var(--bt-brand)!important;border-color:#fff!important;box-shadow:0 8px 18px rgba(70,0,8,.25)!important}
+#appView .db38-hero .btn-primary:hover{background:#fff2f3!important}
+#appView .db38-hero .btn-secondary{background:rgba(255,255,255,.10)!important;color:#fff!important;border-color:rgba(255,255,255,.38)!important;box-shadow:none!important}
+#appView .db38-hero .btn-secondary:hover{background:rgba(255,255,255,.20)!important}
+
+/* ---------- کارت‌های شاخص مدیریت ---------- */
+#appView .mg38-kpi{
+  border-radius:18px!important;overflow:hidden;animation:btDashIn .5s ease both;
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+#appView .mg38-kpis > .mg38-kpi:nth-child(2){animation-delay:.06s}
+#appView .mg38-kpis > .mg38-kpi:nth-child(3){animation-delay:.12s}
+#appView .mg38-kpis > .mg38-kpi:nth-child(4){animation-delay:.18s}
+#appView .mg38-kpis > .mg38-kpi:nth-child(5){animation-delay:.24s}
+#appView .mg38-kpi:hover{transform:translateY(-4px);box-shadow:0 16px 32px rgba(16,24,40,.12)!important;border-color:var(--tn-bg)!important}
+#appView .mg38-accent{
+  position:absolute;inset:0 0 auto 0;height:4px;display:block;
+  background:linear-gradient(90deg,var(--tn),var(--tn2));
+}
+#appView .mg38-kpi .mg38-ico{
+  background:linear-gradient(135deg,var(--tn),var(--tn2))!important;color:#fff!important;
+  border-radius:13px!important;box-shadow:0 8px 16px rgba(16,24,40,.18);
+}
+#appView .mg38-val{font-variant-numeric:tabular-nums}
+
+/* ---------- نمودارهای محصول و آخرین فعالیت‌ها ---------- */
+#appView .dbc-section{border-radius:20px!important;box-shadow:var(--bt-sh-sm)!important;animation:btDashIn .5s .1s ease both}
+#appView .dbc-card{border-radius:16px!important;transition:transform .22s ease,box-shadow .22s ease}
+#appView .dbc-card:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(16,24,40,.10)!important}
+#appView .dbc-track i{transform-origin:right center;animation:btBarGrow .8s cubic-bezier(.2,.8,.2,1) both}
+#appView .db38-grid .sd-panel{border-radius:20px!important;animation:btDashIn .5s .16s ease both}
+#appView .db38-act{border-radius:12px;transition:background .18s ease,transform .18s ease}
+#appView .db38-act:hover{background:var(--bt-panel-2);transform:translateX(-3px)}
+#appView .db38-aico{background:var(--bt-brand-50)!important;color:var(--bt-brand)!important;border-radius:10px!important}
+
+/* ---------- داشبورد واحدها (نگهبانی، فروش، انبار، فروشگاه، ترابری) ---------- */
+#appView .role-dash{gap:18px}
+#appView .role-dash-heading{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:22px 24px!important;border-radius:20px!important;
+  background:
+    radial-gradient(480px 170px at 100% 0%,rgba(180,15,35,.08),transparent 70%),
+    linear-gradient(115deg,#fff 0%,#fff8f8 100%)!important;
+  border:1px solid #f0d9de!important;box-shadow:0 10px 26px rgba(105,12,29,.06)!important;
+  animation:btDashIn .45s ease both;
+}
+#appView .role-dash-hero-ico{
+  width:54px;height:54px;min-width:54px;border-radius:16px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,#d92337,var(--bt-brand-700));
+  box-shadow:0 10px 20px rgba(156,0,16,.28);
+}
+#appView .role-dash-heading-text{flex:1 1 260px;min-width:0}
+#appView .role-dash-heading h2{font-size:23px!important;margin:0!important}
+#appView .role-dash-heading p{font-size:13px!important}
+.role-dash-live{
+  display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
+  background:var(--bt-green-bg);border:1px solid #cdebdc;color:var(--bt-green);
+  font-size:11.5px;font-weight:800;white-space:nowrap;
+}
+#appView .role-dash-grid{gap:14px}
+#appView .role-dash-card{
+  min-height:178px;padding:18px!important;border-radius:20px!important;gap:7px!important;overflow:hidden;
+  box-shadow:0 6px 18px rgba(16,24,40,.05)!important;animation:btDashIn .5s ease both;animation-delay:var(--d,0ms);
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important;
+}
+#appView .role-dash-card::after{
+  content:"";position:absolute;width:130px;height:130px;border-radius:50%;left:-46px;bottom:-70px;
+  background:var(--tn-bg);opacity:.75;pointer-events:none;
+}
+#appView .role-dash-card > *{position:relative;z-index:1}
+#appView .role-dash-card:hover{
+  transform:translateY(-4px)!important;border-color:var(--tn)!important;
+  box-shadow:0 16px 32px rgba(16,24,40,.12)!important;
+}
+#appView .role-dash-card:focus-visible{box-shadow:var(--bt-ring)!important;outline:none}
+#appView .role-dash-top{display:flex;align-items:center;justify-content:space-between;width:100%}
+#appView .role-dash-ico{
+  width:46px;height:46px;min-width:46px;border-radius:14px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,var(--tn),var(--tn2));box-shadow:0 8px 16px rgba(16,24,40,.18);
+}
+#appView .role-dash-num{background:var(--tn-bg)!important;color:var(--tn)!important;font-size:11px!important}
+#appView .role-dash-label{font-size:13.5px!important;font-weight:800!important;color:var(--bt-ink-2)!important}
+#appView .role-dash-card strong{font-size:34px!important;font-variant-numeric:tabular-nums}
+#appView .role-dash-bar{display:block;width:100%;height:8px;border-radius:999px;background:var(--bt-soft);overflow:hidden}
+#appView .role-dash-bar i{
+  display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--tn),var(--tn2));
+  transform-origin:right center;animation:btBarGrow .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--d,0ms) + 160ms);
+}
+#appView .role-dash-card small{color:var(--tn)!important;font-size:12px!important}
+#appView .role-dash-foot{border-radius:14px!important;background:var(--bt-panel-2)!important;animation:btDashIn .5s .2s ease both}
+.role-dash-foot-live{display:inline-flex;align-items:center;gap:7px}
+#appView .role-report-page .table-wrap{border-radius:18px!important;box-shadow:var(--bt-sh-sm);overflow:hidden;animation:btDashIn .5s .08s ease both}
+#appView .role-report-page > .btn{align-self:flex-start}
+
+@media (max-width:768px){
+  #appView .db38-hero{padding:18px!important;border-radius:18px!important}
+  #appView .db38-hero::after{left:40px}
+  #appView .role-dash-heading{padding:16px!important;gap:12px}
+  #appView .role-dash-hero-ico{width:46px;height:46px;min-width:46px;border-radius:13px}
+  #appView .role-dash-card{min-height:164px}
+}
+@media (prefers-reduced-motion:reduce){
+  #appView .db38-hero,#appView .mg38-kpi,#appView .dbc-section,#appView .db38-grid .sd-panel,
+  #appView .role-dash-heading,#appView .role-dash-card,#appView .role-dash-foot,
+  #appView .role-report-page .table-wrap{animation:none!important}
+  #appView .dbc-track i,#appView .role-dash-bar i{animation:none!important}
+  #appView .db38-live i,.role-dash-live i,.role-dash-foot-live i{animation:none!important}
+  #appView .mg38-kpi,#appView .dbc-card,#appView .role-dash-card,#appView #railNav > button{transition:none!important}
+}
+
+/* v37.10.0 — ریل باریک تبلت/موبایل: کاشی آیکن فشرده‌تر تا با برچسب جا شود */
+@media (max-width:1024px){
+  #appView #railNav .nav-icon{width:29px!important;min-width:29px!important;height:29px!important;border-radius:9px!important}
+  #appView #railNav > button:hover{transform:none}
+}
+
+/* ====================================================================
+   v37.11.0 — کارت «سفارشات ورودی امروز» در داشبورد انبار
+   --------------------------------------------------------------------
+   آمار زندهٔ سمت سرور (/api/warehouse/today-stats): جمع کل امروز +
+   تفکیک هر محصول. فقط نمایش؛ منطق انبار همان قبلی است.
+   ==================================================================== */
+#appView .wh-dash-live{
+  background:var(--bt-panel);border:1px solid #f0d9de;border-radius:20px;
+  box-shadow:0 10px 26px rgba(105,12,29,.06);padding:20px 22px;animation:btDashIn .5s .18s ease both;
+}
+#appView .wh-dash-head{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+#appView .wh-dash-ico{
+  width:48px;height:48px;min-width:48px;border-radius:14px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,var(--tn,#d21f33),var(--tn2,#8f0c1c));box-shadow:0 8px 16px rgba(156,0,16,.25);
+}
+#appView .wh-dash-title{flex:1 1 280px;min-width:0}
+#appView .wh-dash-title h3{margin:0;font-size:18px;font-weight:900;color:var(--bt-ink)}
+#appView .wh-dash-title p{margin:3px 0 0;font-size:12.5px;color:var(--bt-muted);line-height:1.8}
+#appView .wh-dash-head .btn{margin-inline-start:auto}
+#appView .wh-dash-totals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+#appView .wh-dash-total{
+  background:linear-gradient(180deg,#fff,#fff8f8);border:1px solid #f3e0e4;border-radius:14px;
+  padding:12px 14px;display:grid;gap:2px;
+}
+#appView .wh-dash-total span{font-size:11.5px;font-weight:800;color:var(--bt-muted)}
+#appView .wh-dash-total b{font-size:23px;font-weight:900;color:var(--bt-ink);line-height:1.3;font-variant-numeric:tabular-nums}
+#appView .wh-dash-total.is-wide b{font-size:16.5px;color:var(--bt-brand);padding-top:5px}
+#appView .wh-dash-status{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+#appView .wh-dash-chip{
+  display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;
+  font-size:11.5px;font-weight:800;border:1px solid var(--bt-line);background:var(--bt-panel-2);color:var(--bt-ink-2);
+}
+#appView .wh-dash-chip b{font-variant-numeric:tabular-nums}
+#appView .wh-dash-chip.is-pending{background:var(--bt-red-bg);border-color:#f3ccd2;color:var(--bt-red)}
+#appView .wh-dash-chip.is-preparing{background:#f3eefc;border-color:#ddd0f7;color:var(--bt-purple)}
+#appView .wh-dash-chip.is-done{background:var(--bt-green-bg);border-color:#cdebdc;color:var(--bt-green)}
+#appView .wh-dash-updated{margin-inline-start:auto;font-size:11px;color:var(--bt-muted-2);font-weight:700}
+#appView .wh-dash-list{display:grid;gap:8px;margin-top:14px}
+#appView .wh-dash-prod{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:right;cursor:pointer;
+  background:var(--bt-panel);border:1px solid var(--bt-line);border-radius:14px;padding:10px 14px;
+  font:inherit;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+#appView .wh-dash-prod:hover{transform:translateY(-2px);border-color:var(--tn,#d21f33);box-shadow:0 10px 22px rgba(16,24,40,.09)}
+#appView .wh-dash-prod:focus-visible{box-shadow:var(--bt-ring);outline:none}
+#appView .wh-dash-rank{
+  width:26px;height:26px;min-width:26px;border-radius:8px;display:grid;place-items:center;
+  background:var(--bt-soft);color:var(--bt-muted);font-size:12px;font-weight:900;
+}
+#appView .wh-dash-prod:first-child .wh-dash-rank{background:linear-gradient(135deg,var(--tn,#d21f33),var(--tn2,#8f0c1c));color:#fff}
+#appView .wh-dash-prod-main{flex:1 1 auto;min-width:0;display:grid;gap:6px}
+#appView .wh-dash-prod-name{font-size:13.5px;font-weight:800;color:var(--bt-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#appView .wh-dash-prod-bar{display:block;height:7px;border-radius:999px;background:var(--bt-soft);overflow:hidden}
+#appView .wh-dash-prod-bar i{
+  display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--tn,#d21f33),var(--tn2,#8f0c1c));
+  transform-origin:right center;animation:btBarGrow .8s cubic-bezier(.2,.8,.2,1) both;
+}
+#appView .wh-dash-prod-meta{display:grid;justify-items:end;gap:0;flex:0 0 auto}
+#appView .wh-dash-prod-meta b{font-size:14px;font-weight:900;color:var(--bt-ink);white-space:nowrap}
+#appView .wh-dash-prod-meta small{font-size:11px;color:var(--bt-muted);font-weight:700;white-space:nowrap}
+#appView .wh-dash-go{color:var(--tn,#d21f33);font-weight:900;flex:0 0 auto}
+#appView .wh-dash-empty{
+  margin-top:14px;padding:18px;border:1.5px dashed var(--bt-line-2);border-radius:14px;
+  background:var(--bt-panel-2);color:var(--bt-muted);font-size:13px;font-weight:700;text-align:center;
+}
+@media (max-width:900px){
+  #appView .wh-dash-totals{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #appView .wh-dash-live{padding:16px}
+}
+@media (max-width:560px){
+  #appView .wh-dash-prod-meta small{display:none}
+  #appView .wh-dash-updated{margin-inline-start:0}
+  #appView .wh-dash-head .btn{margin-inline-start:0}
+}
+@media (prefers-reduced-motion:reduce){
+  #appView .wh-dash-live{animation:none!important}
+  #appView .wh-dash-prod-bar i{animation:none!important}
+  #appView .wh-dash-prod{transition:none!important}
+}
+
+/* Stable paired dashboard tables: update row values in place instead of clearing the list. */
+#appView .wh-dash-content{display:grid;gap:14px;min-width:0}
+#appView .wh-dash-tables{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;min-width:0;margin-top:2px}
+#appView .wh-dash-table-card{min-width:0;overflow:hidden;border:1px solid var(--bt-line);border-radius:14px;background:var(--bt-panel)}
+#appView .wh-dash-table-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:13px 14px 10px;border-bottom:1px solid var(--bt-line)}
+#appView .wh-dash-table-heading>div{min-width:0}
+#appView .wh-dash-table-heading h4{margin:0;font-size:14px;font-weight:900;color:var(--bt-ink)}
+#appView .wh-dash-table-heading p{margin:3px 0 0;font-size:11px;line-height:1.6;color:var(--bt-muted)}
+#appView .wh-dash-table-heading>span{flex:0 0 auto;padding:3px 8px;border-radius:999px;background:var(--bt-soft);color:var(--bt-muted);font-size:10.5px;font-weight:800}
+#appView .wh-dash-table-wrap{width:100%;max-width:100%;overflow:hidden}
+#appView .wh-dash-table{width:100%;table-layout:fixed;border-collapse:collapse}
+#appView .wh-dash-table th,#appView .wh-dash-table td{min-width:0;padding:8px 7px;border-bottom:1px solid var(--bt-line);text-align:right;vertical-align:middle;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+#appView .wh-dash-table th{background:var(--bt-panel-2);color:var(--bt-muted);font-size:10px;font-weight:800}
+#appView .wh-dash-table th:first-child,#appView .wh-dash-table td:first-child{width:36px;text-align:center}
+#appView .wh-dash-table th:nth-child(3),#appView .wh-dash-table td:nth-child(3){width:27%;text-align:center;font-variant-numeric:tabular-nums}
+#appView .wh-dash-table th:nth-child(4),#appView .wh-dash-table td:nth-child(4){width:16%;text-align:center;font-variant-numeric:tabular-nums}
+#appView .wh-dash-table th:nth-child(5),#appView .wh-dash-table td:nth-child(5){width:17%;text-align:center;font-variant-numeric:tabular-nums}
+#appView .wh-dash-table tbody tr:last-child td{border-bottom:0}
+#appView .wh-dash-table tbody tr:not(.wh-dash-empty-row):hover td{background:#fffafa}
+#appView .wh-dash-table .wh-dash-rank-cell{color:var(--bt-muted);font-weight:800}
+#appView .wh-dash-product-link{display:block;width:100%;padding:0;border:0;background:transparent;color:var(--bt-ink);font:inherit;font-weight:850;text-align:right;cursor:pointer;overflow-wrap:anywhere}
+#appView .wh-dash-product-link:hover{color:var(--bt-brand);text-decoration:underline;text-underline-offset:2px}
+#appView .wh-dash-product-link:focus-visible{outline:2px solid var(--bt-brand);outline-offset:2px;border-radius:3px}
+#appView .wh-dash-product-name{display:block;font-weight:850;color:var(--bt-ink);overflow-wrap:anywhere}
+#appView .wh-dash-product-link .code-pill,#appView .wh-dash-product-name .code-pill{margin-inline-end:4px}
+#appView .wh-dash-empty-row td{padding:18px 10px;text-align:center!important;color:var(--bt-muted);font-weight:700}
+#appView .wh-dash-all-products{display:inline-flex;align-items:center;justify-content:center;margin:9px 12px 12px;padding:7px 12px;border:1px solid var(--bt-line);border-radius:9px;background:var(--bt-panel-2);color:var(--bt-brand);font:inherit;font-size:11px;font-weight:850;cursor:pointer}
+#appView .wh-dash-all-products:hover{border-color:var(--bt-brand);background:var(--bt-red-bg)}
+#appView .wh-dash-all-products[hidden]{display:none!important}
+#appView .wh-dash-delivered-total{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;padding:9px 12px;border-top:1px solid var(--bt-line);background:var(--bt-panel-2);font-size:11px;color:var(--bt-muted);font-weight:750}
+#appView .wh-dash-delivered-total b{color:var(--bt-green);font-size:13px;font-weight:900}
+#appView .wh-dash-delivered-total span b{font-size:11px}
+#appView .wh-dash-refresh-error{margin-inline-start:auto;font-size:10.5px;font-weight:700;color:var(--bt-amber)}
+#appView .wh-dash-all-modal{display:grid;gap:10px;max-height:70vh;overflow:auto}
+#appView .wh-dash-all-modal>p{margin:0;color:var(--bt-muted);font-size:12px}
+@media (max-width:960px){#appView .wh-dash-tables{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){
+  #appView .wh-dash-table-heading{padding:11px 10px 8px}
+  #appView .wh-dash-table-heading h4{font-size:12.5px}
+  #appView .wh-dash-table-heading p{font-size:10px}
+  #appView .wh-dash-table th,#appView .wh-dash-table td{padding:7px 4px;font-size:10px}
+  #appView .wh-dash-table th:first-child,#appView .wh-dash-table td:first-child{width:26px}
+  #appView .wh-dash-table th:nth-child(3),#appView .wh-dash-table td:nth-child(3){width:29%}
+  #appView .wh-dash-table th:nth-child(4),#appView .wh-dash-table td:nth-child(4){width:16%}
+  #appView .wh-dash-table th:nth-child(5),#appView .wh-dash-table td:nth-child(5){width:18%}
+  #appView .wh-dash-refresh-error{margin-inline-start:0}
+}
+/* The all-products dialog lives under #modal, outside the dashboard subtree. */
+#modal .wh-dash-all-modal{display:grid;gap:10px;max-height:70vh;overflow:auto;min-width:0}
+#modal .wh-dash-all-modal>p{margin:0;color:var(--bt-muted);font-size:12px}
+#modal .wh-dash-table-wrap{width:100%;max-width:100%;overflow:hidden}
+#modal .wh-dash-table{width:100%;table-layout:fixed;border-collapse:collapse;background:var(--bt-panel)}
+#modal .wh-dash-table th,#modal .wh-dash-table td{min-width:0;padding:7px 5px;border-bottom:1px solid var(--bt-line);text-align:right;vertical-align:middle;font-size:10px;line-height:1.5;overflow-wrap:anywhere}
+#modal .wh-dash-table th{background:var(--bt-panel-2);color:var(--bt-muted);font-size:9px;font-weight:800}
+#modal .wh-dash-table th:first-child,#modal .wh-dash-table td:first-child{width:28px;text-align:center}
+#modal .wh-dash-table th:nth-child(3),#modal .wh-dash-table td:nth-child(3){width:27%;text-align:center;font-variant-numeric:tabular-nums}
+#modal .wh-dash-table th:nth-child(4),#modal .wh-dash-table td:nth-child(4){width:16%;text-align:center;font-variant-numeric:tabular-nums}
+#modal .wh-dash-table th:nth-child(5),#modal .wh-dash-table td:nth-child(5){width:17%;text-align:center;font-variant-numeric:tabular-nums}
+#modal .wh-dash-product-link{display:block;width:100%;padding:0;border:0;background:transparent;color:var(--bt-ink);font:inherit;font-weight:850;text-align:right;cursor:pointer;overflow-wrap:anywhere}
+#modal .wh-dash-product-link:hover{color:var(--bt-brand);text-decoration:underline;text-underline-offset:2px}
+#modal .wh-dash-product-link:focus-visible{outline:2px solid var(--bt-brand);outline-offset:2px;border-radius:3px}
+#modal .wh-dash-table .wh-dash-rank-cell{color:var(--bt-muted);font-weight:800}
+#modal .wh-dash-table tbody tr:last-child td{border-bottom:0}
+
+/* ====================================================================
+   v37.12.0 — صفحهٔ ورود با طرح گرافیکی لوگوِ بنر داشبورد
+   --------------------------------------------------------------------
+   همان دستور بصری بنر داشبورد مدیریت (v37.10): گرادیان ملایم قرمز برند
+   با دو هالهٔ روشن، حلقهٔ تزئینی بزرگ، واترمارک محو لوگو و لوگوی رسمی
+   داخل قاب سفید دایره‌ای با سایه؛ فرم ورود روی پنل شیشه‌ای می‌نشیند.
+   منطق ورود، شناسه‌ها و رفتار فرم هیچ تغییری نکرده است.
+   ==================================================================== */
+@keyframes loginRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes loginHalo{0%{box-shadow:0 18px 40px rgba(70,0,8,.32),0 0 0 0 rgba(255,255,255,.34)}70%{box-shadow:0 18px 40px rgba(70,0,8,.32),0 0 0 16px rgba(255,255,255,0)}100%{box-shadow:0 18px 40px rgba(70,0,8,.32),0 0 0 0 rgba(255,255,255,0)}}
+
+#loginView.login-page:not(.hidden){
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(900px 520px at 88% -12%,rgba(255,255,255,.18),transparent 62%),
+    radial-gradient(640px 420px at 6% 112%,rgba(255,120,130,.32),transparent 60%),
+    linear-gradient(150deg,#d92337 0%,var(--bt-brand) 52%,var(--bt-brand-700) 100%)!important;
+}
+#loginView::before{
+  /* حلقهٔ تزئینی بزرگ بنر داشبورد */
+  content:"";position:absolute;width:340px;height:340px;border-radius:50%;
+  border:56px solid rgba(255,255,255,.055);left:-130px;top:-190px;pointer-events:none;
+}
+#loginView::after{
+  /* واترمارک محو لوگوی رسمی */
+  content:"";position:absolute;width:270px;height:270px;left:56px;bottom:-120px;pointer-events:none;opacity:.06;
+  background:url("/logo.png") center/contain no-repeat;
+}
+#loginView .login-stage{position:relative;z-index:1}
+#loginView .login-hero{gap:14px!important;animation:loginRise .5s ease both}
+#loginView.login-page .login-stage .login-logo-badge{
+  width:124px!important;height:124px!important;border-radius:50%!important;
+  background:#fff!important;padding:6px!important;overflow:hidden!important;
+  display:grid!important;place-items:center!important;
+  animation:loginHalo 2.6s ease-out infinite;
+}
+#loginView.login-page .login-stage .login-logo-badge img{
+  width:100%!important;height:100%!important;object-fit:contain!important;display:block;
+  border-radius:50%!important;background:transparent!important;
+}
+#loginView .login-org{font-size:22px!important;text-shadow:0 2px 10px rgba(70,0,8,.35)}
+#loginView .login-tag{
+  display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:999px;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);
+  color:#fff;font-size:12px;font-weight:800;white-space:nowrap;
+}
+#loginView .login-tag i{
+  width:8px;height:8px;min-width:8px;border-radius:50%;background:#2ecc71;animation:btLivePulse 1.8s ease-out infinite;
+}
+#loginView .login-card{
+  width:min(430px,100%)!important;padding:28px 26px 24px!important;border-radius:24px!important;
+  background:linear-gradient(160deg,rgba(255,255,255,.15),rgba(255,255,255,.07))!important;
+  border:1px solid rgba(255,255,255,.30)!important;
+  box-shadow:0 24px 50px rgba(60,0,8,.28),inset 0 1px 0 rgba(255,255,255,.25)!important;
+  backdrop-filter:blur(14px) saturate(1.35);-webkit-backdrop-filter:blur(14px) saturate(1.35);
+  animation:loginRise .55s .12s ease both;
+}
+#loginView .login-subtitle{color:rgba(255,255,255,.85)!important}
+#loginView .input-shell{height:52px!important;border-radius:14px!important;box-shadow:0 6px 16px rgba(60,0,8,.14)!important}
+#loginView .input-shell:focus-within{box-shadow:0 0 0 3px rgba(255,255,255,.45),0 6px 16px rgba(60,0,8,.14)!important}
+#loginView .btn-primary{
+  border-radius:14px!important;box-shadow:0 12px 26px rgba(60,0,8,.25)!important;
+  transition:transform .2s ease,box-shadow .2s ease,background .2s ease!important;
+}
+#loginView .btn-primary:hover{transform:translateY(-1px);box-shadow:0 16px 30px rgba(60,0,8,.30)!important}
+#loginView .btn-primary:active{transform:translateY(0)}
+#loginView .login-credit{
+  border-top:0!important;padding:8px 16px!important;border-radius:999px;
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);
+  animation:loginRise .55s .22s ease both;
+}
+@media (max-width:640px){
+  #loginView.login-page .login-stage .login-logo-badge{width:100px!important;height:100px!important}
+  #loginView .login-org{font-size:18px!important}
+  #loginView .login-card{padding:22px 18px 18px!important;border-radius:20px!important}
+  #loginView::after{width:200px;height:200px;left:8px;bottom:-96px}
+}
+@media (max-width:1024px) and (orientation:landscape) and (max-height:500px){
+  #loginView.login-page .login-stage .login-logo-badge{width:64px!important;height:64px!important}
+}
+@media (prefers-reduced-motion:reduce){
+  #loginView .login-hero,#loginView .login-card,#loginView .login-credit{animation:none!important}
+  #loginView.login-page .login-stage .login-logo-badge{animation:none!important}
+  #loginView .login-tag i{animation:none!important}
+  #loginView .btn-primary{transition:none!important}
+}
+
+/* ====================================================================
+   v37.13.0 — نوار قرمز سمت راست با طرح گرافیکی لوگوی صفحهٔ ورود/بنر
+   --------------------------------------------------------------------
+   همان دستور بصری بنر داشبورد (v37.10) و صفحهٔ ورود (v37.12) روی ستون
+   ناوبری: گرادیان قرمز برند با دو هالهٔ روشن و بافت مورب ظریف، حلقهٔ
+   تزئینی بزرگ، واترمارک محو لوگو، لوگوی رسمی در قاب سفید دایره‌ای با
+   هالهٔ نور ضربان‌دار، و کارت ساعت و آیتم‌های منو به‌صورت شیشه‌ای.
+   ساختار، ترتیب آیتم‌ها، شمارنده‌ها و رفتار ناوبری هیچ تغییری نکرده است.
+   ==================================================================== */
+@keyframes railLogoHalo{0%{box-shadow:0 10px 22px rgba(70,0,8,.35),0 0 0 0 rgba(255,255,255,.32)}70%{box-shadow:0 10px 22px rgba(70,0,8,.35),0 0 0 11px rgba(255,255,255,0)}100%{box-shadow:0 10px 22px rgba(70,0,8,.35),0 0 0 0 rgba(255,255,255,0)}}
+
+#appView .rail{
+  background:
+    radial-gradient(560px 300px at 88% -10%,rgba(255,255,255,.20),transparent 62%),
+    radial-gradient(430px 320px at 4% 110%,rgba(255,120,130,.30),transparent 60%),
+    repeating-linear-gradient(135deg,rgba(255,255,255,.03) 0 2px,transparent 2px 14px),
+    linear-gradient(165deg,#d92337 0%,var(--bt-brand) 52%,var(--bt-brand-700) 100%)!important;
+  box-shadow:-1px 0 0 rgba(120,0,10,.35),10px 0 34px rgba(156,0,16,.20)!important;
+}
+#appView .rail::before{
+  /* حلقهٔ تزئینی بزرگ صفحهٔ ورود، این‌بار روی ستون ناوبری */
+  content:"";position:absolute;width:300px;height:300px;border-radius:50%;
+  border:48px solid rgba(255,255,255,.06);background:none!important;
+  top:-150px;left:-120px;right:auto;bottom:auto;pointer-events:none;
+}
+#appView .rail::after{
+  /* واترمارک محو لوگوی رسمی پایین ستون (جایگزین بافت مورب قبلی که به پس‌زمینه رفت) */
+  content:"";position:absolute;width:210px;height:210px;
+  top:auto;right:auto;bottom:-72px;left:-58px;pointer-events:none;opacity:.055;
+  background:url("/logo.png") center/contain no-repeat;
+}
+#appView .rail-top{border-bottom:1px solid rgba(255,255,255,.22)!important}
+#appView .rail .rail-logo.logo-frame{
+  width:52px!important;height:52px!important;min-width:52px;border-radius:50%!important;
+  background:#fff!important;padding:3px!important;overflow:hidden!important;
+  animation:railLogoHalo 2.8s ease-out infinite;
+}
+#appView .rail .rail-logo.logo-frame img{border-radius:50%!important}
+#appView .rail-brand strong{font-size:18px!important;text-shadow:0 2px 8px rgba(70,0,8,.35)!important}
+#appView .rail-brand::after{
+  /* زیرعنوان هم‌زبان با نشان «سامانه یکپارچهٔ عملیات» صفحهٔ ورود */
+  content:"سامانه یکپارچهٔ عملیات";display:block;margin-top:1px;
+  font-size:10px;font-weight:700;color:rgba(255,255,255,.72);white-space:nowrap;
+}
+
+/* کارت ساعت: پنل شیشه‌ای هم‌خانوادهٔ کارت ورود */
+#appView .rail-clock{
+  border-radius:16px!important;
+  background:linear-gradient(160deg,rgba(255,255,255,.16),rgba(255,255,255,.06))!important;
+  border:1px solid rgba(255,255,255,.26)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 10px 22px rgba(70,0,8,.18)!important;
+  backdrop-filter:blur(8px) saturate(1.3);-webkit-backdrop-filter:blur(8px) saturate(1.3);
+}
+
+/* منو: آیتم‌های شیشه‌ای در hover و آیتم فعال سفیدِ براق */
+#appView .cartable-nav-title{color:rgba(255,255,255,.78)!important;letter-spacing:.02em}
+#appView #railNav > button{border:1px solid transparent!important;border-radius:13px!important}
+#appView #railNav > button:hover{
+  background:linear-gradient(160deg,rgba(255,255,255,.17),rgba(255,255,255,.07))!important;
+  border-color:rgba(255,255,255,.18)!important;color:#fff!important;
+}
+#appView #railNav > button.active,
+#appView #railNav > button[aria-current="page"]{
+  background:linear-gradient(165deg,#ffffff 0%,#fff1f2 100%)!important;
+  box-shadow:0 10px 22px rgba(70,0,8,.30),inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+#appView #railNav .cartable-nav-home{
+  background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.24)!important;
+  border-radius:12px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
+}
+#appView #railNav .cartable-nav-home:hover{background:rgba(255,255,255,.18)!important}
+
+@media (max-width:1024px){
+  #appView .rail::before{width:200px;height:200px;border-width:32px;top:-100px;left:-84px}
+  #appView .rail::after{width:150px;height:150px;bottom:-56px;left:-46px}
+  #appView .rail-clock{backdrop-filter:none;-webkit-backdrop-filter:none}
+}
+@media (prefers-reduced-motion:reduce){
+  #appView .rail .rail-logo.logo-frame{animation:none!important;box-shadow:0 10px 22px rgba(70,0,8,.35),0 0 0 3px rgba(255,255,255,.22)!important}
+}
+
+/* ====================================================================
+   v37.14.0 — فرم‌ها و سربرگ‌های مدرن و شیک در سراسر سامانه
+   --------------------------------------------------------------------
+   همان زبان بصری بنر داشبورد (v37.10)، صفحهٔ ورود (v37.12) و نوار قرمز
+   (v37.13) روی همهٔ فرم‌ها و سربرگ‌ها: گرادیان ملایم قرمز برند،
+   سربرگ‌های شیشه‌ای با نوار لهجهٔ گرادیانی، ورودی‌های نرم با حلقهٔ
+   تمرکز برند، دکمه‌های گرادیانی با برقِ hover و سربرگ جدول هم‌خانواده.
+   فقط لایهٔ نمایش است؛ ساختار، شناسه‌ها، data-actionها و منطق فرم‌ها
+   هیچ تغییری نکرده‌اند.
+   ==================================================================== */
+:root{
+  --bt-r-xl:20px;
+  --fm-brand-grad:linear-gradient(135deg,#cf1d33 0%,var(--bt-brand) 55%,var(--bt-brand-700) 100%);
+  --fm-head-bg:linear-gradient(180deg,#ffffff 0%,#fdf3f4 100%);
+  --fm-field-bg:linear-gradient(180deg,#ffffff 0%,#fbfcfd 100%);
+  --fm-ring:0 0 0 4px rgba(180,15,35,.10);
+}
+
+/* ---------- سربرگ اصلی صفحه: شیشه‌ای با خط لهجهٔ گرادیانی ---------- */
+#appView .workspace-header{
+  background:
+    radial-gradient(420px 130px at 96% -40%,rgba(180,15,35,.12),transparent 70%),
+    linear-gradient(180deg,rgba(255,255,255,.96),rgba(253,243,244,.92))!important;
+  box-shadow:0 12px 30px -18px rgba(23,27,34,.28)!important;
+}
+#appView .workspace-header::after{
+  content:"";position:absolute;inset-inline:0;bottom:-1px;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(180,15,35,.55) 16%,rgba(180,15,35,.55) 84%,transparent);
+}
+#appView .header-main{position:relative;padding-inline-start:14px}
+#appView .header-main::before{
+  content:"";position:absolute;inset-inline-start:0;top:5px;bottom:5px;width:4px;border-radius:99px;
+  background:var(--fm-brand-grad);box-shadow:0 4px 10px rgba(180,15,35,.35);
+}
+#appView .header-profile{
+  background:linear-gradient(180deg,#ffffff,#fbf7f8)!important;border-color:var(--bt-brand-100)!important;
+  border-radius:14px!important;box-shadow:0 4px 14px -8px rgba(23,27,34,.25)!important;
+}
+#appView .header-avatar{background:var(--fm-brand-grad)!important;border-radius:12px!important;box-shadow:0 6px 14px rgba(180,15,35,.30),inset 0 1px 0 rgba(255,255,255,.35)!important}
+#appView #bellCount{background:var(--fm-brand-grad)!important;box-shadow:0 4px 10px rgba(180,15,35,.35)}
+#appView .icon-btn,#appView .notification-btn{border-radius:12px!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,color .16s ease,background .16s ease}
+#appView .icon-btn:hover,#appView .notification-btn:hover{transform:translateY(-1px);box-shadow:0 8px 16px -8px rgba(180,15,35,.35)!important;border-color:var(--bt-brand-200)!important}
+
+/* ---------- کارت‌ها و سربرگ کارت‌ها ---------- */
+#appView .sd-panel,#appView .card,#appView .panel,#appView .adm-panel{
+  border-radius:var(--bt-r-xl)!important;border-color:#e9ebef!important;
+  box-shadow:0 1px 2px rgba(16,24,40,.05),0 14px 34px -20px rgba(23,27,34,.22)!important;
+}
+#appView .sd-head{
+  position:relative;background:var(--fm-head-bg)!important;border-bottom:1px solid var(--bt-brand-100)!important;
+  border-radius:19px 19px 0 0;
+}
+#appView .sd-head::before{
+  content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:4px;
+  background:var(--fm-brand-grad);border-radius:0 4px 4px 0;
+}
+#appView .sd-head-ico{
+  background:var(--fm-brand-grad)!important;color:#fff!important;border-radius:13px!important;
+  box-shadow:0 8px 18px rgba(180,15,35,.28),inset 0 1px 0 rgba(255,255,255,.35)!important;
+}
+#appView .sd-head-ico .svg{color:#fff!important}
+#appView .sd-count{
+  background:linear-gradient(180deg,#ffffff,var(--bt-brand-50))!important;border-color:var(--bt-brand-100)!important;
+  box-shadow:0 4px 12px -6px rgba(180,15,35,.28)!important;
+}
+#appView .panel-head{position:relative}
+#appView .panel-head h2{position:relative;padding-inline-start:12px}
+#appView .panel-head h2::before{
+  content:"";position:absolute;inset-inline-start:0;top:4px;bottom:4px;width:4px;border-radius:99px;background:var(--fm-brand-grad);
+}
+#appView .stl-form-head{
+  background:
+    radial-gradient(360px 120px at 96% -30%,rgba(180,15,35,.10),transparent 70%),
+    linear-gradient(120deg,#fff8f8,#ffffff)!important;
+  border-bottom:1px solid var(--bt-brand-100)!important;
+}
+#appView .adm-toolbar{background:linear-gradient(180deg,#ffffff,#fbf7f8)!important}
+#modal .modal-card{border-radius:22px!important}
+#modal .modal-head,#modal .modal-header{
+  position:relative;background:var(--fm-head-bg)!important;border-bottom:1px solid var(--bt-brand-100)!important;
+}
+#modal .modal-head::before,#modal .modal-header::before{
+  content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:4px;background:var(--fm-brand-grad);
+}
+#modal .modal-close{border-radius:11px!important;transition:transform .16s ease,border-color .16s ease,color .16s ease,background .16s ease}
+#modal .modal-close:hover{color:var(--bt-brand)!important;border-color:var(--bt-brand-200)!important;background:var(--bt-brand-50)!important;transform:scale(1.06)}
+.notification-popover{border-radius:18px!important;box-shadow:0 24px 60px rgba(16,24,40,.20)!important}
+.notification-item{transition:background .15s ease}
+.notification-item:hover{background:var(--bt-brand-50)!important}
+
+/* تب فعال: آیکن گرادیانی برند، هم‌خانوادهٔ آیکن‌های داشبورد */
+#appView .sd-tab,#appView .wh38-tab,#appView .v26-sales-tab{transition:background .16s ease,color .16s ease,box-shadow .16s ease}
+#appView .sd-tab.active .sd-tab-ico,
+#appView .wh38-tab.active > span:not(.wh38-tab-idx),
+#appView .v26-sales-tab.active .v26-tab-icon{
+  background:var(--fm-brand-grad)!important;color:#fff!important;
+  box-shadow:0 6px 14px rgba(180,15,35,.30),inset 0 1px 0 rgba(255,255,255,.35)!important;
+}
+
+/* ---------- برچسب‌ها و راهنماها ---------- */
+#appView .field > label:not(.adm-check):not(.gt-switch),
+#modal .field > label:not(.adm-check):not(.gt-switch),
+#appView .sd-line-cell > label,#modal .sd-line-cell > label{
+  display:flex!important;align-items:center;gap:6px;
+}
+#appView .field > label:not(.adm-check):not(.gt-switch)::before,
+#modal .field > label:not(.adm-check):not(.gt-switch)::before,
+#appView .sd-line-cell > label::before,#modal .sd-line-cell > label::before,
+#appView .cust-field > span::before,#modal .cust-field > span::before,
+#appView .sc2-field > span::before{
+  content:"";width:6px;height:6px;min-width:6px;border-radius:99px;background:var(--fm-brand-grad);
+  box-shadow:0 2px 6px rgba(180,15,35,.35);
+}
+#appView .cust-field > span,#modal .cust-field > span{display:flex!important;align-items:center;gap:6px}
+#appView .field-hint,#modal .field-hint,#appView .form-hint{font-size:11.5px!important;color:var(--bt-muted)!important;font-weight:600;line-height:1.7}
+#appView .form-error:not(:empty),#modal .form-error:not(:empty){
+  background:var(--bt-red-bg);border:1px solid #f5ccd2;border-radius:10px;padding:8px 12px;min-height:0;
+}
+
+/* ---------- قاب ورودی (input-shell) در همهٔ فرم‌ها ---------- */
+#appView .input-shell,#modal .input-shell,#loginView .input-shell{
+  min-height:48px;border:1.5px solid var(--bt-line-2)!important;border-radius:14px!important;
+  background:var(--fm-field-bg)!important;
+  box-shadow:inset 0 1px 2px rgba(16,24,40,.04),0 1px 2px rgba(16,24,40,.03)!important;
+  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+#appView .input-shell:hover,#modal .input-shell:hover,#loginView .input-shell:hover{border-color:#e3a7ae!important}
+#appView .input-shell:focus-within,#modal .input-shell:focus-within,#loginView .input-shell:focus-within{
+  border-color:var(--bt-brand)!important;background:#fff!important;
+  box-shadow:var(--fm-ring),0 8px 18px -10px rgba(180,15,35,.45)!important;
+}
+#appView .input-shell .field-icon,#modal .input-shell .field-icon,#loginView .input-shell .field-icon{transition:color .16s ease}
+#appView .input-shell:focus-within .field-icon,#modal .input-shell:focus-within .field-icon,#loginView .input-shell:focus-within .field-icon{color:var(--bt-brand)!important}
+#appView .input-shell ::placeholder,#modal .input-shell ::placeholder{color:var(--bt-muted-2)}
+#appView .input-shell:has(> input:disabled),#modal .input-shell:has(> input:disabled),
+#appView .input-shell:has(> select:disabled),#modal .input-shell:has(> select:disabled){
+  background:#f1f3f5!important;box-shadow:none!important;
+}
+
+/* ---------- ورودی‌های بدون قاب (مستقیم در فرم/جدول/مودال) ---------- */
+#appView #content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="file"]):not([type="color"]):not(.ui-jdate),
+#modal input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="file"]):not([type="color"]):not(.ui-jdate){
+  border:1.5px solid var(--bt-line-2);border-radius:12px;background-color:#fff;color:var(--bt-ink);
+  min-height:44px;padding:0 12px;font:inherit;
+  box-shadow:inset 0 1px 2px rgba(16,24,40,.04);
+  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+#appView #content textarea,#modal textarea{
+  border:1.5px solid var(--bt-line-2);border-radius:14px;background:var(--fm-field-bg);color:var(--bt-ink);
+  padding:11px 13px;font:inherit;line-height:1.8;min-height:84px;
+  box-shadow:inset 0 1px 2px rgba(16,24,40,.04);
+  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+#appView #content select:not([multiple]):not([size]),#modal select:not([multiple]):not([size]){
+  appearance:none;-webkit-appearance:none;
+  border:1.5px solid var(--bt-line-2);border-radius:12px;background-color:#fff;color:var(--bt-ink);
+  min-height:44px;padding:0 12px;padding-inline-end:34px;font:inherit;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23b40f23' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:left 11px center;background-size:14px;
+  box-shadow:inset 0 1px 2px rgba(16,24,40,.04);
+  transition:border-color .16s ease,box-shadow .16s ease,background-color .16s ease;
+}
+#appView #content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="file"]):not([type="color"]):not(.ui-jdate):hover,
+#appView #content select:not([multiple]):not([size]):hover,#appView #content textarea:hover,
+#modal input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="file"]):not([type="color"]):not(.ui-jdate):hover,
+#modal select:not([multiple]):not([size]):hover,#modal textarea:hover{border-color:#e3a7ae}
+#appView #content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="file"]):not([type="color"]):not(.ui-jdate):focus,
+#appView #content select:not([multiple]):not([size]):focus,#appView #content textarea:focus,
+#modal input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="file"]):not([type="color"]):not(.ui-jdate):focus,
+#modal select:not([multiple]):not([size]):focus,#modal textarea:focus{
+  border-color:var(--bt-brand);box-shadow:var(--fm-ring);outline:0;background-color:#fff;
+}
+#appView #content input.invalid,#appView #content select.invalid,#appView #content textarea.invalid,
+#appView #content input[aria-invalid="true"],#modal input.invalid,#modal textarea.invalid{
+  border-color:var(--bt-red)!important;background-color:var(--bt-red-bg)!important;
+}
+#appView #content input:disabled,#appView #content select:disabled,#appView #content textarea:disabled,
+#modal input:disabled,#modal select:disabled,#modal textarea:disabled{
+  background-color:#f1f3f5;color:var(--bt-muted);cursor:not-allowed;box-shadow:none;
+}
+/* داخل قاب، خود ورودی همچنان بدون قاب می‌ماند (قرارداد form-layout) */
+#appView #content .input-shell > input,#appView #content .input-shell > select,#appView #content .input-shell > textarea,
+#modal .input-shell > input,#modal .input-shell > select,#modal .input-shell > textarea{
+  background-image:none!important;
+}
+/* استثناهای فشرده/خاص: پلاک ایران، وزن انبار، قیمت مدیریت، وزن بزرگ باسکول */
+#appView #content .iran-plate input,#appView #content .iran-plate select,#modal .iran-plate input,#modal .iran-plate select{
+  border:0!important;border-radius:0!important;background-color:transparent!important;background-image:none!important;box-shadow:none!important;min-height:0!important;
+}
+#appView #content .wh38-weight input{border:0!important;background-color:transparent!important;box-shadow:none!important;min-height:0!important}
+#appView #content .weight-input-large input{min-height:54px!important}
+#appView .adm-price input{min-height:36px!important}
+#appView .ui-jdate{border:1.5px solid var(--bt-line-2)!important;border-radius:12px!important;min-height:44px;transition:border-color .16s ease,box-shadow .16s ease}
+#appView .ui-jdate:hover{border-color:#e3a7ae!important}
+
+/* چک‌باکس و رادیو: لهجهٔ برند یکدست */
+#appView input[type="checkbox"],#appView input[type="radio"],
+#modal input[type="checkbox"],#modal input[type="radio"]{
+  width:18px;height:18px;min-height:0!important;accent-color:var(--bt-brand);cursor:pointer;flex:0 0 auto;
+}
+#appView .adm-check,#modal .adm-check{border-radius:12px!important;background:linear-gradient(180deg,#ffffff,var(--bt-panel-2))!important;transition:border-color .16s ease,background .16s ease}
+#appView .adm-check:hover,#modal .adm-check:hover{border-color:var(--bt-brand-200)!important}
+#appView .adm-check:has(> input:checked),#modal .adm-check:has(> input:checked){
+  border-color:var(--bt-brand-200)!important;background:var(--bt-brand-50)!important;
+}
+
+/* ---------- بخش‌بندی فرم، ردیف اقلام و نوار اقدام ---------- */
+#appView .gt-fieldset{
+  border:1px solid var(--bt-brand-100)!important;border-radius:18px!important;
+  background:linear-gradient(180deg,#ffffff,#fdf8f8)!important;
+  box-shadow:0 1px 2px rgba(16,24,40,.04);
+}
+#appView .gt-fieldset-title .svg{
+  width:30px!important;height:30px!important;min-width:30px;padding:6px;border-radius:9px;
+  background:var(--fm-brand-grad);color:#fff!important;box-shadow:0 6px 14px rgba(180,15,35,.28);
+}
+#appView .sd-line{
+  border-radius:16px!important;border-color:var(--bt-line-2)!important;
+  background:linear-gradient(180deg,#ffffff,#fafbfc)!important;
+  transition:border-color .16s ease,box-shadow .16s ease;
+}
+#appView .sd-line:hover{border-color:var(--bt-brand-200)!important;box-shadow:0 10px 22px -14px rgba(180,15,35,.35)}
+#appView .sd-line-no{
+  background:var(--fm-brand-grad)!important;color:#fff!important;border:0!important;
+  box-shadow:0 5px 12px rgba(180,15,35,.30);border-radius:10px!important;
+}
+#appView .sticky-actions,#modal .sticky-actions{
+  border-top:1px solid var(--bt-brand-100);padding:12px 6px 4px;
+  background:linear-gradient(to top,rgba(255,255,255,.97) 72%,rgba(255,255,255,0))!important;
+}
+#appView .sd-submit-bar{
+  border:1px solid var(--bt-brand-100)!important;border-radius:16px!important;
+  background:linear-gradient(180deg,#ffffff,#fdf6f7)!important;
+  box-shadow:0 12px 26px -18px rgba(180,15,35,.40)!important;
+}
+#appView .st-run-letterhead{border-color:var(--bt-brand-100)!important;border-radius:16px!important;background:linear-gradient(180deg,#ffffff,#fdf8f8)!important}
+
+/* ---------- دکمه‌ها: گرادیانی با برقِ hover ---------- */
+#appView .btn,#modal .btn{
+  border-radius:12px!important;position:relative;
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease,border-color .16s ease,color .16s ease!important;
+}
+#appView .btn:hover:not(:disabled),#modal .btn:hover:not(:disabled){transform:translateY(-1px)!important}
+#appView .btn:active:not(:disabled),#modal .btn:active:not(:disabled){transform:translateY(0)!important}
+#appView .btn-primary,#modal .btn-primary,.login-card .btn-primary{
+  background:linear-gradient(135deg,#cd1a2e 0%,var(--bt-brand) 55%,var(--bt-brand-700) 100%)!important;
+  border-color:transparent!important;color:#fff!important;overflow:hidden;
+  box-shadow:0 12px 24px -10px rgba(180,15,35,.60),inset 0 1px 0 rgba(255,255,255,.25)!important;
+}
+#appView .btn-primary::after,#modal .btn-primary::after,.login-card .btn-primary::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.35) 50%,transparent 58%);
+  transform:translateX(130%);transition:transform .55s ease;
+}
+#appView .btn-primary:hover:not(:disabled)::after,#modal .btn-primary:hover:not(:disabled)::after,.login-card .btn-primary:hover:not(:disabled)::after{transform:translateX(-130%)}
+#appView .btn-secondary,#modal .btn-secondary{
+  background:linear-gradient(180deg,#ffffff,#f7f8fa)!important;
+  box-shadow:0 1px 2px rgba(16,24,40,.05)!important;
+}
+#appView .btn-secondary:hover:not(:disabled),#modal .btn-secondary:hover:not(:disabled){
+  border-color:var(--bt-brand-200)!important;color:var(--bt-brand)!important;
+  box-shadow:0 8px 18px -10px rgba(180,15,35,.35)!important;
+}
+#appView .btn-danger,#modal .btn-danger{
+  background:linear-gradient(135deg,#d92d20,#b4232d)!important;border-color:transparent!important;color:#fff!important;
+  box-shadow:0 10px 20px -10px rgba(180,35,45,.55),inset 0 1px 0 rgba(255,255,255,.22)!important;
+}
+#appView .btn-success,#modal .btn-success{
+  background:linear-gradient(135deg,#14a05e,#0f7a4e)!important;border-color:transparent!important;color:#fff!important;
+  box-shadow:0 10px 20px -10px rgba(15,122,78,.55),inset 0 1px 0 rgba(255,255,255,.22)!important;
+}
+#appView .btn-ghost:hover:not(:disabled),#modal .btn-ghost:hover:not(:disabled){background:var(--bt-brand-50)!important;color:var(--bt-brand)!important;border-color:var(--bt-brand-100)!important}
+#appView .btn:disabled,#modal .btn:disabled{box-shadow:none!important;filter:saturate(.55)}
+#appView .pill{transition:border-color .16s ease,color .16s ease,background .16s ease}
+#appView .pill:hover{border-color:var(--bt-brand-200);color:var(--bt-brand);background:#fff}
+#appView .count-chip{background:var(--fm-brand-grad)!important;color:#fff!important;box-shadow:0 5px 12px rgba(180,15,35,.30)}
+
+/* ---------- سربرگ جدول‌ها ---------- */
+#appView .table-wrap,#appView .adm-table-wrap{
+  border-radius:16px!important;border-color:var(--bt-line-2)!important;background:#fff;
+  box-shadow:0 1px 2px rgba(16,24,40,.05),0 14px 30px -22px rgba(23,27,34,.25)!important;
+}
+#appView .table th,#appView .adm-table thead th{
+  background:linear-gradient(180deg,#fdf3f4,#fbe9ec)!important;color:#8a1220!important;
+  border-bottom:2px solid var(--bt-brand-200)!important;letter-spacing:0;
+}
+#appView .table tbody tr,#appView .adm-table tbody tr{transition:background .15s ease}
+#appView .table tbody tr:hover td{background:#fdf6f7!important}
+
+/* ---------- واکنش‌گرایی و دسترس‌پذیری ---------- */
+@media (max-width:768px){
+  #appView #content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="file"]):not([type="color"]):not(.ui-jdate),
+  #appView #content select:not([multiple]):not([size]),
+  #modal input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="file"]):not([type="color"]):not(.ui-jdate),
+  #modal select:not([multiple]):not([size]){min-height:48px}
+  #appView .sd-head{border-radius:17px 17px 0 0}
+  #appView .sd-panel,#appView .card,#appView .panel,#appView .adm-panel{border-radius:18px!important}
+  #modal .modal-card{border-radius:18px!important}
+}
+@media (prefers-reduced-motion:reduce){
+  #appView .btn,#modal .btn,#appView .input-shell,#modal .input-shell,#appView .icon-btn{transition:none!important}
+  #appView .btn-primary::after,#modal .btn-primary::after,.login-card .btn-primary::after{display:none!important}
+  #appView .btn:hover:not(:disabled),#modal .btn:hover:not(:disabled),#appView .icon-btn:hover{transform:none!important}
+}
+@media print{
+  #appView .table th,#appView .adm-table thead th{background:#fff!important;box-shadow:none!important}
+  #appView .sd-head,#modal .modal-head{background:#fff!important}
+}
+
+/* ====================================================================
+   v37.15.0 — منوی مستقل «در انتظار اقدام فروش» + بازطراحی فرم ثبت ورود
+   --------------------------------------------------------------------
+   ستون «در انتظار اقدام فروش» از کنار فرم ثبت ورود نگهبانی جدا و منوی
+   مستقل کارتابل شد؛ فرم ثبت ورود بدون فیلد «محله»، با چیدمان فشردهٔ
+   افقی (مشتری در یک ردیف، پلاک کنار نوع وسیله و هدف مراجعه) بازطراحی
+   شد تا ارتفاع عمودی آن کم شود و پلاک ایران ظاهر سه‌بعدی مدرن گرفت.
+   ==================================================================== */
+
+/* ---------- فرم ثبت ورود فشرده ---------- */
+#appView .gt-entry-pad{padding:16px 20px 8px!important}
+#appView .gt-entry-panel .gt-fieldset{padding:14px 16px!important}
+#appView .gt-entry-panel .gt-fieldset + .gt-fieldset{margin-top:12px!important}
+#appView .gt-entry-panel .gt-fieldset-title{margin-bottom:10px!important}
+#appView .gt-entry-cust{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:12px;align-items:start}
+#appView .gt-entry-cust .cust-code-entry{margin:0!important}
+#appView .gt-entry-vehicle{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:16px;align-items:start}
+#appView .gt-entry-vehicle-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+@media (max-width:1150px){
+  #appView .gt-entry-cust{grid-template-columns:1fr 1fr}
+  #appView .gt-entry-cust .cust-code-entry{grid-column:1/-1}
+  #appView .gt-entry-vehicle{grid-template-columns:minmax(0,1fr)}
+  #appView .gt-plate-col{max-width:380px}
+}
+@media (max-width:640px){
+  #appView .gt-entry-cust,#appView .gt-entry-vehicle-fields{grid-template-columns:minmax(0,1fr)}
+  #appView .gt-entry-pad{padding:12px 14px 6px!important}
+}
+
+/* ---------- منوی مستقل «در انتظار اقدام فروش» ---------- */
+#appView .gt-waiting-list{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+  padding:14px 20px 8px;align-items:start;
+}
+#appView .gt-waiting-list .sd-queue-row{margin:0!important}
+@media (max-width:1100px){#appView .gt-waiting-list{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- پلاک ایران سه‌بعدی مدرن ---------- */
+#appView .iran-plate{
+  border:2px solid #1e2a38!important;border-radius:16px!important;
+  background:linear-gradient(180deg,#ffffff 0%,#eef1f5 52%,#dbe3ec 100%)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 -10px 18px rgba(30,42,56,.12),
+    0 16px 30px -12px rgba(23,32,44,.45),
+    0 4px 0 #aeb9c6!important;
+  transform:perspective(700px) rotateX(1.6deg);transform-origin:center bottom;
+  transition:transform .25s ease,box-shadow .25s ease;
+}
+#appView .iran-plate:hover{
+  transform:perspective(700px) rotateX(0deg);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 -8px 14px rgba(30,42,56,.10),
+    0 10px 22px -10px rgba(23,32,44,.40),
+    0 3px 0 #aeb9c6!important;
+}
+#appView .iran-plate .blue-strip{
+  background:linear-gradient(180deg,#2b83cf 0%,#0d4f8c 58%,#093d6d 100%)!important;
+  box-shadow:inset -1px 0 0 rgba(255,255,255,.28),inset 0 1px 0 rgba(255,255,255,.40);
+}
+#appView .iran-plate .plate-part{
+  border-left:1px solid rgba(30,42,56,.16)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(30,42,56,.03));
+}
+#appView .iran-plate .plate-part:last-child{background:linear-gradient(180deg,#f8fafc,#e2eaf2)!important}
+#appView .iran-plate input,#appView .iran-plate select{
+  text-shadow:0 1px 0 rgba(255,255,255,.85);
+}
+#appView .iran-plate:focus-within{
+  border-color:var(--bt-brand)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    0 16px 30px -12px rgba(180,15,35,.35),
+    0 4px 0 #aeb9c6,
+    0 0 0 4px rgba(180,15,35,.12)!important;
+}
+@media (prefers-reduced-motion:reduce){
+  #appView .iran-plate{transform:none!important;transition:none!important}
+}
+@media print{
+  #appView .iran-plate{transform:none!important;box-shadow:none!important;background:#fff!important}
+}
+
+/* ====================================================================
+   v37.16.0 — بهینه‌سازی کامل تبلت و موبایل برای کادرها و فیلدها
+   --------------------------------------------------------------------
+   لایهٔ واکنش‌گرای نهایی روی همهٔ لایه‌های قبلی: فونت ۱۶ فیلدها در
+   موبایل (جلوگیری از زوم خودکار سافاری)، اهداف لمسی حداقل ۴۴px،
+   تک‌ستونه‌شدن گریدهای فرم، مودال تمام‌عرضِ امن، نوارهای اقدام
+   تمام‌عرض و جدول‌های لمسی‌تر. منطق و چیدمان دسکتاپ بدون تغییر است.
+   ==================================================================== */
+#appView{-webkit-tap-highlight-color:transparent}
+#appView .workspace{min-height:100vh;min-height:100dvh}
+#appView .table-wrap,#appView .adm-table-wrap{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+#appView #content .sd-panel,#appView #content .card,#appView #content .panel{min-width:0}
+
+/* ---------- تبلت (≤۱۰۲۴) ---------- */
+@media (max-width:1024px){
+  #appView .form-grid-3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #appView .sd-head{row-gap:10px}
+  #modal .modal-card{width:min(880px,100%)!important}
+  #appView .role-dash-heading{padding:20px 22px!important}
+}
+
+/* ---------- موبایل و تبلت کوچک (≤۷۶۸) ---------- */
+@media (max-width:768px){
+  /* فونت ۱۶px فیلدها: جلوگیری از زوم خودکار iOS هنگام تمرکز */
+  #appView #content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="file"]):not([type="color"]),
+  #appView #content select,#appView #content textarea,
+  #modal input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([type="file"]):not([type="color"]),
+  #modal select,#modal textarea,#loginView input{font-size:16px!important}
+  /* استثناهای فشرده: ردیف قلم، قیمت، وزن و پلاک اندازهٔ خودشان را نگه می‌دارند */
+  #appView #content .sd-line-compact .input-shell input,#appView #content .sd-line-compact .input-shell select{font-size:13px!important}
+  #appView #content .adm-price input{font-size:14px!important}
+  #appView #content .wh38-weight input{font-size:19px!important}
+  #appView #content .iran-plate input,#appView #content .iran-plate select,#modal .iran-plate input,#modal .iran-plate select{font-size:inherit!important}
+
+  /* گریدهای فرم تک‌ستونه و فشرده */
+  #appView .form-grid,#appView .form-grid-3,#appView .gt-grid2,
+  #modal .form-grid,#modal .cust-form-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+  #appView .form-grid,#appView .form-grid-3{gap:12px!important}
+  #appView .field,#modal .field{gap:6px!important}
+  #appView #content .input-shell,#modal .input-shell{min-height:50px}
+
+  /* اهداف لمسی */
+  #appView .btn,#modal .btn{min-height:46px!important}
+  #appView .btn-sm,#modal .btn-sm{min-height:40px!important;padding-inline:14px!important}
+  #appView .btn-lg,#modal .btn-lg{min-height:52px!important}
+  #appView .sd-tab,#appView .wh38-tab,#appView .v26-sales-tab{min-height:48px!important}
+  #appView input[type="checkbox"],#appView input[type="radio"],
+  #modal input[type="checkbox"],#modal input[type="radio"]{width:20px;height:20px}
+
+  /* مودال: تمام‌عرض امن با ارتفاع پویا */
+  .modal-root{padding:10px!important}
+  #modal .modal-card{max-height:94vh!important;max-height:94dvh!important;border-radius:18px!important}
+  #modal .modal-body{padding:16px 14px!important}
+  #modal .modal-head,#modal .modal-header{padding:13px 16px!important}
+
+  /* نوارهای اقدام فرم: دکمه‌ها تمام‌عرض و زیر هم */
+  #appView .sd-submit-bar{flex-direction:column!important;align-items:stretch!important;text-align:center;gap:10px!important}
+  #appView .sd-submit-bar .btn{width:100%!important}
+  #appView .sticky-actions{flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+  #appView .sticky-actions .btn{width:100%!important}
+  #modal .cust-form-actions{flex-direction:column!important;align-items:stretch!important}
+  #modal .cust-form-actions .btn{width:100%!important}
+
+  /* جدول لمسی‌تر */
+  #appView .table th,#appView .table td{padding:10px 11px!important;font-size:13px!important}
+  #appView .adm-actions{justify-content:flex-start!important}
+
+  /* اعلان‌ها داخل قاب امن صفحه */
+  .notification-popover{top:66px!important;left:10px!important;right:calc(var(--mobile-rail-width,68px) + 10px)!important;width:auto!important}
+}
+
+/* ---------- موبایل کوچک (≤۵۶۰) ---------- */
+@media (max-width:560px){
+  #appView .workspace{padding:0 10px!important}
+  #appView .workspace-header{margin:0 -10px!important;padding:10px!important}
+  #appView .sd-head{padding:12px 14px!important}
+  #appView .sd-pad{padding:12px 14px!important}
+  #appView .card-pad{padding:14px!important}
+  #appView .gt-fieldset{padding:12px!important}
+  #appView .sd-count{padding:5px 10px!important}
+  #appView .sd-count strong{font-size:14px!important}
+  #appView .badge{font-size:11px!important;white-space:normal!important;text-align:center}
+  #appView .gt-plate-col{max-width:none!important}
+  #appView .role-dash-card strong{font-size:24px!important}
+  #appView .adm-toolbar{padding:10px 12px!important}
+  #appView .adm-list > .adm-row{padding:10px 12px!important}
+}
+
+/* ---------- افقی کم‌ارتفاع (گوشی خوابیده) ---------- */
+@media (max-height:500px) and (orientation:landscape){
+  #appView .workspace-header{padding-top:8px!important;padding-bottom:8px!important;min-height:0!important}
+  #appView .content{padding-top:12px!important}
+  #modal .modal-card{max-height:96vh!important;max-height:96dvh!important}
+}
+
+/* ---------- نشانگر درشت (لمسی) در همهٔ اندازه‌ها ---------- */
+@media (pointer:coarse){
+  #appView .sd-tab,#appView .wh38-tab,#appView .v26-sales-tab{min-height:48px}
+  #appView .icon-btn,#appView .notification-btn{min-width:44px;min-height:44px}
+  #appView .sd-line-compact .sd-line-del{width:36px!important;height:36px!important}
+}
+
+/* فهرست خلاصهٔ سفارش‌ها: هر سفارش یک خط؛ صفحهٔ کوچک در ناحیهٔ خودش اسکرول می‌شود. */
+.st-registered-panel{padding:22px;display:grid;gap:12px;min-width:0}
+.st-registered-head,.st-registered-pages{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;min-width:0}
+.st-registered-head h2{margin:0;font-size:22px}.st-registered-head p{margin:6px 0 0;color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.st-registered-live{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:7px 10px;max-width:100%;overflow-wrap:anywhere}
+.st-registered-scroll{min-width:0;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;border-radius:12px}
+.st-registered-scroll:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.st-registered-scroll-hint{display:none;margin:0;color:var(--muted);font-size:11px}
+.st-registered-list{display:grid;gap:8px;width:max-content;min-width:100%}
+.st-registered-card{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;display:flex;align-items:center;gap:12px;white-space:nowrap;min-width:100%}
+.st-registered-time,.st-registered-count{font-size:12px;color:var(--muted)}
+.st-registered-card>.badge{white-space:nowrap!important}
+.st-registered-services,.st-registered-actions{display:flex;align-items:center;gap:8px}.st-registered-actions{margin-inline-start:auto}
+.st-registered-service{font-size:11px;background:#f3f5f7;border-radius:8px;padding:6px 8px}
+.st-registered-actions .btn{white-space:nowrap;flex-shrink:0}
+.st-registered-pages{justify-content:center;font-size:12px;color:var(--muted)}
+@media(max-width:1100px){.st-registered-scroll-hint{display:block}}
+@media(max-width:700px){.st-registered-panel{padding:13px}.st-registered-card{padding:9px 10px}}
+
+/* Read-only warehouse delivery documents. */
+.wh-delivered{padding:18px;background:#fff;border:1px solid #e2e7ee;border-radius:14px}
+.wh-delivered-heading h2{margin:0 0 6px}.wh-delivered-heading p{color:#667085;margin:0 0 16px}
+.wh-delivered-search{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.wh-delivered-search>div{display:flex;gap:8px;flex:1;min-width:200px}.wh-delivered-search input{flex:1;min-width:0;padding:9px;border:1px solid #cbd5e1;border-radius:8px}
+.wh-delivered-row{grid-template-columns:1fr 1.5fr .7fr 1fr 1.4fr auto;gap:10px;align-items:center;min-width:800px}
+.wh-delivered-pages{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:14px}
+
+/* کارتابل انبار: عنوان هدر کمی درشت‌تر تا با فضای سربرگ توازن داشته باشد. */
+#appView[data-cartable-page="warehouse"] .workspace-header .header-main h1{font-size:26px!important;line-height:1.3!important}
+@media(max-width:768px){#appView[data-cartable-page="warehouse"] .workspace-header .header-main h1{font-size:18px!important;line-height:1.35!important}}
+.whh-order-detail{display:grid;gap:18px;min-width:0}
+.whh-order-detail>section{min-width:0}
+.whh-order-detail h3{margin:0 0 10px;font-size:16px}
+.whh-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.whh-detail-cell{display:grid;gap:3px;min-width:0;padding:9px 11px;border:1px solid var(--bt-line);border-radius:9px;background:var(--bt-panel-2)}
+.whh-detail-cell small,.whh-order-detail small{color:var(--bt-muted);font-size:11px;line-height:1.5}
+.whh-detail-cell b{min-width:0;overflow-wrap:anywhere;font-size:13px;line-height:1.6}
+.whh-detail-actor{margin:8px 0 0;padding:8px 10px;border-radius:8px;background:var(--bt-brand-50);color:var(--bt-ink-2)}
+.whh-order-timeline,.whh-order-events{display:grid;gap:8px;padding:0 20px 0 0;margin:0}
+.whh-order-timeline>li,.whh-order-events>li{padding:9px 11px;border-right:2px solid var(--bt-brand-200);background:var(--bt-panel-2);border-radius:8px;overflow-wrap:anywhere}
+.whh-order-timeline>li{display:grid;gap:2px}
+.whh-event-head{display:grid;gap:3px}
+.whh-event-details{margin-top:7px}
+.whh-event-details summary{cursor:pointer;color:var(--bt-brand);font-size:12px;font-weight:800}
+.whh-event-details pre,.whh-weight-log pre{max-width:100%;max-height:240px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:9px;background:#f3f4f6;border-radius:7px;font:11px/1.6 ui-monospace,monospace}
+.whh-weight-log{display:grid;gap:2px;padding:7px 0;border-bottom:1px solid var(--bt-line)}
+.whh-weight-log:last-child{border-bottom:0}
+.whh-item-description{display:block;margin-top:4px}
+@media(max-width:768px){.whh-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.whh-order-detail h3{font-size:15px}}
+@media(max-width:480px){.whh-detail-grid{grid-template-columns:minmax(0,1fr)}.whh-detail-cell{padding:8px}.whh-order-timeline,.whh-order-events{padding-right:16px}}
+.sales-history-detail{display:grid;gap:14px;min-width:0}
+.sales-history-detail>section{min-width:0}
+.sales-history-detail h3{margin:8px 0;font-size:16px}
+.sales-history-summary{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--bt-line);border-radius:10px;background:var(--bt-panel-2)}
+.sales-history-info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.sales-history-info-grid>div{display:grid;gap:3px;min-width:0;padding:8px 10px;border:1px solid var(--bt-line);border-radius:8px;background:var(--bt-panel-2)}
+.sales-history-info-grid small{font-size:11px;color:var(--bt-muted)}
+.sales-history-info-grid b{font-size:12px;overflow-wrap:anywhere;line-height:1.5}
+.sales-history-event-details{margin-top:7px}
+.sales-history-event-details summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--bt-brand)}
+.sales-history-event-details pre{max-width:100%;max-height:300px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:10px;border-radius:8px;background:#f3f4f6;font:11px/1.6 ui-monospace,monospace}
+.sales-history-timeline>li{overflow-wrap:anywhere}
+.sales-history-items td small{display:block;color:var(--bt-muted);margin-top:3px}
+@media(max-width:768px){.sales-history-info-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.sales-history-info-grid{grid-template-columns:minmax(0,1fr)}}

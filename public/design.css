@@ -1,0 +1,2109 @@
+/* ================================================================
+   v38 DESIGN SYSTEM — بابل طیور
+   لایه جدید طراحی: مدرن و مینیمال با حفظ قرمز برند
+   این فایل بعد از styles.css بارگذاری می‌شود و به‌صورت تدریجی
+   جایگزین آن می‌شود (بازطراحی قدم‌به‌قدم).
+   ساختار: ۱) توکن‌ها ۲) پایه ۳) اجزای سراسری ۴) شل سامانه
+           ۵) کارتابل فروش (sd-*) ۶) ریسپانسیو
+   ================================================================ */
+
+/* ---------- 1) توکن‌ها ---------- */
+:root{
+  /* برند */
+  --brand:#b40f23;
+  --brand-dark:#99091c;
+  --brand-deep:#7a0716;
+  --brand-050:#fef1f2;
+  --brand-100:#fde3e6;
+  --brand-200:#f9c9cf;
+  --brand-300:#f2a7b0;
+  /* خنثی‌ها */
+  --ink:#151a21;
+  --ink-2:#2a323d;
+  --ink-3:#4b5563;
+  --muted:#67707d;
+  --muted-2:#98a0ac;
+  --bg:#f4f5f7;
+  --bg-soft:#eceef2;
+  --panel:#ffffff;
+  --panel-2:#fafbfc;
+  --line:#e6e9ee;
+  --line-strong:#d5dae2;
+  /* وضعیت‌ها */
+  --green:#0f7b4f; --green-bg:#e9f7f0; --green-line:#c4e8d6;
+  --orange:#9a6700; --orange-bg:#fff6e0; --orange-line:#f0dfae;
+  --blue:#2456a6; --blue-bg:#eef4ff; --blue-line:#d3e1fb;
+  --danger:#bb2030; --danger-bg:#fdeff1; --danger-line:#f4ccd2;
+  --purple:#6d3fc0; --purple-bg:#f4effd; --purple-line:#e0d4f7;
+  --gray-chip:#5d6673; --gray-chip-bg:#f1f3f6; --gray-chip-line:#e1e5ea;
+  /* سطوح */
+  --shadow-xs:0 1px 2px rgba(16,24,40,.05);
+  --shadow-sm:0 2px 8px rgba(16,24,40,.06);
+  --shadow-md:0 8px 24px rgba(16,24,40,.09);
+  --shadow-lg:0 24px 64px rgba(16,24,40,.16);
+  --r-sm:10px; --r-md:14px; --r-lg:18px; --r-xl:22px;
+  --rail:252px;
+  --font:"B Yekan","B Yekan+","BYekan","Vazirmatn",Tahoma,Arial,sans-serif;
+  --ring:0 0 0 3px rgba(180,15,35,.12);
+}
+
+/* ---------- 2) پایه ---------- */
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-size:15.5px;line-height:1.8}
+::selection{background:var(--brand-100);color:var(--brand-deep)}
+button:focus-visible,.btn:focus-visible,[tabindex]:focus-visible{outline:none;box-shadow:var(--ring)}
+.input-shell input:focus-visible,.input-shell select:focus-visible,.input-shell textarea:focus-visible,textarea:focus-visible{outline:none;box-shadow:none}
+/* خنثی‌سازی قوانین قدیمی با انتخاب‌گر id تا فقط پوسته‌ی بیرونی حلقه فوکوس بگیرد */
+#loginForm .input-shell input:focus,#pwForm .input-shell input:focus,
+#content form .input-shell input:focus,#content form .input-shell select:focus,#content form .input-shell textarea:focus,
+.modal-card form .input-shell input:focus,.modal-card form .input-shell select:focus,.modal-card form .input-shell textarea:focus{
+  border:0!important;box-shadow:none!important;outline:0!important;background:transparent!important;
+}
+input::placeholder,textarea::placeholder{color:#a6adb8}
+svg.svg{stroke-width:1.7}
+
+/* ---------- 3) اجزای سراسری ---------- */
+/* دکمه‌ها */
+.btn{min-height:40px;border-radius:11px;padding:0 16px;font-size:14px;font-weight:800;gap:7px;transition:background .15s ease,border-color .15s ease,color .15s ease,box-shadow .15s ease,transform .06s ease}
+.btn:hover{transform:none}
+.btn:active{transform:translateY(1px)}
+.btn .svg{width:17px;height:17px}
+.btn-primary{background:var(--brand);box-shadow:0 1px 2px rgba(180,15,35,.25),inset 0 1px 0 rgba(255,255,255,.14)}
+.btn-primary:hover{background:var(--brand-dark)}
+.btn-secondary{background:#fff;border-color:var(--line-strong);color:var(--ink-2);box-shadow:var(--shadow-xs)}
+.btn-secondary:hover{background:var(--panel-2);border-color:#c4cbd6}
+.btn-ghost{color:var(--muted)}
+.btn-ghost:hover{background:#eef0f3;color:var(--ink-2)}
+.btn-success{background:var(--green)}
+.btn-danger{background:var(--danger)}
+.btn-sm{min-height:34px;padding:0 12px;font-size:13px;border-radius:9px}
+.btn-sm .svg{width:15px;height:15px}
+.btn-lg{min-height:48px;padding:0 22px;font-size:15.5px;border-radius:13px}
+.danger-text{color:var(--danger)!important}
+
+/* بج‌ها */
+.badge{min-height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:900;line-height:1}
+.badge.green{color:var(--green);background:var(--green-bg);border-color:var(--green-line)}
+.badge.orange{color:var(--orange);background:var(--orange-bg);border-color:var(--orange-line)}
+.badge.blue{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-line)}
+.badge.red{color:var(--danger);background:var(--danger-bg);border-color:var(--danger-line)}
+.badge.gray{color:var(--gray-chip);background:var(--gray-chip-bg);border-color:var(--gray-chip-line)}
+.badge.purple{color:var(--purple);background:var(--purple-bg);border-color:var(--purple-line)}
+
+.pill{min-height:30px;padding:0 12px;border-radius:999px;border-color:var(--line);background:#fff;color:var(--muted);font-size:12.5px;font-weight:800;box-shadow:var(--shadow-xs)}
+.eyebrow{color:var(--brand);font-size:11px;letter-spacing:.14em;font-weight:1000}
+.count-chip{background:var(--brand-050);color:var(--brand);border-radius:9px}
+.empty{color:var(--muted);padding:34px 18px;font-size:14px}
+
+/* کارت و پنل */
+.card{border-color:var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-xs)}
+.card-pad{padding:22px}
+.panel-head{border-bottom-color:var(--line)}
+.panel-head h2{font-size:19px;font-weight:1000;letter-spacing:normal}
+.panel-head p{font-size:13.5px}
+
+/* فرم‌ها */
+.field label{font-size:13.5px;font-weight:900;color:var(--ink-2)}
+.label-row span{font-size:11.5px}
+.input-shell{height:46px;border-color:var(--line-strong);border-radius:11px;background:#fff;padding:0 13px;transition:border-color .14s ease,box-shadow .14s ease}
+.input-shell:focus-within{border-color:var(--brand-300);box-shadow:var(--ring)}
+.input-shell input,.input-shell select,.input-shell textarea{font-size:14.5px}
+textarea{border:1px solid var(--line-strong);border-radius:11px;padding:11px 13px;background:#fff;width:100%;font-family:inherit;resize:vertical;transition:border-color .14s ease,box-shadow .14s ease}
+textarea:focus{outline:none;border-color:var(--brand-300);box-shadow:var(--ring)}
+select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2367707d' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 12px center;padding-left:32px!important}
+
+/* جدول‌ها */
+.table-wrap{border-color:var(--line);border-radius:13px}
+.table th{background:var(--panel-2);font-size:12px;color:var(--muted);letter-spacing:.02em}
+.table td{font-size:13.5px}
+.table tbody tr:hover td{background:#f8fafc}
+
+/* مودال و توست */
+.modal-root{backdrop-filter:blur(3px)}
+.modal-card{border-radius:var(--r-xl)!important;box-shadow:var(--shadow-lg)!important;border:1px solid var(--line)}
+.modal-head{border-bottom:1px solid var(--line);padding:16px 20px}
+.modal-head strong{font-size:16.5px;font-weight:1000}
+.modal-body{padding:20px}
+.toast{border-radius:12px;box-shadow:var(--shadow-lg);font-size:13.5px;font-weight:800;background:#1c232d}
+
+/* ---------- 4) شل سامانه ---------- */
+/* نوار کناری قرمز برند */
+.rail{width:var(--rail);background:linear-gradient(195deg,#bd1226 0%,#9c0c1e 55%,#82081a 100%);padding:20px 14px 16px;box-shadow:none;border-left:1px solid rgba(255,255,255,.06)}
+.rail:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(560px 300px at 110% -8%,rgba(255,255,255,.14),transparent 62%)}
+.rail>*{position:relative}
+.rail-top{padding:2px 8px 18px;border-bottom:1px solid rgba(255,255,255,.13)}
+.rail-logo{width:46px;height:46px;border-radius:13px;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.rail-brand strong{font-size:16.5px;letter-spacing:normal}
+.rail-brand span{font-size:10.5px;opacity:.72}
+.rail-nav{margin-top:16px;gap:4px}
+.rail-nav button{height:47px;border-radius:12px;font-size:14px;font-weight:800;color:rgba(255,255,255,.86);position:relative}
+.rail-nav button:hover{background:rgba(255,255,255,.10);color:#fff}
+.rail-nav button.active{background:#fff;color:var(--brand);box-shadow:0 10px 22px rgba(60,8,16,.28)}
+.rail-nav .nav-icon .svg{width:21px;height:21px}
+.rail-nav .nav-badge{background:rgba(255,255,255,.18);color:#fff;box-shadow:none}
+.rail-nav button.active .nav-badge{background:var(--brand-050);color:var(--brand)}
+.rail-bottom{padding-top:14px;border-top-color:rgba(255,255,255,.13)}
+.user-mini{padding:7px 8px;border-radius:12px;background:rgba(0,0,0,.10)}
+.user-mini strong{font-size:13.5px}
+.user-mini span{font-size:10.5px;opacity:.72}
+.avatar{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.18);font-size:13px}
+.rail-logout{height:40px;border-radius:10px;border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.06);font-size:13px;font-weight:800}
+.rail-logout:hover{background:rgba(255,255,255,.13)}
+
+/* فضای کار و هدر */
+.workspace{margin-right:var(--rail);padding:0 28px 40px}
+.workspace-header{min-height:96px;padding:22px 0 16px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.workspace-header h1{font-size:26px;font-weight:1000;letter-spacing:normal}
+.workspace-header p{font-size:13.5px;margin-top:3px}
+.header-kicker{font-size:11px;letter-spacing:.12em}
+.header-status{background:#fff;border:1px solid var(--line);border-radius:999px;box-shadow:var(--shadow-xs);font-size:12px;font-weight:800;color:var(--ink-3)}
+.header-status .status-dot{background:#22b573;box-shadow:0 0 0 4px rgba(34,181,115,.12)}
+.header-date{background:#fff;border:1px solid var(--line);border-radius:12px;padding:7px 14px;box-shadow:var(--shadow-xs);text-align:right;direction:rtl}
+.header-date span{font-size:10.5px;color:var(--muted);display:block;line-height:1.4;text-align:right;direction:rtl}
+.header-date strong{font-size:13px;color:var(--ink);display:block;line-height:1.5;text-align:right;direction:rtl}
+.icon-btn{background:#fff;border:1px solid var(--line);border-radius:12px;width:44px;height:44px;display:grid;place-items:center;box-shadow:var(--shadow-xs);color:var(--ink-2);position:relative}
+.icon-btn:hover{background:var(--panel-2)}
+.notification-btn .bell-icon{color:var(--brand)}
+#bellCount{position:absolute;top:-6px;left:-6px;background:var(--brand);color:#fff;border-radius:999px;min-width:20px;height:20px;display:grid;place-items:center;font-size:10.5px;font-weight:900;padding:0 5px;box-shadow:0 0 0 2px #fff}
+.content{padding-top:22px}
+
+/* پاپ‌اور اعلان‌ها */
+.notification-popover{border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow-lg);background:#fff}
+
+/* ---------- 5) کارتابل فروش (v38 / sd-*) ---------- */
+/* نوار تب‌های فروش */
+.v29-sales-shell{margin-top:18px}
+.v28-sales-pane{animation:sdFade .22s ease}
+@keyframes sdFade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.sd-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:var(--bg-soft);border:1px solid var(--line);border-radius:var(--r-lg);padding:6px}
+.sd-tab{position:relative;display:flex;align-items:center;gap:10px;border:1px solid transparent;border-radius:13px;padding:9px 12px;background:transparent;text-align:right;transition:background .14s ease,box-shadow .14s ease,border-color .14s ease;min-width:0}
+.sd-tab:hover{background:rgba(255,255,255,.65)}
+.sd-tab.active{background:#fff;border-color:var(--line);box-shadow:var(--shadow-sm)}
+.sd-tab-index{font-size:10.5px;font-weight:1000;color:var(--muted-2);letter-spacing:.06em}
+.sd-tab.active .sd-tab-index{color:var(--brand)}
+.sd-tab-ico{flex:0 0 auto;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#e8eaef;color:var(--ink-3)}
+.sd-tab.active .sd-tab-ico{background:var(--brand-050);color:var(--brand)}
+.sd-tab-copy{min-width:0;display:flex;flex-direction:column;line-height:1.45}
+.sd-tab-copy strong{font-size:13.5px;font-weight:1000;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-tab-copy small{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-tab-count{margin-right:auto;flex:0 0 auto;min-width:24px;height:22px;padding:0 7px;border-radius:999px;display:grid;place-items:center;font-size:11px;font-weight:1000;background:#dfe2e8;color:var(--ink-3);opacity:0;transform:scale(.8);transition:.15s ease}
+.sd-tab-count.show{opacity:1;transform:none}
+.sd-tab.active .sd-tab-count.show{background:var(--brand);color:#fff}
+
+/* پنل مشترک بخش‌ها */
+.sd-panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-xs)}
+.sd-pad{padding:22px}
+.sd-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px;border-bottom:1px solid var(--line)}
+.sd-head-main{display:flex;gap:13px;min-width:0}
+.sd-head-ico{flex:0 0 auto;width:42px;height:42px;border-radius:12px;background:var(--brand-050);color:var(--brand);display:grid;place-items:center}
+.sd-head h2{margin:1px 0 0;font-size:18px;font-weight:1000;letter-spacing:normal}
+.sd-head p{margin:3px 0 0;font-size:12.5px;color:var(--muted);line-height:1.8}
+.sd-count{flex:0 0 auto;text-align:center;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:7px 14px;min-width:74px}
+.sd-count strong{display:block;font-size:18px;color:var(--brand);line-height:1.4}
+.sd-count span{display:block;font-size:10.5px;color:var(--muted)}
+
+/* حالت خالی */
+.sd-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;padding:44px 22px;color:var(--muted)}
+.sd-empty>div{width:56px;height:56px;border-radius:16px;background:var(--panel-2);border:1px dashed var(--line-strong);display:grid;place-items:center;color:var(--muted-2);margin-bottom:6px}
+.sd-empty strong{font-size:15px;color:var(--ink-2);font-weight:900}
+.sd-empty span{font-size:12.5px;max-width:380px;line-height:1.9}
+
+/* چیپ‌های اطلاعات کوچک */
+.sd-chips{display:flex;flex-wrap:wrap;gap:6px}
+.sd-chip{display:inline-flex;align-items:center;gap:5px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-3);border-radius:8px;padding:3px 9px;font-size:11.5px;font-weight:800}
+.sd-chip .svg{width:13px;height:13px;color:var(--muted)}
+.sd-chip b{color:var(--ink-2)}
+.code-pill{background:var(--ink);color:#fff;border-radius:7px;padding:1px 8px;font-size:11px;font-weight:900;letter-spacing:.04em;display:inline-flex;align-items:center;min-height:20px}
+.order-code{background:var(--brand-050);color:var(--brand);border:1px solid var(--brand-200);border-radius:8px;padding:2px 9px;font-size:11.5px;font-weight:1000;letter-spacing:.04em;display:inline-flex;align-items:center}
+.sd-type{display:inline-flex;align-items:center;border-radius:8px;padding:2px 9px;font-size:11px;font-weight:900;border:1px solid transparent}
+.sd-type.onsite{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-line)}
+.sd-type.phone{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-line)}
+.sd-type.store{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-line)}
+
+/* --- تب ۱: حضوری --- */
+.sd-onsite-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(260px,1fr);gap:18px;align-items:start}
+.sd-search{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line-strong);border-radius:12px;height:48px;padding:0 14px;margin:16px 22px 0;transition:border-color .14s ease,box-shadow .14s ease}
+.sd-search:focus-within{border-color:var(--brand-300);box-shadow:var(--ring)}
+.sd-search .svg{color:var(--muted)}
+.sd-search input{flex:1;border:0;outline:0;background:none;font-family:inherit;font-size:14px;min-width:0}
+.sd-queue{display:grid;gap:9px;padding:16px 22px 22px}
+.sd-queue-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:14px;text-align:right;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;transition:border-color .14s ease,box-shadow .14s ease,transform .1s ease;width:100%}
+.sd-queue-row:hover{border-color:var(--brand-200);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
+.sd-avatar{width:46px;height:46px;border-radius:13px;background:var(--brand-050);color:var(--brand);display:grid;place-items:center;font-size:15px;font-weight:1000;border:1px solid var(--brand-100)}
+.sd-avatar.lg{width:56px;height:56px;font-size:18px;border-radius:15px}
+.sd-queue-main{min-width:0}
+.sd-queue-main strong{display:block;font-size:14.5px;font-weight:900;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-queue-main small{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;color:var(--muted);font-size:11.5px}
+.sd-queue-time{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.sd-queue-cta{display:inline-flex;align-items:center;gap:6px;background:var(--brand);color:#fff;border-radius:10px;padding:9px 14px;font-size:12.5px;font-weight:900;white-space:nowrap;box-shadow:0 4px 12px rgba(180,15,35,.22)}
+.sd-queue-row:hover .sd-queue-cta{background:var(--brand-dark)}
+.sd-queue-row .sd-live-dot{width:7px;height:7px;border-radius:50%;background:#22b573;display:inline-block;margin-left:4px;box-shadow:0 0 0 3px rgba(34,181,115,.15)}
+
+/* کارت راهنمای مسیر */
+.sd-flow-card{position:sticky;top:18px}
+.sd-flow-card .sd-pad{padding:20px}
+.sd-steps{display:grid;gap:0;margin-top:14px}
+.sd-step{display:flex;gap:12px;align-items:flex-start;position:relative;padding:0 0 18px}
+.sd-step:last-child{padding-bottom:0}
+.sd-step:before{content:"";position:absolute;right:16px;top:34px;bottom:2px;width:2px;background:var(--line);border-radius:2px}
+.sd-step:last-child:before{display:none}
+.sd-step b{flex:0 0 auto;width:33px;height:33px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);display:grid;place-items:center;font-size:13px;color:var(--muted);position:relative;z-index:1}
+.sd-step div strong{display:block;font-size:13.5px;font-weight:900;color:var(--ink-2)}
+.sd-step div small{display:block;font-size:11px;color:var(--muted)}
+.sd-step.active b{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 5px 12px rgba(180,15,35,.3)}
+.sd-step.active div strong{color:var(--brand)}
+.sd-live-note{display:flex;align-items:center;gap:8px;margin-top:16px;padding:10px 12px;background:var(--green-bg);border:1px solid var(--green-line);border-radius:11px;font-size:12px;font-weight:800;color:var(--green)}
+.sd-live-note i{width:8px;height:8px;border-radius:50%;background:#22b573;animation:sdPulse 1.8s infinite}
+@keyframes sdPulse{0%,100%{box-shadow:0 0 0 0 rgba(34,181,115,.35)}50%{box-shadow:0 0 0 6px rgba(34,181,115,0)}}
+
+/* --- صفحه ثبت سفارش حضوری --- */
+.sd-oe-banner{display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 20px;box-shadow:var(--shadow-xs)}
+.sd-oe-banner-right{display:flex;align-items:center;gap:14px;min-width:0}
+.sd-oe-banner h2{font-size:19px;font-weight:1000;margin:0}
+.sd-oe-banner p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.sd-oe-banner-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.sd-oe-customer{display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,#fff,#fff7f7);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 20px;margin-top:14px;box-shadow:var(--shadow-xs);flex-wrap:wrap}
+.sd-oe-customer-id{min-width:0;flex:1}
+.sd-oe-customer-id span{font-size:11px;color:var(--muted);display:block}
+.sd-oe-customer-id strong{font-size:19px;font-weight:1000;display:block;margin-top:1px}
+.sd-oe-customer-id small{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.sd-stepper{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+.sd-stepper span{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:11.5px;font-weight:900;white-space:nowrap}
+.sd-stepper span.done{background:var(--green-bg);border-color:var(--green-line);color:var(--green)}
+.sd-stepper span.active{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 5px 12px rgba(180,15,35,.28)}
+.sd-stepper i{width:18px;height:2px;background:var(--line-strong);border-radius:2px}
+.sd-oe-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;margin-top:16px;align-items:start}
+.sd-lines{display:grid;gap:10px}
+.sd-summary-side{position:sticky;top:18px}
+.sd-summary-side .sd-pad{padding:18px 20px}
+.sd-summary-stat{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px;color:var(--muted)}
+.sd-summary-stat strong{color:var(--ink);font-size:15px}
+.sd-summary-list{display:grid;gap:8px;margin-top:12px}
+.sd-summary-list>div{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.sd-summary-list span{display:flex;align-items:center;gap:7px;font-size:12.5px;min-width:0}
+.sd-summary-list b{font-size:12px;white-space:nowrap;color:var(--ink-2)}
+.sd-summary-note{margin-top:14px;font-size:11px;color:var(--muted);line-height:1.9;background:var(--panel-2);border:1px dashed var(--line-strong);border-radius:10px;padding:10px 12px}
+
+/* ردیف‌های محصول (مشترک: حضوری/تلفنی/آینده) */
+.sd-line{position:relative;display:grid;grid-template-columns:34px minmax(0,1.7fr) 110px 118px minmax(0,1.1fr) 40px;gap:10px;align-items:start;background:var(--panel-2);border:1px solid var(--line);border-radius:13px;padding:12px;transition:border-color .14s ease,box-shadow .14s ease}
+.sd-line:focus-within{border-color:var(--brand-200);box-shadow:var(--ring);background:#fff}
+.sd-line-no{width:30px;height:30px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:11.5px;font-weight:1000;color:var(--muted);margin-top:7px}
+.sd-line-cell{display:grid;gap:5px;min-width:0}
+.sd-line-cell>label{font-size:10.5px;font-weight:900;color:var(--muted)}
+.sd-line .input-shell{height:42px;border-radius:10px}
+.sd-line textarea{min-height:42px;max-height:90px;font-size:13px;padding:9px 12px}
+.sd-picked{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;color:var(--green);min-height:20px}
+.sd-picked.none{color:var(--muted-2);font-weight:700}
+.sd-line-del{width:38px;height:38px;margin-top:22px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--muted-2);display:grid;place-items:center;transition:.14s}
+.sd-line-del:hover{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-line)}
+.product-suggest{position:absolute;top:calc(100% + 4px);right:0;left:0;z-index:30}
+.op-suggest-box,.product-suggest:not(:empty){background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-md);overflow:hidden}
+.product-option,.op-product-option{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;padding:10px 13px;background:#fff;border:0;border-bottom:1px solid var(--line);text-align:right;font-family:inherit}
+.product-option:last-child,.op-product-option:last-child{border-bottom:0}
+.product-option:hover,.op-product-option:hover{background:var(--brand-050)}
+.product-option span b,.op-product-option span b{display:block;font-size:13px}
+.product-option span span,.op-product-option span small{display:block;font-size:11px;color:var(--muted)}
+.product-option .svg,.op-product-option .svg{color:var(--brand)}
+.sd-lines-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 22px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.sd-lines-head h3{margin:0;font-size:15.5px;font-weight:1000}
+.sd-lines-head p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.sd-lines-body{padding:16px 22px 20px}
+.sd-mini-stats{display:flex;gap:8px;flex-wrap:wrap}
+.mini-stat{display:inline-flex;align-items:center;gap:7px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:6px 11px;font-size:11.5px;color:var(--muted)}
+.mini-stat strong{color:var(--brand);font-size:13px}
+.sd-add-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 22px 20px;flex-wrap:wrap}
+.sd-add-row span{font-size:11.5px;color:var(--muted)}
+
+/* --- تب ۲: غیرحضوری --- */
+.sd-remote-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;align-items:start}
+.sd-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.sd-form-grid .span-3{grid-column:1/-1}
+.sd-note-box{border:1px solid var(--line);border-radius:12px;background:var(--panel-2);padding:12px 14px}
+.sd-note-head{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px}
+.sd-note-head .svg{color:var(--muted);margin-top:3px}
+.sd-note-head strong{display:block;font-size:13px}
+.sd-note-head small{display:block;font-size:11px;color:var(--muted);line-height:1.8}
+.sd-note-box textarea{background:#fff}
+.sd-note-foot{display:flex;justify-content:space-between;gap:10px;margin-top:7px;font-size:10.5px;color:var(--muted-2)}
+.sd-submit-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;border-top:1px solid var(--line);padding:16px 22px;background:var(--panel-2);border-radius:0 0 var(--r-lg) var(--r-lg);flex-wrap:wrap}
+.sd-submit-bar small{font-size:11.5px;color:var(--muted)}
+
+/* کارت‌های سفارش فروشگاه */
+.sd-store-list{display:grid;gap:12px;padding:16px 20px 20px}
+.sd-store-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px 16px;transition:border-color .14s,box-shadow .14s}
+.sd-store-card:hover{border-color:var(--orange-line);box-shadow:var(--shadow-sm)}
+.sd-store-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.sd-store-top h3{margin:7px 0 0;font-size:15px;font-weight:1000}
+.sd-store-top p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.sd-store-items{display:grid;gap:6px;margin-top:11px}
+.sd-store-items>div{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:12px}
+.sd-store-items .sd-row-no{width:20px;height:20px;border-radius:6px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:10px;font-weight:1000;color:var(--muted)}
+.sd-store-items span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sd-store-items b{font-size:11.5px;white-space:nowrap;color:var(--ink-2)}
+.sd-store-meta{display:grid;gap:4px;margin-top:11px;font-size:11.5px;color:var(--muted)}
+.sd-store-meta b{color:var(--ink-3)}
+.sd-store-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;flex-wrap:wrap}
+.sd-store-summary{display:flex;align-items:center;gap:8px;margin:12px 20px 0;padding:9px 13px;background:var(--orange-bg);border:1px solid var(--orange-line);border-radius:11px;font-size:12px;font-weight:800;color:var(--orange)}
+.sd-store-summary b{background:#fff;border-radius:999px;padding:1px 9px;border:1px solid var(--orange-line)}
+
+/* نوار وضعیت غیرحضوری */
+.sd-remote-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.sd-remote-strip>div{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 16px;display:flex;align-items:center;gap:11px;box-shadow:var(--shadow-xs)}
+.sd-remote-strip strong{font-size:20px;color:var(--brand);line-height:1.3}
+.sd-remote-strip span{font-size:12px;color:var(--muted)}
+
+/* --- تب ۳: در جریان --- */
+.sd-flow-list{display:grid;gap:12px}
+.sd-flow-card{position:relative;display:flex;gap:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px 18px;overflow:hidden;transition:border-color .14s,box-shadow .14s}
+.sd-flow-card:hover{box-shadow:var(--shadow-sm)}
+.sd-flow-card:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--line-strong)}
+.sd-flow-card.is-orange:before{background:#e8a13c}
+.sd-flow-card.is-purple:before{background:#9a6fe0}
+.sd-flow-card.is-blue:before{background:#5b8bd9}
+.sd-flow-card.is-green:before{background:#3fae7d}
+.sd-flow-card.is-red:before{background:#d5566a}
+.sd-flow-card.is-gray:before{background:#aab2bd}
+.sd-flow-index{flex:0 0 auto;width:38px;height:38px;border-radius:11px;background:var(--panel-2);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:1000;color:var(--muted)}
+.sd-flow-main{flex:1;min-width:0}
+.sd-flow-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.sd-flow-title-chips{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.sd-flow-top h3{margin:7px 0 0;font-size:16px;font-weight:1000}
+.sd-flow-top>p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.sd-flow-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.sd-flow-stats>div{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:7px 12px;min-width:118px}
+.sd-flow-stats span{display:block;font-size:10.5px;color:var(--muted)}
+.sd-flow-stats strong{display:block;font-size:12.5px;margin-top:1px}
+.sd-flow-items{display:grid;gap:6px;margin-top:12px}
+.sd-flow-items>div{display:grid;grid-template-columns:auto auto minmax(0,1.4fr) auto minmax(0,1fr);gap:9px;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:12px}
+.sd-flow-items .sd-row-no{width:21px;height:21px;border-radius:6px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:10px;color:var(--muted);font-weight:1000}
+.sd-flow-items b{font-size:12px;white-space:nowrap;color:var(--ink-2)}
+.sd-flow-items small{color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sd-flow-actions{display:flex;align-items:center;gap:8px;margin-top:13px;flex-wrap:wrap}
+.sd-flow-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 22px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted);flex-wrap:wrap}
+.sd-flow-toolbar .sd-live{display:inline-flex;align-items:center;gap:7px;font-weight:800;color:var(--green)}
+.sd-flow-toolbar .sd-live i{width:8px;height:8px;border-radius:50%;background:#22b573;animation:sdPulse 1.8s infinite}
+.sd-flow-toolbar .sd-legend{display:inline-flex;align-items:center;gap:12px}
+.sd-flow-toolbar .sd-legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-left:5px}
+.sd-flow-toolbar .sd-legend i.orange{background:#e8a13c}
+.sd-flow-toolbar .sd-legend i.gray{background:#aab2bd}
+.sd-flow-toolbar .sd-legend i.purple{background:#9a6fe0}
+
+/* --- تب ۴: تسویه --- */
+.stl-pane{display:grid;gap:18px}
+.stl-layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px;align-items:start}
+.stl-queue-panel{display:flex;flex-direction:column}
+.stl-block-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:17px 20px;border-bottom:1px solid var(--line)}
+.stl-block-head h2{margin:0;font-size:16px;font-weight:1000}
+.stl-eyebrow{font-size:10.5px;font-weight:1000;color:var(--brand);letter-spacing:.12em;display:block;margin-bottom:3px}
+.stl-queue-list{display:grid;gap:8px;padding:14px;max-height:640px;overflow:auto}
+.stl-queue-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;text-align:right;background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 14px;transition:.14s;width:100%}
+.stl-queue-item:hover{border-color:var(--brand-200);box-shadow:var(--shadow-sm)}
+.stl-queue-item.active{border-color:var(--brand);background:var(--brand-050);box-shadow:0 0 0 3px rgba(180,15,35,.08)}
+.stl-q-name b{display:block;font-size:13.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stl-q-name small{display:block;font-size:11px;color:var(--muted)}
+.stl-q-meta{display:grid;justify-items:end;gap:2px;font-size:10.5px;color:var(--muted)}
+.stl-q-meta small:first-child{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-line);border-radius:999px;padding:1px 8px;font-weight:900;font-size:10px}
+.stl-q-empty{padding:26px 14px;text-align:center;color:var(--muted);font-size:13px}
+
+/* فرم تسویه */
+.stl-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-xs);overflow:hidden}
+.stl-form-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 22px;background:linear-gradient(120deg,#fff8f8,#fff);border-bottom:1px solid var(--line)}
+.stl-dispatch-control{display:flex;align-items:center;gap:7px;flex-wrap:wrap;max-width:390px;min-width:220px}.stl-dispatch-control select{min-width:180px;flex:1 1 180px}.stl-dispatch-hint{flex-basis:100%;font-size:11px;color:var(--muted)}
+.stl-form-head h2{margin:2px 0 0;font-size:19px;font-weight:1000}
+.stl-form-head p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+.stl-section{padding:18px 22px;border-top:1px solid var(--line)}
+.stl-card>.stl-section:first-of-type{border-top:0}
+.stl-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px;flex-wrap:wrap}
+.stl-section-head h3{margin:0;font-size:15px;font-weight:1000;display:flex;align-items:center;gap:8px}
+.stl-section-head h3 .svg{color:var(--brand)}
+.stl-hint-inline{font-size:11.5px;color:var(--muted)}
+.stl-table{border:1px solid var(--line);border-radius:13px;overflow:hidden}
+.stl-grid-head,.stl-row{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(110px,.9fr) minmax(150px,1fr) minmax(130px,.9fr) 92px;gap:12px;align-items:center;padding:11px 15px}
+.stl-grid-head{background:var(--panel-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:1000;color:var(--muted)}
+.stl-row{border-bottom:1px solid var(--line);background:#fff;transition:background .14s}
+.stl-row:last-child{border-bottom:0}
+.stl-row:hover{background:#fbfcfe}
+.stl-row.is-skip{background:#fafafa}
+.stl-row.is-skip .stl-cell{opacity:.55}
+.stl-row.is-void{background:#fafafa}
+.stl-row.is-void .stl-cell{opacity:.5;text-decoration:line-through}
+.stl-row.needs-price{background:#fffaf0}
+.stl-row.needs-price .stl-input{border-color:var(--orange-line);box-shadow:0 0 0 3px rgba(154,103,0,.08)}
+.stl-cell{min-width:0}
+.stl-cell-name b{display:block;font-size:13.5px;font-weight:900}
+.stl-cell-name small{display:block;font-size:10.5px;color:var(--muted)}
+.stl-label{display:block;font-size:10px;color:var(--muted);margin-bottom:2px}
+.stl-kg{font-size:13px;font-weight:900;color:var(--ink-2)}
+.stl-input{width:100%;height:40px;border:1px solid var(--line-strong);border-radius:9px;padding:0 11px;font-family:inherit;font-size:13.5px;text-align:left;direction:ltr;font-variant-numeric:tabular-nums;background:#fff;transition:.14s}
+.stl-input:focus{outline:none;border-color:var(--brand-300);box-shadow:var(--ring)}
+.stl-input:disabled{background:#f3f4f6;color:var(--muted-2)}
+.stl-amount{font-size:13.5px;color:var(--ink);font-weight:900}
+.stl-check{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:var(--ink-3);cursor:pointer}
+.stl-check input{width:17px;height:17px;accent-color:var(--brand)}
+.stl-totals{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:13px;padding:13px 16px;background:var(--ink);border-radius:13px;color:#fff;flex-wrap:wrap}
+.stl-totals>div{display:flex;align-items:center;gap:10px;font-size:12.5px}
+.stl-totals span{color:#b9c1ca}
+.stl-totals b{font-size:15px}
+.stl-totals .stl-grand b{font-size:19px;color:#fff}
+.stl-grid2{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line)}
+.stl-grid2 .stl-section{border-top:0}
+.stl-grid2 .stl-section:first-child{border-left:1px solid var(--line)}
+.stl-sig{width:100%;height:172px;border:1.5px dashed var(--line-strong);border-radius:13px;background:#fdfdfd;touch-action:none;cursor:crosshair}
+.stl-sig-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.stl-state{font-size:12px;font-weight:800;color:var(--muted)}
+.stl-state.ok{color:var(--green)}
+.stl-state.warn{color:var(--orange)}
+.stl-fp-actions{display:grid;gap:9px;margin-top:6px}
+.stl-manual{margin-top:12px;background:var(--orange-bg);border:1px solid var(--orange-line);border-radius:11px;padding:10px 12px}
+.stl-errors{margin:0 22px;background:var(--danger-bg);border:1px solid var(--danger-line);border-radius:12px;padding:12px 15px;color:var(--danger);font-size:12.5px}
+.stl-errors ul{margin:6px 0 0;padding-right:18px}
+.stl-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;background:var(--panel-2);border-top:1px solid var(--line);flex-wrap:wrap}
+.stl-submit{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 26px;border-radius:13px;border:0;background:var(--brand);color:#fff;font-family:inherit;font-size:15px;font-weight:900;box-shadow:0 8px 20px rgba(180,15,35,.25);transition:.15s}
+.stl-submit:hover{background:var(--brand-dark)}
+.stl-submit:disabled{opacity:.6;cursor:wait}
+.stl-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px;background:#fff;border:1.5px dashed var(--line-strong);border-radius:var(--r-lg);padding:60px 24px;color:var(--muted);min-height:420px}
+.stl-empty-ico{width:60px;height:60px;border-radius:18px;background:var(--brand-050);color:var(--brand);display:grid;place-items:center}
+.stl-empty b{font-size:15.5px;color:var(--ink-2)}
+.stl-empty span{font-size:12.5px;max-width:340px;line-height:1.9}
+
+/* فاکتورهای صادرشده */
+.sd-invoice-list{display:grid;gap:9px;padding:16px 20px 20px}
+.sd-invoice-row{display:grid;grid-template-columns:minmax(0,1.3fr) auto auto auto auto;gap:13px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 15px}
+.sd-invoice-row:hover{border-color:var(--green-line)}
+.sd-invoice-no{display:inline-flex;background:var(--green-bg);border:1px solid var(--green-line);color:var(--green);border-radius:8px;padding:2px 9px;font-size:11px;font-weight:1000;margin-bottom:4px}
+.sd-invoice-row strong{display:block;font-size:13.5px}
+.sd-invoice-row>div:first-child small{font-size:11px;color:var(--muted)}
+.sd-invoice-amount{font-size:14px;color:var(--ink);white-space:nowrap}
+.sd-invoice-status{display:grid;gap:3px;justify-items:start}
+.sd-invoice-status small{font-size:10.5px;color:var(--muted)}
+.verify-inline{display:flex;flex-wrap:wrap;gap:5px}
+.mini-verify{border-radius:8px;padding:3px 8px;font-size:10px}
+
+/* --- تب ۵: روزهای آتی --- */
+.fx-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;align-items:start}
+.fx-form{display:grid;gap:14px}
+.fx-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-xs)}
+.fx-card-head{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.fx-card-head .fx-ico{width:32px;height:32px;border-radius:9px;background:var(--brand-050);color:var(--brand);display:grid;place-items:center;flex:0 0 auto}
+.fx-card-head h3{margin:0;font-size:14.5px;font-weight:1000;flex:1}
+.fx-card-body{padding:16px 20px 18px}
+.fx-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.fx-full{margin-top:13px}
+.fx-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fx-list-grid{display:grid;gap:10px}
+.fx-row{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 14px;transition:.14s}
+.fx-row:hover{border-color:var(--purple-line);box-shadow:var(--shadow-sm)}
+.fx-row-top{display:flex;gap:12px;align-items:flex-start}
+.fx-row-date{flex:0 0 auto;min-width:86px;text-align:center;background:var(--purple-bg);border:1px solid var(--purple-line);border-radius:11px;padding:8px 10px}
+.fx-row-date strong{display:block;font-size:12.5px;color:var(--purple);line-height:1.6}
+.fx-row-date b{display:block;font-size:15px;color:var(--purple)}
+.fx-row-info{flex:1;min-width:0}
+.fx-row-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fx-row-info h3{margin:6px 0 0;font-size:14.5px;font-weight:1000}
+.fx-row-info p{margin:2px 0 0;font-size:11.5px;color:var(--muted)}
+.fx-row-status{flex:0 0 auto}
+.fx-row-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.fx-row-meta span{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-size:11px;color:var(--muted)}
+.fx-row-meta b{color:var(--ink-3)}
+.fx-row-actions{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
+.fx-list-count{background:var(--purple-bg);color:var(--purple);border-radius:999px;padding:2px 10px;font-size:11.5px;font-weight:900}
+.jalali-field .date-today-btn{border:0;background:var(--brand-050);color:var(--brand);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:900;font-family:inherit}
+.jalali-field .date-today-btn:hover{background:var(--brand-100)}
+.field-hint{font-size:10.5px;color:var(--muted-2)}
+
+/* ---------- 6) ریسپانسیو ---------- */
+@media (max-width:1250px){
+  .sd-onsite-grid,.sd-remote-grid,.sd-oe-layout,.fx-grid{grid-template-columns:1fr}
+  .sd-flow-card,.sd-summary-side{position:static}
+  .stl-layout{grid-template-columns:1fr}
+  .stl-queue-list{max-height:330px}
+}
+@media (max-width:1000px){
+  .workspace{margin-right:0}
+  .sd-tabs{display:flex;overflow-x:auto;scrollbar-width:none}
+  .sd-tabs::-webkit-scrollbar{display:none}
+  .sd-tab{flex:0 0 auto;min-width:186px}
+}
+@media (max-width:900px){
+  .sd-grid-head{display:none}
+  .stl-row{grid-template-columns:1fr 1fr;gap:9px}
+  .stl-cell-name{grid-column:1/-1}
+  .stl-cell-cancel{grid-column:1/-1}
+  .stl-grid2{grid-template-columns:1fr}
+  .stl-grid2 .stl-section:first-child{border-left:0;border-bottom:1px solid var(--line)}
+  .sd-line{grid-template-columns:34px minmax(0,1fr) 40px}
+  .sd-line-cell.cell-product{grid-column:2}
+  .sd-line-cell.cell-qty{grid-column:2}
+  .sd-line-cell.cell-unit{grid-column:2}
+  .sd-line-cell.cell-desc{grid-column:2}
+  .sd-line-del{grid-row:1;grid-column:3;margin-top:7px}
+  .sd-flow-items>div{grid-template-columns:auto auto minmax(0,1fr) auto}
+  .sd-flow-items small{display:none}
+  .sd-invoice-row{grid-template-columns:1fr auto;row-gap:9px}
+  .sd-form-grid{grid-template-columns:1fr 1fr}
+  .sd-form-grid .span-2{grid-column:1/-1}
+  .sd-remote-strip{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  .workspace{padding:0 14px 96px}
+  .content{padding-top:16px}
+  .sd-head{flex-direction:column}
+  .sd-count{align-self:flex-start}
+  .sd-queue-row{grid-template-columns:auto minmax(0,1fr)}
+  .sd-queue-time{display:none}
+  .sd-queue-cta{grid-column:1/-1;justify-content:center}
+  .sd-oe-banner{flex-direction:column;align-items:stretch}
+  .sd-oe-banner-actions{justify-content:stretch}
+  .sd-oe-banner-actions .btn{flex:1}
+  .sd-stepper{display:none}
+  .sd-form-grid{grid-template-columns:1fr}
+  .fx-grid-2{grid-template-columns:1fr}
+  .sd-flow-top{flex-direction:column}
+  .sd-flow-stats>div{flex:1;min-width:104px}
+  .stl-actions{flex-direction:column;align-items:stretch}
+  .stl-form-head{flex-direction:column;align-items:stretch}
+  .stl-dispatch-control{max-width:none;min-width:0;width:100%}
+  .stl-dispatch-control .btn{justify-content:center}
+  .stl-actions .btn,.stl-submit{width:100%;justify-content:center}
+}
+
+/* ---------- 7) کارتابل نگهبانی (قدم ۲ / gt-*) ---------- */
+.gt-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+.gt-fieldset{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:var(--panel-2)}
+.gt-fieldset+.gt-fieldset{margin-top:14px}
+.gt-fieldset-title{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:1000;color:var(--ink-2);margin-bottom:13px}
+.gt-fieldset-title .svg{width:17px;height:17px;color:var(--brand)}
+.gt-fieldset-title small{color:var(--muted);font-weight:700;font-size:11px}
+.gt-fieldset-title .gt-switch{margin-right:auto}
+.gt-grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.gt-switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;font-weight:800;color:var(--ink-3);background:#fff;border:1px solid var(--line-strong);border-radius:999px;padding:6px 12px}
+.gt-switch input{width:15px;height:15px;accent-color:var(--brand);cursor:pointer}
+.gt-novehicle{display:flex;align-items:center;justify-content:center;gap:8px;height:64px;border:1.5px dashed var(--line-strong);border-radius:14px;color:var(--muted);font-size:13px;font-weight:800;background:#fff}
+/* پلاک ایران — نسخه مدرن */
+.iran-plate{margin-top:12px;display:grid;grid-template-columns:58px 1.05fr .78fr 1.2fr .8fr;direction:ltr;height:80px;border:2.5px solid #22303f;border-radius:15px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
+.iran-plate .blue-strip{background:linear-gradient(180deg,#1a6fb5,#0d4f8c);display:grid;place-items:center;color:#fff}
+.iran-plate .blue-strip span{font-size:10px;font-weight:900;line-height:1.25;text-align:center}
+.iran-plate .plate-part{border-left:2px solid #eef1f4;display:grid;place-items:center;font-size:24px;font-weight:1000;color:var(--ink)}
+.iran-plate .plate-part:last-child{border-left:0;background:#f2f5f8}
+.iran-plate input,.iran-plate select{width:100%;height:100%;border:0;outline:0;background:transparent;text-align:center;font:inherit;color:inherit}
+.iran-plate input:focus{background:var(--brand-050)}
+.iran-plate select{font-size:21px}
+.iran-plate .plate-code input{font-size:20px}
+.plate-preview{margin-top:8px;font-size:12px;color:var(--muted);font-weight:700}
+.gt-suggest{display:grid;gap:7px;margin-top:10px}
+.gt-suggest .suggestion{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:right;transition:.14s;font-family:inherit}
+.gt-suggest .suggestion:hover{border-color:var(--brand-200);background:var(--brand-050)}
+.gt-suggest .suggestion main{min-width:0}
+.gt-suggest .suggestion b{display:block;font-size:13.5px}
+.gt-suggest .suggestion span span,.gt-suggest .suggestion main span{display:block;color:var(--muted);font-size:11.5px}
+.gt-suggest .suggestion .svg{color:var(--brand)}
+/* سوابق مراجعه */
+.gt-table-pad{padding:16px 20px 20px}
+.gt-table .table td{vertical-align:middle}
+.gt-cust-cell{display:flex;align-items:center;gap:11px;min-width:0}
+.gt-cust-cell .sd-avatar{width:38px;height:38px;border-radius:11px;font-size:13px}
+.gt-cust-cell strong{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gt-cust-cell small{display:block;font-size:11.5px;color:var(--muted)}
+/* کنترل خروج */
+.gt-exit-list{display:grid;gap:11px;padding:16px 20px 20px}
+.gt-exit-row{display:grid;grid-template-columns:minmax(0,1.4fr) auto auto auto;gap:14px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;transition:.14s}
+.gt-exit-row:hover{border-color:var(--green-line);box-shadow:var(--shadow-sm)}
+.gt-exit-main{min-width:0}
+.gt-exit-main .sd-chips{margin-top:6px}
+.gt-exit-main strong{display:block;font-size:14.5px}
+.gt-exit-amount{display:grid;justify-items:end;gap:2px}
+.gt-exit-amount b{font-size:14px}
+.gt-exit-amount small{font-size:10.5px;color:var(--muted)}
+.gt-check-list{display:grid;gap:8px}
+.gt-check{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer;transition:.14s}
+.gt-check:hover{border-color:var(--green-line)}
+.gt-check input{width:18px;height:18px;accent-color:var(--green)}
+.gt-check b{display:block;font-size:13.5px}
+.gt-check small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.gt-exit-editor{margin-top:16px;border-color:var(--green-line);box-shadow:0 0 0 3px rgba(15,123,79,.06)}
+@media (max-width:1150px){.gt-grid{grid-template-columns:1fr}}
+@media (max-width:900px){.gt-grid2{grid-template-columns:1fr}.gt-exit-row{grid-template-columns:1fr auto}.gt-exit-amount{justify-items:start;grid-column:1/-1}}
+@media (max-width:560px){.iran-plate{height:66px;grid-template-columns:44px 1fr .8fr 1.1fr .8fr}.iran-plate .plate-part{font-size:19px}.iran-plate select{font-size:17px}}
+
+/* ---------- 8) انبار و فروشگاه (قدم ۳ / wh38-*, st38-*) ---------- */
+.wh38-tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wh38-tab{display:flex;align-items:center;gap:13px;border:1px solid var(--line);background:#fff;border-radius:16px;padding:15px 17px;text-align:right;transition:.15s;min-height:88px}
+.wh38-tab:hover{border-color:var(--brand-200);box-shadow:var(--shadow-sm)}
+.wh38-tab.active{border-color:var(--brand-300);background:var(--brand-050);box-shadow:0 0 0 3px rgba(180,15,35,.08)}
+.wh38-tab-idx{font-size:11px;font-weight:1000;color:var(--muted-2)}
+.wh38-tab.active .wh38-tab-idx{color:var(--brand)}
+.wh38-tab>span:nth-child(2){width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:var(--panel-2);color:var(--ink-3);flex:0 0 auto}
+.wh38-tab.active>span:nth-child(2){background:#fff;color:var(--brand)}
+.wh38-tab b{display:block;font-size:15px;font-weight:1000}
+.wh38-tab small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.wh38-tab em{font-style:normal;margin-right:auto;min-width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-2);font-size:15px;font-weight:1000}
+.wh38-tab.active em{background:var(--brand);border-color:var(--brand);color:#fff}
+.wh38-list{display:grid;gap:13px;margin-top:16px}
+.wh38-card{display:grid;grid-template-columns:44px minmax(0,1fr);gap:15px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-xs);transition:.14s}
+.wh38-card:hover{border-color:var(--brand-200);box-shadow:var(--shadow-sm)}
+.wh38-no{width:42px;height:42px;border-radius:12px;background:var(--brand-050);border:1px solid var(--brand-100);color:var(--brand);display:grid;place-items:center;font-weight:1000;font-size:14px}
+.wh38-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.wh38-top .sd-chips{margin-top:7px}
+.wh38-top h3{margin:0;font-size:16px;font-weight:1000}
+.wh38-top p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.wh38-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
+.wh38-meta>span{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:6px 11px;font-size:11px;color:var(--muted)}
+.wh38-meta b{display:block;color:var(--ink-2);font-size:12px;margin-top:1px}
+.wh38-items{display:grid;gap:6px;margin-top:11px}
+.wh38-items>div{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:9px;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:12.5px}
+.wh38-items>div>span:first-child{width:21px;height:21px;border-radius:6px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:10px;color:var(--muted);font-weight:1000}
+.wh38-items b{font-size:12px;white-space:nowrap;color:var(--ink-2)}
+.wh38-actions{display:flex;justify-content:flex-end;margin-top:13px;padding-top:13px;border-top:1px dashed var(--line)}
+/* برگه آماده‌سازی */
+.wh38-sheet{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-xs);overflow:hidden;margin-top:16px}
+.wh38-sheet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:17px 22px;background:linear-gradient(120deg,#fff8f8,#fff);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.wh38-sheet-head h2{margin:2px 0 0;font-size:19px;font-weight:1000}
+.wh38-sheet-head p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+.wh38-progress{display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:10px;align-items:center;padding:13px 22px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+.wh38-progress span{font-size:12.5px;font-weight:900;color:var(--muted)}
+.wh38-progress span.done{color:var(--green)}
+.wh38-progress span.active{color:var(--brand)}
+.wh38-progress i{height:2px;background:var(--line);border-radius:2px}
+.wh38-note{display:grid;gap:3px;margin:16px 22px 0;padding:12px 15px;border:1px solid var(--brand-100);background:var(--brand-050);border-radius:12px}
+.wh38-note b{font-size:13.5px;color:var(--brand-deep)}
+.wh38-note span{font-size:12px;color:var(--ink-3)}
+.wh38-prep-items{display:grid;gap:12px;padding:16px 22px}
+.wh38-prep-item{display:grid;grid-template-columns:40px minmax(0,1.25fr) minmax(190px,.8fr);gap:14px;align-items:start;border:1px solid var(--line);border-radius:15px;padding:14px 16px;background:var(--panel-2)}
+.wh38-prep-num{width:38px;height:38px;border-radius:11px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-weight:1000;font-size:13px;color:var(--muted)}
+.wh38-prep-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wh38-prep-title strong{font-size:14.5px}
+.wh38-req{display:inline-flex;align-items:center;gap:8px;margin-top:8px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:6px 11px;font-size:11.5px;color:var(--muted)}
+.wh38-req b{color:var(--ink-2)}
+.wh38-prep-desc{margin-top:9px;font-size:11.5px;color:var(--muted);line-height:1.8}
+.wh38-weight label{display:block;font-size:12px;font-weight:900;color:var(--ink-2);margin-bottom:6px}
+.wh38-weight>div{display:flex;align-items:center;background:#fff;border:1.5px solid var(--line-strong);border-radius:12px;height:54px;transition:.14s}
+.wh38-weight>div:focus-within{border-color:var(--brand-300);box-shadow:var(--ring)}
+.wh38-weight input{flex:1;min-width:0;border:0;outline:0;background:none;text-align:center;font-size:19px;font-weight:1000;font-family:inherit}
+.wh38-weight input:disabled{color:var(--muted-2);background:#f3f4f6}
+.wh38-weight b{padding:0 12px;font-size:11px;color:var(--muted);border-right:1px solid var(--line);align-self:stretch;display:flex;align-items:center}
+.wh38-oos{display:flex;align-items:center;gap:9px;margin-top:9px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 11px;cursor:pointer}
+.wh38-oos input{width:17px;height:17px;accent-color:var(--brand)}
+.wh38-oos strong{font-size:12.5px}
+.wh38-oos small{display:block;font-size:10.5px;color:var(--muted)}
+.wh38-sheet-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 22px;background:var(--panel-2);border-top:1px solid var(--line);flex-wrap:wrap}
+.wh38-sheet-foot>div:first-child span{display:block;font-size:11.5px;color:var(--muted)}
+.wh38-sheet-foot>div:first-child strong{display:block;font-size:21px;color:var(--brand);margin-top:2px}
+/* فروشگاه */
+.st38-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.st38-hero-badge{display:grid;gap:2px;background:var(--orange-bg);border:1px solid var(--orange-line);border-radius:12px;padding:9px 15px;text-align:center}
+.st38-hero-badge span{font-size:13.5px;font-weight:1000;color:var(--orange)}
+.st38-hero-badge small{font-size:10.5px;color:var(--orange)}
+.st38-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+.st38-lock{display:flex;align-items:center;gap:10px;background:var(--panel-2);border:1px dashed var(--line-strong);border-radius:12px;padding:10px 13px}
+.st38-lock .svg{color:var(--muted)}
+.st38-lock strong{display:block;font-size:12.5px}
+.st38-lock span{display:block;font-size:10.5px;color:var(--muted)}
+.st38-list{display:grid;gap:11px;padding:16px 20px 20px}
+.st38-row{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px;transition:.14s}
+.st38-row:hover{border-color:var(--orange-line);box-shadow:var(--shadow-sm)}
+.st38-row-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.st38-row-cust{margin-top:7px;font-size:12.5px;color:var(--ink-2)}
+.st38-row-cust span{color:var(--muted)}
+.st38-row-items{display:grid;gap:5px;margin-top:9px}
+.st38-row-items>div{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-size:12px}
+.st38-row-items b{font-size:11.5px;white-space:nowrap;color:var(--ink-2)}
+.st38-row-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;flex-wrap:wrap}
+.st38-row-foot>span{font-size:11.5px;color:var(--muted)}
+.st38-row-foot b{color:var(--ink-3)}
+@media (max-width:1150px){.st38-grid{grid-template-columns:1fr}}
+@media (max-width:900px){.wh38-tabs{grid-template-columns:1fr}.wh38-prep-item{grid-template-columns:36px 1fr}.wh38-weight{grid-column:2}.wh38-sheet-foot{flex-direction:column;align-items:stretch}.wh38-sheet-foot .toolbar{display:grid;grid-template-columns:1fr}}
+
+/* اصلاح ردیف اقلام در پنل باریک کارتابل فروشگاه */
+@media (min-width: 901px){
+  .st38-grid .sd-line{grid-template-columns:34px minmax(0,1fr) 105px 112px 40px}
+  .st38-grid .sd-line .cell-product{grid-column:2}
+  .st38-grid .sd-line .cell-qty{grid-column:3}
+  .st38-grid .sd-line .cell-unit{grid-column:4}
+  .st38-grid .sd-line .sd-line-del{grid-row:1;grid-column:5}
+  .st38-grid .sd-line .cell-desc{grid-column:1/-1}
+}
+
+/* ================================================================
+   قدم ۴ — داشبورد (db38) + گزارش‌ها (rp38) + مدیریت (ad38)
+   ================================================================ */
+
+/* ---------- نوار KPI مشترک ---------- */
+.mg38-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.mg38-kpi{position:relative;background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px 16px 13px;display:flex;gap:12px;align-items:flex-start;box-shadow:var(--shadow-xs);overflow:hidden}
+.mg38-kpi::before{content:"";position:absolute;inset-inline:0;top:0;height:3px;background:var(--line-strong)}
+.mg38-kpi .mg38-ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--gray-chip-bg);color:var(--gray-chip)}
+.mg38-kpi .mg38-copy{min-width:0}
+.mg38-kpi .mg38-lbl{display:block;font-size:12px;font-weight:900;color:var(--ink-2)}
+.mg38-kpi .mg38-val{display:block;font-size:21px;font-weight:1000;line-height:1.45;color:var(--ink);overflow-wrap:anywhere}
+.mg38-kpi small{display:block;font-size:10.5px;color:var(--muted);margin-top:1px}
+.mg38-kpi.t-red::before{background:var(--brand)}.mg38-kpi.t-red .mg38-ico{background:var(--brand-050);color:var(--brand)}
+.mg38-kpi.t-blue::before{background:var(--blue)}.mg38-kpi.t-blue .mg38-ico{background:var(--blue-bg);color:var(--blue)}
+.mg38-kpi.t-orange::before{background:#d99a06}.mg38-kpi.t-orange .mg38-ico{background:var(--orange-bg);color:var(--orange)}
+.mg38-kpi.t-green::before{background:var(--green)}.mg38-kpi.t-green .mg38-ico{background:var(--green-bg);color:var(--green)}
+.mg38-kpi.t-purple::before{background:var(--purple)}.mg38-kpi.t-purple .mg38-ico{background:var(--purple-bg);color:var(--purple)}
+
+/* ---------- داشبورد ---------- */
+.db38-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.db38-hero-right{display:flex;align-items:center;gap:14px}
+.db38-hero-right .db38-logo{width:52px;height:52px;border-radius:16px;background:var(--brand);color:#fff;display:grid;place-items:center;box-shadow:0 6px 16px rgba(180,15,35,.28)}
+.db38-hero h2{margin:0;font-size:21px;font-weight:1000}
+.db38-hero p{margin:3px 0 0;font-size:12.5px;color:var(--muted)}
+.db38-hero-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.db38-date{background:#fff;border:1px solid var(--line);border-radius:13px;padding:8px 14px;display:grid;gap:0;box-shadow:var(--shadow-xs)}
+.db38-date small{font-size:10px;color:var(--muted)}
+.db38-date b{font-size:13px;font-weight:900;color:var(--ink-2)}
+.db38-grid{display:grid;grid-template-columns:1.25fr .95fr;gap:16px;margin-top:16px}
+.db38-flow{display:flex;align-items:stretch;gap:0;padding:8px 6px 4px}
+.db38-flow-item{flex:1;display:grid;gap:8px;justify-items:center;text-align:center;position:relative;padding:10px 6px}
+.db38-flow-item::after{content:"";position:absolute;top:37px;inset-inline-end:-50%;width:100%;height:2px;background:var(--line-strong);z-index:0}
+.db38-flow-item:last-child::after{display:none}
+.db38-flow-item .db38-fico{position:relative;z-index:1;width:48px;height:48px;border-radius:15px;background:var(--panel-2);border:1.5px solid var(--line);display:grid;place-items:center;color:var(--muted)}
+.db38-flow-item b{font-size:13px;font-weight:1000}
+.db38-flow-item small{font-size:10.5px;color:var(--muted);display:block}
+.db38-flow-item .db38-fno{font-size:10px;font-weight:1000;color:var(--brand);background:var(--brand-050);border:1px solid var(--brand-200);border-radius:99px;padding:0 8px}
+.db38-activity{display:grid;gap:8px}
+.db38-act{display:flex;align-items:center;gap:11px;background:var(--panel-2);border:1px solid var(--line);border-radius:13px;padding:10px 13px}
+.db38-act .db38-aico{width:34px;height:34px;border-radius:10px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted);flex:none}
+.db38-act>div{min-width:0;flex:1}
+.db38-act b{font-size:13px;font-weight:900;display:block}
+.db38-act small{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.db38-act time{font-size:11px;color:var(--muted);white-space:nowrap}
+
+/* ---------- گزارش‌ها ---------- */
+.rp38-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.rp38-bar{display:grid;grid-template-columns:110px 1fr 36px;align-items:center;gap:10px;padding:7px 0}
+.rp38-bar>span{font-size:12px;font-weight:800;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp38-bar .rp38-track{height:9px;background:var(--bg-soft);border-radius:99px;overflow:hidden}
+.rp38-bar .rp38-track i{display:block;height:100%;border-radius:99px;background:linear-gradient(270deg,var(--brand),#d9485a)}
+.rp38-bar>b{font-size:13px;font-weight:1000;text-align:center}
+.rp38-minis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rp38-mini{background:var(--panel-2);border:1px solid var(--line);border-radius:13px;padding:13px 15px;display:grid;gap:2px}
+.rp38-mini b{font-size:21px;font-weight:1000;color:var(--ink)}
+.rp38-mini span{font-size:11.5px;color:var(--muted);font-weight:800}
+.rp38-highlight{display:flex;flex-direction:column;justify-content:center;gap:4px;background:linear-gradient(140deg,var(--purple-bg),#fff 70%);border:1px solid var(--purple-line)}
+.rp38-highlight .rp38-big{font-size:44px;font-weight:1000;color:var(--purple);line-height:1.2}
+
+/* ---------- مدیریت ---------- */
+.ad38-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ad38-tab{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:13px 16px;cursor:pointer;text-align:right;transition:border-color .15s,box-shadow .15s,background .15s}
+.ad38-tab:hover{border-color:var(--line-strong)}
+.ad38-tab .ad38-tico{width:42px;height:42px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line);display:grid;place-items:center;color:var(--muted);flex:none}
+.ad38-tab b{display:block;font-size:14px;font-weight:1000}
+.ad38-tab small{display:block;font-size:11px;color:var(--muted)}
+.ad38-tab em{margin-inline-start:auto;font-style:normal;min-width:30px;height:30px;padding:0 8px;border-radius:10px;background:var(--gray-chip-bg);color:var(--gray-chip);display:grid;place-items:center;font-size:13px;font-weight:1000}
+.ad38-tab.active{border-color:var(--brand-300);background:var(--brand-050);box-shadow:var(--ring)}
+.ad38-tab.active .ad38-tico{background:#fff;border-color:var(--brand-200);color:var(--brand)}
+.ad38-tab.active em{background:var(--brand);color:#fff}
+.ad38-pane{display:grid;gap:16px;margin-top:16px}
+.ad38-pane.hidden-pane{display:none}
+.ad38-2col{display:grid;grid-template-columns:.92fr 1.08fr;gap:16px;align-items:start}
+.ad38-user{display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.ad38-user.inactive{opacity:.62}
+.ad38-user .ad38-avatar{width:44px;height:44px;border-radius:13px;background:var(--brand-050);color:var(--brand);display:grid;place-items:center;font-weight:1000;font-size:15px;flex:none}
+.ad38-user.inactive .ad38-avatar{background:var(--gray-chip-bg);color:var(--gray-chip)}
+.ad38-user>div{min-width:0;flex:1}
+.ad38-user b{font-size:13.5px;font-weight:1000;display:inline-block;margin-inline-end:8px}
+.ad38-user .ad38-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.ad38-user .ad38-actions{display:flex;gap:6px;flex:none}
+.ad38-prod{display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:13px;padding:10px 13px}
+.ad38-prod .ad38-pcode{width:40px;height:40px;border-radius:11px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:1000;font-size:14px;flex:none}
+.ad38-prod>div{min-width:0;flex:1}
+.ad38-prod b{font-size:13px;font-weight:900;display:block}
+.ad38-prod span{font-size:10.5px;color:var(--muted);display:block}
+.ad38-prod .ad38-punit{font-size:11.5px;color:var(--ink-2);font-weight:800;background:#fff;border:1px solid var(--line);border-radius:99px;padding:2px 10px;flex:none}
+.ad38-audit{display:flex;align-items:flex-start;gap:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:13px;padding:11px 14px}
+.ad38-audit .ad38-atime{font-size:11px;color:var(--muted);white-space:nowrap;padding-top:3px;min-width:96px}
+.ad38-audit>div{min-width:0;flex:1}
+.ad38-audit b{font-size:13px;font-weight:900;display:block}
+.ad38-audit small{font-size:11px;color:var(--muted);display:block}
+.ad38-audit .ad38-auser{flex:none;font-size:11px;font-weight:900;background:#fff;border:1px solid var(--line);border-radius:99px;padding:3px 11px;color:var(--ink-2)}
+.ad38-lists{display:grid;gap:9px}
+.pager{justify-content:center;margin-top:12px}
+
+@media (max-width:1200px){
+  .mg38-kpis{grid-template-columns:repeat(3,1fr)}
+  .db38-grid,.rp38-grid,.ad38-2col{grid-template-columns:1fr}
+}
+@media (max-width:900px){
+  .mg38-kpis{grid-template-columns:repeat(2,1fr)}
+  .ad38-tabs{grid-template-columns:1fr}
+  .db38-flow{flex-direction:column}
+  .db38-flow-item{grid-template-columns:48px 1fr;text-align:right;justify-items:start;gap:4px 12px;padding:8px 4px}
+  .db38-flow-item .db38-fico{grid-row:1/3}
+  .db38-flow-item::after{display:none}
+}
+@media (max-width:560px){
+  .mg38-kpis{grid-template-columns:1fr 1fr}
+  .rp38-bar{grid-template-columns:84px 1fr 30px}
+}
+
+/* ================================================================
+   قدم ۵ — صفحه ورود (lg38) + قالب چاپ فاکتور/گزارش (inv38/rpt38)
+   ================================================================ */
+
+/* ---------- صفحه ورود ---------- */
+.login-page{background:var(--bg)}
+.login-side{background:
+  radial-gradient(900px 480px at 88% -12%,rgba(255,255,255,.16),transparent 60%),
+  radial-gradient(700px 420px at -10% 110%,rgba(0,0,0,.28),transparent 60%),
+  linear-gradient(152deg,#c81429 0%,var(--brand) 42%,var(--brand-deep) 100%);
+  padding:56px 60px}
+.login-side-pattern{opacity:.07;background-size:34px 34px}
+.login-brand-mark{width:86px;height:86px;border-radius:22px;box-shadow:0 18px 44px rgba(0,0,0,.28)}
+.login-brand-label{letter-spacing:.22em}
+.login-side h1{font-size:40px}
+.login-side-meta{margin-top:28px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);border-radius:99px;padding:6px 16px;width:max-content;backdrop-filter:blur(4px)}
+.login-panel-inner{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow-md);padding:34px 32px;width:min(474px,100%)}
+.login-title{font-size:26px;margin-top:18px}
+.login-subtitle{font-size:13px}
+.auth-form{gap:14px;margin-top:22px}
+#loginForm .input-shell{height:50px;border-radius:13px;background:var(--panel-2)}
+#loginForm .input-shell:focus-within{background:#fff;border-color:var(--brand-300);box-shadow:var(--ring)}
+#loginForm .btn-primary{min-height:50px;border-radius:13px;font-size:15.5px}
+#showPassword::before{content:"";width:19px;height:19px;display:block;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center/contain no-repeat}
+.login-footer{font-size:11px}
+@media (max-width:700px){
+  .login-panel{background:var(--bg)}
+  .login-panel-inner{border-radius:20px;padding:26px 20px;box-shadow:var(--shadow-sm)}
+}
+
+/* ---------- قالب چاپ فاکتور ---------- */
+.inv38-sheet{max-width:880px;margin:auto;color:#1d222a;font-family:var(--font)}
+.inv38-head{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.inv38-brand{display:flex;align-items:center;gap:12px}
+.inv38-brand img{width:52px;height:52px;object-fit:contain;border:1px solid #e3e6ea;border-radius:14px;padding:6px;background:#fff}
+.inv38-brand b{font-size:20px;font-weight:1000;display:block}
+.inv38-brand span{display:block;font-size:10px;color:#8a919c}
+.inv38-brand small{display:block;font-size:8.5px;color:#a6adb8}
+.inv38-meta{display:grid;grid-template-columns:repeat(3,auto);gap:8px}
+.inv38-meta>div{border:1px solid #e3e6ea;background:#fafbfc;border-radius:11px;padding:6px 14px;text-align:center}
+.inv38-meta span{display:block;font-size:8.5px;color:#8a919c}
+.inv38-meta b{display:block;font-size:12px;margin-top:2px}
+.inv38-rule{height:3px;background:linear-gradient(270deg,var(--brand),#d9485a);border-radius:99px;margin:14px 0 12px}
+.inv38-cust{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px}
+.inv38-cust>div{border:1px solid #e3e6ea;background:#fafbfc;border-radius:11px;padding:8px 13px}
+.inv38-cust span{display:block;font-size:9px;color:#8a919c}
+.inv38-cust b{display:block;font-size:12px;margin-top:3px}
+.inv38-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:13px;border:1px solid #e3e6ea;border-radius:12px;overflow:hidden}
+.inv38-table th{background:#f6f7f9;font-size:9.5px;color:#67707d;padding:8px 9px;text-align:right;border-bottom:1px solid #e3e6ea}
+.inv38-table td{font-size:10.5px;padding:8px 9px;border-bottom:1px solid #eef0f3;text-align:right;vertical-align:top}
+.inv38-table tr:last-child td{border-bottom:0}
+.inv38-table td small{display:block;color:#8a919c;margin-top:2px;font-size:8.5px}
+.inv38-total{display:flex;justify-content:flex-end;margin-top:12px}
+.inv38-total-box{width:300px;border:1px solid #e3e6ea;border-radius:12px;padding:10px 13px}
+.inv38-total-box>div{display:flex;justify-content:space-between;padding:4px 0;font-size:10px}
+.inv38-total-box .grand{border-top:1px dashed #d5dae2;margin-top:4px;padding-top:8px;font-size:14px;font-weight:1000}
+.inv38-total-box .grand b{color:var(--brand)}
+.inv38-verify{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-top:18px;align-items:stretch}
+.inv38-verify-box{border:1px solid #e3e6ea;border-radius:13px;padding:11px;background:#fafbfc}
+.inv38-verify-title{font-size:11.5px;font-weight:1000;margin-bottom:8px}
+.inv38-verify-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.inv38-vitem{border:1px solid #e3e6ea;border-radius:10px;background:#fff;padding:8px;min-height:66px}
+.inv38-vitem>span{display:block;font-size:8.5px;color:#8a919c}
+.inv38-vitem>strong{display:block;margin-top:4px;font-size:10px}
+.inv38-vitem .ok{color:#0f7b4f}.inv38-vitem .bad{color:#b40f23}.inv38-vitem .manual{color:#9a6700}
+.inv38-vitem small{display:block;color:#8a919c;margin-top:4px;font-size:7.5px}
+.inv38-sign-img{display:block;max-width:150px;max-height:42px;margin:5px auto 0}
+.inv38-cust-under{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:4px 8px;margin-top:9px;align-items:center}
+.inv38-cust-under span{font-size:8px;color:#8a919c}
+.inv38-cust-under b{font-size:9.5px}
+.inv38-sales-sign{border:1px solid #e3e6ea;border-radius:13px;background:#fff;padding:10px 12px;display:flex;flex-direction:column;justify-content:space-between}
+.inv38-sales-sign span{font-size:11px;font-weight:1000;color:#4b5563}
+.inv38-sales-sign div{height:34px}
+.inv38-sales-sign small{font-size:8px;color:#98a0ac}
+.inv38-foot{margin-top:12px;font-size:8.5px;color:#98a0ac;text-align:center}
+
+/* ---------- قالب چاپ گزارش ---------- */
+.rpt38-head{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.rpt38-head h1{font-size:21px;font-weight:1000;margin:0}
+.rpt38-head p{margin:2px 0 0;font-size:10px;color:#8a919c}
+.rpt38-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.rpt38-kpis>div{border:1px solid #e3e6ea;border-radius:11px;padding:9px 12px}
+.rpt38-kpis span{font-size:9px;color:#8a919c;display:block}
+.rpt38-kpis strong{font-size:16px;color:var(--brand);display:block;margin-top:3px}
+.rpt38-h2{font-size:13px;font-weight:1000;border-right:3px solid var(--brand);padding-right:8px;margin:18px 0 8px}
+.rpt38-table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #e3e6ea;border-radius:11px;overflow:hidden}
+.rpt38-table th{background:#f6f7f9;font-size:9.5px;color:#67707d;padding:7px 10px;text-align:right}
+.rpt38-table td{font-size:10.5px;padding:7px 10px;border-top:1px solid #eef0f3;text-align:right}
+
+/* ---------- اصلاحات صفحه ورود (دور بازبینی) ---------- */
+/* یکپارچه‌سازی ورودی‌های فرم ورود: حذف کادر داخلی خود input در همه حالت‌ها */
+#loginForm .input-shell input,#pwForm .input-shell input{
+  border:0!important;background:transparent!important;min-height:0!important;
+  padding:0!important;border-radius:0!important;box-shadow:none!important;
+}
+#loginForm .input-shell input:hover,#pwForm .input-shell input:hover{border:0!important;box-shadow:none!important}
+/* برند کنار لوگو */
+.login-brand-row{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.login-brand-mark{margin-bottom:0;flex:none}
+.login-brand-text b{display:block;font-size:27px;font-weight:1000;line-height:1.55;letter-spacing:normal}
+.login-brand-text span{display:block;font-size:15px;font-weight:800;opacity:.85;margin-top:2px}
+.login-side h1{margin:0 0 12px}
+.login-topline{min-height:0}
+
+/* ================================================================
+   صفحه ورود — یک‌رنگ قرمز برند، همه‌ی محتوا وسط و بالای صفحه
+   ================================================================ */
+#loginView.login-page:not(.hidden){
+  display:block;min-height:100vh;min-height:100dvh;margin:0;
+  background:radial-gradient(900px 480px at 88% -12%,rgba(255,255,255,.14),transparent 60%),
+    linear-gradient(160deg,#c81429 0%,var(--brand) 48%,var(--brand-deep) 100%)!important;
+  color:#fff;
+}
+#loginView .login-stage{
+  min-height:100vh;min-height:100dvh;box-sizing:border-box;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  gap:26px;padding:44px 20px 28px;text-align:center;
+}
+#loginView .login-hero{display:flex;flex-direction:column;align-items:center;gap:14px}
+#loginView .login-logo-badge{
+  width:112px;height:112px;border-radius:50%;background:#fff;display:grid;place-items:center;
+  padding:12px;box-sizing:border-box;box-shadow:0 18px 40px rgba(0,0,0,.22);
+}
+#loginView .login-logo-badge img{width:100%;height:100%;object-fit:contain;display:block}
+#loginView .login-org{
+  font-size:20px;font-weight:1000;color:#fff;white-space:nowrap;line-height:1.4;
+}
+#loginView .login-card{
+  margin-top:10px;width:min(420px,100%);box-sizing:border-box;display:flex;flex-direction:column;align-items:stretch;
+  text-align:center;background:transparent;border:0;box-shadow:none;padding:0;
+}
+#loginView .login-title{font-size:26px;font-weight:1000;margin:0;color:#fff;white-space:nowrap}
+#loginView .login-subtitle{font-size:13px;margin:6px 0 0;color:rgba(255,255,255,.88);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#loginView .auth-form{margin-top:22px;gap:14px;text-align:right}
+#loginView label{color:#fff;font-weight:900;font-size:13px}
+#loginView .label-row span{display:none}
+#loginView .input-shell{background:#fff!important;border:0!important;height:50px;border-radius:13px;box-shadow:none}
+#loginView .input-shell:focus-within{box-shadow:0 0 0 3px rgba(255,255,255,.45)!important;background:#fff!important}
+#loginView .input-shell input{color:#151a21}
+#loginView .field-icon,#loginView .input-action{color:var(--brand)}
+#loginView .btn-primary{
+  background:#fff!important;color:var(--brand)!important;border:0!important;box-shadow:0 10px 26px rgba(0,0,0,.18);
+  min-height:50px;border-radius:13px;font-size:15.5px;font-weight:1000;
+}
+#loginView .btn-primary:hover{background:#fff8f8!important}
+#loginView .form-error{color:#fff;font-weight:900;font-size:13px;text-align:center}
+#loginView .login-credit{
+  font-size:12.5px;font-weight:800;color:rgba(255,255,255,.9);white-space:nowrap;
+  padding-top:6px;border-top:1px solid rgba(255,255,255,.22);margin-top:auto;
+}
+@media (max-width:420px){
+  #loginView .login-logo-badge{width:96px;height:96px}
+  #loginView .login-org{font-size:16px}
+  #loginView .login-title{font-size:23px}
+  #loginView .login-credit{font-size:11px}
+}
+
+/* ================================================================
+   پرونده مشتریان (کد مشتری) — customers-ui.js
+   ================================================================ */
+.cust-toolbar{display:flex;gap:12px;align-items:center;padding:4px 20px 16px;flex-wrap:wrap}
+.cust-search{flex:1 1 260px;min-width:0}
+.cust-list{display:grid;gap:10px;padding:0 20px 20px;min-width:0}
+.cust-row{display:grid;grid-template-columns:104px minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) auto;align-items:center;gap:16px;
+  padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:#fff;cursor:pointer;min-width:0;box-shadow:var(--shadow-xs)}
+.cust-row:hover,.cust-row:focus-visible{border-color:var(--brand-300);box-shadow:var(--ring);outline:none}
+.cust-code{font-family:var(--font);font-weight:900;color:var(--brand);background:#fdf2f3;border:1px solid #f0cfd3;
+  border-radius:10px;padding:7px 8px;white-space:nowrap;font-size:15px;letter-spacing:.06em;direction:ltr;unicode-bidi:isolate;
+  display:inline-block;width:100%;box-sizing:border-box;text-align:center;font-variant-numeric:tabular-nums}
+.cust-code-lg{font-size:18px;padding:8px 16px;width:auto;min-width:120px}
+.cust-main,.cust-stats{display:grid;gap:4px;min-width:0}
+.cust-main strong{font-size:15.5px;line-height:1.6;overflow-wrap:anywhere}
+.cust-main small,.cust-stats small{color:#4b5563;font-size:13px;line-height:1.6}
+.cust-chips{display:flex;gap:6px;flex-wrap:wrap;min-width:0;align-content:center}
+.cust-chips .sd-chip{font-size:13px;direction:ltr;unicode-bidi:isolate}
+.cust-open{color:var(--muted)}
+.cust-code-chip{direction:ltr;font-weight:900;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.cust-code-entry{margin-bottom:12px}
+.cust-code-row{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
+.cust-code-row .input-shell{flex:1 1 180px;min-width:0}
+.cust-chip-picked{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;padding:9px 12px;border-radius:12px;background:#f3faf6;border:1px solid #bfe3cf;font-size:14px;line-height:1.7}
+.cust-chip-picked b{direction:ltr;unicode-bidi:isolate;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.cust-chip-x{margin-inline-start:auto;border:0;background:none;color:var(--brand);font-weight:800;cursor:pointer;font-size:12px}
+.cust-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cust-field{display:grid;gap:6px;min-width:0}
+.cust-field span{font-size:12.5px;font-weight:800;color:var(--ink-2)}
+.cust-field input,.cust-field select,.cust-field textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--line-strong);border-radius:12px;padding:10px 12px;font:inherit;background:#fff;color:var(--ink)}
+.cust-span2{grid-column:1/-1}
+.cust-form-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+.cust-detail{display:grid;gap:16px;min-width:0}
+.cust-hero{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.cust-hero>div{display:grid;gap:2px;min-width:0;flex:1 1 180px}
+.cust-hero small{color:var(--muted)}
+.cust-kv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cust-kv{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;min-width:0}
+.cust-kv small{color:#4b5563;font-size:13px}
+.cust-kv b{overflow-wrap:anywhere;font-size:14.5px;line-height:1.7}
+.cust-history{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.cust-history h4{margin:0 0 8px;font-size:14px}
+.cust-history ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.cust-history li{display:grid;gap:2px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;min-width:0;font-size:13px}
+.cust-history li{font-size:14px;line-height:1.7}
+.cust-history li span{color:#4b5563;font-size:12.5px}
+.cust-history li small{color:#4b5563;font-size:13px}
+.cust-none{color:var(--muted)}
+@media (max-width:900px){
+  .cust-row{grid-template-columns:96px minmax(0,1fr) auto}
+  .cust-chips{grid-column:2/3}
+  .cust-stats{grid-column:2/3}
+  .cust-open{grid-row:1;grid-column:3}
+}
+@media (max-width:640px){
+  .cust-toolbar{padding:4px 12px 12px}
+  .cust-list{padding:0 12px 14px}
+  .cust-row{grid-template-columns:minmax(0,1fr);gap:10px;padding:14px}
+  .cust-code{width:max-content;font-size:15px;padding:7px 14px}
+  .cust-open{display:none}
+  .cust-chips,.cust-stats{grid-column:auto}
+  .cust-form-grid,.cust-kv-grid,.cust-history{grid-template-columns:minmax(0,1fr)}
+  .cust-form-actions .btn{flex:1 1 auto}
+}
+
+/* ================================================================
+   صفحه‌های داشبورد مدیریت (admin-ui.js)
+   ================================================================ */
+#railNav button{min-width:70px!important;padding-inline:4px!important}
+@media (max-width:980px){
+  #railNav{gap:3px}
+  #railNav .nav-label{font-size:10.5px;white-space:nowrap}
+}
+@media (max-width:420px){
+  #railNav button{min-width:62px!important}
+  #railNav .nav-label{font-size:10px}
+}
+.adm-panel{min-width:0}
+.adm-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:4px 20px 16px}
+.adm-search{flex:1 1 240px;min-width:0}
+.adm-list{display:grid;gap:10px;padding:0 20px 20px;min-width:0}
+.adm-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;align-items:center;
+  padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:#fff;min-width:0;box-shadow:var(--shadow-xs)}
+.adm-row-prod{grid-template-columns:minmax(90px,auto) minmax(0,1.3fr) minmax(220px,1.2fr) minmax(0,1fr)}
+.adm-cell{display:grid;gap:3px;min-width:0;align-content:center}
+.adm-cell small{color:#4b5563;font-size:12.5px;line-height:1.6}
+.adm-cell b{font-size:15px;line-height:1.6;overflow-wrap:anywhere}
+.adm-cell span{color:#4b5563;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.adm-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.adm-price{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.adm-price input{width:140px;max-width:100%;min-width:0;border:1px solid var(--line-strong);border-radius:12px;padding:8px 10px;font:inherit;background:#fff}
+.adm-select{border:1px solid var(--line-strong);border-radius:12px;padding:9px 12px;font:inherit;background:#fff;min-height:42px;max-width:100%;min-width:0}
+.adm-date{display:flex;gap:6px;align-items:center;font-size:13px;color:#4b5563;font-weight:800}
+.adm-date input{border:1px solid var(--line-strong);border-radius:12px;padding:8px 10px;font:inherit;background:#fff;min-width:0}
+.adm-count{padding:0 20px 10px;font-size:13px;color:#4b5563;font-weight:800}
+.adm-msg{padding:0 20px}
+.adm-check{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:800;color:var(--ink-2)}
+.adm-note{font-size:13px;color:#4b5563;line-height:1.7}
+.adm-act summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:center}
+.adm-act summary::-webkit-details-marker{display:none}
+.adm-act[open]{border-color:var(--brand-300)}
+.adm-detail{display:grid;gap:10px;padding:12px 4px 4px;border-top:1px dashed var(--line);margin-top:10px;min-width:0}
+.adm-detail>div{display:grid;gap:4px;min-width:0}
+.adm-detail small{color:#4b5563;font-size:12.5px}
+.adm-detail code,.adm-detail pre{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font-family:ui-monospace,Consolas,monospace}
+.adm-report{display:grid;grid-template-columns:minmax(260px,320px) minmax(0,1fr);gap:18px;padding:0 20px 20px;align-items:start}
+.adm-rep-side,.adm-rep-main{min-width:0;display:grid;gap:14px}
+.adm-rep-block{display:grid;gap:8px;border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0}
+.adm-rep-block b{font-size:14px}
+.adm-rep-block>small{color:#4b5563;font-size:12.5px}
+.adm-checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}
+.adm-checks .adm-check{font-size:13px}
+.adm-filter{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) auto;gap:6px;align-items:center;margin-bottom:6px}
+.adm-filter select,.adm-filter input{border:1px solid var(--line-strong);border-radius:10px;padding:7px 8px;font:inherit;font-size:13px;background:#fff;min-width:0;width:100%;box-sizing:border-box}
+.adm-full{width:100%}
+.adm-rep-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.adm-rep-bar .adm-count{padding:0}
+.adm-rep-result{min-width:0}
+.adm-date-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.adm-date-pair .adm-date{flex-direction:column;align-items:stretch;gap:4px}
+.adm-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+.adm-table{width:100%;border-collapse:collapse;font-size:13px}
+.adm-table th{background:#f8fafc;color:var(--ink-2);font-weight:900;white-space:nowrap;text-align:start;padding:9px 10px;border-bottom:1px solid var(--line)}
+.adm-table td{padding:8px 10px;border-bottom:1px solid #eef0f3;text-align:start;overflow-wrap:anywhere;vertical-align:top;line-height:1.7}
+@media (max-width:900px){
+  .adm-report{grid-template-columns:minmax(0,1fr)}
+  .adm-row-prod{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}
+@media (max-width:640px){
+  .adm-toolbar{padding:4px 12px 12px}
+  .adm-list{padding:0 12px 14px}
+  .adm-count{padding:0 12px 8px}
+  .adm-msg{padding:0 12px}
+  .adm-report{padding:0 12px 14px}
+  .adm-row,.adm-row-prod{grid-template-columns:minmax(0,1fr);gap:10px;padding:14px}
+  .adm-actions{justify-content:flex-start}
+  .adm-price input{width:100%}
+  .adm-price .btn{flex:1 1 auto}
+  .adm-table-wrap{overflow:visible;border:0;background:transparent}
+  .adm-table,.adm-table tbody{display:block;width:100%}
+  .adm-table thead{display:none}
+  .adm-table tr{display:block;border:1px solid var(--line);border-radius:14px;padding:8px 12px;margin-bottom:10px;background:#fff}
+  .adm-table td{display:flex;justify-content:space-between;gap:12px;border:0;padding:5px 0;font-size:13px}
+  .adm-table td::before{content:attr(data-label);color:#4b5563;font-weight:800;flex:0 0 auto;max-width:44%}
+  .adm-filter{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .adm-filter>button{grid-column:1/-1}
+  .adm-date-pair{grid-template-columns:minmax(0,1fr)}
+}
+/* ناوبری موبایل در mobile.css به ستون کناری تک‌ستونه منتقل شده است. */
+/* ================================================================
+   واحد پخش و کارتابل راننده (dispatch-ui.js) + سوابق رانندگان
+   ================================================================ */
+.dsp-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}
+.dsp-list .dsp-card{display:grid;gap:10px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:#fff;min-width:0;box-shadow:var(--shadow-xs)}
+.dsp-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;min-width:0}
+.dsp-card-head>div{display:grid;gap:3px;min-width:0}
+.dsp-card-head b{font-size:15px;overflow-wrap:anywhere}
+.dsp-card-head small{color:#4b5563;font-size:12.5px;overflow-wrap:anywhere}
+.dsp-card-head .badge{flex:0 0 auto}
+.dsp-items{list-style:none;margin:0;padding:0;display:grid;gap:4px;min-width:0}
+.dsp-items li{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;padding:6px 10px;background:#f8fafc;border-radius:10px;min-width:0}
+.dsp-items li span{overflow-wrap:anywhere;min-width:0}
+.dsp-items li b{white-space:nowrap}
+.dsp-driver{font-size:13.5px;color:var(--ink-2);overflow-wrap:anywhere}
+.dsp-wait{padding:10px 12px;border:1px solid #d7dff3;border-radius:10px;background:#f3f6ff;color:#34446f;font-size:13px;font-weight:700;line-height:1.65}
+.dsp-driver-warning{margin:0 20px 12px;padding:12px 14px;border:1px solid #f0d38a;border-radius:12px;background:#fff9e8;color:#765313;font-size:13px;line-height:1.7}.dsp-driver-warning b{display:block;margin-bottom:2px}
+.dsp-assign{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dsp-assign select{flex:1 1 200px;min-width:0}
+.dsp-summary{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--ink-2)}
+.dsp-summary small{flex-basis:100%;color:#4b5563}
+.dsp-log{font-size:13px}
+.dsp-log summary{cursor:pointer;color:var(--brand);font-weight:800}
+.dsp-log ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.dsp-log li{display:grid;gap:2px;padding:8px 10px;border-right:3px solid var(--brand-300);background:#fafbfc;border-radius:8px;overflow-wrap:anywhere}
+.dsp-log li small{color:#4b5563;font-size:12px}
+.dsp-h{margin:18px 4px 8px;font-size:16px}
+.dsp-done{margin-top:16px}
+.dsp-deliver{display:grid;gap:14px;min-width:0}
+.dsp-block{display:grid;gap:10px;border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0}
+.dsp-block h4{margin:0;font-size:14px}
+.dsp-radio{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dsp-radio label{display:flex;align-items:center;gap:8px;border:1px solid var(--line-strong);border-radius:12px;padding:10px 12px;font-weight:800;background:#fff;min-height:44px}
+.dsp-radio label:has(input:checked){border-color:var(--brand);background:var(--brand-100)}
+.dsp-line{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;padding:10px;border-radius:12px;background:#fafbfc;min-width:0}
+.dsp-line-name{grid-column:1/-1;display:grid;gap:2px;min-width:0}
+.dsp-line-name b{overflow-wrap:anywhere}
+.dsp-line input{width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--line-strong);border-radius:10px;padding:8px 10px;font:inherit;background:#fff;direction:ltr;text-align:right}
+.dsp-line .cust-span2{grid-column:1/-1}
+.dsp-sig{display:block;width:100%;height:160px;border:1.5px dashed var(--line-strong);border-radius:12px;background:#fff;touch-action:none;cursor:crosshair}
+.dsp-sig-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.drv-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+.drv-row{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.drv-chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:0 20px 14px}
+.drv-chip{display:grid;gap:4px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:#fafbfc;min-width:0}
+.drv-chip small{color:#4b5563;font-size:12px}
+.drv-chip b{font-size:16px}
+.drv-day{display:grid;gap:10px;min-width:0}
+.drv-day-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;border-radius:12px;background:var(--brand-100);color:var(--ink-2);font-size:13px;min-width:0}
+.drv-del{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));align-items:start}
+.drv-lines{width:100%;font-size:13px}
+.drv-lines summary{cursor:pointer;color:var(--brand);font-weight:800}
+.drv-lines .table-wrap{margin-top:8px}
+.drv-filters{gap:8px}
+.drv-filters .adm-date input{width:150px;max-width:100%}
+.drv-sigview{display:grid;gap:10px;justify-items:center}
+.drv-sigview img{max-width:100%;border:1px solid var(--line);border-radius:12px;background:#fff}
+@media (max-width:900px){
+  .dsp-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .drv-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .drv-tabs .sd-tab{padding:8px 6px}
+  .drv-tabs .sd-tab-copy small{display:none}
+  .drv-chips{padding:0 12px 12px}
+  .dsp-list .dsp-card{padding:12px}
+  .dsp-radio,.dsp-line{grid-template-columns:minmax(0,1fr)}
+  .dsp-line .cust-span2{grid-column:auto}
+  .drv-del{grid-template-columns:minmax(0,1fr)}
+  .drv-filters .adm-date{flex:1 1 140px}
+  .drv-filters .adm-select{flex:1 1 100%}
+}
+/* نوار پنج‌تایی کارتابل فروش در موبایل: دو ستون، بدون بریدگی */
+@media (max-width:640px){
+  .sd-tabs:not(.adm-tabs):not(.drv-tabs):not(.dsp-tabs){grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sd-tabs:not(.adm-tabs):not(.drv-tabs):not(.dsp-tabs) .sd-tab{min-width:0}
+  .sd-tabs:not(.adm-tabs):not(.drv-tabs):not(.dsp-tabs) .sd-tab-index{display:none}
+  .sd-tabs:not(.adm-tabs):not(.drv-tabs):not(.dsp-tabs) .sd-tab-copy{min-width:0;overflow-wrap:anywhere}
+}
+
+/* موبایل: سربرگ جدول تسویه حذف می‌شود چون هر خانه برچسب خودش را دارد */
+@media (max-width:600px){.stl-grid-head{display:none}}
+
+/* موبایل: جدول سوابق مراجعه به کارت تبدیل می‌شود (بدون سرریز افقی) */
+@media (max-width:600px){
+  .gt-table thead{display:none}
+  .gt-table,.gt-table tbody,.gt-table tr,.gt-table td{display:block;width:100%}
+  .gt-table{min-width:0!important}
+  .gt-cust-cell strong{white-space:normal}
+  .gt-table tr{border:1px solid var(--line);border-radius:12px;margin:10px 0;padding:6px 12px;background:#fff}
+  .gt-table td{border:0;padding:6px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:start;min-width:0;overflow-wrap:anywhere}
+  .gt-table td::before{content:attr(data-label);color:var(--muted);font-size:12px;font-weight:800;flex:0 0 auto}
+  .gt-table td:nth-child(1)::before{content:'مشتری'}
+  .gt-table td:nth-child(2)::before{content:'پلاک'}
+  .gt-table td:nth-child(3)::before{content:'محله'}
+  .gt-table td:nth-child(4)::before{content:'هدف'}
+  .gt-table td:nth-child(5)::before{content:'وضعیت'}
+  .gt-table td:nth-child(6)::before{content:'زمان'}
+  .gt-customer-history-table td:nth-child(3)::before{content:'شماره سفارش'}
+  .gt-customer-history-table td:nth-child(4)::before{content:'جزئیات سفارش'}
+}
+
+/* موبایل: ردیف‌های آماده خروج تک‌ستونه؛ تب‌ها دوستونه و بدون اسکرول افقی */
+@media (max-width:600px){
+  .gt-exit-row{grid-template-columns:minmax(0,1fr);gap:10px}
+  .gt-exit-row .toolbar{flex-wrap:wrap}
+  .gt-exit-row .toolbar .btn{flex:1 1 auto}
+  .gt-exit-amount{justify-items:start}
+  .sd-tabs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;overflow:visible!important}
+}
+@media (max-width:600px){
+  .sd-tab{height:auto!important;min-height:58px;white-space:normal}
+  .sd-tab-copy{min-width:0;white-space:normal;overflow:visible}
+  .sd-tab-copy strong,.sd-tab-copy small{white-space:normal;overflow-wrap:anywhere;overflow:visible}
+}
+
+/* ---------- سرصفحهٔ یکپارچه: عنوان راست، حساب کاربری و خروج بالا-چپ ---------- */
+.workspace-header{
+  display:grid!important;grid-template-columns:minmax(0,1fr) max-content;align-items:center;gap:18px;
+  direction:rtl;min-height:104px;padding:16px 12px 14px;margin:0 12px 4px;border-bottom:1px solid var(--line)
+}
+.workspace-header .header-main{grid-column:1;grid-row:1;min-width:0;height:auto;text-align:right}
+.workspace-header .header-kicker{margin:0 0 4px;color:var(--brand);font-size:12px;font-weight:1000}
+.workspace-header h1{margin:0;font-size:28px;line-height:1.25;letter-spacing:normal;overflow-wrap:anywhere}
+.workspace-header p{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.55;overflow-wrap:anywhere}
+.header-actions{
+  grid-column:2;grid-row:1;display:flex!important;flex:0 1 auto;width:auto!important;max-width:100%;min-width:0;
+  flex-flow:row nowrap;align-items:center;justify-content:flex-start!important;gap:8px;margin:0!important;
+  direction:ltr;justify-self:stretch
+}
+.header-profile{order:0;direction:rtl;display:flex;align-items:center;gap:9px;min-width:0;max-width:100%;padding:6px 7px;background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow-xs)}
+.header-avatar{width:36px;height:36px;min-width:36px;flex:0 0 36px;display:grid;place-items:center;border-radius:50%;background:var(--brand);color:#fff;font-size:14px;font-weight:900}
+.header-profile-text{display:flex;flex-direction:column;min-width:0;line-height:1.35}
+.header-profile-text strong,.header-profile-text span{display:block;max-width:145px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.header-profile-text strong{font-size:13px}.header-profile-text span{color:var(--muted);font-size:11px}
+.header-logout{min-height:36px;white-space:nowrap;flex:0 0 auto}
+.header-actions .header-status{order:1;margin:0!important;white-space:nowrap}
+.header-actions .notification-btn{order:2;flex:0 0 44px}
+.header-actions .header-date{order:3;min-width:max-content;text-align:right;direction:rtl;white-space:nowrap}
+@media(max-width:1100px){
+  .workspace-header{grid-template-columns:minmax(0,1fr);gap:12px;min-height:0;padding:15px 10px 13px}
+  .workspace-header .header-main{grid-column:1;grid-row:1}
+  .header-actions{grid-column:1;grid-row:2;justify-self:stretch;width:100%!important;flex-wrap:wrap}
+}
+@media(max-width:600px){
+  .workspace-header{margin-inline:8px;padding:13px 4px 11px}
+  .workspace-header h1{font-size:22px}
+  .workspace-header p{font-size:12px}
+  .header-actions{gap:6px}
+  .header-profile{flex:0 1 auto}
+  .header-profile-text strong,.header-profile-text span{max-width:105px}
+  .header-actions .header-date{display:none}
+  .header-actions .icon-btn{width:40px;height:40px}
+}
+
+/* نگهبانی: نمایش فوری درخواست‌های خروج راننده در صفحهٔ اصلی */
+.gate-ui-build{display:flex;justify-content:flex-start;margin:0 4px 5px;color:var(--muted);font-size:10px}
+.gate-ui-build span{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:#fff;padding:2px 9px;direction:ltr}
+.gate-dispatch-home{margin:18px 0;border-color:#edc96f;background:linear-gradient(135deg,#fffdf6,#fff)}
+.gate-dispatch-home>.sd-head{padding:15px 18px;border-bottom:1px solid #f2e4bd}
+.gate-dispatch-home .gate-dispatch-home-group{padding:12px 18px 4px}
+.gate-dispatch-home-group h3{margin:0 0 8px;color:#765313;font-size:14px;font-weight:1000}
+.gate-dispatch-home-footer{display:flex;justify-content:flex-start;padding:10px 18px 16px}
+.gate-dispatch-load-error{margin:14px 0;padding:12px 15px;border:1px solid var(--danger-line);border-radius:12px;background:var(--danger-bg);color:var(--danger);font-size:13px;font-weight:800;line-height:1.7}
+@media (max-width:640px){
+  .gate-dispatch-home>.sd-head{padding:12px}
+  .gate-dispatch-home .gate-dispatch-home-group{padding:10px 10px 2px}
+  .gate-dispatch-home-footer{padding:8px 10px 12px}
+}
+
+/* فروش: تأیید نهایی تحویل راننده و امضای مشتری */
+.sd-sales-tabs{grid-template-columns:repeat(6,minmax(0,1fr))}
+.sales-delivery-pane{display:grid;gap:16px}
+.sales-delivery-list{display:grid;gap:12px;padding:14px 18px 18px}
+.sales-delivery-card{padding:0;overflow:hidden;border-color:var(--line)}
+.sales-delivery-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(120deg,#fff,#fafbfc)}
+.sales-delivery-card-head>div{min-width:0}
+.sales-delivery-card-head h3{margin:7px 0 2px;font-size:16px;overflow-wrap:anywhere}
+.sales-delivery-card-head small{color:var(--muted)}
+.sales-delivery-meta{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;padding:13px 18px}
+.sales-delivery-meta>span{display:grid;gap:3px;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.sales-delivery-meta small{color:var(--muted);font-size:11px}
+.sales-delivery-meta b{font-size:12px;overflow-wrap:anywhere}
+.sales-delivery-lines{display:grid;gap:7px;padding:2px 18px 12px}
+.sales-delivery-line{display:grid;grid-template-columns:auto minmax(130px,1.2fr) repeat(4,minmax(95px,.7fr));align-items:center;gap:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.sales-delivery-line>strong{min-width:0;overflow-wrap:anywhere}
+.sales-delivery-line>span:not(.sd-row-no){color:var(--muted);font-size:11px;white-space:nowrap}
+.sales-delivery-line>span b{color:var(--ink);font-size:12px}
+.sales-delivery-line>small{grid-column:2/-1;color:var(--orange);font-size:11px}
+.sales-delivery-summary{display:flex;flex-wrap:wrap;gap:9px 18px;margin:0 18px;padding:11px 13px;border-radius:10px;background:var(--bg-soft);font-size:12px}
+.sales-delivery-note{margin:10px 18px 0;padding:9px 12px;border-right:3px solid var(--blue);background:var(--blue-bg);border-radius:8px;font-size:12px;line-height:1.7}
+.sales-delivery-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:9px;padding:14px 18px 16px}
+.sales-finalized-stamp{color:var(--green);font-size:12px;font-weight:900}
+.sales-delivery-history .sales-delivery-card-head{padding:12px 14px}
+.sales-delivery-history .sales-delivery-meta{grid-template-columns:repeat(6,minmax(0,1fr));padding:10px 14px}
+.sales-delivery-history .sales-delivery-line{grid-template-columns:auto minmax(120px,1fr) repeat(4,minmax(80px,.6fr));padding:8px}
+.sales-delivery-signature{display:grid;justify-items:center;gap:12px;padding:12px}
+.sales-delivery-signature img{display:block;max-width:100%;width:min(560px,100%);min-height:130px;max-height:360px;object-fit:contain;border:1px solid var(--line);border-radius:12px;background:#fff}
+.sales-delivery-signature small{color:var(--muted)}
+@media(max-width:1100px){
+  .sd-sales-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .sales-delivery-meta,.sales-delivery-history .sales-delivery-meta{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .sales-delivery-line,.sales-delivery-history .sales-delivery-line{grid-template-columns:auto minmax(0,1fr) repeat(2,minmax(90px,.7fr))}
+  .sales-delivery-line>small{grid-column:2/-1}
+}
+@media(max-width:600px){
+  .sales-delivery-list{padding:10px}
+  .sales-delivery-card-head{align-items:flex-start;padding:13px}
+  .sales-delivery-meta,.sales-delivery-history .sales-delivery-meta{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px}
+  .sales-delivery-lines{padding:0 10px 10px}
+  .sales-delivery-line,.sales-delivery-history .sales-delivery-line{grid-template-columns:auto minmax(0,1fr);gap:6px 8px}
+  .sales-delivery-line>span:not(.sd-row-no){white-space:normal}
+  .sales-delivery-line>small{grid-column:2}
+  .sales-delivery-summary{margin:0 10px}
+  .sales-delivery-note{margin-inline:10px}
+  .sales-delivery-actions{padding:11px 10px 13px}
+  .sales-delivery-actions .btn{flex:1 1 100%;justify-content:center}
+}
+
+/* ================================================================
+   v37.2.6 — فروشگاه جدا، قیمت‌گذاری پخش، فاکتور راننده و هم‌ترازی پوسته
+   ================================================================ */
+.workspace-header{
+  box-sizing:border-box;width:100%;max-width:1640px;margin-inline:auto!important;
+  padding-inline:0!important;
+}
+#bell #bellCount{
+  top:-8px!important;inset-inline-end:-8px!important;inset-inline-start:auto!important;
+  left:auto!important;right:auto!important;z-index:3;min-width:21px;height:21px;
+  padding:0 5px;border:2px solid #fff;border-radius:999px;line-height:1;
+  display:grid;place-items:center;font-size:10px;font-weight:1000;
+  box-shadow:0 2px 5px rgba(35,20,24,.18);
+}
+#bell #bellCount.hidden{display:none!important}
+
+/* هفت تب فروش با شمارندهٔ مستقل فروشگاه */
+.sd-sales-tabs{grid-template-columns:repeat(7,minmax(0,1fr))}
+@media(max-width:1100px){.sd-sales-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* فرم غیرحضوری و کادر یادداشت: یک قاب بیرونی، بدون border تکراری */
+.sales-pane-v40{display:grid;gap:16px;min-width:0}
+.sales-form-v40{display:grid;gap:17px;min-width:0}
+.sales-remote-customer-grid-v40{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.sales-remote-customer-grid-v40 .field{min-width:0}
+.sales-remote-place-v40{grid-column:1/-1}
+.sales-pane-v40 .input-shell{box-sizing:border-box;min-height:48px;height:48px;border:1px solid var(--line-strong);border-radius:12px;background:#fff;box-shadow:none}
+.sales-pane-v40 .input-shell input{border:0!important;box-shadow:none!important;outline:0!important;background:transparent!important;min-height:0;padding:0;flex:1 1 auto}
+.sd-note-box.sales-phone-notes-v40{margin-top:1px;padding:13px 15px;border:1px solid var(--line);border-radius:13px;background:var(--panel-2)}
+.sd-note-box.sales-phone-notes-v40 textarea{display:block;box-sizing:border-box;width:100%;min-height:104px;height:auto;margin-top:9px;padding:10px 12px;border:0!important;border-radius:8px;background:transparent!important;box-shadow:none!important;outline:0!important;resize:vertical;line-height:1.8}
+.sd-note-box.sales-phone-notes-v40 textarea:focus{border:0!important;box-shadow:none!important}
+.sd-note-box.sales-phone-notes-v40 .sd-note-foot{flex-wrap:wrap}
+.phone-queue-panel-v40{align-self:start}
+.phone-queue-list-v40{display:grid;gap:8px}
+.phone-queue-card-v40{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;min-width:0}
+.phone-queue-card-v40>div{display:grid;gap:2px;min-width:0}
+.phone-queue-card-v40>div b{font-size:12px;overflow-wrap:anywhere}
+.phone-queue-card-v40>div small{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+.phone-queue-card-v40>.badge{white-space:nowrap}
+.phone-queue-card-v40>.btn{min-height:34px}
+.store-status-strip-v40{display:flex;gap:8px;flex-wrap:wrap;margin:-5px 0 12px}
+.store-status-strip-v40>span{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:#fafbfc;color:var(--muted);font-size:11px}
+.store-status-strip-v40 b{color:var(--brand);font-size:13px}
+.sd-store-list-v40{max-height:none;overflow:visible;padding:0;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.sd-store-card-v40{padding:14px;min-width:0}
+.sd-store-card-v40 .sd-store-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:7px;margin-top:11px}
+.sd-store-card-v40 .sd-store-meta>span{min-width:0;overflow-wrap:anywhere}
+.sd-store-card-v40 .sd-store-foot{justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.sd-store-card-v40 .sd-store-foot>small{color:var(--muted);font-size:10px}
+
+/* توضیحات ردیف کالا — هم‌اندازهٔ فیلدهای محصول/مقدار/واحد، تک‌قاب و بدون بریدگی متن (v37.2.9) */
+.sd-line .cell-desc>.input-shell{box-sizing:border-box;display:flex;align-items:center;height:42px;min-height:42px;padding:0 10px;overflow:visible;border:1px solid var(--line-strong);border-radius:10px;background:#fff}
+.sd-line .cell-desc input{box-sizing:border-box;display:block;width:100%;height:auto;min-height:0;max-height:none;padding:6px 4px;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:0!important;font-size:13px;line-height:1.6}
+.sd-line .cell-desc input:focus{border:0!important;box-shadow:none!important}
+.sd-line .cell-desc input::placeholder{font-size:11px;color:var(--muted-2)}
+.sales-lines-add-v41{display:flex;justify-content:flex-start;align-items:center;margin-top:7px}
+.sales-lines-add-v41 .btn{min-height:42px}
+@media(max-width:650px){.sales-lines-add-v41 .btn{width:100%}}
+.v26-product-line-main .v26-textarea textarea,.fx41-form .v26-textarea textarea{box-sizing:border-box;border:0!important;box-shadow:none!important;background:transparent!important;outline:0!important}
+
+/* قیمت کامل، وزن، مبلغ قلم و مبلغ خالص در گردش پخش */
+.sales-delivery-line{grid-template-columns:auto minmax(140px,1.2fr) repeat(6,minmax(80px,.7fr))}
+@media(max-width:1100px){.sales-delivery-line{grid-template-columns:auto minmax(0,1fr) repeat(3,minmax(72px,.7fr))}}
+#content .future-contact-grid-v40{align-items:start}
+#content .future-contact-grid-v40>.future-contact-field-v40{min-width:0}
+#content .future-contact-grid-v40 .input-shell{box-sizing:border-box;min-height:48px;height:48px;border:1px solid var(--line-strong);border-radius:12px;background:#fff;box-shadow:none}
+#content .future-contact-grid-v40 .input-shell input{min-height:0;padding:0;border:0!important;box-shadow:none!important;background:transparent!important;outline:0!important;flex:1 1 auto}
+/* نام و تلفن: هر فیلد فقط یک قاب بیرونی و اندازهٔ یکسان در فرم غیرحضوری و سفارش آینده */
+#content .contact-field-v41{box-sizing:border-box;width:100%;min-width:0}
+#content .contact-field-v41 .input-shell{display:flex;box-sizing:border-box;width:100%;height:48px;min-height:48px;padding:0 12px;border:1px solid var(--line-strong);border-radius:12px;background:#fff;box-shadow:none}
+#content .contact-field-v41 .input-shell:focus-within{border-color:var(--brand-300);box-shadow:var(--ring)}
+#content .contact-field-v41 .input-shell input{box-sizing:border-box;width:100%;height:auto;min-height:0;padding:0!important;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:0!important;flex:1 1 auto}
+#content .future-note-v40 textarea{box-sizing:border-box;width:100%;min-height:88px;margin-top:2px;border:1px solid var(--line-strong);border-radius:11px;padding:10px 12px;line-height:1.8}
+#content .future-note-v40 textarea:focus{border-color:var(--brand-200);box-shadow:0 0 0 3px rgba(180,15,35,.08)}
+.dsp-roster{display:grid;gap:11px;margin:15px 0 16px;padding:14px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(135deg,#fbfcfe,#fff);min-width:0}
+.dsp-roster-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.dsp-roster-head h3{margin:0;font-size:15px;font-weight:1000}
+.dsp-roster-head p{margin:3px 0 0;color:var(--muted);font-size:11px;line-height:1.7}
+.dsp-roster-head>span{padding:5px 9px;border:1px solid var(--green-line);border-radius:999px;background:var(--green-bg);color:var(--green);font-size:10px;font-weight:900}
+.dsp-roster-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:9px;min-width:0}
+.dsp-roster-card{display:grid;gap:9px;min-width:0;padding:11px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.dsp-roster-card>header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;min-width:0}
+.dsp-roster-card>header>div{display:grid;gap:2px;min-width:0}
+.dsp-roster-card>header strong{font-size:13px;overflow-wrap:anywhere}
+.dsp-roster-card>header span{color:var(--muted);font-size:10px;overflow-wrap:anywhere}
+.dsp-active-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;background:var(--green-bg);color:var(--green)!important;font-weight:900;white-space:nowrap}
+.dsp-active-pill i,.dsp-live-dot{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#15a56b}
+.dsp-roster-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.dsp-roster-stats>span{display:grid;gap:1px;padding:6px;border:1px solid #edf0f3;border-radius:8px;background:#fafbfc;min-width:0}
+.dsp-roster-stats small{font-size:9px;color:var(--muted);overflow-wrap:anywhere}
+.dsp-roster-stats b{font-size:13px}
+.dsp-roster-orders{display:grid;gap:5px;min-width:0}
+.dsp-roster-orders>div{display:grid;grid-template-columns:9px minmax(0,1fr) auto;align-items:center;gap:7px;padding:6px 7px;border-radius:8px;background:#f8fafc;min-width:0}
+.dsp-roster-orders>div>span:nth-child(2){display:grid;gap:1px;min-width:0}
+.dsp-roster-orders>div b{font-size:10px;overflow-wrap:anywhere}
+.dsp-roster-orders>div small{font-size:9px;color:var(--muted);overflow-wrap:anywhere}
+.dsp-roster-orders .badge{min-height:22px;padding:0 6px;font-size:9px;max-width:150px;white-space:normal;text-align:center}
+.dsp-live-dot.is-blue{background:#4479d6}.dsp-live-dot.is-purple{background:#9566d0}.dsp-live-dot.is-green{background:#15a56b}
+.dsp-roster-orders>p{margin:0;padding:8px;border-radius:8px;background:#f8fafc;color:var(--muted);font-size:10px;text-align:center}
+.dsp-roster-pos{color:var(--muted);font-size:10px}
+.dsp-invoice{display:grid;gap:0;min-width:0;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.dsp-invoice>header,.dsp-invoice>footer{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 11px;background:#fafbfc}
+.dsp-invoice>header{border-bottom:1px solid var(--line)}
+.dsp-invoice>header h3{margin:2px 0 0;font-size:13px}
+.dsp-invoice-kicker{color:var(--brand);font-size:8px;font-weight:1000;letter-spacing:.07em}
+.dsp-invoice-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.dsp-invoice table{width:100%;min-width:590px;border-collapse:collapse;font-size:11px}
+.dsp-invoice th,.dsp-invoice td{padding:7px 9px;border-bottom:1px solid #eef0f3;text-align:right;vertical-align:middle;white-space:nowrap}
+.dsp-invoice th{background:#fff;font-size:10px;color:var(--muted);font-weight:900}
+.dsp-invoice td:first-child{white-space:normal;min-width:160px}
+.dsp-invoice td strong{color:var(--ink);font-size:11px}
+.dsp-invoice>footer{justify-content:flex-start;border-top:1px solid var(--line);font-size:10px;color:var(--muted)}
+.dsp-invoice>footer span{display:flex;align-items:center;gap:4px}
+.dsp-invoice>footer b,.dsp-invoice>footer strong{color:var(--ink);font-size:11px}
+.dsp-invoice .dsp-invoice-payable{margin-inline-start:auto;color:var(--green);font-weight:900}
+.dsp-invoice.is-compact>header{padding:7px 9px}
+.dsp-invoice.is-compact>header h3{font-size:11px}
+.dsp-invoice.is-compact table{min-width:540px;font-size:10px}
+.dsp-invoice.is-compact th,.dsp-invoice.is-compact td{padding:6px 8px}
+.dsp-summary>b{color:var(--green)}
+.dsp-delivery-modal-card{width:min(1180px,calc(100vw - 34px))!important;max-width:1180px!important;max-height:94vh!important}
+.dsp-delivery-modal-card .modal-body{padding:16px 19px!important}
+.dsp-delivery-modal-card .cust-form{display:grid;gap:12px}
+.dsp-delivery-customer{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fafbfc}
+.dsp-delivery-customer strong{font-size:14px}
+.dsp-delivery-customer span,.dsp-delivery-customer small{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+.dsp-delivery-modal-card .dsp-deliver{gap:10px}
+.dsp-delivery-modal-card .dsp-block{gap:8px;padding:10px}
+.dsp-payable-preview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:10px 12px;border:1px solid var(--green-line);border-radius:12px;background:var(--green-bg)}
+.dsp-payable-preview>div{display:grid;gap:2px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.7)}
+.dsp-payable-preview>div span{font-size:9px;color:var(--muted)}
+.dsp-payable-preview>div b{font-size:12px;color:var(--ink)}
+.dsp-payable-preview .dsp-payable-final strong{font-size:16px;color:var(--green)}
+.dsp-payable-preview>small{grid-column:1/-1;color:var(--muted);font-size:9px}
+.dsp-delivery-modal-card .dsp-line{grid-template-columns:minmax(0,1.2fr) repeat(2,minmax(135px,.7fr));align-items:start;gap:8px;padding:9px;border:1px solid var(--line);background:#fafbfc}
+.dsp-delivery-modal-card .dsp-line-name{grid-column:1/-1}
+.dsp-delivery-modal-card .dsp-line-name small{font-size:10px;color:var(--muted);line-height:1.7;overflow-wrap:anywhere}
+.dsp-delivery-modal-card .dsp-line .cust-field{display:grid;gap:4px;min-width:0}
+.dsp-delivery-modal-card .dsp-line .cust-field>span{font-size:10px;font-weight:900;color:var(--muted)}
+.dsp-delivery-modal-card .dsp-line input{box-sizing:border-box;min-height:40px;padding:6px 9px;border:1px solid var(--line-strong);border-radius:9px;background:#fff;font:inherit}
+.dsp-delivery-modal-card .dsp-line .cust-span2{grid-column:1/-1}
+.dsp-delivery-modal-card .dsp-line .cust-field small{font-size:9px;color:var(--muted)}
+.dsp-delivery-modal-card .dsp-line .cust-field small b{color:var(--brand)}
+.dsp-delivery-modal-card .dsp-sig{height:135px!important}
+.dsp-delivery-modal-card .cust-form-actions{position:sticky;bottom:0;padding:10px 0 2px;background:linear-gradient(to top,#fff 78%,rgba(255,255,255,.84));z-index:2}
+.dsp-dispatch-lock,.stl-dispatch-lock{display:grid;gap:3px;padding:10px 12px;border:1px solid var(--blue-line);border-radius:11px;background:var(--blue-bg);color:var(--blue);font-size:11px}
+.dsp-dispatch-lock b,.stl-dispatch-lock b{font-size:12px}
+.stl-approved-banner{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;margin-bottom:12px;padding:10px 12px;border:1px solid var(--green-line);border-radius:11px;background:var(--green-bg);color:var(--green);font-size:11px}
+.stl-approved-banner strong{font-size:12px}
+.stl-approved-banner span{color:var(--muted)}
+.stl-approved-banner b{margin-inline-start:auto;color:var(--ink);font-size:12px}
+.stl-approval-prompt{margin-bottom:12px;padding:10px 12px;border:1px solid var(--orange-line);border-radius:11px;background:var(--orange-bg);color:var(--orange);font-size:11px;line-height:1.7}
+.stl-form-head .stl-dispatch-control{flex-wrap:wrap}
+.stl-form-head .stl-dispatch-control .btn{white-space:normal}
+.stl-dispatch-lock{margin-top:12px;color:var(--blue);font-size:11px}
+@media(max-width:850px){
+  .sales-pane-v40{gap:12px}
+  .phone-queue-card-v40{grid-template-columns:minmax(0,1fr) auto}
+  .phone-queue-card-v40>.btn{grid-column:1/-1;justify-content:center}
+  .dsp-roster-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+  .dsp-payable-preview{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:1100px){
+  .sd-store-list-v40{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:600px){
+  .sales-remote-customer-grid-v40{grid-template-columns:minmax(0,1fr)}
+  .sales-remote-place-v40{grid-column:auto}
+  .phone-queue-card-v40{grid-template-columns:minmax(0,1fr)}
+  .phone-queue-card-v40>.badge{justify-self:start}
+  .phone-queue-card-v40>.btn{grid-column:auto;width:100%;justify-content:center}
+  .store-status-strip-v40{display:grid;grid-template-columns:1fr 1fr}
+  .sd-store-card-v40 .sd-store-foot{align-items:stretch}
+  .sd-store-card-v40 .sd-store-foot .toolbar{width:100%}
+  .sd-store-card-v40 .sd-store-foot .btn{flex:1;justify-content:center}
+  .dsp-roster{padding:10px}
+  .dsp-roster-head{display:grid}
+  .dsp-roster-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dsp-roster-orders>div{grid-template-columns:9px minmax(0,1fr)}
+  .dsp-roster-orders .badge{grid-column:2;justify-self:start;max-width:100%}
+  .dsp-invoice>header{align-items:flex-start}
+  .dsp-invoice>footer{display:grid;grid-template-columns:1fr 1fr;align-items:start}
+  .dsp-invoice .dsp-invoice-payable{margin-inline-start:0}
+  .dsp-payable-preview{grid-template-columns:minmax(0,1fr)}
+  .dsp-payable-preview>small{grid-column:auto}
+  .dsp-delivery-modal-card{width:calc(100vw - 14px)!important;max-width:100%!important;max-height:calc(100dvh - 10px)!important;border-radius:17px 17px 10px 10px!important}
+  .dsp-delivery-modal-card .modal-body{padding:11px!important}
+  .dsp-delivery-modal-card .dsp-line{grid-template-columns:minmax(0,1fr)!important}
+  .dsp-delivery-modal-card .dsp-line .cust-span2{grid-column:auto}
+  .dsp-delivery-modal-card .cust-form-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .dsp-delivery-modal-card .cust-form-actions .btn{padding-inline:8px;width:100%;font-size:12px}
+  .stl-approved-banner{align-items:flex-start;display:grid}
+  .stl-approved-banner b{margin-inline-start:0}
+}
+
+/* ================================================================
+   v37.2.10 — تقویم جلالی تعاملی و انتخاب‌گر ساعت ۲۴ساعته
+   Jalali popover calendar + 24h time picker for warehouse date
+   ================================================================ */
+.jalali-calendar-popover{
+  position:fixed; z-index:1200; display:none; width:320px; max-width:calc(100vw - 24px);
+  background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow-lg);
+  padding:12px; direction:rtl; font-family:var(--font);
+}
+.jalali-calendar-popover.show{display:block; animation:sdFade .16s ease}
+.jalali-cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.jalali-cal-title{font-size:15px;font-weight:1000;color:var(--ink);min-width:0;text-align:center;flex:1}
+.jalali-cal-nav{display:flex;gap:6px}
+.jalali-cal-nav button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);display:grid;place-items:center;cursor:pointer;color:var(--ink-2);transition:.14s}
+.jalali-cal-nav button:hover{background:#fff;border-color:var(--brand-200);color:var(--brand)}
+.jalali-cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+.jalali-cal-weekdays span{font-size:11px;font-weight:800;color:var(--muted);text-align:center;padding:4px 0}
+.jalali-cal-weekdays span.is-fri{color:var(--danger)}
+.jalali-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.jalali-cal-day{height:36px;border-radius:10px;border:1px solid transparent;background:transparent;font-family:inherit;font-size:13px;font-weight:700;color:var(--ink-2);cursor:pointer;transition:.12s;display:grid;place-items:center}
+.jalali-cal-day:hover{background:var(--panel-2);border-color:var(--line)}
+.jalali-cal-day.is-today{border-color:var(--brand-200);color:var(--brand);background:var(--brand-050);font-weight:1000}
+.jalali-cal-day.is-selected{background:var(--brand);color:#fff;border-color:var(--brand);box-shadow:0 4px 12px rgba(180,15,35,.22)}
+.jalali-cal-day.is-other{color:var(--muted-2);opacity:.5}
+.jalali-cal-day.is-disabled{opacity:.28;cursor:not-allowed;background:var(--panel-2)}
+.jalali-cal-day.is-fri:not(.is-selected){color:var(--danger)}
+.jalali-cal-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.jalali-cal-foot .jalali-today-btn{border:0;background:var(--brand-050);color:var(--brand);border-radius:9px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:900;cursor:pointer}
+.jalali-cal-foot .jalali-today-btn:hover{background:var(--brand-100)}
+
+.time-picker-popover{
+  position:fixed; z-index:1210; display:none; width:300px; max-width:calc(100vw - 24px);
+  background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow-lg);
+  padding:14px; direction:rtl; font-family:var(--font);
+}
+.time-picker-popover.show{display:block; animation:sdFade .16s ease}
+.time-picker-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.time-picker-head h4{margin:0;font-size:13px;font-weight:1000;color:var(--ink)}
+.time-picker-head .tp-now{font-size:11px;color:var(--muted)}
+.time-picker-display{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;padding:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px}
+.time-picker-display b{font-size:28px;font-weight:1000;color:var(--brand);letter-spacing:.04em;direction:ltr;unicode-bidi:isolate}
+.time-picker-display span{font-size:11px;color:var(--muted)}
+.time-picker-grid{display:grid;gap:10px}
+.time-picker-section label{font-size:11px;font-weight:900;color:var(--muted);display:block;margin-bottom:6px}
+.time-picker-hours,.time-picker-mins{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.time-picker-hours button,.time-picker-mins button{height:34px;border-radius:9px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:12.5px;font-weight:800;color:var(--ink-2);cursor:pointer;transition:.12s}
+.time-picker-hours button:hover,.time-picker-mins button:hover{border-color:var(--brand-200);background:var(--brand-050);color:var(--brand)}
+.time-picker-hours button.is-selected,.time-picker-mins button.is-selected{background:var(--brand);color:#fff;border-color:var(--brand);box-shadow:0 3px 10px rgba(180,15,35,.22)}
+.time-picker-actions{display:flex;gap:8px;margin-top:12px}
+.time-picker-actions .btn{flex:1;justify-content:center}
+
+.jalali-field .jalali-date-input{cursor:pointer}
+.time24-field .time24-input{cursor:pointer}
+
+/* v37.2.12 — پلاک استاندارد ایران — یک اندازه واحد 42px برای همه کارتابل‌ها */
+.iran-plate.is-readonly{
+  height:42px; grid-template-columns:38px 1fr .75fr 1.05fr .75fr;
+  border-width:2px; border-radius:9px; box-shadow:var(--shadow-xs);
+  pointer-events:none; margin:0; font-size:15px;
+}
+.iran-plate.is-readonly .blue-strip span{font-size:7px;line-height:1.2}
+.iran-plate.is-readonly .plate-part{font-size:14px;border-left-width:1.5px}
+.iran-plate.is-readonly .plate-part span{display:grid;place-items:center;width:100%;height:100%;font-weight:1000;color:var(--ink);font-size:14px}
+.iran-plate.is-compact{height:42px;grid-template-columns:38px 1fr .75fr 1.05fr .75fr;border-radius:9px;border-width:2px;box-shadow:var(--shadow-xs);pointer-events:none;margin:0}
+.iran-plate.is-compact .blue-strip span{font-size:7px;line-height:1.2}
+.iran-plate.is-compact .plate-part{font-size:14px;border-left-width:1.5px}
+.iran-plate.is-compact .plate-part span{display:grid;place-items:center;width:100%;height:100%;font-weight:1000;color:var(--ink);font-size:14px}
+.plate-view-inline{display:inline-flex;vertical-align:middle}
+.jalali-datetime-shell{cursor:pointer}
+.jalali-datetime-shell .datetime-display{flex:1}
+.datetime-popover .jalali-cal-grid{max-height:none}
+.datetime-popover .time-picker-hours{grid-template-columns:repeat(6,1fr)}
+.datetime-popover .time-picker-mins{grid-template-columns:repeat(6,1fr)}
+
+/* ================================================================
+   v37.2.11-fix — منظم‌سازی کارت راننده + نالین datetime
+   ================================================================ */
+.dsp-roster-grid{grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;align-items:stretch}
+.dsp-roster-card{display:flex;flex-direction:column;gap:10px;padding:13px;border-radius:14px;box-shadow:0 1px 6px rgba(16,24,40,.04)}
+.dsp-roster-card>header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-width:0}
+.dsp-roster-card>header>div{display:grid;gap:4px;min-width:0;align-content:start}
+.dsp-roster-card>header strong{font-size:13.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-card>header>div>span{font-size:11px;color:var(--muted);line-height:1.5}
+.dsp-roster-card>header .iran-plate{margin-top:4px;max-width:220px}
+.dsp-roster-card .dsp-roster-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.dsp-roster-card .dsp-roster-stats>span{padding:7px 6px;border-radius:10px}
+.dsp-roster-card>.btn{margin-top:auto}
+@media(max-width:1024px){
+  .dsp-roster-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .dsp-roster-card>header{grid-template-columns:minmax(0,1fr) auto}
+}
+@media(max-width:700px){
+  .dsp-roster-grid{grid-template-columns:1fr}
+  .dsp-roster-card>header{grid-template-columns:minmax(0,1fr) auto;align-items:start}
+  .dsp-roster-card>header .iran-plate{max-width:100%}
+}
+@media(max-width:480px){
+  .dsp-roster-card>header{grid-template-columns:1fr}
+  .dsp-roster-card>header>.badge{justify-self:start}
+}
+
+/* jalali-datetime single box — هم‌ترازی و فوکوس بهتر */
+.jalali-datetime-shell{display:flex;align-items:center;gap:8px;min-height:44px;padding-inline:12px;border-radius:11px;transition:border-color .14s,box-shadow .14s}
+.jalali-datetime-shell:focus-within{border-color:var(--brand-300);box-shadow:0 0 0 3px var(--brand-050)}
+.jalali-datetime-shell .datetime-display{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jalali-datetime-field{display:grid;gap:6px}
+.jalali-datetime-field label{font-size:12px;font-weight:800;color:var(--muted)}
+.datetime-popover{min-width:340px}
+.datetime-popover .jalali-cal-grid{grid-template-columns:repeat(7,1fr)}
+
+/* v37.2.11-fix2 — roster 4-column [avatar] 1fr [plate] auto [actions] */
+.dsp-roster-top{display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:10px;min-width:0}
+.dsp-roster-avatar{width:40px;height:40px;border-radius:50%;background:var(--brand-050);color:var(--brand);display:grid;place-items:center;font-weight:900;font-size:13px;border:1px solid var(--line)}
+.dsp-roster-main{display:grid;gap:2px;min-width:0}
+.dsp-roster-main strong{font-size:13.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-main span{font-size:11px;color:var(--muted);line-height:1.4}
+.dsp-roster-plate .iran-plate{max-width:190px}
+.dsp-roster-card{padding:13px}
+@media(max-width:1024px){
+  .dsp-roster-top{grid-template-columns:40px 1fr auto;gap:8px}
+  .dsp-roster-top .dsp-active-pill{grid-column:1/-1;justify-self:start}
+  .dsp-roster-plate .iran-plate{max-width:160px}
+}
+@media(max-width:600px){
+  .dsp-roster-top{grid-template-columns:40px 1fr;gap:8px}
+  .dsp-roster-plate{grid-column:1/-1}
+  .dsp-roster-plate .iran-plate{max-width:100%;width:100%}
+}
+
+/* v37.2.13 — ساعت عقربه‌ای دایره‌ای برای انتخاب زمان روزهای آتی + پلاک استاندارد یکسان */
+.analog-tabs{display:flex;gap:6px;padding:2px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;width:fit-content;margin:0 auto 12px}
+.analog-tab{padding:6px 16px;border-radius:999px;border:0;background:transparent;font-family:inherit;font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;transition:.14s}
+.analog-tab.is-active{background:var(--brand);color:#fff;box-shadow:0 2px 8px rgba(180,15,35,.18)}
+.analog-clock-wrap{display:grid;place-items:center;padding:8px 0}
+.analog-clock-wrap.is-hidden{display:none}
+.analog-clock{position:relative;width:var(--size);height:var(--size);border-radius:50%;background:radial-gradient(circle at 30% 30%, #ffffff 0%, #f8fafc 60%, #f1f5f9 100%);border:1px solid #e2e8f0;box-shadow:0 4px 20px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.8)}
+.analog-clock-face{position:absolute;inset:10px;border-radius:50%;border:1px dashed #e2e8f0;pointer-events:none}
+.analog-number{position:absolute;left:50%;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:1px solid transparent;background:transparent;display:grid;place-items:center;font-family:inherit;font-size:13px;font-weight:800;color:var(--ink-2);cursor:pointer;transition:.12s;transform:rotate(var(--angle)) translate(var(--r, 92px)) rotate(calc(-1 * var(--angle)))}
+.analog-number.is-outer{--r:92px}
+.analog-number.is-inner{--r:58px;width:32px;height:32px;margin:-16px 0 0 -16px;font-size:12px;background:#f8fafc;border-color:#e2e8f0}
+.analog-number:hover{background:var(--brand-050);border-color:var(--brand-200);color:var(--brand)}
+.analog-number.is-selected{background:var(--brand);color:#fff;border-color:var(--brand);box-shadow:0 3px 12px rgba(180,15,35,.22);font-weight:1000}
+.analog-number.is-selected span{color:#fff}
+.analog-hand{position:absolute;left:50%;bottom:50%;width:2px;background:var(--brand);transform-origin:50% 100%;border-radius:2px;pointer-events:none;transition:.22s cubic-bezier(.34,1.2,.64,1)}
+.analog-hand.hour-hand{height:62px;z-index:2;transform:rotate(var(--deg, 0deg))}
+.analog-hand.minute-hand{height:82px;background:var(--ink-2);opacity:.9;z-index:1;transform:rotate(var(--deg, 0deg))}
+.analog-hand.hour-hand::after{content:'';position:absolute;top:-4px;left:50%;width:8px;height:8px;background:var(--brand);border-radius:50%;transform:translateX(-50%);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.analog-center{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--brand);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:3}
+[data-face="minute"] .analog-number{--r:92px}
+.datetime-popover{width:380px!important;max-width:calc(100vw - 16px)}
+@media(max-width:480px){
+  .analog-clock{--size:200px!important}
+  .analog-number{--r:82px!important;width:32px;height:32px;margin:-16px 0 0 -16px;font-size:12px}
+  .analog-number.is-inner{--r:52px!important;width:28px;height:28px;margin:-14px 0 0 -14px}
+  .analog-hand.hour-hand{height:52px}
+  .analog-hand.minute-hand{height:72px}
+}
+
+/* ===== 37.2.14 — بازطراحی نهایی کارتابل‌ها: یک‌خطی، منظم، پلاک استاندارد ===== */
+/* پلاک — استاندارد یکسان اما سایز بهینه برای هر کارتابل */
+.dsp-roster-plate .iran-plate{height:32px!important;grid-template-columns:32px 1fr .65fr .95fr .65fr!important;border-radius:7px!important}
+.dsp-roster-plate .iran-plate .blue-strip span{font-size:5.5px!important;line-height:1.2!important}
+.dsp-roster-plate .iran-plate .plate-part span{font-size:11px!important}
+.dsp-card-head .iran-plate,
+.dsp-driver .iran-plate,
+.dsp-delivery-customer .iran-plate,
+.sc-item .iran-plate{height:36px!important;grid-template-columns:34px 1fr .7fr 1fr .7fr!important;border-radius:7px!important}
+.dsp-card-head .iran-plate .plate-part span,
+.dsp-driver .iran-plate .plate-part span,
+.dsp-delivery-customer .iran-plate .plate-part span{font-size:12.5px!important}
+.iran-plate.is-readonly, .iran-plate.is-compact{height:42px;grid-template-columns:38px 1fr .75fr 1.05fr .75fr;border-radius:9px} /* پیش‌فرض برای جاهای دیگر (نگهبانی، فروش، انبار) */
+
+/* کارت راننده — 4 ستون دقیق [آواتار] 1fr [پلاک] auto [وضعیت] — یک خط، وسط‌چین */
+.dsp-roster{display:grid;gap:12px;margin:16px 0;padding:16px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,#fbfcfe,#fff)}
+.dsp-roster-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dsp-roster-head h3{margin:0;font-size:15px;font-weight:1000}
+.dsp-roster-head p{margin:2px 0 0;color:var(--muted);font-size:11px}
+.dsp-roster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px}
+.dsp-roster-card{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 1px 6px rgba(16,24,40,.04)}
+.dsp-roster-top{display:grid;grid-template-columns:42px 1fr auto auto;align-items:center;gap:10px;min-width:0}
+.dsp-roster-avatar{width:42px;height:42px;border-radius:50%;background:var(--brand-050);color:var(--brand);display:grid;place-items:center;font-weight:900;font-size:14px;border:1px solid var(--line);flex:0 0 auto}
+.dsp-roster-main{display:grid;gap:2px;min-width:0}
+.dsp-roster-main strong{font-size:13.5px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-main span{font-size:11px;color:var(--muted);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-plate{justify-self:end}
+.dsp-roster-orders{display:grid;gap:6px}
+.dsp-roster-orders>div{display:grid;grid-template-columns:10px 1fr auto;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;background:#f8fafc;min-width:0}
+.dsp-roster-orders>div>span:nth-child(2){display:grid;gap:1px;min-width:0}
+.dsp-roster-orders>div b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-orders>div small{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dsp-roster-stats>span{display:grid;gap:2px;padding:8px 6px;border:1px solid #edf0f3;border-radius:10px;background:#fafbfc;text-align:center}
+.dsp-roster-stats small{font-size:9px;color:var(--muted);white-space:nowrap}
+.dsp-roster-stats b{font-size:13px;white-space:nowrap}
+.dsp-roster-pos{display:grid;gap:1px;padding:6px 8px;border:1px dashed #e2e8f0;border-radius:9px;background:#f8fafc;text-align:center;min-width:0}
+.dsp-roster-pos small{font-size:9px;color:var(--muted);white-space:nowrap}
+.dsp-roster-pos b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* کارت پخش — یک خط دقیق، هم‌تراز */
+.dsp-card{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+.dsp-card-head{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:12px 14px;min-width:0;background:#fbfcfe;border-bottom:1px solid var(--line)}
+.dsp-card-head>div{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:0;overflow:hidden}
+.dsp-card-head b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-card-head small{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.dsp-card-head .iran-plate{flex:0 0 auto}
+.dsp-card-head .badge{flex:0 0 auto}
+.dsp-driver{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;padding:10px 14px;font-size:13px;background:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-driver .iran-plate{flex:0 0 auto}
+.dsp-delivery-customer{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;padding:10px 14px;background:#fff;min-width:0;overflow:hidden}
+.dsp-delivery-customer strong{font-size:13px;white-space:nowrap}
+.dsp-delivery-customer span{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.dsp-delivery-customer small{font-size:11px;color:var(--muted);white-space:nowrap}
+.dsp-delivery-customer .iran-plate{flex:0 0 auto}
+.dsp-items{margin:0;padding:0;list-style:none}
+.dsp-items li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 14px;white-space:nowrap;overflow:hidden}
+.dsp-items li span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+@media(max-width:1100px){
+  .dsp-roster-grid{grid-template-columns:1fr 1fr}
+  .dsp-card-head{grid-template-columns:1fr auto}
+}
+@media(max-width:700px){
+  .dsp-roster-grid{grid-template-columns:1fr}
+  .dsp-roster-top{grid-template-columns:42px 1fr auto;gap:8px}
+  .dsp-roster-top .dsp-active-pill{grid-column:1/-1;justify-self:start}
+  .dsp-roster-plate{justify-self:start}
+  .dsp-card-head{grid-template-columns:1fr;gap:8px}
+  .dsp-card-head .badge{justify-self:start}
+  .dsp-delivery-customer{flex-wrap:wrap}
+}
+@media(max-width:480px){
+  .dsp-roster-top{grid-template-columns:42px 1fr}
+  .dsp-roster-plate{grid-column:1/-1}
+  .dsp-roster-stats{grid-template-columns:1fr 1fr}
+}
+
+/* ===== 37.2.15 — بازطراحی کامل پخش و رانندگان + تاریخ داشبورد RTL + تایید نهایی بدون قیمت ===== */
+.dsp-roster-plate .iran-plate{height:34px!important;grid-template-columns:32px 1fr .65fr .95fr .65fr!important;border-radius:7px!important}
+.dsp-roster-plate .iran-plate .blue-strip span{font-size:5.5px!important}
+.dsp-roster-plate .iran-plate .plate-part span{font-size:11px!important}
+.dsp-card-head .iran-plate,
+.dsp-driver .iran-plate,
+.dsp-delivery-customer .iran-plate,
+.sc-item .iran-plate{height:36px!important;grid-template-columns:34px 1fr .7fr 1fr .7fr!important;border-radius:7px!important}
+.dsp-card-head .iran-plate .plate-part span,
+.dsp-driver .iran-plate .plate-part span{font-size:12.5px!important}
+
+/* پخش — کارت یک‌خطی کاملاً تراز */
+.dsp-card-head{padding:12px 14px;background:#fbfcfe}
+.dsp-card-head>div{gap:10px}
+.dsp-card-head b{font-size:14px;font-weight:900}
+.dsp-card-head small{font-size:11px}
+
+/* راننده — کارت مرتب با پایانه دقیق زیر برچسب */
+.dsp-roster-card{gap:12px}
+.dsp-roster-top{gap:12px}
+.dsp-roster-pos{padding:8px 6px}
+/* ===== 37.2.15 — بازطراحی کامل پخش و رانندگان — یک‌خطی، استاندارد ایران، RTL داشبورد ===== */
+/* تاریخ داشبورد RTL */
+.header-date, .header-date *{direction:rtl!important;text-align:right!important}
+.header-date strong{font-feature-settings:"tnum";letter-spacing:0}
+
+/* پلاک استاندارد ایران — دقیقاً 520×110 (نسبت 4.727) — سه سایز بهینه */
+.iran-plate{box-sizing:border-box;direction:ltr}
+.iran-plate.is-readonly{height:42px!important;width:198px!important;grid-template-columns:40px 1fr .78fr 1.12fr .78fr!important;border:2px solid #1a2332!important;border-radius:8px!important;overflow:hidden;background:#fff}
+.iran-plate.is-readonly .blue-strip{background:linear-gradient(180deg,#0a4a8a 0%,#083c70 100%)!important;display:grid;place-items:center;color:#fff!important;line-height:1}
+.iran-plate.is-readonly .blue-strip span{font-size:7px!important;font-weight:900!important;letter-spacing:.02em}
+.iran-plate.is-readonly .plate-part{border-left:1.5px solid #dbe1e7!important}
+.iran-plate.is-readonly .plate-part:last-child{background:#eef2f6!important;border-left:0!important}
+.iran-plate.is-readonly .plate-part span{font-size:14px!important;font-weight:900!important;color:#0f172a!important}
+
+/* پخش — 36px (استانداردِ کارت) */
+.dsp-card-head .iran-plate,
+.dsp-driver .iran-plate,
+.dsp-delivery-customer .iran-plate{height:34px!important;width:161px!important;grid-template-columns:34px 1fr .7fr 1fr .7fr!important;border-radius:7px!important}
+.dsp-card-head .iran-plate .blue-strip span,
+.dsp-driver .iran-plate .blue-strip span,
+.dsp-delivery-customer .iran-plate .blue-strip span{font-size:6px!important}
+.dsp-card-head .iran-plate .plate-part span,
+.dsp-driver .iran-plate .plate-part span,
+.dsp-delivery-customer .iran-plate .plate-part span{font-size:11.5px!important}
+
+/* راننده — 32px (فشرده برای لیست) */
+.dsp-roster-plate .iran-plate{height:30px!important;width:142px!important;grid-template-columns:30px 1fr .62fr .88fr .62fr!important;border-radius:6px!important;border-width:1.5px!important}
+.dsp-roster-plate .iran-plate .blue-strip span{font-size:5px!important}
+.dsp-roster-plate .iran-plate .plate-part{border-left-width:1px!important}
+.dsp-roster-plate .iran-plate .plate-part span{font-size:10.5px!important}
+
+/* کارتابل پخش — بازطراحی مینیمال یک‌خطی */
+.dsp-list{display:grid;gap:12px}
+.dsp-card{display:flex;flex-direction:column;gap:0;border:1px solid #e2e8f0;border-radius:14px;background:#fff;overflow:hidden;box-shadow:0 1px 4px rgba(15,23,42,.04)}
+.dsp-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:linear-gradient(180deg,#fbfdff 0%,#f8fafc 100%);border-bottom:1px solid #eef2f7;min-width:0}
+.dsp-card-head>div{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.dsp-card-head b{font-size:13.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.dsp-card-head small{font-size:11px;color:#64748b;white-space:nowrap}
+.dsp-card-head .iran-plate{flex:0 0 auto}
+.dsp-card-head .badge{flex:0 0 auto;font-size:10px;padding:4px 8px}
+.dsp-items{padding:8px 14px}
+.dsp-items li{padding:6px 0;border-bottom:1px dashed #f1f5f9;font-size:12.5px}
+.dsp-items li:last-child{border:0}
+.dsp-driver{padding:10px 14px;background:#fff;border-top:1px solid #f1f5f9;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden}
+.dsp-driver b{font-size:13px;white-space:nowrap}
+.dsp-delivery-customer{padding:10px 14px;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden;border-top:1px solid #f1f5f9;background:#fff}
+.dsp-delivery-customer strong{font-size:13px;white-space:nowrap}
+.dsp-delivery-customer span, .dsp-delivery-customer small{font-size:11.5px;white-space:nowrap}
+
+/* کارتابل رانندگان — دقیقاً زیرِ هم، بدون فاصله اضافی */
+.dsp-roster{margin:16px 0;padding:16px;background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%);border:1px solid #e2e8f0;border-radius:16px}
+.dsp-roster-head{margin-bottom:12px}
+.dsp-roster-grid{gap:12px}
+.dsp-roster-card{padding:14px;gap:10px}
+.dsp-roster-top{grid-template-columns:42px 1fr auto auto;gap:10px}
+.dsp-roster-main{line-height:1.2}
+.dsp-roster-plate{justify-self:end}
+.dsp-roster-stats{gap:6px}
+.dsp-roster-stats>span{padding:8px 4px}
+.dsp-roster-orders>div{padding:8px 10px}
+.dsp-roster-pos{margin-top:2px;padding:8px 10px;background:#f8fafc;border:1px dashed #e2e8f0;border-radius:10px;display:grid;gap:2px;text-align:center}
+.dsp-roster-pos small{font-size:9px;color:#64748b}
+.dsp-roster-pos b{font-size:12px;color:#0f172a;direction:ltr}
+
+@media(max-width:1100px){
+  .dsp-roster-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:700px){
+  .dsp-roster-grid{grid-template-columns:1fr}
+  .dsp-card-head{flex-wrap:wrap}
+  .dsp-card-head>div{flex-wrap:wrap}
+  .dsp-roster-top{grid-template-columns:42px 1fr auto}
+  .dsp-roster-top .dsp-active-pill{grid-column:1/-1;justify-self:start}
+}
+
+/* ================================================================
+   v37.2.15-final — ساماندهی نهایی چیدمان‌ها و پلاک استاندارد ایران
+   قاعده پلاک: نسبت دقیق ۵۲۰×۱۱۰ (4.727) — اندازه با --plate-h کنترل می‌شود
+   تا در هر ردیف متناسب با ارتفاع همان ردیف نمایش داده شود.
+   ================================================================ */
+/* ===== اندازه‌های قطعی پلاک — غالب بر همه قوانین قبلی ===== */
+.iran-plate.iran-plate{
+  --plate-h:76px;
+  box-sizing:border-box!important;
+  display:inline-grid!important;
+  vertical-align:middle;
+  direction:ltr;
+  width:calc(var(--plate-h) * 4.727)!important;
+  max-width:100%;
+  height:var(--plate-h)!important;
+  min-height:0!important;
+  margin:0!important;
+  grid-template-columns:calc(var(--plate-h) * .46) 1fr .72fr 1.02fr .72fr!important;
+  border:2px solid #1c2733!important;
+  border-radius:10px!important;
+  overflow:hidden!important;
+  background:#fff!important;
+  box-shadow:0 1px 3px rgba(15,23,42,.10);
+}
+.iran-plate.iran-plate .blue-strip{background:linear-gradient(180deg,#0d5a9c,#0a4074)!important;display:grid!important;place-items:center;color:#fff!important;line-height:1}
+.iran-plate.iran-plate .blue-strip span{font-size:calc(var(--plate-h) * .2)!important;font-weight:900!important;line-height:1.15!important;text-align:center;letter-spacing:0}
+.iran-plate.iran-plate .plate-part{display:grid!important;place-items:center;border-left:1.5px solid #d7dee6!important;font-size:calc(var(--plate-h) * .42)!important;min-width:0;padding:0!important}
+.iran-plate.iran-plate .plate-part:last-child{border-left:0!important;background:#eef2f7!important}
+.iran-plate.iran-plate .plate-part span{display:grid!important;place-items:center;width:100%;height:100%;margin:0;font-weight:900!important;color:#0f172a!important;font-size:calc(var(--plate-h) * .42)!important;line-height:1!important}
+.iran-plate.iran-plate input,.iran-plate.iran-plate select{width:100%;height:100%;border:0;outline:0;background:transparent;text-align:center;font:inherit;color:inherit}
+.iran-plate.iran-plate input:focus{background:var(--brand-050)}
+.iran-plate.iran-plate select{font-size:calc(var(--plate-h) * .38)!important}
+.iran-plate.iran-plate .plate-code input{font-size:calc(var(--plate-h) * .34)!important}
+
+/* اندازه‌های استاندارد: فرم (پیش‌فرض) ← نمایشی ← فشرده */
+.iran-plate.iran-plate.is-readonly{--plate-h:30px;border-radius:8px!important}
+.iran-plate.iran-plate.is-compact{--plate-h:28px;border-radius:7px!important;border-width:1.5px!important}
+#plateBox .iran-plate.iran-plate{margin-top:10px!important}
+
+/* درون کارت‌های پخش/تحویل/وزن‌کشی — هم‌قد متن ردیف */
+.dsp-card-head .iran-plate.iran-plate,
+.dsp-driver .iran-plate.iran-plate,
+.dsp-delivery-customer .iran-plate.iran-plate,
+.sc-item .iran-plate.iran-plate{--plate-h:30px}
+
+/* لیست رانندگان (کارتابل پخش) — فشرده‌ترین حالت */
+.dsp-roster-plate .iran-plate.iran-plate{--plate-h:26px}
+
+/* جدول‌ها و ردیف‌های فهرستی — متناسب با ارتفاع ردیف */
+.adm-cell .iran-plate.iran-plate,
+.cust-row .iran-plate.iran-plate,
+.cust-chips .iran-plate.iran-plate,
+.cust-kv .iran-plate.iran-plate,
+.table .iran-plate.iran-plate,
+.queue-item .iran-plate.iran-plate,
+.customer-row-v21 .iran-plate.iran-plate,
+.v26-customer-row .iran-plate.iran-plate,
+.v26-customer-identity .iran-plate.iran-plate,
+.sd-queue-row .iran-plate.iran-plate,
+.stl-q-name .iran-plate.iran-plate,
+.fx-row-meta .iran-plate.iran-plate,
+.store-row-customer .iran-plate.iran-plate,
+.sales-delivery-line .iran-plate.iran-plate,
+.dsp-roster-orders .iran-plate.iran-plate{--plate-h:26px}
+
+/* ---------- چیدمان یک‌خطی کارت‌های پخش ---------- */
+.dsp-card-head{display:flex!important;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;background:#fbfcfe;border-bottom:1px solid var(--line);min-width:0}
+.dsp-card-head>div{display:flex!important;align-items:center;gap:9px;min-width:0;flex:1;flex-wrap:nowrap!important;overflow:hidden}
+.dsp-card-head b{font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;flex:0 1 auto;min-width:0}
+.dsp-card-head small{font-size:11px;color:#64748b;white-space:nowrap;flex:0 0 auto}
+.dsp-card-head .iran-plate{flex:0 0 auto}
+.dsp-card-head .badge{flex:0 0 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px;font-size:10.5px;min-height:26px;padding:0 9px}
+.dsp-driver{display:flex!important;align-items:center;gap:8px;flex-wrap:nowrap!important;white-space:nowrap;overflow:hidden;padding:9px 14px;font-size:12.5px;border-top:1px solid #f1f5f9}
+.dsp-driver .iran-plate{flex:0 0 auto}
+.dsp-driver b{font-size:12.5px;white-space:nowrap}
+.dsp-delivery-customer{display:flex!important;align-items:center;gap:9px;flex-wrap:nowrap!important;white-space:nowrap;overflow:hidden;padding:10px 14px;border-top:1px solid #f1f5f9;background:#fff}
+.dsp-delivery-customer strong{font-size:13px;white-space:nowrap}
+.dsp-delivery-customer span,.dsp-delivery-customer small{font-size:11px;white-space:nowrap}
+.dsp-delivery-customer .iran-plate{flex:0 0 auto}
+
+/* ---------- کارتابل رانندگان — همه چیز در یک خط ---------- */
+.dsp-roster-top{display:grid!important;grid-template-columns:42px minmax(0,1fr) auto auto!important;align-items:center;gap:10px;min-width:0}
+.dsp-roster-plate{justify-self:end;min-width:0}
+.dsp-roster-main strong{font-size:13px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-main span{font-size:11px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-stats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px}
+.dsp-roster-stats>span{padding:7px 5px!important;border:1px solid #edf0f3;border-radius:9px;background:#fafbfc;text-align:center;min-width:0}
+.dsp-roster-stats small{font-size:9.5px!important;color:var(--muted);white-space:nowrap;display:block}
+.dsp-roster-stats b{font-size:13.5px!important;white-space:nowrap;display:block;line-height:1.3}
+.dsp-roster-orders>div{grid-template-columns:10px minmax(0,1fr) auto!important;align-items:center!important;gap:8px;padding:7px 9px!important;border-radius:9px;background:#f8fafc;min-width:0}
+.dsp-roster-orders>div b{font-size:11px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-orders>div small{font-size:9.5px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-orders .badge{white-space:nowrap!important;max-width:none!important;overflow:hidden;text-overflow:ellipsis;font-size:9.5px!important;min-height:22px!important;padding:0 8px!important;text-align:center}
+.dsp-active-pill{white-space:nowrap;flex:0 0 auto}
+.dsp-roster-pos{display:grid!important;gap:2px;padding:7px 10px!important;border:1px dashed #e2e8f0;border-radius:9px;background:#f8fafc;text-align:center}
+.dsp-roster-pos small{font-size:9.5px!important}
+.dsp-roster-pos b{font-size:12px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr}
+
+/* ---------- تب‌ها: هر تعداد تب، هم‌عرض و در یک خط ---------- */
+.sd-tabs{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+.dsp-tabs{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.sd-sales-tabs{grid-template-columns:repeat(7,minmax(0,1fr))}
+
+/* ---------- ردیف‌های مدیریت رانندگان — یک خط، بدون شکستن دکمه‌ها ---------- */
+.drv-row{grid-template-columns:minmax(110px,1.1fr) minmax(100px,.9fr) auto auto minmax(270px,auto)!important;gap:12px!important}
+.drv-row .adm-cell small{font-size:11.5px!important;line-height:1.5}
+.drv-row .adm-cell b{font-size:13.5px!important;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drv-row .adm-cell span{font-size:12.5px!important;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drv-row .adm-actions{flex-wrap:nowrap!important;justify-content:flex-end;gap:6px;white-space:nowrap}
+.drv-row .adm-actions .btn{white-space:nowrap;flex:0 0 auto}
+.drv-row .adm-actions .badge{white-space:nowrap;flex:0 0 auto}
+
+/* ---------- ردیف مشتریان — پلاک هم‌قد ردیف ---------- */
+.cust-row{min-height:0}
+.cust-chips{flex-wrap:nowrap!important;align-items:center;gap:8px}
+.cust-chips .iran-plate{flex:0 0 auto}
+
+/* ---------- نشان‌های وضعیت: همیشه یک خط ---------- */
+.dsp-card-head .badge,.dsp-roster-orders .badge,.dsp-summary .badge,.stl-q-name .badge,.sd-queue-row .badge{white-space:nowrap!important}
+
+/* ---------- جدول‌های کارتابل‌ها: سلول پلاک جمع‌وجور ---------- */
+.table td .iran-plate,.table th .iran-plate{margin:0}
+.table td{vertical-align:middle}
+
+/* ---------- پاسخگویی: در عرض‌های کم، شکستن کنترل‌شده ---------- */
+@media(max-width:1250px){
+  .dsp-roster-grid{grid-template-columns:1fr 1fr!important}
+}
+@media(max-width:1024px){
+  .drv-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto!important;row-gap:10px}
+  .drv-row .adm-actions{grid-column:1/-1;justify-content:flex-start}
+}
+@media(max-width:760px){
+  .dsp-roster-grid{grid-template-columns:1fr!important}
+  .dsp-card-head{flex-wrap:wrap!important}
+  .dsp-card-head>div{flex-wrap:wrap!important}
+  .dsp-roster-top{grid-template-columns:42px minmax(0,1fr) auto!important;row-gap:8px}
+  .dsp-roster-top .dsp-active-pill{grid-column:1/-1;justify-self:start}
+  .dsp-roster-plate{grid-column:1/-1;justify-self:start}
+  .drv-row{grid-template-columns:minmax(0,1fr)!important}
+  .cust-chips{flex-wrap:wrap!important}
+}
+
+/* v37.3 — عنوان و توضیح سربرگ کارت‌ها زیر هم قرار می‌گیرند و کلمات وسط نمی‌شکنند
+   (پیش‌تر در عرض کم، عنوان و توضیح کنار هم فشرده و ستونی می‌شدند) */
+.sd-head-main{flex-wrap:wrap}
+.sd-head-main>h2,.sd-head-main>p{flex:1 1 100%;min-width:0;overflow-wrap:normal;word-break:normal}
+
+/* Customer debt ledger */
+.cust-debt{margin:16px 0;padding:14px;border:1px solid var(--border,#dbe1e8);border-radius:10px;overflow-wrap:anywhere}
+.cust-debt h3{margin:0 0 8px}.cust-debt p{margin:6px 0}.cust-debt-hint{font-size:12px;color:var(--muted,#626b78)}
+.cust-debt-invoice{border:1px solid var(--border,#dbe1e8);border-radius:8px;padding:10px;margin-top:10px}
+.cust-debt-heading,.cust-debt-receipt{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.cust-debt-values{display:flex;gap:8px 16px;flex-wrap:wrap;margin:10px 0;font-size:12px}
+.cust-debt-history{border-top:1px solid var(--border,#dbe1e8);padding-top:6px}
+.cust-debt-receipt{padding:6px 0;border-bottom:1px solid var(--border,#dbe1e8);font-size:12px}
+.cust-debt-receipt small{color:var(--muted,#626b78)}.cust-debt-actions{display:flex;flex-wrap:wrap;gap:5px}
+
+/* ---------- ویرایش کنترل‌شدهٔ اسناد نهایی فروش و انبار ---------- */
+.modal-card.document-edit-modal{width:min(980px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto}
+.document-edit-form{display:grid;gap:12px;min-width:0}
+.document-edit-notice,.document-edit-section,.document-edit-finance,.document-edit-totals{min-width:0;border:1px solid var(--border,#dbe1e8);border-radius:11px;background:#fff;padding:12px}
+.document-edit-notice{background:#f8fafc;border-color:#dce4ed}
+.document-edit-notice.is-review{background:#fff9ed;border-color:#f1d59b}
+.document-edit-notice>div{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.document-edit-notice>div>b{font-size:14px}.document-edit-notice>div>span,.document-edit-notice>small{font-size:11px;color:var(--muted,#626b78)}
+.document-edit-notice p{margin:8px 0 0;font-size:12px;line-height:1.8;color:#46515f}
+.document-edit-reason{padding:8px 10px;border-right:3px solid #e5a52b;background:#fff;font-size:12px}
+.document-edit-section>header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}
+.document-edit-section>header>div{display:grid;gap:3px}.document-edit-section>header b{font-size:13px}.document-edit-section>header small{font-size:10.5px;color:var(--muted,#626b78)}
+.document-edit-invoice-lines,.document-edit-warehouse-lines{display:grid;gap:7px}
+.document-edit-invoice-line{display:grid;grid-template-columns:28px minmax(100px,1fr) minmax(150px,.8fr) minmax(90px,auto);align-items:center;gap:8px;padding:8px;border:1px solid #edf0f3;border-radius:9px;background:#fff}
+.document-edit-line-number{display:grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#f1f5f9;color:#475569;font-size:11px}
+.document-edit-line-name{display:grid;gap:3px;min-width:0}.document-edit-line-name>b,.document-edit-line-name>small{overflow:hidden;text-overflow:ellipsis}.document-edit-line-name>b{font-size:12px}.document-edit-line-name>small{font-size:10.5px;color:var(--muted,#626b78)}
+.document-edit-form label{display:grid;gap:4px;min-width:0}.document-edit-form label>span{font-size:10.5px;color:#5b6572}.document-edit-form input,.document-edit-form select,.document-edit-form textarea{box-sizing:border-box;width:100%;min-width:0;min-height:35px;padding:6px 9px;border:1px solid #ccd4de;border-radius:8px;background:#fff;color:inherit;font:inherit;font-size:12px}.document-edit-form input:disabled,.document-edit-form select:disabled{background:#f1f3f5;color:#6b7280}
+.document-edit-invoice-line>strong{font-size:12px;text-align:left;white-space:nowrap}
+.document-edit-finance{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.document-edit-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.document-edit-totals>div{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:7px 8px;border-radius:8px;background:#f8fafc;font-size:11px}
+.document-edit-totals>div>b{white-space:nowrap}.document-edit-totals>.document-edit-due{background:#eef6ff;color:#174a7c}
+.document-edit-totals>p{grid-column:1/-1;margin:0;padding:7px 9px;border-radius:8px;background:#f8fafc;font-size:11px}.document-edit-totals>p.is-balanced{color:#16734b;background:#ecfdf3}.document-edit-totals>p.is-unbalanced{color:#9a5b00;background:#fff7e6}
+.document-edit-settlement>header{margin-bottom:8px}.document-edit-method-row{display:grid;grid-template-columns:minmax(120px,.7fr) minmax(110px,.6fr) minmax(180px,1fr) auto;align-items:end;gap:8px;padding:8px;border:1px solid #edf0f3;border-radius:9px;margin:7px 0;background:#fff}
+.document-edit-method-extra{display:flex;gap:7px;min-width:0}.document-edit-method-extra:empty{display:none}.document-edit-method-extra>label{flex:1 1 0}.document-edit-method-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.document-edit-error{padding:9px 11px;border:1px solid #f1b9bd;border-radius:8px;background:#fff1f2;color:#9f1d2a;font-size:12px}
+.document-edit-request-reason{padding:10px;border:1px solid var(--border,#dbe1e8);border-radius:10px}.document-edit-request-reason textarea{resize:vertical;min-height:80px}
+.document-edit-warehouse-line{display:grid;grid-template-columns:28px minmax(150px,1fr) minmax(180px,.8fr) minmax(145px,.6fr);align-items:center;gap:8px;padding:9px;border:1px solid #edf0f3;border-radius:9px;background:#fff}
+.document-edit-old-weighings{grid-column:1/-1;font-size:10.5px;color:var(--muted,#626b78)}.document-edit-old-weighings summary{cursor:pointer;padding:3px 0}.document-edit-old-weighings .whd-tare-batch{margin:4px 0}
+.wh-document-edit-queue{margin:10px 0;padding:12px;border:1px solid #dbe4ee;border-radius:12px;background:#f8fafc}
+.wh-document-edit-queue-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.wh-document-edit-queue-head>div{display:grid;gap:2px}.wh-document-edit-queue-head b{font-size:13px}.wh-document-edit-queue-head small{font-size:10.5px;color:var(--muted,#626b78)}.wh-document-edit-queue-head>span{display:grid;place-items:center;min-width:27px;height:27px;padding:0 7px;border-radius:50%;background:#e8eef6;color:#344054;font-weight:700;font-size:11px}
+.wh-document-edit-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 10px;margin:6px 0;border:1px solid #e7ecf2;border-radius:9px;background:#fff}
+.wh-document-edit-row>div{display:grid;gap:3px;min-width:0}.wh-document-edit-row strong{font-size:12px}.wh-document-edit-row small{font-size:10.5px;color:var(--muted,#626b78)}.wh-document-edit-row>div>span{font-size:11px}.wh-document-edit-row em{color:#9a5b00;font-size:10.5px;font-style:normal}
+@media(max-width:700px){
+ .modal-card.document-edit-modal{width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}
+ .document-edit-invoice-line{grid-template-columns:26px minmax(0,1fr) auto}.document-edit-invoice-line>label{grid-column:2/-1}.document-edit-invoice-line>strong{grid-column:2/-1;text-align:right}
+ .document-edit-method-row{grid-template-columns:repeat(2,minmax(0,1fr));align-items:end}.document-edit-method-extra{grid-column:1/-1}.document-edit-method-row>.document-edit-remove{justify-self:start}
+ .document-edit-totals{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .document-edit-warehouse-line{grid-template-columns:26px minmax(0,1fr)}.document-edit-warehouse-line>.document-edit-line-name{grid-column:2}.document-edit-warehouse-line>label{grid-column:2}
+ .wh-document-edit-row{grid-template-columns:minmax(0,1fr);align-items:start}.wh-document-edit-row>button{justify-self:start}
+}
+
+/* Gate entry: independent search panel, separate from customer details. */
+#appView #content .gt-search-panel{margin:16px 22px 0;padding:16px;border:1px solid var(--border,#dbe1e8);border-radius:12px;background:#f8fafc}
+#appView #content .gt-search-panel h3{margin:0 0 12px;font-size:14px}
+#appView #content .gt-search-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+#appView #content .gt-search-grid>div{min-width:0;margin:0}
+#appView #content .gt-search-grid>.cust-code-entry:only-child{grid-column:1/-1}
+#appView #content .gt-order-search>label{display:block;margin-bottom:8px;font-size:12px;font-weight:700;line-height:1.8}
+#appView #content .gt-search-grid .cust-code-row{display:flex;gap:8px;align-items:center;min-width:0}
+#appView #content .gt-search-grid .cust-code-row>input,#appView #content .gt-search-grid .input-shell{flex:1;min-width:0;width:100%}
+#appView #content .gt-search-grid .cust-code-row>button{flex-shrink:0;white-space:normal}
+#appView #content .gt-entry-cust{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:700px){
+ #appView #content .gt-search-panel{margin:12px 12px 0;padding:12px}
+ #appView #content .gt-search-grid,#appView #content .gt-entry-cust{grid-template-columns:minmax(0,1fr)}
+ #appView #content .gt-search-grid .cust-code-row{flex-wrap:wrap}
+}

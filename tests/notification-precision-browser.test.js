@@ -1,0 +1,23 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict'),{spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),net=require('node:net');
+for(const mode of ['0','1'])test('مشاهده و پذیرش واقعی اعلان در مرورگر، گردش '+mode,{skip:!process.env.BT_CHROMIUM_PATH,timeout:90000},async()=>{
+ const {chromium}=require('playwright-core');const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-notice-ui-'));const port=await new Promise(r=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>r(p));});});
+ const base=`http://127.0.0.1:${port}`,proc=spawn(process.execPath,['server.js'],{cwd:path.join(__dirname,'..'),env:{...process.env,PORT:String(port),HOST:'127.0.0.1',DATA_DIR:dir,ADMIN_INITIAL_PASSWORD:'Initial!2345',BT_EXPERIMENTAL_TRANSPORT_WORKFLOW:mode},stdio:['ignore','pipe','inherit']});let browser;
+ try{
+  await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('startup timeout')),15000);proc.stdout.on('data',d=>{if(String(d).includes('"listening"')){clearTimeout(timer);resolve();}});proc.once('exit',c=>reject(Error('server exited '+c)));});
+  browser=await chromium.launch({executablePath:process.env.BT_CHROMIUM_PATH,args:['--no-sandbox','--disable-dev-shm-usage']});const ctx={};for(const k of ['admin','gate','sales','sales2','warehouse'])ctx[k]=await browser.newContext();
+  const post=async(k,url,data={})=>{const r=await ctx[k].request.post(base+url,{data});assert.ok(r.ok(),`${url} ${r.status()} ${await r.text()}`);return r.json();};const get=async(k,url)=>{const r=await ctx[k].request.get(base+url);assert.ok(r.ok());return r.json();};
+  await post('admin','/api/login',{username:'admin',password:'Initial!2345'});await post('admin','/api/account/password',{currentPassword:'Initial!2345',newPassword:'Changed!2345'});
+  for(const [username,roleCode] of [['gate1','gate'],['sales1','sales'],['sales2','sales'],['wh1','warehouse']])await post('admin','/api/admin/users',{username,roleCode,fullName:username,position:'تست',password:'Changed!2345',mustChangePassword:false});
+  for(const [k,username] of [['gate','gate1'],['sales','sales1'],['sales2','sales2'],['warehouse','wh1']])await post(k,'/api/login',{username,password:'Changed!2345'});
+  const sales=await ctx.sales.newPage(),warehouse=await ctx.warehouse.newPage();await sales.goto(base+'/',{waitUntil:'networkidle'});await warehouse.goto(base+'/',{waitUntil:'networkidle'});
+  const visit=(await post('gate','/api/visits',{name:'مراجعه آزمایشی',phone:'09121112233',noVehicle:true})).visit;
+  await sales.evaluate(async()=>{await refreshIndicators();await go('sales','onsite');});
+  let n=(await get('sales','/api/notifications')).notifications.find(n=>n.entityId===visit.id);assert.equal(n.isRead,false);assert.equal(n.navSection,'onsite');
+  await sales.route('**/api/visits?id=*',route=>route.abort());await sales.evaluate(id=>openOrder(id),visit.id);assert.equal((await get('sales','/api/notifications')).notifications.find(x=>x.id===n.id).isRead,false);await sales.unroute('**/api/visits?id=*');
+  const ack=sales.waitForResponse(r=>r.url().endsWith('/api/notifications/read')&&r.request().method()==='POST');await sales.evaluate(id=>openOrder(id),visit.id);assert.equal((await ack).status(),200);assert.equal((await get('sales','/api/notifications')).notifications.find(x=>x.id===n.id).isRead,true);assert.equal((await get('sales2','/api/notifications')).notifications.find(x=>x.id===n.id).isRead,false);
+  const order=(await post('sales','/api/orders',{visitId:visit.id,items:[{productId:'p01',requestedQty:3,requestedUnit:'کیلوگرم'}],...(mode==='1'?{deliveryMode:'PICKUP'}:{})})).order;
+  await warehouse.evaluate(async()=>{await refreshIndicators();await go('warehouse','incoming');});const wn=(await get('warehouse','/api/notifications')).notifications.find(x=>x.entityId===order.id);assert.equal(wn.isRead,false);
+  const accept=warehouse.waitForResponse(r=>r.url().endsWith('/warehouse/accept')&&r.request().method()==='POST');const ackWh=warehouse.waitForResponse(r=>r.url().endsWith('/api/notifications/read')&&r.request().method()==='POST');await warehouse.locator(`[data-action=wh38-order-details][data-id="${order.id}"]`).click();await warehouse.locator('[data-wh-accept-order]').click();assert.equal((await accept).status(),200);assert.equal((await ackWh).status(),200);assert.equal((await get('warehouse','/api/notifications')).notifications.find(x=>x.id===wn.id).isRead,true);
+ }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
+});

@@ -1,0 +1,71 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict'),{spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),net=require('node:net');
+test('سفارش جزئی فروشگاه مستقل، تک‌محموله و بدون تسویه از ثبت تا دریافت',{timeout:90000},async()=>{
+ const port=await new Promise(r=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>r(p));});}),dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-partial-')),base=`http://127.0.0.1:${port}`,pass='Changed!2345';
+ const proc=spawn(process.execPath,['server.js'],{cwd:path.join(__dirname,'..'),env:{...process.env,PORT:String(port),HOST:'127.0.0.1',DATA_DIR:dir,ADMIN_INITIAL_PASSWORD:'Initial!2345'},stdio:['ignore','pipe','pipe']});
+ try{await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(Error('startup')),15000);proc.stdout.on('data',d=>{if(String(d).includes('"listening"')){clearTimeout(t);resolve();}});proc.once('exit',c=>reject(Error('exit '+c)));});
+ const call=async(method,url,body,cookie)=>{const r=await fetch(base+url,{method,headers:{...(cookie?{Cookie:cookie}:{}),...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});return{status:r.status,data:await r.json(),cookie:(r.headers.get('set-cookie')||'').split(';')[0]};};
+ const ok=async(method,url,body,cookie)=>{const r=await call(method,url,body,cookie);assert(r.status>=200&&r.status<300,url+' '+r.status+' '+JSON.stringify(r.data));return r.data;};
+ const admin=(await call('POST','/api/login',{username:'admin',password:'Initial!2345'})).cookie;await ok('POST','/api/account/password',{currentPassword:'Initial!2345',newPassword:pass},admin);
+ for(const [username,roleCode,extra] of [['partial-sales','sales',{}],['partial-transport','dispatch',{}],['partial-wh','warehouse',{}],['partial-store','store',{storeName:'شعبه ۱ حمزه کلا'}],['other-store','store',{storeName:'فروشگاه دیگر'}]])await ok('POST','/api/admin/users',{username,roleCode,fullName:username,position:'تست',password:pass,mustChangePassword:false,...extra},admin);
+ const login=async username=>(await call('POST','/api/login',{username,password:pass})).cookie,sales=await login('partial-sales'),transport=await login('partial-transport'),wh=await login('partial-wh'),shop=await login('partial-store'),other=await login('other-store');
+ const items=[{productId:'p01',requestedQty:3,requestedUnit:'کیلوگرم'},{productId:'p02',requestedQty:1,requestedUnit:'کیلوگرم'}],driver=(await ok('POST','/api/transport/drivers',{fullName:'راننده',phone:'09121112233'},transport)).driver,vehicle=(await ok('POST','/api/transport/vehicles',{vehicleType:'وانت',plate:'12ب34567'},transport)).vehicle;
+ assert.equal((await call('POST','/api/store/orders',{storeOrderKind:'PARTIAL',items},shop)).status,400);
+ const customer=(await ok('POST','/api/store/orders',{storeOrderKind:'PARTIAL',storePurpose:'CUSTOMER',name:'مشتری',phone:'09121112234',items},shop)).order;assert.equal(customer.customer.name,'مشتری');
+ const changed=(await ok('PUT',`/api/store/orders/${customer.id}`,{name:'مشتری ویرایش‌شده',phone:'09121112236',items},shop)).order;assert.equal(changed.customer.name,'مشتری ویرایش‌شده');assert.equal((await call('PUT',`/api/store/orders/${customer.id}`,{name:'',phone:'09121112236',items},shop)).status,400);
+ const future=new Date(Date.now()+3*86400000).toISOString().slice(0,10)+'T12:00';await ok('POST',`/api/store/orders/${customer.id}/approve`,{scheduledAt:future},sales);const scheduled=(await ok('GET',`/api/orders/${customer.id}`,null,sales)).order;assert.equal(scheduled.status,'SCHEDULED_REMOTE');assert.equal((await call('POST',`/api/store/orders/${customer.id}/quick-send`,{},sales)).status,409);assert.equal((await call('POST',`/api/orders/${customer.id}/warehouse/accept`,{},wh)).status,409);
+ const stock=(await ok('POST','/api/store/orders',{storeOrderKind:'PARTIAL',storePurpose:'STOCK',items},shop)).order;assert.equal(stock.customerId,null);assert.equal(stock.debtTrackingEnabled,false);assert.equal(stock.storeOrderKind,'PARTIAL');
+ const bulk=(await ok('POST','/api/store/orders',{items},shop)).order;
+ const scope=await ok('GET','/api/store/scope',null,admin);assert(scope.stores.length>=2);assert.equal((await call('GET','/api/store/scope',null,shop)).status,403);
+ assert((await ok('GET','/api/store/orders',null,admin)).orders.some(o=>o.id===stock.id));assert.equal((await ok('GET',`/api/store/orders/${stock.id}`,null,admin)).order.id,stock.id);
+ assert.equal((await call('POST','/api/store/orders',{items},admin)).status,400);
+ const owner=scope.stores.find(u=>u.storeName.includes('حمزه'));
+ const adminMade=(await ok('POST','/api/store/orders',{items,storeId:owner.id},admin)).order;assert.equal(adminMade.storeId,owner.id);assert.notEqual(adminMade.createdBy,owner.id);
+ const branchList=await ok('GET','/api/store/orders?branchNo='+adminMade.branchNo,null,admin);assert(branchList.orders.every(o=>o.branchNo===adminMade.branchNo));
+ await ok('PUT',`/api/store/orders/${adminMade.id}`,{items,notes:'ویرایش مدیر'},admin);
+ await ok('POST',`/api/store/orders/${adminMade.id}/cancel`,{reason:'آزمون مدیر'},admin);
+ assert((await ok('GET','/api/store/orders?branchNo=9999',null,shop)).orders.some(o=>o.id===stock.id),'shop cannot change ownership scope via branch filter');
+ assert.equal((await call('GET',`/api/store/orders/${stock.id}`,null,other)).status,404);
+ await ok('GET','/api/driver/orders',null,admin);
+assert.equal(bulk.storeOrderKind,'BULK');assert.equal(bulk.customerId,null);
+ const bulkEdited=(await ok('PUT',`/api/store/orders/${bulk.id}`,{items,notes:'روزانه'},shop)).order;assert.equal(bulkEdited.customerId,null);
+ const legacy=(await ok('POST','/api/store/orders',{name:'خریدار قدیمی',phone:'09121112235',items},shop)).order;assert(legacy.customerId);const legacyEdited=(await ok('PUT',`/api/store/orders/${legacy.id}`,{items,notes:'بدون تغییر مشتری'},shop)).order;assert.equal(legacyEdited.customerId,legacy.customerId);assert.equal(legacyEdited.customer.name,'خریدار قدیمی');
+ assert.equal((await ok('GET','/api/store/orders?kind=PARTIAL',null,shop)).total,2);assert.equal((await ok('GET','/api/store/orders?kind=BULK',null,shop)).total,3);assert.equal((await call('GET',`/api/store/orders/${stock.id}`,null,other)).status,404);
+ assert.equal((await call('PUT',`/api/store/orders/${stock.id}`,{storeOrderKind:'BULK',items},shop)).status,409);
+ const edited=(await ok('PUT',`/api/store/orders/${stock.id}`,{items,notes:'تأمین تکمیلی'},shop)).order;
+ await ok('POST',`/api/store/orders/${stock.id}/quick-send`,{},sales);let planned=(await ok('GET','/api/transport/plans',null,transport)).orders.find(x=>x.id===stock.id);assert.deepEqual(planned.services.map(x=>x.run),[1]);
+ await ok('PUT',`/api/transport/drivers/${driver.id}/resources`,{vehicleId:vehicle.id,paymentDeviceId:''},transport);
+ assert.equal((await call('POST',`/api/transport/plans/${stock.id}/assign`,{run:2,driverId:driver.id,vehicleId:vehicle.id},transport)).status,400);
+ await ok('POST',`/api/transport/plans/${stock.id}/assign`,{run:1,driverId:driver.id,vehicleId:vehicle.id},transport);
+ await ok('POST',`/api/orders/${stock.id}/warehouse/accept`,{},wh);await ok('POST',`/api/orders/${stock.id}/warehouse/start-preparing`,{},wh);const active=edited.items.filter(i=>i.itemStatus!=='CANCELLED'),id=active[0].id,id2=active[1].id;
+ assert.equal((await call('POST',`/api/orders/${stock.id}/store-run/move`,{itemId:id},wh)).status,409);assert.equal((await call('POST',`/api/orders/${stock.id}/store-run/weights`,{run:2,items:[{itemId:id,deliveredKg:2}]},wh)).status,400);
+ await ok('POST',`/api/orders/${stock.id}/store-run/weights`,{run:1,items:[{itemId:id,deliveredKg:2.5}]},wh);
+ assert.equal((await call('POST',`/api/orders/${stock.id}/store-run/send-run`,{run:1},wh)).status,409);const done=(await ok('GET',`/api/orders/${stock.id}`,null,wh)).order.items.find(i=>i.id===id);assert(done.runCompleted);assert.equal((await call('POST',`/api/orders/${stock.id}/store-run/weights`,{run:1,items:[{itemId:id,deliveredKg:1}]},wh)).status,409);await ok('POST',`/api/orders/${stock.id}/store-run/out-of-stock`,{itemId:id2},wh);
+ await ok('POST',`/api/orders/${stock.id}/store-run/send-run`,{run:1},wh);let order=(await ok('GET',`/api/orders/${stock.id}`,null,sales)).order;assert(order.warehouseCompletedAt);assert.equal(order.payments.length,0);assert.equal((await call('POST',`/api/orders/${stock.id}/settle`,{},sales)).status,409);
+ const salesDoc=(await ok('GET',`/api/sales/store-documents/${stock.id}/1`,null,sales)).document;assert.equal(salesDoc.driverName,'راننده');assert.equal(salesDoc.lines[0].deliveredKg,2.5);assert.equal(salesDoc.storeOrderKind,'PARTIAL');assert(!('handoverToken' in salesDoc));assert.equal((await call('GET',`/api/sales/store-documents/${stock.id}/2`,null,sales)).status,404);
+ const doc=(await ok('GET',`/api/warehouse/store-documents/${stock.id}/1`,null,wh)).document;assert.equal(doc.lines[0].deliveredKg,2.5);assert.equal(doc.driverName,'راننده');await ok('POST',`/api/warehouse/transport-handovers/${stock.id}`,{run:1,physicalHandoverConfirmed:true,handoverToken:doc.handoverToken},wh);
+ await ok('POST',`/api/sales/store-transport/${stock.id}/1/review`,{reviewConfirmed:true},sales);await ok('POST',`/api/gate/store-shipments/${stock.id}/1/depart`,{departureConfirmed:true},admin);assert.equal((await call('POST',`/api/store/orders/${stock.id}/confirm-receipt`,{run:1},other)).status,404);await ok('POST',`/api/store/orders/${stock.id}/confirm-receipt`,{run:1},admin);await ok('POST',`/api/sales/store-transport/${stock.id}/1/return`,{documentsReturned:true},sales);
+ order=(await ok('GET',`/api/orders/${stock.id}`,null,sales)).order;assert.equal(order.status,'CLOSED');assert.equal(order.payments.length,0);assert.equal(order.transportStoreTrips['1'].status,'CLOSED');
+ // All items unavailable: close without driver, shipment, invoice or payment.
+ const empty=(await ok('POST','/api/store/orders',{storeOrderKind:'PARTIAL',storePurpose:'STOCK',items},shop)).order;
+ await ok('POST',`/api/store/orders/${empty.id}/quick-send`,{},sales);await ok('POST',`/api/orders/${empty.id}/warehouse/accept`,{},wh);await ok('POST',`/api/orders/${empty.id}/warehouse/start-preparing`,{},wh);
+ await ok('POST',`/api/orders/${empty.id}/store-run/out-of-stock`,{itemId:empty.items[0].id},wh);
+ let pending=(await ok('GET',`/api/orders/${empty.id}`,null,sales)).order;assert.equal(pending.status,'WAREHOUSE_PREPARING');
+ await ok('POST',`/api/orders/${empty.id}/store-run/out-of-stock`,{itemId:empty.items[1].id},wh);
+ let ended=(await ok('GET',`/api/orders/${empty.id}`,null,sales)).order;assert.equal(ended.status,'OUT_OF_STOCK');assert(ended.warehouseCompletedAt);assert.equal(ended.payments.length,0);assert(!ended.storeRunOps.r1Shipment);assert(!ended.transportStoreTrips);assert((await ok('GET','/api/notifications',null,shop)).notifications.some(n=>n.entityId===empty.id));
+
+ // Combined send + physical handover is atomic, including document numbering and audit.
+ const combined=(await ok('POST','/api/store/orders',{storeOrderKind:'PARTIAL',storePurpose:'STOCK',items:[items[0]]},shop)).order;
+ await ok('POST',`/api/store/orders/${combined.id}/quick-send`,{},sales);await ok('POST',`/api/orders/${combined.id}/warehouse/accept`,{},wh);
+ await ok('POST',`/api/orders/${combined.id}/store-run/weights`,{run:1,items:[{itemId:combined.items[0].id,deliveredKg:2}]},wh);
+ const combinedUrl=`/api/orders/${combined.id}/store-run/send-run`,combinedBody={run:1,physicalHandoverConfirmed:true};
+ assert.equal((await call('POST',combinedUrl,combinedBody,wh)).status,409);let untouched=(await ok('GET',`/api/orders/${combined.id}`,null,wh)).order;assert(!untouched.storeRunOps?.r1Shipment);
+ await ok('POST',`/api/transport/plans/${combined.id}/assign`,{run:1,driverId:driver.id,vehicleId:vehicle.id},transport);
+ const {DatabaseSync}=require('node:sqlite');let sql=new DatabaseSync(path.join(dir,'baboltoyoor.db'));sql.exec("CREATE TRIGGER combined_send_fail BEFORE INSERT ON audit WHEN NEW.action='TRANSPORT_WAREHOUSE_HANDOVER' BEGIN SELECT RAISE(ABORT,'test handover failure'); END");sql.close();
+ assert.equal((await call('POST',combinedUrl,combinedBody,wh)).status,500);untouched=(await ok('GET',`/api/orders/${combined.id}`,null,wh)).order;assert(!untouched.storeRunOps?.r1Shipment);assert(!untouched.transportHandovers?.['1']);assert(!untouched.items[0].sentRun1);assert(!untouched.storeWarehouseDocumentNos?.['1']);
+ sql=new DatabaseSync(path.join(dir,'baboltoyoor.db'));sql.exec('DROP TRIGGER combined_send_fail');sql.close();
+ const sent=(await ok('POST',combinedUrl,combinedBody,wh)).order;assert(sent.transportHandovers['1'].physicalHandoverConfirmed);assert.equal(sent.transportHandovers['1'].document.lines[0].deliveredKg,2);
+ assert.deepEqual((await ok('POST',combinedUrl,combinedBody,wh)).order.transportHandovers,sent.transportHandovers);
+
+ }finally{if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
+});

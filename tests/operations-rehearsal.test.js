@@ -1,0 +1,20 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+const {seedDatabase}=require('../lib/synthetic-fixture'),{runDrill}=require('../scripts/restore-drill'),{runJob}=require('../lib/offsite-backup-job'),{checkService}=require('../lib/service-monitor');
+const {runLoad}=require('../scripts/load-test');
+test('isolated HTTP concurrency and retry reconciliation',async()=>{const r=await runLoad({requests:24,concurrency:4,orders:100});assert.equal(r.failures,0);assert.equal(r.singlePersistedVisit,true);await assert.rejects(runLoad({concurrency:65}),/bounds/);});
+test('encrypted scheduled export verifies restore and records monitored success/failure',async t=>{
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'bt-operations-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+ const data=path.join(root,'data'),dest=path.join(root,'exports');fs.mkdirSync(data);fs.mkdirSync(dest);
+ const source=seedDatabase({dataDir:data,orders:20,password:'Synthetic!Only2026'}),passphrase='Synthetic encryption only 2026';
+ const hash=()=>require('node:crypto').createHash('sha256').update(fs.readFileSync(source)).digest('hex'),before=hash();
+ const plain=await runDrill({source});assert.equal(plain.encrypted,false);assert.equal(hash(),before);
+ const result=await runJob({source,dataDir:data,destination:dest,passphrase,keep:1});assert.equal(result.restoreVerified,true);assert.equal(hash(),before);
+ const mock=async()=>({ok:true,json:async()=>({service:'baboltoyoor',status:'ok',release:'test'})});
+ await checkService({url:'https://example.invalid',dataDir:data,fetchImpl:mock,offsiteMaxAgeMs:3600000});
+ await assert.rejects(runJob({source,dataDir:data,destination:data,passphrase}),/outside/);
+ await assert.rejects(runDrill({source:path.join(dest,result.file),passphrase:'wrong secret for synthetic fixture'}));
+ await assert.rejects(runJob({source,dataDir:data,destination:dest,passphrase:'short',keep:1}));
+ await assert.rejects(checkService({url:'https://example.invalid',dataDir:data,fetchImpl:mock,offsiteMaxAgeMs:3600000}),/verified/);
+ assert.equal(fs.existsSync(path.join(dest,result.file)),true);assert.equal(fs.existsSync(path.join(dest,'.baboltoyoor-offsite.lock')),false);
+});

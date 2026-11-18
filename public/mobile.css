@@ -1,0 +1,947 @@
+/*
+ * v37.2.6 — ناوبری ستونی و هدر موبایل
+ * این فایل بعد از styles.css و design.css بارگذاری می‌شود تا تعارض breakpointهای
+ * قدیمی نقش‌های مختلف را یکجا و بدون تغییر گردش‌کار کسب‌وکار جمع‌بندی کند.
+ */
+:root {
+  --mobile-rail-width: calc(68px + env(safe-area-inset-right, 0px));
+  --mobile-tap-size: 44px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-block: 16px;
+}
+
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+button,
+a,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.notification-label {
+  display: none;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+.app,
+.workspace,
+.workspace-header,
+.content,
+#content,
+.modal-root,
+.modal-card,
+.notification-popover {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#content > *,
+.content > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 1024px) {
+  /* ابزارهای همهٔ نقش‌ها در یک ستون باریک ثابت کنار صفحه می‌مانند؛
+     هر گزینه آیکون بالا و عنوان زیر آن دارد. */
+  .rail {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    width: var(--mobile-rail-width) !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    padding: calc(8px + env(safe-area-inset-top, 0px)) 4px
+      calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-right: calc(4px + env(safe-area-inset-right, 0px)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    overflow: hidden !important;
+    border-radius: 0 !important;
+    z-index: 160 !important;
+    box-shadow: -7px 0 24px rgba(20, 29, 38, .14) !important;
+  }
+
+  .rail-top {
+    display: none !important;
+  }
+
+  .rail-bottom {
+    display: flex !important;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 4px 0 0 !important;
+    padding: 6px 0 0 !important;
+    border-top: 1px solid rgba(255, 255, 255, .16) !important;
+  }
+
+  .rail-bottom .user-mini {
+    display: none !important;
+  }
+
+  #changePasswordBtn {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 56px !important;
+    margin: 0 !important;
+    padding: 5px 2px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    border-radius: 10px !important;
+    text-align: center !important;
+  }
+
+  #changePasswordBtn .nav-icon {
+    width: 23px !important;
+    min-width: 23px !important;
+    height: 23px;
+  }
+
+  #changePasswordBtn .nav-icon .svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  #changePasswordBtn > span:last-child {
+    max-width: 100%;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  #appView #railNav {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 5px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 5px 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, .36) transparent;
+  }
+
+  #appView #railNav::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  #appView #railNav::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .36);
+  }
+
+  #appView #railNav > button {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 56px !important;
+    margin: 0 !important;
+    padding: 5px 2px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    border-radius: 10px !important;
+    text-align: center !important;
+    white-space: normal !important;
+  }
+
+  #appView #railNav .nav-icon {
+    display: grid !important;
+    place-items: center !important;
+    flex: 0 0 auto !important;
+    width: 23px !important;
+    min-width: 23px !important;
+    height: 23px;
+  }
+
+  #appView #railNav .nav-icon .svg {
+    width: 21px;
+    height: 21px;
+    stroke-width: 2.2;
+  }
+
+  #appView #railNav .nav-label {
+    display: block !important;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: visible !important;
+    overflow-wrap: anywhere;
+    font-size: 10px !important;
+    font-weight: 800;
+    line-height: 1.15 !important;
+    text-align: center;
+    white-space: normal !important;
+  }
+
+  #appView #railNav .nav-badge {
+    position: absolute !important;
+    top: 1px !important;
+    right: 3px !important;
+    min-width: 16px;
+    height: 16px;
+    padding-inline: 3px;
+    font-size: 8px;
+  }
+
+  .workspace {
+    width: auto !important;
+    margin-top: 0 !important;
+    margin-right: var(--mobile-rail-width) !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+    padding-right: max(10px, env(safe-area-inset-right, 0px)) !important;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;
+    padding-left: max(10px, env(safe-area-inset-left, 0px)) !important;
+  }
+
+  .workspace-header {
+    position: static !important;
+    top: auto !important;
+    z-index: auto !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: start !important;
+    direction: rtl;
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 0 4px !important;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 2px 10px !important;
+    gap: 9px !important;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 4px 14px rgba(22, 28, 37, .045);
+  }
+
+  .workspace-header .header-main { 
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0;
+    text-align: right;
+  }
+
+  .workspace-header .header-kicker {
+    margin: 0 0 2px;
+    font-size: 10px !important;
+    letter-spacing: .08em;
+  }
+
+  .workspace-header h1 {
+    max-width: 100%;
+    margin: 0;
+    font-size: clamp(20px, 4.8vw, 24px) !important;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .workspace-header p {
+    max-width: 100%;
+    margin: 3px 0 0;
+    font-size: 11px !important;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .header-actions {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    justify-self: stretch !important;
+    width: 100% !important;
+    min-width: 0;
+    flex-flow: row nowrap !important;
+    align-items: center;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    direction: ltr;
+  }
+
+  .header-profile {
+    flex: 0 1 340px !important;
+    min-width: 0;
+    max-width: calc(100% - 68px) !important;
+    padding: 5px 6px !important;
+    gap: 7px;
+  }
+
+  .header-profile-text {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .header-profile-text strong,
+  .header-profile-text span {
+    max-width: 100%;
+  }
+
+  .header-actions .header-status,
+  .header-actions .header-date {
+    display: none !important;
+  }
+
+  .header-logout {
+    flex: 0 0 auto !important;
+    min-width: var(--mobile-tap-size) !important;
+    min-height: var(--mobile-tap-size) !important;
+    padding-inline: 8px !important;
+    font-size: 11px !important;
+  }
+
+  .header-actions .notification-btn {
+    order: 2 !important;
+    flex: 0 0 62px !important;
+    width: 62px !important;
+    min-width: 62px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    display: grid !important;
+    grid-template-rows: 25px 12px;
+    align-content: center;
+    justify-items: center;
+    gap: 0;
+    padding: 2px 4px !important;
+    border: 1px solid var(--brand-200) !important;
+    border-radius: 12px !important;
+    background: var(--brand-050) !important;
+    color: var(--brand) !important;
+    box-shadow: 0 2px 8px rgba(180, 15, 35, .1);
+  }
+
+  .header-actions .notification-btn .bell-icon {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 25px;
+    color: var(--brand);
+  }
+
+  .header-actions .notification-btn .bell-icon .svg {
+    width: 23px;
+    height: 23px;
+    stroke-width: 2.5;
+  }
+
+  .header-actions .notification-label {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--brand-dark);
+    font-size: 9px;
+    font-weight: 1000;
+    line-height: 1.1;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .header-actions .notification-btn b {
+    top: -3px !important;
+    right: -2px !important;
+    left: auto !important;
+    z-index: 2;
+    min-width: 18px;
+    height: 18px;
+    font-size: 9px;
+  }
+
+  .header-actions .notification-btn:focus-visible {
+    outline: 3px solid var(--brand-300);
+    outline-offset: 2px;
+  }
+
+  .modal-close {
+    min-width: var(--mobile-tap-size);
+    min-height: var(--mobile-tap-size);
+  }
+
+  .content,
+  #content {
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: auto !important;
+    padding-top: 14px !important;
+    padding-bottom: 20px;
+  }
+
+  .content :is(.card, .sd-panel, .workspace-card, .workspace-card-v21,
+    .adm-panel, .stl-card, .op-panel, .op-sidecard, .workspace-shell) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .modal-root {
+    padding: max(7px, env(safe-area-inset-top, 0px)) 8px
+      calc(7px + env(safe-area-inset-bottom, 0px)) !important;
+    align-items: flex-end !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .modal-card {
+    width: min(980px, 100%) !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 14px) !important;
+    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 14px) !important;
+    overflow: auto;
+    overscroll-behavior: contain;
+    border-radius: 17px 17px 12px 12px !important;
+  }
+
+  .modal-head {
+    gap: 8px;
+    padding: 11px 13px !important;
+  }
+
+  .modal-head strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: 16px;
+  }
+
+  .modal-body {
+    min-width: 0;
+    padding: 14px !important;
+  }
+
+  #modal .modal-card :is(.returned-editor, .warehouse-delivery-modal,
+    .order-details-modal, .store-detail-modal, .detail-modal-grid) {
+    min-width: 0 !important;
+    max-width: 100%;
+  }
+
+  #modal .modal-card input:not([type="checkbox"]):not([type="radio"]),
+  #modal .modal-card select,
+  #modal .modal-card textarea {
+    max-width: 100%;
+    font-size: 16px !important;
+  }
+
+  #modal .modal-card :is(.btn, .btn-lg, .btn-sm, .modal-close) {
+    min-width: 0;
+    min-height: var(--mobile-tap-size);
+    white-space: normal;
+  }
+
+  #modal .table-wrap,
+  #modal .adm-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #modal table {
+    max-width: 100%;
+  }
+
+  .notification-popover {
+    position: fixed !important;
+    z-index: 260 !important;
+    max-width: min(420px, calc(100vw - 24px)) !important;
+    max-height: calc(100vh - env(safe-area-inset-top, 0px) - 24px);
+    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 24px);
+    overflow: auto;
+  }
+
+  #toast {
+    right: calc(var(--mobile-rail-width) + 8px) !important;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    left: max(12px, env(safe-area-inset-left, 0px)) !important;
+    max-width: none;
+    text-align: center;
+  }
+
+  /* فهرست‌ها و جدول‌ها اسکرول را داخل خودشان نگه می‌دارند. */
+  #content .table-wrap,
+  #content .adm-table-wrap,
+  #content .gt-table-pad {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #content .table-wrap,
+  #content .adm-table-wrap {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  #content table {
+    max-width: 100%;
+  }
+
+  /* کنترل‌های فرم در iOS اندازهٔ قلم 16px دارند تا بزرگ‌نمایی خودکار رخ ندهد. */
+  #content input:not([type="checkbox"]):not([type="radio"]),
+  #content select,
+  #content textarea,
+  #loginView input:not([type="checkbox"]):not([type="radio"]),
+  #loginView select,
+  #loginView textarea {
+    max-width: 100%;
+    font-size: 16px !important;
+    scroll-margin-block: 16px;
+  }
+
+  #content input:not([type="checkbox"]):not([type="radio"]),
+  #content select {
+    min-height: var(--mobile-tap-size);
+  }
+
+  #content textarea {
+    min-height: 88px;
+  }
+
+  #content input[type="checkbox"],
+  #content input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+  }
+
+  #content :is(.btn, .btn-lg, .btn-sm, .stl-submit) {
+    min-width: 0;
+    min-height: var(--mobile-tap-size);
+    max-width: 100%;
+    padding-inline: 12px;
+    white-space: normal;
+    line-height: 1.4;
+  }
+
+  #content :is(.toolbar, .adm-toolbar, .form-actions, .adm-actions, .gate-dispatch-home-footer) {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* همهٔ شبکه‌های دو/سه‌ستونهٔ صفحات نقش‌ها در عرض‌های تبلت جمع می‌شوند. */
+  #content :is(.workspace-grid, .dashboard-grid, .unit-layout, .settlement-layout,
+    .report-columns, .admin-grid, .warehouse-layout, .sales-workspace,
+    .remote-workspace, .store-layout-v22, .warehouse-v21, .v26-dashboard-grid,
+    .v26-remote-layout, .v26-settlement-layout, .v26-future-layout,
+    .sd-onsite-grid, .sd-remote-grid, .sd-oe-layout, .fx-grid, .stl-layout,
+    .db38-grid, .rp38-grid, .ad38-2col, .cust-detail-layout, .sc2-main) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #content :is(.warehouse-queue-panel, .warehouse-queue-panel-v21,
+    .sd-flow-card, .sd-summary-side, .v26-order-summary, .v26-side-panel) {
+    position: static !important;
+    top: auto !important;
+  }
+
+  #content :is(.kpi-grid, .report-kpis-v21, .mg38-kpis, .v26-kpi-grid,
+    .v26-flow-stats, .adm-filter, .remote-customer-grid, .store-customer-grid) {
+    min-width: 0;
+  }
+
+  /* تب‌های عملیاتی هر نقش داخل viewport می‌مانند؛ عنوان‌ها در صورت نیاز می‌شکنند. */
+  #content :is(.sd-tabs, .v26-sales-tabs, .ad38-tabs, .wh38-tabs, .unit-tabs) {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    min-width: 0;
+    max-width: 100%;
+    overflow: visible !important;
+    gap: 6px !important;
+  }
+
+  #content :is(.sd-tab, .v26-sales-tab, .unit-tabs button) {
+    min-width: 0 !important;
+    max-width: 100%;
+    height: auto !important;
+    min-height: 50px;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  #content :is(.sd-tab-copy, .sd-tab-copy strong, .sd-tab-copy small,
+    .v26-tab-copy, .v26-tab-copy strong, .v26-tab-copy small) {
+    min-width: 0;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  #content .drv-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  #content .dsp-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #content :is(.adm-tabs, .ad38-tabs, .wh38-tabs) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* موجودی/گزارش‌ها: کارت‌های شاخص روی تبلت سه‌ستونه و روی موبایل دو‌ستونه. */
+  #content :is(.kpi-grid, .report-kpis-v21, .mg38-kpis, .v26-kpi-grid) {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #content,
+  .content {
+    padding-top: 12px !important;
+  }
+
+  .workspace-header {
+    padding-bottom: 10px !important;
+  }
+
+  .workspace-header h1 {
+    font-size: clamp(20px, 5vw, 24px) !important;
+    line-height: 1.4;
+  }
+
+  .workspace-header p {
+    font-size: 12px !important;
+    line-height: 1.65;
+  }
+
+  .header-profile-text strong,
+  .header-profile-text span {
+    max-width: min(36vw, 125px);
+  }
+
+  .modal-card :is(.detail-grid, .detail-grid-6, .detail-modal-grid,
+    .invoice-verify-grid, .sc2-admin-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .modal-card .returned-edit-row {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .modal-card :is(.returned-edit-index, .returned-delete-btn) {
+    grid-column: auto !important;
+  }
+
+  .modal-card :is(.detail-modal-hero, .order-detail-head,
+    .warehouse-modal-head, .warehouse-modal-footer) {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .modal-card .modal-actions {
+    flex-wrap: wrap;
+  }
+
+  #content :is(.section-head, .panel-head, .store-section-title,
+    .sales-delivery-card-head, .sc2-bar, .sc2-op-head, .sc2-panel-head) {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+
+  #content :is(.section-head, .panel-head) h2,
+  #content :is(.section-head, .panel-head) h3 {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  #content :is(.adm-row, .adm-row-prod, .cust-row, .queue-item,
+    .sales-delivery-card, .sales-delivery-line, .store-order-row-v22,
+    .store-approval-card-v22) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #content :is(.sd-lines, .op-lines, .v26-product-lines, .sales-delivery-lines) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #content :is(.adm-date, .adm-select, .field, .cust-field, .input-shell,
+    .stl-dispatch-control, .sc2-field) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #content .sd-form-grid,
+  #content .form-grid,
+  #content .form-grid-3,
+  #content .gt-grid2,
+  #content .cust-form-grid,
+  #content .fx-grid-2,
+  #content .remote-customer-grid,
+  #content .store-customer-grid,
+  #content .sc2-admin-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #content :is(.adm-filter, .v26-flow-stats, .invoice-verify-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #content :is(.sd-submit-bar, .remote-submit-bar, .store-submit-v22,
+    .store-row-foot, .store-approval-foot, .form-foot, .v26-form-foot,
+    .v26-store-foot, .stl-actions, .sales-delivery-actions) {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  #content .stl-queue-list {
+    max-height: 300px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #content .stl-row {
+    min-width: 0;
+  }
+
+  #content .sc2-scale,
+  #content .sc2-op,
+  #content .sc2-ticket,
+  #content .sc2-panel {
+    min-width: 0;
+    padding: 15px !important;
+  }
+
+  #content .sc2-number {
+    font-size: clamp(38px, 10vw, 52px);
+  }
+
+  #content .v33-prep-progress {
+    max-width: 100%;
+    min-width: 0 !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #content :is(.v33-prep-sheet, .warehouse-delivery-card,
+    .gate-dispatch-home, .sales-delivery-card) {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 620px) {
+  .workspace {
+    padding-right: max(10px, env(safe-area-inset-right, 0px)) !important;
+    padding-left: max(10px, env(safe-area-inset-left, 0px)) !important;
+  }
+
+  .header-profile-text strong {
+    max-width: min(28vw, 98px);
+  }
+
+  .header-profile-text span {
+    max-width: min(28vw, 98px);
+  }
+
+  #content :is(.sd-tabs, .v26-sales-tabs, .ad38-tabs, .wh38-tabs,
+    .unit-tabs, .adm-tabs) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #content .drv-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  #content :is(.kpi-grid, .report-kpis-v21, .mg38-kpis, .v26-kpi-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px;
+  }
+
+  #content :is(.adm-filter, .v26-flow-stats, .invoice-verify-grid) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #content .sd-head,
+  #content .sales-delivery-card-head {
+    align-items: stretch;
+  }
+
+  #content .gt-table-pad {
+    padding: 10px !important;
+  }
+
+  #content .table-wrap,
+  #content .adm-table-wrap {
+    max-width: 100%;
+  }
+
+  #content .stl-actions .btn,
+  #content .stl-submit,
+  #content .sales-delivery-actions .btn,
+  #content .gate-dispatch-home-footer .btn {
+    flex: 1 1 100%;
+    width: 100%;
+    justify-content: center;
+  }
+
+  #loginView .login-stage {
+    min-height: 100svh;
+    min-height: 100dvh;
+    gap: clamp(14px, 3.4vh, 24px);
+    padding: max(22px, env(safe-area-inset-top, 0px)) 16px
+      max(18px, env(safe-area-inset-bottom, 0px));
+  }
+
+  #loginView .login-logo-badge {
+    width: clamp(78px, 23vw, 104px);
+    height: clamp(78px, 23vw, 104px);
+  }
+
+  #loginView .login-org,
+  #loginView .login-subtitle,
+  #loginView .login-credit {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  #loginView .login-org {
+    font-size: clamp(15px, 4.4vw, 18px);
+  }
+
+  #loginView .login-title {
+    white-space: normal;
+    font-size: clamp(22px, 6vw, 26px);
+  }
+
+  #loginView .login-subtitle {
+    line-height: 1.7;
+  }
+
+  #loginView .login-card {
+    margin-top: 0;
+  }
+
+  #loginView .auth-form {
+    margin-top: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .header-profile-text span,
+  .header-actions .header-status {
+    display: none !important;
+  }
+
+  #content :is(.kpi-grid, .report-kpis-v21, .mg38-kpis, .v26-kpi-grid) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #content .stl-row {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 7px;
+    padding: 10px !important;
+  }
+
+  #content .stl-cell-name,
+  #content .stl-cell-cancel {
+    grid-column: auto !important;
+  }
+
+  #loginView .login-credit {
+    font-size: 10.5px;
+  }
+}
+
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 500px) {
+  #loginView .login-stage {
+    gap: 10px;
+    padding-top: max(10px, env(safe-area-inset-top, 0px));
+  }
+
+  #loginView .login-logo-badge {
+    width: 64px;
+    height: 64px;
+  }
+
+  #loginView .login-credit {
+    margin-top: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* v37.2.6 mobile follow-ups: single-frame sales inputs + invoice scrolling */
+@media (max-width: 1024px) {
+  #content .sales-remote-customer-grid-v40 { grid-template-columns: minmax(0, 1fr) !important; }
+  #content .sales-remote-place-v40 { grid-column: auto !important; }
+  #content .sd-line .cell-desc > .input-shell { height: 46px !important; min-height: 46px !important; display:flex !important; align-items:center !important; overflow:visible !important; padding:0 10px !important; }
+  #content .sd-line .cell-desc input { height:auto !important; min-height:0 !important; max-height:none !important; padding:8px 4px !important; border:0 !important; font-size: 16px !important; line-height:1.5 !important; }
+  #content .phone-queue-card-v40 { grid-template-columns: minmax(0, 1fr) auto; }
+  #content .phone-queue-card-v40 > .btn { grid-column: 1 / -1; justify-content: center; }
+  #content .dsp-roster-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #content .sales-delivery-line { grid-template-columns: auto minmax(0, 1fr) repeat(2, minmax(0, 1fr)) !important; }
+  #content .sales-delivery-line > small { grid-column: 2 / -1; }
+  #modal .modal-card.dsp-delivery-modal-card { width: calc(100vw - 14px) !important; max-width: 100% !important; max-height: calc(100dvh - 10px) !important; }
+  #modal .dsp-delivery-modal-card .dsp-line { grid-template-columns: minmax(0, 1fr) !important; }
+  #modal .dsp-delivery-modal-card .dsp-line .cust-span2 { grid-column: auto !important; }
+  #modal .dsp-delivery-modal-card .dsp-invoice-scroll { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+@media (max-width: 600px) {
+  #content .phone-queue-card-v40 { grid-template-columns: minmax(0, 1fr) !important; }
+  #content .phone-queue-card-v40 > .btn { grid-column: auto !important; width: 100%; }
+  #modal .dsp-delivery-modal-card .cust-form-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  #modal .dsp-delivery-modal-card .cust-form-actions .btn { min-width: 0; padding-inline: 8px; font-size: 12px; }
+}
+
+/*
+ * v37.3 — پیاده‌سازی مشخصات چیدمان v37.2.18 (طبق tests/warehouse-prices-ui.test.js):
+ * برچسب ابزارهای ستون ناوبری وسط کلمه نمی‌شکند، شبکه‌های فرم در موبایل تک‌ستونی
+ * می‌شوند و نوار تب‌ها به‌جای فشرده‌شدن، افقی اسکرول می‌خورد.
+ */
+@media (max-width: 768px) {
+  #appView #railNav .nav-label { overflow-wrap: normal !important; word-break: keep-all !important; hyphens: none !important; }
+  #appView .form-grid,
+  #appView .cust-form-grid,
+  #appView .gt-grid,
+  #appView .sd-onsite-grid { grid-template-columns: 1fr !important; }
+  #appView .sd-tabs,
+  #appView .wh38-tabs { overflow-x: auto !important; }
+}

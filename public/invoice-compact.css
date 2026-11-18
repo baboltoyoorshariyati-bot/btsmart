@@ -1,0 +1,179 @@
+/* v37.3.11 — shared by invoice preview and the standalone print window. */
+.inv38-sheet.inv38-compact {max-width:880px;margin:0 auto;line-height:1.4;font-size:11px;direction:rtl;color:#1d222a;background:#fff}
+.inv38-compact .inv38-head {gap:8px;align-items:center}
+.inv38-compact .inv38-brand {gap:6px;min-width:0}
+.inv38-compact .inv38-brand img {width:36px;height:36px;padding:3px;border-radius:8px}
+.inv38-compact .inv38-brand b {font-size:16px;line-height:1.3}
+.inv38-compact .inv38-brand span {font-size:10px}
+.inv38-compact .inv38-meta {gap:5px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.inv38-compact .inv38-meta > div {padding:4px 8px;border-radius:6px}
+.inv38-compact .inv38-meta span {font-size:9px}
+.inv38-compact .inv38-meta b {font-size:11px;line-height:1.35;margin-top:1px;overflow-wrap:anywhere}
+.inv38-compact .inv38-rule {height:2px;margin:6px 0}
+.inv38-compact .inv38-cust {gap:5px}
+.inv38-compact .inv38-cust > div {padding:4px 8px;border-radius:6px}
+.inv38-compact .inv38-cust span {font-size:9px}
+.inv38-compact .inv38-cust b {font-size:11px;line-height:1.4;margin-top:1px;overflow-wrap:anywhere}
+.inv38-compact .inv38-table {margin-top:6px;border-radius:6px;table-layout:auto}
+.inv38-compact .inv38-table th {padding:4px 6px;font-size:10px;line-height:1.4}
+.inv38-compact .inv38-table td {padding:3px 6px;font-size:11px;line-height:1.4}
+.inv38-compact .inv38-table td:first-child {width:26px}
+.inv38-compact .inv38-table td small {display:inline;margin:0 5px 0 0;font-size:9px;white-space:nowrap}
+/* RTL grid: amount on the physical right, customer contact on physical left. */
+.inv38-compact .inv38-bottom {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:8px;margin-top:6px;align-items:stretch;grid-auto-rows:1fr;direction:rtl}
+.inv38-compact .inv38-total {margin:0;display:flex;min-width:0}
+.inv38-compact .inv38-total-box {box-sizing:border-box;width:100%;padding:5px 8px;border-radius:6px}
+.inv38-compact .inv38-total-box > div {gap:6px;padding:2px 0;font-size:10.5px}
+.inv38-compact .inv38-total-box .grand {margin-top:2px;padding-top:4px;font-size:12px}
+.inv38-compact .inv38-verify {display:flex;margin:0;min-width:0}
+.inv38-compact .inv38-verify-box {box-sizing:border-box;display:flex;flex:1;min-width:0;padding:5px 7px;border-radius:6px}
+.inv38-compact .inv38-verify-title {font-size:10px;line-height:1.3;margin-bottom:3px}
+.inv38-compact .inv38-verify-grid {display:flex;flex:1;min-width:0}
+.inv38-compact .inv38-vitem {box-sizing:border-box;display:flex;flex:1;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;padding:4px 6px;min-height:42px;min-width:0;border:0;background:transparent;break-inside:avoid}
+.inv38-compact .inv38-vitem > span {font-size:9px}
+.inv38-compact .inv38-vitem > strong {margin-top:2px;font-size:10px;line-height:1.3;overflow-wrap:anywhere}
+.inv38-compact .inv38-vitem small {margin-top:2px;font-size:9px;overflow-wrap:anywhere;line-height:1.3}
+.inv38-compact .inv38-sign-img {max-width:120px;max-height:28px;width:auto;height:auto;margin:2px auto 0;object-fit:contain}
+.inv38-compact .inv38-foot {margin-top:5px;font-size:9px;line-height:1.3}
+@media (max-width:520px) {
+  .inv38-compact .inv38-head {flex-wrap:wrap}
+  .inv38-compact .inv38-meta {width:100%}
+  .inv38-compact .inv38-bottom {grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:5px}
+}
+@media print {
+  @page {margin:8mm}
+  .inv38-sheet.inv38-compact {max-width:none;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .inv38-compact .inv38-head {flex-wrap:nowrap}
+  .inv38-compact .inv38-meta {width:auto}
+  .inv38-compact .inv38-bottom,.inv38-compact .inv38-cust,.inv38-compact .inv38-head {break-inside:avoid}
+  .inv38-compact .inv38-table thead {display:table-header-group}
+  .inv38-compact .inv38-table tr {break-inside:avoid}
+}
+
+/* Compact inline customer labels; totals left, customer signature right. */
+.inv38-compact .inv38-cust > div {display:flex;align-items:center;gap:8px;min-width:0}
+.inv38-compact .inv38-cust span {display:inline;flex-shrink:0;white-space:nowrap}
+.inv38-compact .inv38-cust b {display:inline;margin:0;min-width:0}
+.inv38-compact .inv38-bottom {grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+.inv38-compact .inv38-total {grid-column:2;grid-row:1}
+.inv38-compact .inv38-verify {grid-column:1;grid-row:1}
+/* v37.3.17: preview can scroll the item table; numeric identities never split into vertical digits. */
+.inv38-compact .inv38-phone{white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important;unicode-bidi:isolate}
+.inv38-compact .inv38-total-box b{white-space:nowrap;word-break:normal;overflow-wrap:normal}
+.inv38-compact .inv38-table-scroll{max-width:100%;overflow-x:auto}
+.inv38-compact .inv38-meta b{word-break:normal;overflow-wrap:normal}
+@media screen and (max-width:640px){
+ .inv38-compact .inv38-cust{grid-template-columns:minmax(0,1fr)!important}
+ .inv38-compact .inv38-cust>div{display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px;padding:8px}
+ .inv38-compact .inv38-cust b{word-break:normal;overflow-wrap:break-word;text-align:start}
+ .inv38-compact .inv38-table{min-width:540px;table-layout:auto}
+ .inv38-compact .inv38-bottom{grid-template-columns:minmax(0,1fr)!important}
+ .inv38-compact .inv38-total{grid-column:1;grid-row:1}
+ .inv38-compact .inv38-verify{grid-column:1;grid-row:2}
+ .inv38-compact .inv38-meta{grid-template-columns:minmax(0,1fr);width:100%}
+ .inv38-compact .inv38-meta>div{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px}
+ .inv38-compact .inv38-total-box>div{font-size:12px}
+}
+@media print{
+ .inv38-compact .inv38-table-scroll{overflow:visible}
+ .inv38-compact .inv38-table{min-width:0;width:100%}
+}
+.inv38-scroll-hint{display:none}
+@media screen and (max-width:640px){.inv38-scroll-hint{display:block;font-size:10px;color:#687281;margin:10px 0 0}}
+@media print{.inv38-scroll-hint{display:none!important}}
+/* Standalone invoice print page: resources load from a real same-origin URL. */
+body.invoice-print{margin:0;padding:8px;background:#fff}
+@media print{body.invoice-print{padding:0}.invoice-print .inv38-sheet{max-width:none}}
+
+/* Sales invoice: payment details sit beside totals; the contact signature
+   remains the same height and stays aligned at the bottom. */
+.inv38-compact .inv38-sales-title{font-size:14px;font-weight:900;white-space:nowrap}
+.inv38-compact .inv38-sales-title + .inv38-meta{flex:1;min-width:0}
+.inv38-compact .inv38-with-payments{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,1.2fr)}
+.inv38-compact .inv38-with-payments .inv38-verify{grid-column:1;grid-row:1}
+.inv38-compact .inv38-with-payments .inv38-payment-box{grid-column:2;grid-row:1}
+.inv38-compact .inv38-with-payments .inv38-total{grid-column:3;grid-row:1}
+.inv38-compact .inv38-payment-box{box-sizing:border-box;min-width:0;border:1px solid #e3e6ea;border-radius:6px;padding:5px 8px;overflow-wrap:anywhere}
+.inv38-compact .inv38-payment-box h3{font-size:11px;line-height:1.4;margin:0 0 4px;border-bottom:1px solid #e3e6ea;padding-bottom:3px}
+.inv38-compact .inv38-payment-row{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;padding:2px 0;font-size:10.5px}
+.inv38-compact .inv38-payment-row>div,.inv38-compact .inv38-payment-row>span{min-width:0}
+.inv38-compact .inv38-payment-row small{display:block;color:#555;font-size:9px;line-height:1.4}
+.inv38-compact .inv38-payment-row b{white-space:nowrap;flex-shrink:0}
+.inv38-compact .inv38-payment-balance{border-top:1px dashed #d5dae2;margin-top:3px;padding-top:4px;font-weight:700}
+.inv38-compact .inv38-payment-empty,.inv38-compact .inv38-payment-note{display:block;color:#555;font-size:9px;line-height:1.45;padding:3px 0}
+@media screen and (max-width:640px){
+ .inv38-compact .inv38-with-payments{grid-template-columns:minmax(0,1fr)}
+ .inv38-compact .inv38-with-payments .inv38-total{grid-column:1;grid-row:1}
+ .inv38-compact .inv38-with-payments .inv38-payment-box{grid-column:1;grid-row:2}
+ .inv38-compact .inv38-with-payments .inv38-verify{grid-column:1;grid-row:3}
+ .inv38-compact .inv38-sales-title{white-space:normal}
+}
+
+/* Inline the sales invoice header fields, without changing the store document. */
+.inv38-compact .inv38-sales-title + .inv38-meta{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr)}
+.inv38-compact .inv38-sales-title + .inv38-meta > div{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;padding:4px}
+.inv38-compact .inv38-sales-title + .inv38-meta span{display:inline;white-space:nowrap;flex-shrink:0}
+.inv38-compact .inv38-sales-title + .inv38-meta b{display:inline;margin:0;min-width:0;overflow-wrap:anywhere}
+@media screen and (max-width:640px){
+ .inv38-compact .inv38-sales-title + .inv38-meta{grid-template-columns:minmax(0,1fr)}
+ .inv38-compact .inv38-sales-title + .inv38-meta > div{justify-content:space-between}
+}
+
+/* Settlement identity is a single compact header, shared by preview and print. */
+.inv38-settlement .inv38-settlement-meta{width:100%;display:grid;grid-template-columns:minmax(100px,1.3fr) minmax(100px,1fr) minmax(55px,.5fr) minmax(55px,.5fr) minmax(145px,1.4fr);gap:5px}
+.inv38-settlement .inv38-settlement-meta>div{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;padding:4px}
+.inv38-settlement .inv38-settlement-meta span{white-space:nowrap;flex-shrink:0}
+.inv38-settlement .inv38-settlement-meta b{margin:0;min-width:0;overflow-wrap:anywhere}
+@media screen and (max-width:640px){.inv38-settlement .inv38-settlement-meta{grid-template-columns:repeat(2,minmax(0,1fr))}.inv38-settlement .inv38-settlement-meta>div:last-child{grid-column:1/-1}}
+@media print{.inv38-settlement .inv38-settlement-meta{grid-template-columns:minmax(100px,1.3fr) minmax(100px,1fr) minmax(55px,.5fr) minmax(55px,.5fr) minmax(145px,1.4fr)}}
+
+/* Distribution invoices omit the printed title and keep customer contacts paired. */
+.inv38-compact.inv38-distribution .inv38-head{display:block;width:100%}
+.inv38-compact.inv38-distribution .inv38-distribution-meta{display:grid;grid-template-columns:minmax(0,2.25fr) minmax(0,1.3fr) repeat(3,minmax(0,.9fr));width:100%;gap:3px}
+.inv38-compact.inv38-distribution .inv38-distribution-meta>div{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:3px 2px;gap:2px;text-align:center;border:0;border-bottom:1px solid #e3e6ea;border-radius:0;background:transparent}
+.inv38-compact.inv38-distribution .inv38-distribution-meta>.inv38-distribution-contacts{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:3px;padding:0;border:0;border-radius:0;background:transparent}
+.inv38-compact.inv38-distribution .inv38-distribution-contacts>div{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:3px 2px;gap:2px;text-align:center;border:0;border-bottom:1px solid #e3e6ea;border-radius:0;background:transparent}
+.inv38-compact.inv38-distribution .inv38-distribution-meta span{font-size:9px;white-space:nowrap}
+.inv38-compact.inv38-distribution .inv38-distribution-meta b{font-size:10px;line-height:1.4;margin:0;min-width:0;max-width:100%;overflow-wrap:anywhere}
+/* Give the delivery declaration the complete RTL width of the signature box. */
+.inv38-compact .inv38-delivery-signature{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:10px;min-height:0;padding:7px 10px;break-inside:avoid}
+.inv38-compact .inv38-delivery-declaration{grid-column:1/-1;width:100%;margin:0;direction:rtl;text-align:right;line-height:1.8;font-size:11px;color:#111}
+.inv38-compact .inv38-delivery-signer{grid-column:1;margin:0;padding:0;align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;max-width:100%;text-align:center;overflow-wrap:anywhere}
+.inv38-compact .inv38-delivery-signature-line{display:block;width:100%;max-width:150px;height:18px;border-bottom:1px solid #555}
+.inv38-compact .inv38-delivery-signer :is(span,strong,small){font-size:9px;line-height:1.35;color:#111;margin:0}
+.inv38-compact .inv38-delivery-signer strong{font-size:10px;font-weight:800}
+.inv38-compact .inv38-delivery-signer small{font-size:8px;color:#555}
+/* The signature track grows while settlement and totals give up a little width. */
+.inv38-compact.inv38-distribution .inv38-with-payments{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr)}
+@media screen and (max-width:640px){
+ .inv38-compact.inv38-distribution .inv38-distribution-meta{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+ .inv38-compact.inv38-distribution .inv38-distribution-meta>.inv38-distribution-contacts{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .inv38-compact.inv38-distribution .inv38-with-payments{grid-template-columns:minmax(0,1fr)}
+ .inv38-compact .inv38-delivery-signature{grid-template-columns:minmax(0,1fr);gap:6px}
+ .inv38-compact .inv38-delivery-declaration{grid-column:1}
+ .inv38-compact .inv38-delivery-signer{grid-column:1;justify-self:end;width:min(100%,180px)}
+}
+@media print{
+ .inv38-compact.inv38-distribution .inv38-distribution-meta{grid-template-columns:minmax(0,2.25fr) minmax(0,1.3fr) repeat(3,minmax(0,.9fr));gap:3px}
+ .inv38-compact.inv38-distribution .inv38-with-payments{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr)}
+ .inv38-compact .inv38-delivery-signature{grid-template-columns:minmax(0,1fr);min-height:0}
+ .inv38-compact .inv38-delivery-declaration{grid-column:1}
+ .inv38-compact .inv38-delivery-signer{grid-column:1;justify-self:auto;width:auto}
+}
+
+/* Pickup recipient invoice header: all seven labeled values stay on one horizontal line. */
+.inv38-compact.inv38-pickup-recipient .inv38-head{display:block!important;width:100%;margin:0;gap:0}
+.inv38-compact.inv38-pickup-recipient .inv38-pickup-recipient-meta{display:grid;width:100%;grid-template-columns:minmax(0,1.15fr) minmax(0,.95fr) minmax(0,1.1fr) minmax(0,.95fr) minmax(0,.8fr) minmax(0,.8fr) minmax(0,.95fr);gap:2px}
+.inv38-compact.inv38-pickup-recipient .inv38-pickup-recipient-meta>div{display:flex;flex-direction:row;align-items:center;justify-content:center;grid-column:auto;min-width:0;overflow:hidden;padding:3px 2px;gap:3px;text-align:center}
+.inv38-compact.inv38-pickup-recipient .inv38-pickup-recipient-meta span{flex:0 0 auto;font-size:8px;line-height:1.2;white-space:nowrap}
+.inv38-compact.inv38-pickup-recipient .inv38-pickup-recipient-meta b{display:inline-block;flex:0 1 auto;margin:0;max-width:100%;min-width:0;font-size:10px;line-height:1.3;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media screen and (max-width:640px){
+ .inv38-compact.inv38-pickup-recipient .inv38-pickup-recipient-meta{grid-template-columns:minmax(0,1.15fr) minmax(0,.95fr) minmax(0,1.1fr) minmax(0,.95fr) minmax(0,.8fr) minmax(0,.8fr) minmax(0,.95fr);gap:1px}
+ .inv38-compact.inv38-pickup-recipient .inv38-pickup-recipient-meta>div{padding:2px 1px;gap:1px}
+ .inv38-compact.inv38-pickup-recipient .inv38-pickup-recipient-meta span{font-size:7px}
+ .inv38-compact.inv38-pickup-recipient .inv38-pickup-recipient-meta b{font-size:8px;line-height:1.2}
+}
+@media print{
+ .inv38-compact.inv38-pickup-recipient .inv38-head{display:block!important;width:100%}
+ .inv38-compact.inv38-pickup-recipient .inv38-pickup-recipient-meta{grid-template-columns:minmax(0,1.15fr) minmax(0,.95fr) minmax(0,1.1fr) minmax(0,.95fr) minmax(0,.8fr) minmax(0,.8fr) minmax(0,.95fr);gap:2px}
+}

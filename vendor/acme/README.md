@@ -1,0 +1,3 @@
+# ACME client bundle
+
+`acme-client.cjs` bundles `acme-client` 5.4.0 and its npm dependencies for Node.js 22, so an installed Windows server does not need npm or a build step. Exact versions and integrity hashes are in `package-lock.json`; license texts are in `THIRD-PARTY-LICENSES.txt`. Bundle generated with esbuild 0.25.12 using `esbuild node_modules/acme-client/src/index.js --bundle --platform=node --target=node22 --format=cjs --minify --legal-comments=inline --outfile=acme-client.cjs`. To rebuild, install the lockfile in an isolated directory and run that command; audit dependency updates before rebuilding.
