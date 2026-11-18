@@ -1,0 +1,1553 @@
+/* v37.3.17 — audited component boundaries. Loaded after historical layers. */
+:root{--font:'Vazirmatn',Tahoma,Arial,sans-serif}
+#appView #content{min-width:0}
+#btConnectionState{position:fixed;bottom:10px;left:10px;max-width:min(540px,calc(100vw - 84px));padding:10px 14px;border:1px solid #e5b268;background:#fff4dd;color:#744e11;border-radius:8px;z-index:5000;font:13px/1.8 var(--font);box-shadow:0 3px 18px #0002}
+#btConnectionState[hidden]{display:none}
+.bt-sync-state{font-size:12px;color:#687281;padding:8px 0}
+/* Main operations reflow; the form width, not the whole display, determines columns. */
+#appView #content .stl-card{container:stl / inline-size}
+#appView #content .stl-footer-scroll{overflow:visible;max-width:100%;min-width:0}
+#appView #content .stl-primary-actions{min-width:0!important;width:100%;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#appView #content .stl-primary-actions [data-stl-driver],
+#appView #content .stl-primary-actions [data-stl="reopen"],
+#appView #content .stl-primary-actions [data-stl="send-dispatch"],
+#appView #content .stl-primary-actions [data-stl="submit"]{grid-column:auto!important;grid-row:auto!important;min-width:0!important}
+#appView #content .stl-primary-actions .btn,#appView #content .stl-primary-actions .stl-submit{white-space:normal!important;word-break:normal!important;overflow-wrap:normal!important;height:auto!important;min-height:44px!important;padding:9px!important;line-height:1.8!important}
+#appView #content .stl-primary-actions [data-stl-driver]{height:44px!important}
+#appView #content .stl-summary-line{flex-wrap:wrap}
+#appView #content .stl-summary-line b,#appView #content .stl-amount,#appView #content .stl-kg{white-space:nowrap;word-break:normal;overflow-wrap:normal}
+#appView #content .stl-summary-line b{font-size:clamp(12px,2.4vw,16px)}
+#appView #content .stl-check.stl-manual{white-space:normal;align-items:flex-start;line-height:1.9}
+#appView #content .stl-check input{flex-shrink:0}
+#appView #content .stl-cell-name b{white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important;overflow:visible!important;text-overflow:clip!important;line-height:1.9!important}
+#appView #content .stl-form-head-inline{flex-wrap:wrap!important}
+#appView #content .bt-customer-strip-scroll{flex-basis:100%;}
+#appView #content .bt-customer-field{height:auto!important;min-height:38px!important}
+#appView #content .bt-customer-field span{white-space:normal!important;overflow-wrap:break-word!important;word-break:normal!important;overflow:visible!important;text-overflow:clip!important}
+@container stl (min-width:850px){#appView #content .stl-primary-actions{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@container stl (max-width:520px){
+ #appView #content .stl-primary-actions{grid-template-columns:minmax(0,1fr)!important}
+ #appView #content .stl-invoice-bottom{grid-template-columns:minmax(0,1fr)!important}
+ #appView #content .stl-financial-column{grid-column:1!important;grid-row:2!important}
+ #appView #content .stl-verification-column{grid-column:1!important;grid-row:1!important}
+ #appView #content .stl-form-head-inline .bt-customer-strip-scroll{flex:1 1 100%!important;order:3}
+}
+@container stl (max-width:330px){#appView #content .stl-money-summary label{grid-template-columns:minmax(0,1fr)!important;gap:4px}#appView #content .stl-money-summary input{height:44px!important}}
+/* Older browsers without container queries still get a safe single-column mobile form. */
+@media(max-width:600px){
+ #appView #content .stl-primary-actions{grid-template-columns:minmax(0,1fr)!important}
+ #appView #content .stl-money-summary label{grid-template-columns:minmax(0,1fr)!important}
+ #appView #content .stl-invoice-bottom{grid-template-columns:minmax(0,1fr)!important}
+ #appView #content .stl-form-head-inline .bt-customer-strip-scroll{flex:1 1 100%!important;order:3}
+ #appView #content .stl-form-head-inline{justify-content:space-between!important}
+}
+/* Gate plate: fixed number of meaningful parts, no 700px ancestor or zero-width fields. */
+#appView #content #plateBox .iran-plate{display:grid!important;grid-template-columns:26px minmax(28px,1fr) minmax(28px,1fr) minmax(42px,1.5fr) minmax(28px,1fr)!important;width:min(100%,340px)!important;min-width:0!important;max-width:100%!important;direction:ltr!important;height:52px!important;gap:0!important}
+#appView #content #plateBox .plate-part{min-width:0!important;width:auto!important;padding:0!important}
+#appView #content #plateBox input,#appView #content #plateBox select{width:100%!important;min-width:0!important;padding:0 1px!important;height:48px!important;text-align:center!important;letter-spacing:0!important;font-size:16px!important}
+#appView #content #plateBox .blue-strip{width:26px!important;min-width:0!important;font-size:8px!important}
+#appView #content .sd-queue-main{min-width:0!important}
+#appView #content .sd-queue-main strong{white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important;overflow:visible!important;text-overflow:clip!important}
+#appView #content .sd-chip,#appView #content .mini-verify,#appView #content .sd-invoice-no{width:auto!important;max-width:none;white-space:nowrap!important;word-break:normal!important;flex-shrink:0}
+#appView #content #gateWaitingPanel{container:gatequeue / inline-size}
+@container gatequeue (max-width:430px){#appView #content #gateWaitingRows .sd-queue-row{grid-template-columns:32px minmax(0,1fr)!important}#appView #content #gateWaitingRows .sd-queue-row>.badge{grid-column:1/-1;justify-self:start}#appView #content #gateWaitingRows .sd-queue-main{grid-column:2}}
+#appView #content .sd-submit-bar .btn{white-space:normal!important;word-break:normal!important;overflow-wrap:normal!important;min-height:44px!important;height:auto!important;line-height:1.9!important;padding:10px!important;text-align:center}
+#appView #content .sd-submit-bar .btn svg{flex-shrink:0}
+#appView #content .sd-invoice-row{container:invoicecard / inline-size;min-width:0!important}
+#appView #content .sd-invoice-row>div{min-width:0!important}
+#appView #content .sd-invoice-row>div>strong{white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important;line-height:1.9!important}
+#appView #content .sd-invoice-amount{white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important;font-size:clamp(12px,2vw,16px)!important}
+#appView #content .sd-invoice-row .toolbar{flex-wrap:wrap!important}
+#appView #content .sd-invoice-row small{white-space:normal;word-break:normal}
+/* Driver roster: two readable statistics per row, long names fully available on touch. */
+#appView #content .dsp-roster-card{container:roster / inline-size;min-width:0!important}
+#appView #content .dsp-roster-card .dsp-roster-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#appView #content .dsp-roster-main strong,#appView #content .dsp-roster-main span,#appView #content .dsp-roster-orders>div b{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:break-word!important;word-break:normal!important;line-height:1.8!important}
+#appView #content .dsp-roster-stats small{white-space:normal!important;word-break:normal!important;overflow-wrap:normal!important;line-height:1.7!important}
+#appView #content .dsp-roster-foot{flex-wrap:wrap!important}
+#appView #content .dsp-roster-foot>span{min-width:0;flex:1 1 150px}
+#appView #content .dsp-roster-foot small{white-space:normal!important;word-break:normal!important}
+#appView #content .drv-pos-term{white-space:normal;overflow-wrap:anywhere;max-width:100%}
+@container roster (min-width:440px){#appView #content .dsp-roster-card .dsp-roster-stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:600px){
+ #appView #content .sd-invoice-row{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+ #appView #content .sd-invoice-row>div{width:100%!important;display:block}
+ #appView #content .sd-invoice-row .toolbar{display:flex!important}
+ #appView #content .sd-invoice-row .mini-verify{display:inline-block;margin:2px 0}
+ #appView #content .sd-submit-bar{display:flex!important;flex-direction:column!important;align-items:stretch!important;padding:12px!important}
+ #appView #content .sd-submit-bar .btn{width:100%!important;max-width:100%!important}
+ #appView #content #gateWaitingRows .sd-queue-row{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+ #appView #content #gateWaitingRows .sd-queue-row>*{grid-column:1!important;min-width:0!important}
+ #appView #content #gateWaitingRows .sd-avatar{display:none}
+ #appView #content .gt-fieldset{padding:10px!important}
+ #appView #content .gt-fieldset-title{flex-wrap:wrap!important;gap:6px!important}
+ #appView #content .gt-fieldset-title small{white-space:normal!important;word-break:normal!important}
+ #appView #content .gt-switch{margin:0!important}
+ #appView #content .dsp-roster-card{padding:10px!important}
+ #appView #content .dsp-roster-top{flex-wrap:wrap!important}
+ #appView #content .dsp-roster-main{flex:1 1 100%!important}
+ #appView #content .sd-queue-row{grid-template-columns:32px minmax(0,1fr)!important;}
+ #appView #content .sd-queue-row>.badge{grid-column:1/-1}
+ #appView #content .stl-grid-head{display:none!important}
+}
+/* Tables that really require columns expose a labelled local scroll area, never a clipped page. */
+#appView #content .table-wrap,#appView #content .adm-table-wrap{overflow-x:auto;max-width:100%}
+#appView #content .table-wrap table{min-width:560px}
+/* Long-text regressions found during the full 286-case rerun. */
+#appView #content .dsp-roster-orders>div small{white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important;overflow:visible!important;text-overflow:clip!important}
+#appView #content .wh38-incoming-cell{height:auto!important;min-height:38px}
+#appView #content .wh38-incoming-cell>h3{white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important;overflow:visible!important;text-overflow:clip!important;line-height:1.8!important}
+#appView #content .db38-act b{white-space:normal;word-break:normal;overflow-wrap:break-word;line-height:1.9}
+#appView #content .db38-act .badge{white-space:nowrap;min-width:max-content}
+@media(max-width:700px){
+ #appView #content .db38-act{display:grid!important;grid-template-columns:32px minmax(0,1fr)!important;align-items:start!important;padding:10px!important;gap:8px!important}
+ #appView #content .db38-act>div{min-width:0;width:auto}
+ #appView #content .db38-act time{grid-column:2;font-size:10px}
+ #appView #content .wh38-incoming-card .wh38-items>div{display:grid!important;grid-template-columns:24px 32px minmax(0,1fr)!important;gap:6px!important}
+ #appView #content .wh38-incoming-card .wh38-items>div>span:nth-child(3){grid-column:1/-1;grid-row:2;word-break:normal!important;overflow-wrap:break-word!important;white-space:normal!important;line-height:1.9!important}
+ #appView #content .wh38-incoming-card .wh38-items>div>b{grid-column:3;grid-row:1;white-space:nowrap!important;font-size:12px!important}
+}
+
+/* Delivery lifecycle sections: read-only tracking and guarded completion. */
+.sales-delivery-pane{display:grid;gap:18px;min-width:0}
+.sales-delivery-section{min-width:0}
+.sales-delivery-error{padding:14px;border:1px solid #e3b457;border-radius:12px;background:#fff5dd;color:#784b09;line-height:1.9}
+.sales-delivery-tracking .sales-delivery-card-head{flex-wrap:wrap;gap:12px}
+.sales-delivery-tracking .badge{white-space:normal;line-height:1.9}
+.sales-delivery-tracking h3{overflow-wrap:break-word;white-space:normal}
+@media(max-width:700px){.sales-delivery-section>.sd-head{flex-wrap:wrap}.sales-delivery-tracking .sales-delivery-meta{grid-template-columns:minmax(0,1fr)}.sales-delivery-tracking .sales-delivery-meta b{overflow-wrap:break-word}}
+#appView #content .sales-delivery-tracking .sales-delivery-card-head .badge{display:block;max-width:100%;white-space:normal!important;overflow-wrap:anywhere;word-break:normal;font-size:11px;line-height:1.9}
+@media(max-width:700px){
+ #appView #content .sales-delivery-pane .sales-delivery-meta{grid-template-columns:minmax(0,1fr)!important}
+ #appView #content .sales-delivery-pane .sales-delivery-line{grid-template-columns:24px minmax(0,1fr)!important}
+ #appView #content .sales-delivery-pane .sales-delivery-line>strong{grid-column:2;white-space:normal;overflow-wrap:break-word;word-break:normal}
+ #appView #content .sales-delivery-pane .sales-delivery-line>span:not(.sd-row-no),#appView #content .sales-delivery-pane .sales-delivery-line>small{grid-column:1/-1;white-space:normal}
+}
+
+/* Settlement payment rows: occupy the entire form width and align to the system fields. */
+#appView #content .stl-payment-section{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important;grid-column:1/-1!important}
+#appView #content .stl-payment-section .stl-payments{display:block!important;width:100%!important;max-width:none!important;min-width:0!important}
+#appView #content .stl-payment-row,#modal .dsp-pay-row{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;align-items:end!important;gap:10px!important;width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important;padding:12px!important;margin:10px 0!important;border:1px solid var(--bt-line-2,#dce4eb)!important;border-radius:12px!important;background:var(--bt-panel,#fff)!important}
+#appView #content .stl-pay-detail,#modal .dsp-pay-detail{display:contents!important}
+#appView #content .stl-pay-detail[hidden],#modal .dsp-pay-detail[hidden]{display:none!important}
+#appView #content .stl-pay-field,#appView #content .stl-pay-detail label,#modal .dsp-pay-row>.cust-field,#modal .dsp-pay-detail>.cust-field{display:grid!important;grid-template-rows:18px 42px!important;align-content:end!important;gap:5px!important;width:100%!important;min-width:0!important;max-width:none!important;margin:0!important;box-sizing:border-box!important;font-family:inherit!important;font-size:12px!important;font-weight:700!important;color:var(--bt-ink,#263746)!important}
+#appView #content .stl-pay-field>span,#appView #content .stl-pay-detail label>span,#modal .dsp-pay-row>.cust-field>span,#modal .dsp-pay-detail>.cust-field>span{display:block!important;min-width:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;line-height:18px!important}
+#appView #content .stl-pay-field input,#appView #content .stl-pay-field select,#appView #content .stl-pay-detail input,#appView #content .stl-pay-detail select,#modal .dsp-pay-row input,#modal .dsp-pay-row select,#modal .dsp-pay-detail input,#modal .dsp-pay-detail select{display:block!important;width:100%!important;height:42px!important;min-height:42px!important;max-height:42px!important;min-width:0!important;max-width:none!important;margin:0!important;padding:0 10px!important;box-sizing:border-box!important;border:1px solid var(--bt-line-2,#d6e0e7)!important;border-radius:10px!important;background:var(--bt-panel,#fff)!important;color:var(--bt-ink,#263746)!important;font:inherit!important;font-size:13px!important;line-height:40px!important}
+#appView #content .stl-payment-row>[data-payremove],#modal .dsp-pay-row>[data-pay-del]{align-self:end!important;width:100%!important;height:42px!important;min-height:42px!important;max-height:42px!important;min-width:0!important;margin:0!important;white-space:nowrap!important;box-sizing:border-box!important}
+@media(max-width:760px){#appView #content .stl-payment-row,#modal .dsp-pay-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}#appView #content .stl-payment-row>[data-payremove],#modal .dsp-pay-row>[data-pay-del]{grid-column:1/-1!important}}
+
+/* Replace previous badge framing: supplied emblem fills its image box, with transparent outside corners. */
+#loginView .login-logo-badge,#loginView .login-brand-mark.logo-frame,#appView .rail-logo.logo-frame{padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;overflow:hidden!important}
+#loginView .login-logo-badge img,#loginView .login-brand-mark.logo-frame img,#appView .rail-logo.logo-frame img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;object-fit:contain!important}
+.inv38-brand img{box-sizing:border-box!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;object-fit:contain!important}
+
+/* Store-specific delivered-order inbox and receipt confirmation */
+#appView #content .st38-delivered-panel{display:block;min-width:0;width:100%}
+#appView #content .st38-delivered-list{display:grid;gap:12px;padding:14px}
+#appView #content .st38-delivered-card{min-width:0;border:1px solid var(--bt-line-2,#dce4eb);border-radius:14px;background:#fff;padding:15px;box-shadow:0 5px 18px rgba(22,38,52,.04)}
+#appView #content .st38-delivered-card>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid var(--bt-line-2,#e4ebf0);padding-bottom:11px}
+#appView #content .st38-delivered-card h3{font-size:15px;margin:4px 0 1px}#appView #content .st38-delivered-card h3 small{font-size:12px;font-weight:500;color:var(--bt-muted,#718393)}#appView #content .st38-delivered-card p{margin:3px 0 0;font-size:12px;color:var(--bt-muted,#718393)}
+#appView #content .st38-delivered-items{display:grid;gap:7px;margin:12px 0}
+#appView #content .st38-delivered-line{display:grid;grid-template-columns:28px minmax(140px,1.4fr) repeat(4,minmax(100px,1fr));align-items:center;gap:8px;padding:9px 10px;border:1px solid #edf1f4;border-radius:9px;background:#f9fbfc;font-size:12px}
+#appView #content .st38-delivered-line strong{overflow-wrap:anywhere}.st38-delivered-no{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:#fff;border:1px solid var(--bt-line-2,#dce4eb)}
+#appView #content .st38-delivered-summary{display:flex;flex-wrap:wrap;gap:9px 20px;padding:11px 12px;background:#f2f7f9;border-radius:9px;font-size:12px}
+#appView #content .st38-delivered-summary span{display:flex;gap:7px;align-items:baseline}.st38-delivered-summary b{color:var(--bt-ink,#263746)}
+#appView #content .st38-delivered-card>footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:11px;border-top:1px dashed var(--bt-line-2,#dce4eb)}
+#appView #content .st38-confirmed-stamp{color:var(--bt-green,#147a60);font-weight:700;font-size:12px}
+@media(max-width:700px){#appView #content .st38-delivered-card>header{flex-direction:column}#appView #content .st38-delivered-line{grid-template-columns:26px minmax(0,1fr);gap:5px}#appView #content .st38-delivered-line>span:not(.st38-delivered-no),#appView #content .st38-delivered-line>small{grid-column:2}#appView #content .st38-delivered-card>footer{align-items:stretch}#appView #content .st38-delivered-card>footer .btn{width:100%}}
+
+/* Show the store-receipt acknowledgment clearly in Sales delivery review. */
+#appView #content .sales-delivery-badges{display:flex;align-items:flex-start;justify-content:flex-end;gap:6px;flex-wrap:wrap;min-width:0}
+#appView #content .sales-delivery-badges .badge{white-space:normal;text-align:center}
+@media(max-width:700px){#appView #content .sales-delivery-badges{justify-content:flex-start}}
+#appView #content .store-receipt-sales-list{display:grid;gap:9px;padding:12px}
+#appView #content .store-receipt-sales-row{display:grid;grid-template-columns:minmax(150px,1fr) auto minmax(150px,auto) minmax(160px,auto);align-items:center;gap:12px;padding:12px 14px;border:1px solid #e2ece7;border-radius:12px;background:#f8fcfa}
+#appView #content .store-receipt-sales-row h3{margin:4px 0 0;font-size:14px}.store-receipt-sales-row>span:not(.badge){font-size:12px;color:var(--bt-muted,#718393)}.store-receipt-sales-row b{color:var(--bt-ink,#263746)}
+@media(max-width:750px){#appView #content .store-receipt-sales-row{grid-template-columns:1fr;gap:8px}.store-receipt-sales-row .badge{justify-self:start}}
+
+/* Store portal three-stage board: RTL order is incoming, in transit, delivered. */
+#appView #content .st38-grid{grid-template-columns:minmax(0,1fr)!important}
+#appView #content .st38-store-board{display:grid;direction:rtl;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start;min-width:0}
+#appView #content .st38-store-stage{display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:8px;min-width:0;max-height:calc(100vh - 230px);overflow:hidden;border:1px solid var(--bt-line-2,#dce4eb);border-radius:15px;background:#f7f9fb;padding:11px}
+#appView #content .st38-store-stage>header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 2px 8px;border-bottom:1px solid #e4eaf0}
+#appView #content .st38-store-stage>header>div{display:flex;align-items:center;gap:8px;min-width:0}
+#appView #content .st38-store-stage h2{font-size:15px;margin:0;white-space:nowrap}
+#appView #content .st38-stage-index{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:#fff;color:var(--bt-muted,#738292);font-size:11px;font-weight:900}
+#appView #content .st38-store-stage>p{font-size:11px;color:var(--bt-muted,#738292);margin:0;min-height:34px}
+#appView #content .st38-stage-list{display:grid;align-content:start;gap:9px;min-height:100px;overflow:auto;padding:1px 2px 8px}
+#appView #content .st38-store-stage .st38-row,#appView #content .st38-store-stage .st38-delivered-card{min-width:0;margin:0}
+#appView #content .st38-store-stage.delivered .st38-delivered-line{grid-template-columns:24px minmax(0,1fr);}
+#appView #content .st38-store-stage.delivered .st38-delivered-line>span:not(.st38-delivered-no),#appView #content .st38-store-stage.delivered .st38-delivered-line>small{grid-column:2}
+#appView #content .st38-store-stage.delivered .st38-delivered-summary{display:grid;grid-template-columns:1fr;gap:5px}
+@media(max-width:1100px){#appView #content .st38-store-board{grid-template-columns:repeat(2,minmax(0,1fr))}#appView #content .st38-store-stage.delivered{grid-column:1/-1;max-height:none}}
+@media(max-width:700px){#appView #content .st38-store-board{grid-template-columns:minmax(0,1fr)}#appView #content .st38-store-stage{max-height:none}#appView #content .st38-store-stage.delivered{grid-column:auto}}
+#appView #content .dsp-driver-tabs{display:grid!important;direction:rtl;grid-template-columns:repeat(4,minmax(0,1fr))!important;margin-bottom:12px}
+@media(max-width:760px){#appView #content .dsp-driver-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+#appView #content .dsp-store-customer-box{display:flex;align-items:center;gap:7px;margin:6px 0 5px;padding:7px 9px;border:1px solid #dbe8ef;border-radius:8px;background:#f5fafc;max-width:360px}
+#appView #content .dsp-store-customer-box small{display:inline!important;font-size:10px!important;color:var(--bt-muted,#738292);white-space:nowrap}
+#appView #content .dsp-store-customer-box strong{font-size:12px;color:var(--bt-ink,#263746);overflow-wrap:anywhere}
+
+/* Keep expanded transport-history details inside their order card/grid column. */
+#appView #content .drv-day,#appView #content .drv-del,#appView #content .drv-del>.adm-cell{min-width:0;max-width:100%;box-sizing:border-box}
+#appView #content .drv-del{grid-template-columns:repeat(4,minmax(0,1fr))!important;align-items:start}
+#appView #content .drv-del>.adm-cell{overflow-wrap:anywhere}
+#appView #content .drv-del>.adm-cell.adm-actions{grid-column:1/-1!important;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px}
+#appView #content .drv-lines{display:block;width:100%;min-width:0;max-width:100%;grid-column:1/-1;box-sizing:border-box}
+#appView #content .drv-lines[open]>.table-wrap{display:block;width:100%;max-width:100%;min-width:0;overflow-x:auto!important;overflow-y:hidden!important;box-sizing:border-box;contain:inline-size}
+#appView #content .drv-lines table{width:max-content;min-width:100%;max-width:none;table-layout:auto}
+#appView #content .drv-lines th,#appView #content .drv-lines td{white-space:normal;overflow-wrap:anywhere}
+@media(max-width:850px){#appView #content .drv-del{grid-template-columns:repeat(2,minmax(0,1fr))!important}#appView #content .drv-del>.adm-cell.adm-actions{grid-column:1/-1!important}}
+@media(max-width:600px){#appView #content .drv-del{grid-template-columns:minmax(0,1fr)!important}#appView #content .drv-del>.adm-cell.adm-actions{grid-column:1!important}}
+
+/* Sales delivery workbench: four requested right-to-left status columns. */
+#appView #content .sales-delivery-board{display:grid;direction:rtl;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;gap:10px;min-width:0}
+#appView #content .sales-delivery-column{display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:7px;min-width:0;max-height:calc(100vh - 235px);overflow:hidden;border:1px solid var(--bt-line-2,#dce4eb);border-radius:14px;background:#f7f9fb;padding:9px}
+#appView #content .sales-delivery-column>header{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;padding:3px 2px 8px;border-bottom:1px solid #e4eaf0}
+#appView #content .sales-delivery-column>header>div{display:flex;align-items:center;gap:6px;min-width:0}
+#appView #content .sales-delivery-column h2{margin:0;font-size:14px;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+#appView #content .sales-delivery-column-index{display:grid;place-items:center;flex:none;width:24px;height:24px;border-radius:7px;background:#fff;color:var(--bt-muted,#718393);font-size:10px;font-weight:900}
+#appView #content .sales-delivery-column-desc{min-height:40px;margin:0;color:var(--bt-muted,#718393);font-size:10px;line-height:1.7}
+/* v37.3.28 — رفع برش کارت‌های تحویل راننده: ستون-لیست flex بدون کوچک‌کردن کارت‌ها + چیدمان فشرده برای کمترین ارتفاع */
+#appView #content .sales-delivery-column-list{display:flex;flex-direction:column;align-items:stretch;gap:8px;min-height:100px;min-width:0;overflow:auto;padding:1px 1px 7px}
+#appView #content .sales-delivery-column .sales-delivery-card{flex:none;height:auto;min-width:0;width:100%;max-width:100%;overflow:hidden}
+#appView #content .sales-delivery-column .sales-delivery-card-head{align-items:flex-start;gap:5px 8px;padding:8px 10px;flex-wrap:wrap}
+#appView #content .sales-delivery-column .sales-delivery-card-head>div{display:grid;min-width:0;gap:1px}
+#appView #content .sales-delivery-column .sales-delivery-card-head h3{font-size:12.5px;margin:1px 0}
+#appView #content .sales-delivery-column .sales-delivery-badges{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-start;max-width:100%}
+#appView #content .sales-delivery-column .sales-delivery-badges .badge{font-size:9px;line-height:1.6}
+#appView #content .sales-delivery-column .sales-delivery-meta{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:6px 9px}
+#appView #content .sales-delivery-column .sales-delivery-meta>span{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:5px 8px;border-radius:8px;font-size:10px;line-height:1.6;overflow-wrap:anywhere;min-width:0}
+#appView #content .sales-delivery-column .sales-delivery-meta small{font-size:9px;flex:none}
+#appView #content .sales-delivery-column .sales-delivery-meta b{font-size:10px;min-width:0;overflow-wrap:anywhere;text-align:left}
+#appView #content .sales-delivery-column .sales-delivery-lines{display:grid;gap:5px;padding:0 9px 8px}
+#appView #content .sales-delivery-column .sales-delivery-line{display:flex;align-items:flex-start;gap:6px;padding:6px 8px;border:1px solid var(--line,#dce6ed);border-radius:9px;background:#fff;min-width:0}
+#appView #content .sales-delivery-column .sales-delivery-line .sd-row-no{flex:none;margin-top:2px}
+#appView #content .sales-delivery-column .sd-line-body{display:grid;gap:3px;min-width:0;flex:1}
+#appView #content .sales-delivery-column .sd-line-top{display:flex;align-items:baseline;justify-content:space-between;gap:6px;min-width:0}
+#appView #content .sales-delivery-column .sd-line-top strong{min-width:0;overflow-wrap:anywhere;font-size:11px}
+#appView #content .sales-delivery-column .sd-line-amount{flex:none;font-size:11px;color:var(--brand,#b3132a);white-space:nowrap}
+#appView #content .sales-delivery-column .sd-line-stats{display:flex;flex-wrap:wrap;gap:2px 8px;font-size:9.5px;color:var(--bt-muted,#718393)}
+#appView #content .sales-delivery-column .sd-line-stats b{color:var(--bt-ink,#1b2530);font-weight:800;font-size:9.5px}
+#appView #content .sales-delivery-column .sd-line-reason{color:var(--orange,#e8a13c);font-size:9.5px}
+#appView #content .sales-delivery-column .sales-delivery-summary{display:flex;flex-wrap:wrap;gap:3px 9px;margin:0 9px;padding:6px 9px;border-radius:9px;background:var(--bg-soft,#f3f6f9);font-size:10px}
+#appView #content .sales-delivery-column .sales-delivery-summary span{display:inline-flex;align-items:baseline;gap:4px;white-space:nowrap}
+#appView #content .sales-delivery-column .sales-delivery-summary small{color:var(--bt-muted,#718393);font-size:9px}
+#appView #content .sales-delivery-column .sales-delivery-summary .payable b{color:var(--brand,#b3132a)}
+#appView #content .sales-delivery-column .sales-delivery-payments{min-width:0;margin:7px 9px;padding:0;overflow:hidden;border:1px solid var(--line,#dce6ed);border-radius:9px;background:#fff}
+#appView #content .sales-delivery-column .sales-delivery-payments>summary{display:flex;align-items:center;gap:5px;padding:6px 9px;cursor:pointer;font-size:10.5px;font-weight:800;list-style:none;color:var(--bt-ink-2,#33404d);user-select:none}
+#appView #content .sales-delivery-column .sales-delivery-payments>summary::-webkit-details-marker{display:none}
+#appView #content .sales-delivery-column .sales-delivery-payments>summary:before{content:"▾";flex:none;font-size:10px;color:var(--bt-muted,#718393);transition:transform .12s}
+#appView #content .sales-delivery-column .sales-delivery-payments:not([open])>summary:before{transform:rotate(-90deg)}
+#appView #content .sales-delivery-column .sales-delivery-payments[open]>summary{border-bottom:1px solid var(--line,#dce6ed)}
+#appView #content .sales-delivery-column .sales-delivery-payments>.table-wrap{margin:5px;max-width:calc(100% - 10px);min-width:0;overflow-x:auto;border:1px solid var(--line,#dce6ed);border-radius:7px}
+#appView #content .sales-delivery-column .sales-delivery-payments table{font-size:9.5px}
+#appView #content .sales-delivery-column .sales-delivery-payments th,#appView #content .sales-delivery-column .sales-delivery-payments td{white-space:normal;overflow-wrap:anywhere;padding:5px 7px}
+#appView #content .sales-delivery-column .sales-delivery-payments>.empty{margin:5px;padding:8px}
+#appView #content .sales-delivery-column .sales-delivery-note{margin:7px 9px 0;padding:5px 9px;font-size:10px;line-height:1.65}
+#appView #content .sales-delivery-column .sales-delivery-actions{display:grid;gap:5px;padding:8px 9px 9px}
+#appView #content .sales-delivery-column .sales-delivery-actions .btn{width:100%;min-width:0;min-height:34px;padding:7px 10px;font-size:11px;white-space:normal}
+#appView #content .sales-delivery-column .sales-finalized-stamp{font-size:9.5px;color:var(--bt-muted,#718393);text-align:center}
+/* v37.3.28 — کارتابل نگهبانی: سربرگ تحویل راننده در چهار ستون عمودی (راهنما + سه وضعیت) */
+#appView #content .gate-dispatch-board{display:grid;direction:rtl;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:start;min-width:0}
+#appView #content .gate-dispatch-col{display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:7px;min-width:0;max-height:calc(100vh - 235px);overflow:hidden;padding:9px}
+#appView #content .gate-dispatch-col-head{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;padding:3px 2px 8px;border-bottom:1px solid #e4eaf0}
+#appView #content .gate-dispatch-col-head>div{display:flex;align-items:center;gap:6px;min-width:0}
+#appView #content .gate-dispatch-col-head h2{margin:0;font-size:13.5px;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+#appView #content .gate-dispatch-guide-ico{display:grid;place-items:center;color:var(--brand,#b3132a)}
+#appView #content .gate-dispatch-col-desc{min-height:40px;margin:0;color:var(--bt-muted,#718393);font-size:10px;line-height:1.7}
+#appView #content .gate-dispatch-col .gate-dispatch-col-list{display:grid!important;align-content:start;gap:9px!important;min-height:100px;min-width:0;overflow:auto;padding:1px 1px 7px!important}
+#appView #content .gate-dispatch-col .dsp-card{display:flex;flex-direction:column;gap:8px;padding:10px 11px;min-width:0}
+#appView #content .dsp-card .gate-dispatch-card-head{display:grid!important;grid-template-columns:minmax(0,1fr);justify-content:stretch;align-items:flex-start;gap:8px;padding:0 0 8px;background:transparent}
+#appView #content .gate-dispatch-card-id{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+#appView #content .gate-dispatch-card-id b{font-size:12.5px;white-space:normal;overflow-wrap:anywhere;min-width:0}
+#appView #content .gate-dispatch-card-id .badge{flex:none}
+#appView #content .gate-dispatch-card-sub{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+#appView #content .gate-dispatch-card-sub small{font-size:10.5px;color:var(--bt-muted,#718393);white-space:normal;overflow-wrap:anywhere;min-width:0}
+#appView #content .gate-dispatch-col .dsp-items{gap:3px}
+#appView #content .gate-dispatch-col .dsp-items li{font-size:11px;padding:4px 8px;gap:8px}
+#appView #content .gate-dispatch-col .dsp-log{font-size:10.5px}
+#appView #content .gate-dispatch-col .dsp-log ol{gap:4px;margin-top:6px}
+#appView #content .gate-dispatch-col .dsp-log li{padding:6px 8px}
+#appView #content .gate-dispatch-col .adm-note{font-size:10px}
+#appView #content .gate-dispatch-col .adm-full{width:100%}
+#appView #content .gate-dispatch-col .sd-empty{padding:16px 8px}
+#appView #content .gate-dispatch-guide{grid-template-rows:auto minmax(0,1fr);background:linear-gradient(160deg,#fff,#fbf7f4)}
+#appView #content .gate-dispatch-guide-body{overflow:auto;padding:4px 3px;color:var(--bt-ink-2,#33404d)}
+#appView #content .gate-dispatch-guide-body p{margin:0 0 10px;font-size:11px;line-height:1.9}
+#appView #content .gate-dispatch-guide-body ol{margin:0;padding:0 18px 0 0;display:grid;gap:8px;font-size:10.5px;line-height:1.8;color:var(--bt-muted,#5b6a78)}
+@media(max-width:1300px){#appView #content .gate-dispatch-board{grid-template-columns:repeat(2,minmax(0,1fr))}#appView #content .gate-dispatch-col{max-height:70vh}}
+@media(max-width:700px){#appView #content .gate-dispatch-board{grid-template-columns:minmax(0,1fr)}#appView #content .gate-dispatch-col{max-height:none}#appView #content .gate-dispatch-col-desc{min-height:0}}
+
+@media(max-width:1300px){#appView #content .sales-delivery-board{grid-template-columns:repeat(2,minmax(0,1fr))}#appView #content .sales-delivery-column{max-height:70vh}}
+@media(max-width:700px){#appView #content .sales-delivery-board{grid-template-columns:minmax(0,1fr)}#appView #content .sales-delivery-column{max-height:none}#appView #content .sales-delivery-column-desc{min-height:0}}
+
+/* ================= v37.4.0 — سفارش فروشگاه: ارسال دو سرویسی (سرویس اول صبح / سرویس دوم ظهر) ================= */
+#appView .st-run-chips{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:10px 0}
+#appView .st-run-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:999px;font-size:11.5px;font-weight:800;border:1px solid var(--line-strong);background:#fff;color:#3f3f46;white-space:nowrap}
+#appView .st-run-overall{background:var(--blue-bg);color:#1d4ed8;border-color:transparent}
+#appView .st-run-PENDING{background:#fff7e6;color:#b45309;border-color:#f3d9a0}
+#appView .st-run-IN_PROGRESS{background:var(--blue-bg);color:#1d4ed8;border-color:transparent}
+#appView .st-run-DONE{background:var(--green-bg);color:#15803d;border-color:transparent}
+#appView .st-run-NOT_NEEDED{background:#f4f4f5;color:#71717a;border-color:#e4e4e7}
+#appView .st-run-AWAITING_R1{background:#fff7e6;color:#b45309;border-color:#f3d9a0}
+#appView .st-run-IN_SHIPPING{background:var(--blue-bg);color:#1d4ed8;border-color:transparent}
+#appView .st-run-MOVED_R2{background:#faf0ff;color:#9333ea;border-color:#ead3f7}
+#appView .st-run-COMPLETED{background:var(--green-bg);color:#15803d;border-color:transparent}
+#appView .st-run-CLOSED_SHORT{background:#fdecec;color:#b91c1c;border-color:#f3c2c2}
+#appView .wh38-prep-item.sr38-item{display:grid;gap:10px;grid-template-columns:1fr}
+#appView .wh38-prep-item.sr38-done{border-color:#bbe5c8;background:#fbfefc}
+#appView .wh38-prep-item.sr38-short{border-color:#f3c2c2;background:#fffbfb}
+#appView .sr38-row-head{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+#appView .sr38-row-head strong{flex:1;min-width:140px}
+#appView .sr38-totals{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+#appView .sr38-totals b{color:#27272a}
+#appView .sr38-hist{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:4px}
+#appView .sr38-hist li{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-size:11.5px;color:var(--muted);padding:5px 10px;background:#fafafa;border:1px solid #eee;border-radius:9px}
+#appView .sr38-hist li b{color:#27272a}
+#appView .st-run-hist-empty{font-size:11.5px;color:var(--muted);padding:7px 10px;border:1.5px dashed var(--line-strong);border-radius:10px;display:inline-block}
+#appView .sr38-ops{display:grid;gap:9px}
+#appView .sr38-weight-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#appView .sr38-weight-row .wh38-cell-box input{min-width:110px}
+#appView .sr38-ops-btns{display:flex;flex-wrap:wrap;gap:8px}
+#appView .sr38-decision{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;font-weight:800;color:#3f3f46}
+#appView .sr38-decision select{padding:7px 10px;border:1px solid var(--line-strong);border-radius:10px;font:inherit;background:#fff}
+#appView .sr38-final-note{font-size:12.5px;font-weight:800;color:#3f3f46;background:#f6f6f7;border-radius:10px;padding:9px 12px;line-height:1.9}
+#appView .st-run-letterhead{margin-top:14px;padding:12px 14px;border:1px solid #eee;border-radius:14px;background:#fafafa}
+#appView .st-run-letterhead .st-run-chips{margin:0 0 8px}
+#appView .st-run-letterhead-items{display:grid;gap:6px}
+#appView .st-run-letterhead-items .st-run-chip{border-radius:10px;white-space:normal;line-height:1.8}
+#appView .st-run-finalized{display:block;margin-top:8px;color:var(--muted);font-size:11.5px}
+@media(max-width:760px){#appView .st-run-chip{font-size:10.5px;padding:4px 8px}}
+
+/* همان سبک‌ها داخل مودال جزئیات (خارج از #appView) */
+#modal .st-run-chips{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:10px 0}
+#modal .st-run-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:999px;font-size:11.5px;font-weight:800;border:1px solid var(--line-strong);background:#fff;color:#3f3f46;white-space:nowrap}
+#modal .st-run-overall{background:var(--blue-bg);color:#1d4ed8;border-color:transparent}
+#modal .st-run-PENDING{background:#fff7e6;color:#b45309;border-color:#f3d9a0}
+#modal .st-run-IN_PROGRESS{background:var(--blue-bg);color:#1d4ed8;border-color:transparent}
+#modal .st-run-DONE{background:var(--green-bg);color:#15803d;border-color:transparent}
+#modal .st-run-NOT_NEEDED{background:#f4f4f5;color:#71717a;border-color:#e4e4e7}
+#modal .st-run-AWAITING_R1{background:#fff7e6;color:#b45309;border-color:#f3d9a0}
+#modal .st-run-IN_SHIPPING{background:var(--blue-bg);color:#1d4ed8;border-color:transparent}
+#modal .st-run-MOVED_R2{background:#faf0ff;color:#9333ea;border-color:#ead3f7}
+#modal .st-run-COMPLETED{background:var(--green-bg);color:#15803d;border-color:transparent}
+#modal .st-run-CLOSED_SHORT{background:#fdecec;color:#b91c1c;border-color:#f3c2c2}
+#modal .st-run-letterhead{margin-top:14px;padding:12px 14px;border:1px solid #eee;border-radius:14px;background:#fafafa}
+#modal .st-run-letterhead .st-run-chips{margin:0 0 8px}
+#modal .st-run-letterhead-items{display:grid;gap:6px}
+#modal .st-run-letterhead-items .st-run-chip{border-radius:10px;white-space:normal;line-height:1.8}
+#modal .st-run-finalized{display:block;margin-top:8px;color:var(--muted);font-size:11.5px}
+
+/* ===== v37.5.0 — ردیف اقلام تک‌خطی و فشرده فرم ثبت سفارش فروشگاه ===== */
+#appView .sd-line.sd-line-compact{display:flex;flex-direction:row;align-items:center;gap:7px;padding:6px 9px}
+#appView .sd-line.sd-line-compact .sd-line-no{width:24px;height:24px;border-radius:7px;margin:0;font-size:10px;flex:0 0 auto}
+#appView .sd-line.sd-line-compact .sd-line-cell{display:block;min-width:0}
+#appView .sd-line.sd-line-compact .cell-product{flex:0 1 250px;min-width:180px}
+#appView .sd-line.sd-line-compact .cell-qty{flex:0 0 88px}
+#appView .sd-line.sd-line-compact .cell-unit{flex:0 0 112px}
+#appView .sd-line.sd-line-compact .cell-desc{flex:0 1 190px;min-width:80px}
+#appView .sd-line.sd-line-compact .input-shell{height:35px;border-radius:9px}
+#appView .sd-line.sd-line-compact .input-shell input,
+#appView .sd-line.sd-line-compact .input-shell select{font-size:12.5px}
+#appView .sd-line.sd-line-compact .sd-line-del{width:30px;height:30px;margin:0;flex:0 0 auto}
+#appView .sd-line.sd-line-compact .sd-picked-inline{display:inline-flex;align-items:center;gap:3px;position:absolute;top:-8px;inset-inline-start:8px;background:var(--green-bg);color:#15803d;font-size:10px;font-weight:800;padding:1px 7px;border-radius:8px;line-height:1.6;z-index:2}
+#appView .sd-line.sd-line-compact .product-suggest{position:absolute;top:calc(100% + 4px);inset-inline:0;z-index:30}
+@media(max-width:760px){#appView .sd-line.sd-line-compact{flex-wrap:wrap;row-gap:6px}
+ #appView .sd-line.sd-line-compact .cell-product{flex:1 1 calc(100% - 34px)}
+ #appView .sd-line.sd-line-compact .cell-qty{flex:0 0 30%}
+ #appView .sd-line.sd-line-compact .cell-unit{flex:0 0 36%}
+ #appView .sd-line.sd-line-compact .cell-desc{flex:1 1 140px}}
+
+/* ---------- v37.5.0 — ارسال هر سرویس به فروش: چیپ مرحله، دکمهٔ ارسال، پنل فروش ---------- */
+#appView .st-run-chip.st-run-stage,
+#modal .st-run-chip.st-run-stage{background:#e8f1ff;color:#1757a8;border:1px solid #bcd6f6;font-weight:800}
+#appView .sr38-sendbar{align-items:center;gap:10px;flex-wrap:wrap}
+#appView .sr38-sendbar .btn-lg{padding-block:12px}
+#appView .sr-ship-panel{background:var(--bg-alt,#f7f8fa);border:1px solid var(--line,#e3e6ea);border-radius:16px;padding:14px 16px;margin-bottom:14px;display:grid;gap:10px}
+#appView .sr-ship-panel>header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+#appView .sr-ship-panel>header h2{margin:0;font-size:15px}
+#appView .sr-ship-panel>header p{margin:4px 0 0;font-size:11.5px;color:var(--muted)}
+#appView .sr-ship-list{display:grid;gap:10px}
+#appView .sr-ship-row{background:#fff;border:1px solid var(--line,#e3e6ea);border-radius:12px;padding:12px;display:grid;gap:8px}
+#appView .sr-ship-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#appView .sr-ship-head small{color:var(--muted)}
+#appView .sr-ship-lines{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px}
+#appView .sr-ship-line{display:inline-flex;align-items:center;gap:6px}
+#appView .sr-ship-row>.btn{justify-self:end}
+#modal .sr-ship-form .sr-ship-modal-order{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+#modal .sr-ship-hint{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+#modal .sr-ship-items{display:grid;gap:10px;margin-bottom:12px}
+#modal .sr-ship-item{display:grid;grid-template-columns:1fr 150px 130px;gap:10px;align-items:center;background:#fafbfc;border:1px solid var(--line,#e3e6ea);border-radius:12px;padding:10px 12px}
+#modal .sr-ship-item-info{display:grid;gap:2px;font-size:12.5px}
+#modal .sr-ship-item input{text-align:center;font-weight:800}
+#modal .sr-ship-total{font-size:12px;font-weight:900;color:var(--brand,#b40f23);text-align:center}
+#modal .sr-ship-grand{display:flex;justify-content:space-between;align-items:center;border:1px dashed var(--line,#cfcfcf);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px}
+@media (max-width:760px){#modal .sr-ship-item{grid-template-columns:1fr}}
+#appView .st-run-runs-summary,#modal .st-run-runs-summary{display:grid;gap:8px;margin:10px 0}
+#appView .st-run-run-line,#modal .st-run-run-line{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;background:#f7f9fc;border:1px solid var(--line,#e3e6ea);border-radius:10px;padding:9px 12px;font-size:12px}
+#appView .st38-delivered-card header .st-run-chip{margin-inline-start:8px}
+
+/* ================================================================
+   v37.18.0 — برگهٔ سرویس‌های ارسال انبار: ردیف تک‌خطی کم‌ارتفاع
+   همهٔ کنترل‌های هر ردیف در یک راستا؛ در صفحهٔ باریک ردیف افقی پیمایش می‌شود.
+   ================================================================ */
+#appView .st-run-sheet-v318{display:grid;gap:8px}
+#appView .sr318-summary{display:flex;flex-wrap:wrap;gap:5px 14px;align-items:center;background:var(--bg-alt,#f7f8fa);border:1px solid var(--line,#e3e6ea);border-radius:11px;padding:6px 11px;font-size:12px;color:var(--muted)}
+#appView .sr318-summary b{color:var(--ink,#27272a)}
+#appView .sr318-sendline{display:flex;flex-wrap:nowrap;gap:8px;align-items:center;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+#appView .sr318-sendline .btn{height:34px;min-height:34px!important;padding:4px 13px;font-size:12px;white-space:nowrap;flex:0 0 auto}
+#appView .sr318-sendline .st-run-chip{white-space:nowrap;flex:0 0 auto}
+#appView .sr318-sendnote{font-size:11.5px;color:var(--muted);white-space:nowrap}
+#appView .sr318-group{border:1px solid var(--line,#e3e6ea);border-radius:13px;padding:6px 8px;background:#fff;display:grid;gap:5px}
+#appView .sr318-group-head{display:flex;align-items:center;gap:8px;min-height:24px}
+#appView .sr318-group-head b{font-size:13px}
+#appView .sr318-group-head small{color:var(--muted);font-size:11px}
+#appView .sr318-gcount{margin-inline-start:auto;font-size:11px;color:var(--muted)}
+#appView .sr318-rows{display:grid;gap:4px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+#appView .sr318-row{display:flex!important;flex-wrap:nowrap;align-items:center;gap:6px;min-width:1080px;min-height:40px;padding:4px 8px!important;border:1px solid var(--line,#e3e6ea);border-radius:11px;background:#fff}
+#appView .sr318-row .wh38-prep-num{flex:0 0 auto}
+#appView .sr318-name{flex:0 1 150px;min-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+#appView .sr318-req,#appView .sr318-wts{white-space:nowrap;font-size:11.5px;color:var(--muted)}
+#appView .sr318-req b,#appView .sr318-wts b{color:var(--ink,#27272a)}
+#appView .sr318-hist{position:relative}
+#appView .sr318-hist summary{cursor:pointer;font-size:11px;font-weight:800;color:var(--brand,#b40f23);white-space:nowrap;list-style:none}
+#appView .sr318-hist .sr38-hist{position:absolute;z-index:6;top:calc(100% + 4px);inset-inline-start:0;min-width:300px;background:#fff;border:1px solid var(--line,#e3e6ea);border-radius:11px;padding:7px;box-shadow:0 14px 30px -14px rgba(23,32,44,.35)}
+#appView .sr318-ops{display:flex!important;flex-wrap:nowrap;align-items:center;gap:5px;margin-inline-start:auto}
+#appView .sr318-ops .btn{height:30px;min-height:30px!important;padding:3px 9px;font-size:11.5px;white-space:nowrap;flex:0 0 auto}
+#appView .sr318-wbox{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+#appView .sr318-wbox input{width:84px;height:30px;font-size:13px}
+#appView .sr318-wbox b{font-size:11px;color:var(--muted)}
+#appView .sr318-decision{display:flex;align-items:center;flex:0 0 auto}
+#appView .sr318-decision select{height:30px;width:138px;font-size:11.5px;padding:3px 7px}
+#appView .sr318-final{font-size:11.5px;font-weight:800;color:#3f3f46;white-space:nowrap}
+#appView .sr318-empty{border:1.5px dashed var(--line-strong,#d4d4d8);border-radius:10px;padding:7px 10px;color:var(--muted);font-size:12px;text-align:center}
+#appView .sr318-done-box{border:1px dashed var(--line-strong,#d4d4d8);border-radius:12px;padding:6px 9px;background:#fbfbfc}
+#appView .sr318-done-box>summary{cursor:pointer;font-weight:900;font-size:12.5px}
+#appView .sr318-done-box .sr318-rows{margin-top:5px}
+#appView .sr318-foot{padding-top:7px}
+#appView .sr318-foot .btn{min-height:36px}
+
+/* ===== v37.21.0 — کارت ورودی سفارش فروشگاه در کارتابل فروش: تک‌خطی و کم‌ارتفاع ===== */
+/* همهٔ مشخصات و دکمه‌ها در یک راستا؛ نام فروشگاه مشخص و نام مشتری زیر آن.
+   در صفحهٔ باریک، ردیف به‌جای شکستن چندخطی، افقی پیمایش می‌شود تا ارتفاع کم بماند. */
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43 .sd-store-list-v40{overflow-x:auto;padding-bottom:6px}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-card.sd-store-card-v42{display:flex;flex-direction:row;align-items:center;flex-wrap:nowrap;gap:14px;min-width:1040px;min-height:52px;padding:7px 14px}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-card .sd-store-identity-v42{display:flex;flex-direction:column;align-items:flex-start;gap:0;flex:0 1 210px;min-width:150px;margin:0;padding:0;border:0}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-card .sd-store-identity-v42 h3{margin:0;font-size:15px;font-weight:800;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-customer{display:block;color:var(--muted);font-size:11.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-card .order-code{white-space:nowrap;flex:0 0 auto}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-meta{white-space:nowrap;color:var(--muted);font-size:12px;flex:0 0 auto}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-actions{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-inline-start:auto;flex:0 0 auto}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-actions .btn{white-space:nowrap}
+
+/* Warehouse > Stores: explicit, fixed-layout columns; cards become labelled rows on narrow screens. */
+#appView[data-cartable-page="warehouse"] .wh38-store-pane .wh38-store-list{display:block;width:100%;min-width:0;margin-top:10px}
+#appView[data-cartable-page="warehouse"] .wh38-store-table-wrap{max-width:100%;overflow:hidden;border:1px solid var(--line,#e3e6ea);border-radius:12px;background:var(--panel,#fff)}
+#appView[data-cartable-page="warehouse"] .wh38-store-table{width:100%;table-layout:fixed;border-collapse:collapse}
+#appView[data-cartable-page="warehouse"] .wh38-store-table th,#appView[data-cartable-page="warehouse"] .wh38-store-table td{min-width:0;padding:9px 7px;border-bottom:1px solid var(--line,#e3e6ea);text-align:right;vertical-align:middle;line-height:1.5;overflow-wrap:anywhere}
+#appView[data-cartable-page="warehouse"] .wh38-store-table th{background:var(--bg-alt,#f7f8fa);font-size:11px;font-weight:850;color:var(--muted,#667085)}
+#appView[data-cartable-page="warehouse"] .wh38-store-table td{font-size:12px;color:var(--ink,#27272a)}
+#appView[data-cartable-page="warehouse"] .wh38-store-table th:nth-child(1),#appView[data-cartable-page="warehouse"] .wh38-store-table td:nth-child(1){width:17%}
+#appView[data-cartable-page="warehouse"] .wh38-store-table th:nth-child(2),#appView[data-cartable-page="warehouse"] .wh38-store-table td:nth-child(2){width:11%;text-align:center}
+#appView[data-cartable-page="warehouse"] .wh38-store-table th:nth-child(3),#appView[data-cartable-page="warehouse"] .wh38-store-table td:nth-child(3){width:11%}
+#appView[data-cartable-page="warehouse"] .wh38-store-table th:nth-child(4),#appView[data-cartable-page="warehouse"] .wh38-store-table td:nth-child(4){width:16%}
+#appView[data-cartable-page="warehouse"] .wh38-store-table th:nth-child(5),#appView[data-cartable-page="warehouse"] .wh38-store-table td:nth-child(5){width:11%;text-align:center}
+#appView[data-cartable-page="warehouse"] .wh38-store-table th:nth-child(6),#appView[data-cartable-page="warehouse"] .wh38-store-table td:nth-child(6){width:14%}
+#appView[data-cartable-page="warehouse"] .wh38-store-table th:nth-child(7),#appView[data-cartable-page="warehouse"] .wh38-store-table td:nth-child(7){width:7%;text-align:center}
+#appView[data-cartable-page="warehouse"] .wh38-store-table th:nth-child(8),#appView[data-cartable-page="warehouse"] .wh38-store-table td:nth-child(8){width:13%}
+#appView[data-cartable-page="warehouse"] .wh38-store-table tbody tr:last-child td{border-bottom:0}
+#appView[data-cartable-page="warehouse"] .wh38-store-table tbody tr:hover td{background:#fffafa}
+#appView[data-cartable-page="warehouse"] .wh38-store-table-identity{display:grid;gap:2px;min-width:0}
+#appView[data-cartable-page="warehouse"] .wh38-store-table-identity strong{font-size:12px;font-weight:900;line-height:1.5}
+#appView[data-cartable-page="warehouse"] .wh38-store-table-identity small,#appView[data-cartable-page="warehouse"] .wh38-store-table-scheduled{font-size:10px;color:var(--muted,#667085);line-height:1.5}
+#appView[data-cartable-page="warehouse"] .wh38-store-table .order-code{white-space:normal;overflow-wrap:anywhere}
+#appView[data-cartable-page="warehouse"] .wh38-store-table .badge{white-space:normal;line-height:1.4}
+#appView[data-cartable-page="warehouse"] .wh38-store-table-actions{display:flex;justify-content:flex-start;align-items:center;gap:5px;min-width:0}
+#appView[data-cartable-page="warehouse"] .wh38-store-table-actions .btn{max-width:100%;height:auto;min-height:34px;padding:5px 8px;white-space:normal;line-height:1.45;text-align:center}
+@media(max-width:900px){
+  #appView[data-cartable-page="warehouse"] .wh38-store-table,#appView[data-cartable-page="warehouse"] .wh38-store-table tbody{display:block;width:100%}
+  #appView[data-cartable-page="warehouse"] .wh38-store-table thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  #appView[data-cartable-page="warehouse"] .wh38-store-table tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px;margin:0;padding:8px 10px;border-bottom:1px solid var(--line,#e3e6ea)}
+  #appView[data-cartable-page="warehouse"] .wh38-store-table tbody tr:last-child{border-bottom:0}
+  #appView[data-cartable-page="warehouse"] .wh38-store-table td{display:grid;grid-template-columns:minmax(72px,.65fr) minmax(0,1fr);align-items:start;gap:6px;width:auto!important;padding:6px 2px;border:0;text-align:right!important}
+  #appView[data-cartable-page="warehouse"] .wh38-store-table td::before{content:attr(data-label);font-size:10px;font-weight:800;color:var(--muted,#667085)}
+  #appView[data-cartable-page="warehouse"] .wh38-store-table td:first-child,#appView[data-cartable-page="warehouse"] .wh38-store-table td:last-child{grid-column:1/-1}
+  #appView[data-cartable-page="warehouse"] .wh38-store-table-actions .btn{justify-content:center}
+}
+@media(max-width:480px){
+  #appView[data-cartable-page="warehouse"] .wh38-store-table tbody tr{grid-template-columns:minmax(0,1fr);padding:8px}
+  #appView[data-cartable-page="warehouse"] .wh38-store-table td,#appView[data-cartable-page="warehouse"] .wh38-store-table td:first-child,#appView[data-cartable-page="warehouse"] .wh38-store-table td:last-child{grid-column:1}
+  #appView[data-cartable-page="warehouse"] .wh38-store-table td{grid-template-columns:minmax(95px,.7fr) minmax(0,1fr)}
+  #appView[data-cartable-page="warehouse"] .wh38-store-table-actions .btn{width:100%}
+}
+.whd23-list{display:grid;gap:6px}
+.whd23-row{display:grid;grid-template-columns:28px 1.5fr .55fr .55fr 1.5fr;gap:6px;align-items:stretch}
+.whd23-num{display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--muted)}
+.whd23-box{border:1px solid var(--line,#e3e6ea);border-radius:10px;background:#fff;padding:5px 10px;min-height:46px;display:flex;flex-direction:column;justify-content:center;gap:1px;min-width:0}
+.whd23-box label{font-size:10px;font-weight:700;color:var(--muted);line-height:1.2}
+.whd23-box b{font-size:13px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.whd23-row{grid-template-columns:24px 1.2fr .6fr .6fr}.whd23-desc{grid-column:2/-1}}
+/* ۲) کارت سربرگ آماده‌سازی فروشگاه در انبار: فقط فروشگاه، مشتری و تعداد اقلام */
+.wh38-store-pane .whsin22-card.whprep23-card{min-width:540px}
+.wh38-store-pane .whprep23-count{white-space:nowrap;font-size:12.5px;font-weight:800;color:var(--ink,#27272a);background:var(--bg-alt,#f7f8fa);border:1px solid var(--line,#e3e6ea);border-radius:999px;padding:4px 11px;flex:0 0 auto}
+/* ۳) برگهٔ سرویس‌های ارسال: اندازه‌های استاندارد و یکدست کادرها (بدون تصمیم پایان روز، ردیف کوتاه‌تر شد)؛
+      همهٔ کنترل‌های ردیف ارتفاع یکسان ۳۲px دارند و ردیف در عرض استاندارد جا می‌شود. */
+#appView .sr318-row{min-width:960px;min-height:42px;gap:8px;padding:5px 10px}
+#appView .sr318-name{flex:0 1 170px;min-width:110px}
+#appView .sr318-ops{gap:6px}
+#appView .sr318-ops .btn{height:32px;min-height:32px!important;padding:4px 11px;font-size:12px}
+#appView .sr318-wbox input{width:92px;height:32px;font-size:13px}
+#appView .sr318-sendline .btn{height:34px;min-height:34px!important}
+
+/* ===== v37.24.0 — برگهٔ آماده‌سازی فروشگاه: جاگیری کامل در عرض صفحه، بدون اسکرول افقی ===== */
+/* علت درازی کادر کیلوگرم: قاعدهٔ عمومی wh38-cell-box{width:100%} روی کادر وزن هم می‌نشست.
+   حالا ردیف حداقل‌عرض ندارد، در عرض صفحه جا می‌شود و اگر جا کم بود، منظم به خط بعد می‌پیچد. */
+#appView #content .sr318-rows{overflow-x:visible;padding-bottom:0}
+#appView #content .sr318-row{min-width:0;width:100%;flex-wrap:wrap;row-gap:4px;column-gap:6px;min-height:38px;padding:4px 8px}
+#appView #content .sr318-name{flex:1 1 110px;min-width:90px;max-width:160px;font-size:12px}
+#appView #content .sr318-req,#appView #content .sr318-wts{font-size:11px}
+#appView #content .sr318-ops{flex-wrap:wrap;row-gap:4px;gap:5px}
+#appView #content .sr318-wbox.wh38-cell-box{width:auto!important;height:30px!important;min-height:30px!important;flex:0 0 auto;padding:0 7px!important;gap:4px!important}
+#appView #content .sr318-wbox input{width:58px;height:28px;font-size:12.5px;text-align:center}
+#appView #content .sr318-wbox b{font-size:10.5px}
+#appView #content .sr318-ops .btn{height:30px;min-height:30px!important;padding:3px 8px;font-size:11.5px}
+#appView #content .sr318-sendline{flex-wrap:wrap;overflow-x:visible}
+#appView #content .sr318-sendnote{white-space:normal}
+#appView #content .sr318-group{padding:5px 6px}
+
+/* ===== v37.33.0 — عیب‌یابی واقعی برگهٔ سرویس: ردیف اسیر گرید عمومی فرم‌ها بود ===== */
+/* ردیف .wh38-prep-item.sr318-row از form-layout.css مقدار display:grid !important با ستون‌های
+   ۲۸px + چهار ستون 1fr + ۷۶px می‌گرفت؛ دکمه‌ها در ستون ۷۶px ستونی می‌شدند و ردیف ۱۹۲px ارتفاع می‌گرفت.
+   این بلوک با همان سطح اولویت (دو آی‌دی + دو کلاس) و !important، چیدمان را قطعی فلکس تک‌خطی می‌کند. */
+#appView #content .wh38-prep-item.sr318-row{display:flex!important;grid-template-columns:none!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:6px!important;min-width:0!important;width:100%!important;min-height:40px!important;height:auto!important;padding:5px 9px!important}
+#appView #content .sr318-row>.sr318-num{flex:0 0 24px!important}
+#appView #content .sr318-row>.sr318-name{flex:1 1 110px!important;min-width:70px!important;max-width:170px!important}
+#appView #content .sr318-row>.st-run-chip{flex:0 0 auto!important}
+#appView #content .sr318-row>.sr318-req{flex:0 0 auto!important}
+#appView #content .sr318-row>.sr318-wts{flex:0 1 auto!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#appView #content .sr318-row>.sr318-hist{flex:0 0 auto!important}
+#appView #content .sr318-row>.sr318-final{flex:0 1 auto!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#appView #content .sr318-row>.sr318-ops{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:5px!important;flex:0 0 auto!important;margin-inline-start:auto!important}
+@media (max-width:1150px){
+  #appView #content .wh38-prep-item.sr318-row{flex-wrap:wrap!important}
+  #appView #content .sr318-row>.sr318-ops{flex:1 1 100%!important;margin-inline-start:0!important}
+}
+#appView #content .sr318-row>.sr318-name{flex-basis:150px!important;max-width:210px!important}
+#appView #content .sr318-wbox input{height:26px!important;min-height:0!important;padding:0!important}
+#appView #content .sr318-ops .btn{padding:3px 7px!important;font-size:11px!important}
+#appView #content .sr318-row>.sr318-num{margin:0!important}
+
+/* v37.27.0 — کارتابل راننده: جزئیات محموله برای خود راننده باز می‌شود (بک‌اند) و کارت «واگذار شده»
+   فشرده و تک‌ردیفی است: هویت در یک خط و خلاصه + همهٔ دکمه‌ها در یک ردیف هم‌راستا. */
+#appView #content .dsp-list .dsp-card.dsp-card-compact{display:flex!important;flex-direction:column;gap:6px;padding:8px 12px}
+#appView #content .dsp-card-compact .dsp-card-head{padding:2px 0 6px;background:transparent;border-bottom:1px dashed var(--line)}
+#appView #content .dsp-card-compact .dsp-store-customer-box{margin:0;padding:2px 8px}
+#appView #content .dsp-card-actions{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:0}
+#appView #content .dsp-card-actions .dsp-card-meta{font-size:12px;color:#4b5563;white-space:nowrap}
+#appView #content .dsp-card-actions .dsp-card-meta b{color:#111827}
+#appView #content .dsp-card-actions .btn{flex:0 0 auto;height:32px;padding-top:0;padding-bottom:0}
+#appView #content .dsp-card-actions [data-dsp="driver-exit"],#appView #content .dsp-card-actions [data-dsp="deliver"]{margin-inline-start:auto}
+#appView #content .dsp-card-actions .dsp-wait-inline{margin-inline-start:auto;padding:5px 10px;font-size:12px;line-height:1.5}
+@media (max-width:720px){
+  #appView #content .dsp-card-actions{flex-wrap:wrap}
+  #appView #content .dsp-card-actions [data-dsp="driver-exit"],#appView #content .dsp-card-actions [data-dsp="deliver"],#appView #content .dsp-card-actions .dsp-wait-inline{margin-inline-start:0}
+}
+
+/* v37.28.0 — فرم تحویل راننده: مرجوعی/کسری/علت در همان ردیف تحویلیِ هر محصول؛
+   همهٔ کادرهای ردیف هم‌اندازه و در یک خط، با کمترین ارتفاع عمودی. */
+#modal .dsp-delivery-modal-card #dspLines{display:grid;gap:6px}
+#modal .dsp-delivery-modal-card .dsp-returns-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#modal .dsp-delivery-modal-card .dsp-returns-head h4{margin:0}
+#modal .dsp-delivery-modal-card .dsp-line.dsp-line-compact{display:flex!important;align-items:flex-start;gap:8px;padding:6px 9px;border:1px solid var(--line);border-radius:10px;background:#fafbfc}
+#modal .dsp-delivery-modal-card .dsp-line-compact .dsp-line-name{flex:1 1 168px;min-width:118px;display:grid;gap:1px;padding-bottom:2px}
+#modal .dsp-delivery-modal-card .dsp-line-compact .dsp-line-name b{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#modal .dsp-delivery-modal-card .dsp-line-compact .dsp-line-name small{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#modal .dsp-delivery-modal-card .dsp-line-compact .dsp-f{display:flex;flex-direction:column;gap:2px;min-width:0}
+#modal .dsp-delivery-modal-card .dsp-line-compact .dsp-f>span{font-size:9.5px;font-weight:700;color:var(--muted);white-space:nowrap;line-height:1.4}
+#modal .dsp-delivery-modal-card .dsp-line-compact input{height:30px!important;min-height:0!important;width:78px;padding:2px 8px!important;border:1px solid var(--line-strong);border-radius:8px;background:#fff;font:inherit;font-size:12.5px;box-sizing:border-box}
+#modal .dsp-delivery-modal-card .dsp-line-compact .dsp-f-reason{flex:1 1 150px}
+#modal .dsp-delivery-modal-card .dsp-line-compact .dsp-f-reason input{width:100%}
+#modal .dsp-delivery-modal-card .dsp-line-compact .dsp-line-ded{font-size:9px;color:var(--muted);line-height:1.3;white-space:nowrap}
+#modal .dsp-delivery-modal-card .dsp-line-compact .dsp-line-ded b{color:var(--brand)}
+@media (max-width:680px){
+  #modal .dsp-delivery-modal-card .dsp-line.dsp-line-compact{flex-wrap:wrap}
+  #modal .dsp-delivery-modal-card .dsp-line-compact .dsp-line-name{flex:1 1 100%}
+}
+#modal .dsp-delivery-modal-card #dspFullReasonWrap[hidden]{display:none!important}
+
+/* v37.29.0 — فرم تحویل راننده: مرجوعی/کسری/علت داخل همان فهرست اقلام تحویلی (بخش جدای پایین فرم حذف شد) */
+#modal .dsp-delivery-modal-card .dsp-deliver-table-wrap{overflow-x:auto}
+#modal .dsp-delivery-modal-card .dsp-deliver-table{width:100%}
+#modal .dsp-delivery-modal-card .dsp-deliver-table th,#modal .dsp-delivery-modal-card .dsp-deliver-table td{padding:4px 7px;font-size:12px;white-space:nowrap;vertical-align:middle}
+#modal .dsp-delivery-modal-card .dsp-deliver-table td:nth-child(2){white-space:normal;min-width:120px}
+#modal .dsp-delivery-modal-card .dsp-deliver-table td input{height:28px!important;min-height:0!important;width:70px;padding:2px 7px!important;border:1px solid var(--line-strong);border-radius:7px;background:#fff;font:inherit;font-size:12px;box-sizing:border-box}
+#modal .dsp-delivery-modal-card .dsp-deliver-table td input[data-f="reason"]{width:100%;min-width:120px}
+#modal .dsp-delivery-modal-card .dsp-deliver-table .dsp-line-ded{display:block;font-size:9px;color:var(--muted);line-height:1.4}
+#modal .dsp-delivery-modal-card .dsp-deliver-table .dsp-line-ded b{color:var(--brand)}
+#modal .dsp-delivery-modal-card .dsp-deliver-table tfoot td{font-weight:700;background:#f8fafc}
+
+/* ===== v37.34.0 — بازخورد برگهٔ کنترل خروج نگهبانی: ردیف بدون تیک، وضعیت بارگذاری و پیام درون‌برگه‌ای ===== */
+.gt-check.gt-check-missing{border-color:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.13)}
+.gt-exit-loading{padding:26px 20px;text-align:center;color:var(--muted);font-size:13px}
+.gt-exit-msg{margin:0 20px 12px}
+
+/* ===== v37.35.0 — جزئیات سفارش فروشگاه در انبار: فرم فشرده و کم‌ارتفاع ===== */
+/* سربرگ یک‌خطی + مشخصات در یک نوار باریک + سطر عنوان ستون‌ها + ردیف‌های تک‌خطی؛
+   شبکهٔ شش‌خانه و تکرار نام فروشگاه/مشتری حذف شد. همه‌چیز زیر .whd35-detail است
+   تا فرم‌های جزئیات دیگر کارتابل‌ها دست‌نخورده بمانند. */
+.whd35-detail{display:grid;gap:8px}
+.whd35-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 0 8px;border-bottom:1px solid var(--line,#e3e6ea)}
+.whd35-title{display:flex;align-items:baseline;gap:10px;min-width:0;flex-wrap:wrap}
+.whd35-title h2{margin:0;font-size:17px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.whd35-title span{color:var(--muted);font-size:12px;white-space:nowrap}
+.whd35-meta{display:flex;flex-wrap:wrap;gap:5px 16px;padding:6px 10px;background:var(--bg-alt,#f7f8fa);border:1px solid var(--line,#e3e6ea);border-radius:10px;font-size:11.5px;color:var(--muted)}
+.whd35-meta b{color:var(--ink,#27272a);font-weight:800}
+.whd35-note{margin:0;padding:7px 10px}
+.whd35-list{gap:5px}
+.whd35-headrow{font-size:10.5px;font-weight:700;color:var(--muted);padding:0 2px}
+.whd35-list .whd23-box{min-height:33px;padding:3px 9px;border-radius:8px;justify-content:center}
+.whd35-list .whd23-box b{font-size:12.5px}
+.whd35-detail .modal-actions{margin-top:2px}
+
+/* ===== v37.36.0 — سربرگ سوم فروشگاه‌های انبار: «سوابق و گزارشات» ===== */
+#appView[data-cartable-page="warehouse"] .wh38-store-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:560px){
+  #appView[data-cartable-page="warehouse"] .wh38-store-tabs{gap:4px}
+  #appView[data-cartable-page="warehouse"] .wh38-store-tabs button{padding:2px 3px}
+}
+
+/* ===== v37.38.0 — فرم کاربران: راهنمای اتصال راننده ===== */
+#admUserForm .adm-driver-hint{color:var(--muted,#6b7280);font-weight:600;line-height:1.9;font-size:11.5px}
+#admUserForm .adm-driver-hint.is-warn{color:#9a4d00;background:#fff4e0;border:1px solid #f0d3a0;border-radius:8px;padding:5px 9px;display:block;margin-top:6px}
+
+/* ===== v37.40.0 — فرم حضوری فروش تک‌خطی و فشرده + فرم تسویهٔ کم‌ارتفاع ===== */
+/* صفحهٔ ثبت سفارش حضوری: بنر و سربرگ اقلام باریک‌تر؛ ستون خالی کنار فرم حذف شد */
+#appView .sd-oe-banner{padding:9px 14px;border-radius:13px}
+#appView .sd-oe-banner h2{font-size:15.5px}
+#appView .sd-oe-banner p{font-size:11.5px;margin-top:1px}
+#appView .sd-oe-banner-actions .btn-lg{padding:8px 14px;font-size:13px;min-height:38px}
+#appView .sd-oe-layout{grid-template-columns:minmax(0,1fr)!important;margin-top:8px;gap:10px}
+#appView .sd-lines-head{padding:9px 14px}
+#appView .sd-lines-head h3{font-size:14px}
+#appView .sd-lines-head p{font-size:11px;margin-top:1px}
+#appView .sd-lines-body{padding:9px 12px 11px}
+#appView .sd-lines{gap:6px}
+/* ردیف‌های حضوری دقیقاً هم‌قالب ردیف فشردهٔ فروشگاه: بدون برچسب، همه‌چیز در یک خط */
+#appView #content #orderLines .sd-line.sd-line-compact{display:flex!important;flex-direction:row;align-items:center;gap:7px!important;padding:6px 9px!important}
+#appView #content #orderLines .sd-line.sd-line-compact .sd-line-no{grid-area:auto!important;margin:0!important;width:24px;height:24px;border-radius:7px;font-size:10px;flex:0 0 auto}
+#appView #content #orderLines .sd-line.sd-line-compact .sd-line-cell{display:block!important;width:auto!important;min-width:0}
+#appView #content #orderLines .sd-line.sd-line-compact .cell-product{flex:0 1 250px;min-width:170px}
+#appView #content #orderLines .sd-line.sd-line-compact .cell-qty{flex:0 0 88px}
+#appView #content #orderLines .sd-line.sd-line-compact .cell-unit{flex:0 0 112px}
+#appView #content #orderLines .sd-line.sd-line-compact .cell-desc{flex:0 1 220px;min-width:80px}
+#appView #content #orderLines .sd-line.sd-line-compact .input-shell{height:35px!important;min-height:35px!important;border-radius:9px;width:100%!important;padding:0 8px!important}
+#appView #content #orderLines .sd-line.sd-line-compact .input-shell input,
+#appView #content #orderLines .sd-line.sd-line-compact .input-shell select{font-size:12.5px}
+#appView #content #orderLines .sd-line.sd-line-compact .sd-line-del{grid-area:auto!important;margin:0!important;width:30px;height:30px;flex:0 0 auto}
+@media(max-width:760px){#appView #content #orderLines .sd-line.sd-line-compact{flex-wrap:wrap;row-gap:6px}
+ #appView #content #orderLines .sd-line.sd-line-compact .cell-product{flex:1 1 calc(100% - 34px)}
+ #appView #content #orderLines .sd-line.sd-line-compact .cell-qty{flex:0 0 30%}
+ #appView #content #orderLines .sd-line.sd-line-compact .cell-unit{flex:0 0 36%}
+ #appView #content #orderLines .sd-line.sd-line-compact .cell-desc{flex:1 1 140px}}
+/* فرم تسویهٔ فروش: فاصله‌ها و ارتفاع بوم امضا و ردیف‌های پرداخت کمتر شد */
+#appView #content .stl-card{padding:8px!important}
+#appView #content .stl-card .stl-section{padding:6px 8px!important}
+#appView #content .stl-card .stl-section-head{margin-bottom:5px!important}
+#appView #content .stl-card .stl-section-head h3{font-size:13.5px}
+#appView #content .stl-card .stl-grid-head{padding:5px 8px!important;font-size:11px}
+#appView #content .stl-card .stl-row{padding:4px 8px!important}
+#appView #content .stl-input{height:32px!important;min-height:32px!important;font-size:12.5px}
+#appView #content .stl-card .stl-sig{height:78px!important}
+#appView #content .stl-sig-foot{margin-top:5px!important}
+#appView #content .stl-approved-banner,#appView #content .stl-approval-prompt{padding:7px 10px!important;margin-bottom:7px!important}
+#appView #content .stl-invoice-bottom{margin-top:6px!important;gap:8px!important}
+#appView #content .stl-weight-summary{margin-top:5px!important}
+#appView #content .stl-payment-row{padding:7px 9px!important;margin:6px 0!important;gap:7px!important}
+#appView #content .stl-pay-field,#appView #content .stl-pay-detail label{grid-template-rows:15px 36px!important;gap:3px!important}
+#appView #content .stl-pay-field input,#appView #content .stl-pay-field select,#appView #content .stl-pay-detail input,#appView #content .stl-pay-detail select{height:36px!important;min-height:36px!important;max-height:36px!important;line-height:34px!important}
+#appView #content .stl-payment-row>[data-payremove]{height:36px!important;min-height:36px!important;max-height:36px!important}
+#appView #content .stl-pay-totals{padding:7px 10px!important;margin:6px 0!important}
+#appView #content .bt-customer-field{min-height:32px!important;padding-top:3px!important;padding-bottom:3px!important}
+@media(min-width:1100px){#appView #content .stl-verification-column .stl-grid2{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+/* ===== v37.43.0 — کارت «سفارش‌های در جریان» فروش تک‌خطی و کم‌ارتفاع ===== */
+/* فهرست محصولات از روی کارت حذف شده و فقط در «جزئیات کامل» می‌آید؛
+   جلوی هر مقدار، برچسبش (شماره سفارش، شماره تماس، محل ارسال و...) نوشته می‌شود. */
+#appView .sd-flow-list{gap:7px!important}
+#appView .sd-flow-toolbar{padding:8px 14px}
+#appView .sd-flow-card.sd-flow-card-1line{align-items:center;gap:10px;padding:8px 12px;border-radius:12px}
+#appView .sd-flow-card-1line .sd-flow-index{width:28px;height:28px;border-radius:8px;font-size:10.5px}
+#appView .sd-flow-1line-main{flex:1;min-width:0;display:grid;gap:3px}
+#appView .sd-flow-1line-id{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#appView .sd-flow-1line-id strong{font-size:13.5px;font-weight:1000}
+#appView .sd-flow-meta{display:flex;align-items:center;gap:4px 16px;flex-wrap:wrap}
+#appView .sd-fmeta{display:inline-flex;align-items:baseline;gap:5px;font-size:12px;white-space:nowrap}
+#appView .sd-fmeta i{font-style:normal;font-size:10.5px;font-weight:700;color:var(--muted)}
+#appView .sd-fmeta b{font-weight:800;color:var(--ink-2,#263746)}
+#appView .sd-flow-1line-side{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+#appView .sd-flow-1line-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+@media(max-width:900px){#appView .sd-flow-card.sd-flow-card-1line{flex-wrap:wrap}
+ #appView .sd-flow-1line-side{flex-basis:100%;justify-content:space-between}}
+
+/* ===== v37.43.0 — ریسپانسیو کامل: منوی کشویی موبایل و عرض کامل محتوا ===== */
+/* دکمه‌های منو فقط در موبایل دیده می‌شوند */
+#appView .rail-toggle-btn{display:none!important;place-items:center}
+#appView .rail-close-btn{display:none;position:absolute;top:calc(10px + env(safe-area-inset-top,0px));inset-inline-end:10px;width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.10);color:#fff;place-items:center;cursor:pointer;z-index:3}
+.rail-backdrop{position:fixed;inset:0;background:rgba(13,18,24,.48);z-index:250}
+@media (max-width:640px){
+  /* ستون سمت راست: کشوی مخفی از لبهٔ راست؛ با کلاس rail-open باز می‌شود */
+  #appView .rail{position:fixed!important;top:0!important;bottom:0!important;right:0!important;left:auto!important;width:min(300px,84vw)!important;height:100vh!important;height:100dvh!important;padding:14px 12px calc(14px + env(safe-area-inset-bottom,0px))!important;z-index:260!important;transform:translateX(106%);transition:transform .28s ease,box-shadow .28s ease;box-shadow:none!important;overflow-y:auto!important;overflow-x:hidden!important}
+  #appView.rail-open .rail{transform:translateX(0);box-shadow:-18px 0 44px rgba(15,23,32,.30)!important}
+  #appView .rail .rail-top{display:flex!important;padding-inline-end:44px!important}
+  #appView .rail-close-btn{display:grid!important}
+  #appView .rail #railNav > button{flex-direction:row!important;justify-content:flex-start!important;min-height:46px!important;height:auto!important;padding:0 12px!important;font-size:13px!important;text-align:right!important;gap:10px!important}
+  #appView .rail #railNav .nav-label{white-space:nowrap!important;font-size:13px!important;line-height:1.4!important;max-width:none}
+  #appView .rail #railNav > button.active::before{right:0;top:10px;bottom:10px}
+  /* محتوا تمام‌عرض می‌شود */
+  #appView .workspace{margin-right:0!important;padding:0 10px!important}
+  #appView .workspace-header{grid-template-columns:auto minmax(0,1fr) auto!important;margin:0 -10px!important;padding:8px 10px!important;gap:8px!important}
+  #appView .rail-toggle-btn{display:grid!important;grid-column:1;width:42px;height:42px}
+  #appView .header-main{grid-column:2!important;grid-row:1!important}
+  #appView .header-actions{grid-column:3!important;grid-row:1!important}
+  .toast{right:12px!important;left:12px!important}
+  /* پنل اعلان‌ها در موبایل زیر هدر و تمام‌عرض امن می‌نشیند */
+  .notification-popover{top:64px!important;right:10px!important;left:10px!important;width:auto!important}
+}
+
+/* ========================================================================
+   v37.43.0 — صفحهٔ ورود: خط سفید مورب سمت کارت حذف شد و واترمارک ثابت لوگو آمد
+   ------------------------------------------------------------------------
+   علت خط: برقِ (shine) دکمهٔ اصلی با inset:0 به نزدیک‌ترین جدِ positioned
+   (کارت ورود) می‌چسبید و چون دکمه position نداشت، نوار نور هم‌اندازهٔ کارت
+   ساخته و بیرون از آن دیده می‌شد. دکمه position:relative گرفت تا برق داخل
+   خود دکمه بماند و با overflow:hidden بریده شود.
+   جای خط در دسکتاپ: واترمارک بزرگ و بسیار محوِ ثابت لوگو در سمت راست کارت.
+   ======================================================================== */
+#appView .btn-primary,#modal .btn-primary,.login-card .btn-primary{position:relative}
+#loginView .login-stage::before{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  width:min(320px,34vw);height:min(320px,34vw);
+  right:4vw;top:50%;transform:translateY(-50%);
+  background:url("/logo.png") center/contain no-repeat;opacity:.07;
+}
+@media (max-width:1024px){#loginView .login-stage::before{display:none}}
+
+/* پلاک‌های خودرو و موتورسیکلت: قطعات پنهان نباید در grid جا بگیرند. */
+.iran-plate.iran-plate [hidden]{display:none!important}
+.iran-plate.iran-plate.is-motor{width:calc(var(--plate-h) * 2.3)!important;grid-template-columns:calc(var(--plate-h) * .46) 1fr!important;grid-template-rows:1fr 1fr!important}
+.iran-plate.iran-plate.is-motor .blue-strip{grid-column:1!important;grid-row:1!important}
+.iran-plate.iran-plate.is-motor .motor-top{grid-column:2!important;grid-row:1!important}
+.iran-plate.iran-plate.is-motor .motor-bottom{grid-column:1 / span 2!important;grid-row:2!important;border-top:1px solid #d7dee6!important;background:#fff!important}
+.iran-plate.iran-plate.is-motor .plate-part span,.iran-plate.iran-plate.is-motor .plate-part input{font-size:calc(var(--plate-h) * .28)!important}
+.iran-plate.iran-plate .plate-code{background:#eef2f7!important}
+.iran-plate-legacy{display:inline-block;border:2px solid #415060;border-left:7px solid #0d5a9c;border-radius:7px;background:#fff;color:#17202a;font-weight:700;padding:3px 8px;max-width:100%;overflow-wrap:anywhere}
+.plate-legacy-note{display:block;margin-top:6px;color:#8a5200;overflow-wrap:anywhere}
+[data-plate-editor]{min-width:0;max-width:100%}
+
+/* ورودی پلاک: فاصلهٔ selectهای عمومی نباید عرض حرف یا اعداد را بپوشاند. */
+#appView #content .iran-plate.plate-editor input,
+#appView #content .iran-plate.plate-editor select,
+#modal .iran-plate.plate-editor input,
+#modal .iran-plate.plate-editor select{
+  box-sizing:border-box!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  padding:0 2px!important;text-align:center!important;text-align-last:center!important;letter-spacing:0!important;
+  line-height:normal!important;color:#101820!important;cursor:text;
+}
+#appView #content .iran-plate.plate-editor select,#modal .iran-plate.plate-editor select{cursor:pointer}
+.iran-plate.plate-editor .plate-letter-part{position:relative}
+.iran-plate.plate-editor .plate-letter-part::after{content:'▾';position:absolute;right:3px;bottom:1px;line-height:1;font-size:10px;color:#536576;pointer-events:none}
+#appView #content .iran-plate .blue-strip span,#modal .iran-plate .blue-strip span{color:#fff!important}
+#appView #content .iran-plate.plate-editor :is(input,select):focus-visible,
+#modal .iran-plate.plate-editor :is(input,select):focus-visible{outline:2px solid #a8172e!important;outline-offset:-3px!important}
+
+/* موتور ملی: نشان آبی فقط بالا چپ است و پنج رقم تمام عرض پایین را می‌گیرند. */
+#appView #content #plateBox .iran-plate.is-motor{
+  width:min(100%,190px)!important;height:80px!important;
+  grid-template-columns:34px minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) minmax(0,1fr)!important;
+}
+#appView #content #plateBox .iran-plate.is-motor .blue-strip{width:auto!important}
+#appView #content #plateBox .iran-plate.is-motor input{height:100%!important;font-size:22px!important}
+
+/* یک ردیف برچسب و یک ردیف کنترل، در فرم‌های اصلی مدیریت و مشتری. */
+#modal .cust-form .cust-field:not(.adm-check){
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-content:start!important;align-items:stretch!important;
+  min-width:0!important;gap:6px!important;margin:0!important;
+}
+#modal .cust-form .cust-field:not(.adm-check)>span:first-child{
+  min-height:20px!important;line-height:20px!important;
+}
+#modal .cust-form .cust-field[hidden]{display:none!important}
+
+/* نشان مقصد اعلان و شمارنده مراحل نگهبانی */
+.gate-dispatch-count{display:inline-flex;align-items:center;justify-content:center;min-width:1.7em;padding:2px 6px;margin-inline-start:5px;border-radius:999px;background:#e6edf5;color:#233d5b;font-size:.85em}
+.notif-target-highlight{outline:3px solid #e58b24!important;outline-offset:3px;scroll-margin:90px}
+
+/* دامنه و گواهی */
+.tls-settings .notice{margin:14px 0;line-height:1.9}.tls-status{padding:12px 14px;border:1px solid var(--line,#ddd);border-radius:12px;background:#f7fafb;line-height:1.9;overflow-wrap:anywhere}.tls-settings .form-grid{align-items:end}.tls-settings .adm-check{grid-column:1/-1;line-height:1.8}.tls-settings .field small{color:var(--muted);font-size:12px}.tls-current{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* شمارش و چاپ سرویس‌ها و فرم غیرحضوری */
+.store-service-print,.store-receipt-summary{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.store-receipt-summary{grid-column:1/-1;margin-top:7px}.whh-row .store-service-print{grid-column:1/-1}
+@media(min-width:901px){#content .sales-remote-customer-grid-v40{grid-template-columns:repeat(3,minmax(0,1fr))!important}#content .sales-remote-place-v40{grid-column:auto!important}}
+.product-option.keyboard-active,.op-product-option.keyboard-active{background:#fce7eb;outline:2px solid #a6162d;outline-offset:-2px}
+
+/* هماهنگی فرم‌ها: در برگه‌های کوچک نوار عملیات روی ورودی قیمت قرار نگیرد. */
+#appView #content #priceForm .sticky-actions{position:static!important;bottom:auto!important}
+
+/* با کم‌شدن عرض، عملیات هر قلم در همان کارت و در چند خط قابل دسترس بماند. */
+@media(max-width:1150px){
+  #appView #content .sr318-row>.sr318-ops{flex-wrap:wrap!important;min-width:0!important;max-width:100%!important}
+  #appView #content .sr318-row>.sr318-ops .btn{white-space:normal!important;height:auto!important;min-height:34px!important}
+  #appView #content .sr318-group-head{flex-wrap:wrap;min-width:0}
+  #appView #content .sr318-sendline .store-service-print{max-width:100%;flex-wrap:wrap}
+}
+
+/* برگهٔ انبار در موبایل نباید برای دیدن وزن یا وضعیت موجودی اسکرول افقی بخواهد. */
+@media(max-width:700px){
+  #appView #content .bt-customer-strip-scroll{overflow-x:visible!important}
+  #appView #content .bt-customer-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #appView #content .bt-customer-field{height:auto!important;min-height:44px!important}
+  #appView #content .bt-customer-field>span{overflow-wrap:anywhere!important;line-height:1.5!important}
+  #appView #content .wh38-sheet .wh38-progress{display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:6px 10px!important}
+  #appView #content .wh38-sheet .wh38-progress i{display:none!important}
+  #appView #content .wh38-sheet .wh38-note{display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-items:start!important;gap:4px!important;height:auto!important;min-height:0!important}
+  #appView #content .wh38-sheet .wh38-note b,#appView #content .wh38-sheet .wh38-note span{position:static!important;white-space:normal!important;line-height:1.7!important}
+}
+@media(max-width:1150px){
+  #appView #content .wh38-prep-items{grid-template-columns:minmax(0,1fr)!important;overflow-x:visible!important;padding-inline:10px!important}
+  #appView #content .wh38-prep-item:not(.sr318-row){grid-template-columns:28px repeat(2,minmax(0,1fr))!important;grid-template-areas:'num product product' '. quantity description' '. weight stock'!important;gap:8px!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-num{grid-area:num!important;margin-top:25px!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-cell:nth-child(2){grid-area:product!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-cell:nth-child(3){grid-area:quantity!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-cell:nth-child(4){grid-area:description!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-cell:nth-child(5){grid-area:weight!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-stock-cell{grid-area:stock!important}
+  #appView #content .wh38-prep-item:not(.sr318-row) .wh38-cell-label{height:auto!important;min-height:20px!important;white-space:normal!important;line-height:1.5!important}
+  #appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-title strong,#appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-desc{white-space:normal!important;overflow-wrap:anywhere!important;line-height:1.5!important;overflow:visible!important}
+  #appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-title,#appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-desc{height:auto!important;min-height:44px!important;padding-block:7px!important}
+  #appView #content .wh38-prep-item:not(.sr318-row) .wh38-req b{white-space:normal!important;overflow-wrap:anywhere!important}
+}
+
+/* تاریخ تحویل از زمان ورود به انبار مستقل است. */
+@media(min-width:621px){
+ #futureOrderFormV25 .fx-top-grid>.jalali-datetime-field,
+ #futureOrderFormV25 .fx-top-grid>.jalali-field{grid-column:span 6!important}
+ #futureOrderFormV25 .fx-top-grid>.fx-addr-field{grid-column:1/-1!important}
+}
+#futureOrderFormV25 .jalali-field .jalali-shell{height:48px;min-height:48px}
+#futureOrderFormV25 .jalali-field .date-today-btn{flex:0 0 auto}
+.wh38-delivery-date{white-space:normal;overflow-wrap:anywhere}
+#appView #content .wh38-sheet-delivery-date{margin-top:6px;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+
+/* ثبت بیعانه و خلاصهٔ مالی آن در فروش */
+.deposit-entry{margin:12px 0;padding:12px;border:1px solid var(--bt-line);border-radius:10px;background:var(--bt-panel-2)}
+.deposit-hint{display:inline-block;margin-inline-start:8px;font-size:12px;color:var(--bt-muted);line-height:1.7}
+.deposit-fields:not([hidden]){display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:9px;margin-top:10px}
+.deposit-fields label{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:12px;font-weight:700}
+.deposit-fields label[hidden]{display:none!important}
+.deposit-fields input,.deposit-fields select{box-sizing:border-box;width:100%;min-width:0}
+.deposit-summary{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:8px 0;color:var(--bt-ink);font-size:12px;overflow-wrap:anywhere}
+.deposit-summary strong{color:#a44716}
+.deposit-refund-panel{grid-column:1/-1;min-width:0}
+.deposit-refund-row{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid var(--bt-line)}
+.deposit-dispatch-message{grid-column:1/2!important;grid-row:1!important;font-size:11px;line-height:1.5}
+.deposit-excess:not([hidden]){display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:#9a3b13;font-size:12px}
+/* Live sales dashboard and searchable audit history */
+.sales-live,.sales-history-panel{margin-top:20px;padding:20px;border:1px solid #eadfe1;border-radius:18px;background:#fff;box-shadow:0 5px 20px #32101a0b}
+.sales-live-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px}.sales-live-head h2,.sales-live-head h3{margin:0}.sales-live-head p{margin:5px 0 0;color:#6b7280;font-size:13px}
+.sales-live-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:22px}.sales-live-metrics>div{background:#f9f6f6;border:1px solid #f0e7e8;border-radius:12px;padding:14px;min-width:0}.sales-live-metrics small,.sales-live-metrics strong{display:block}.sales-live-metrics small{color:#69717d;margin-bottom:8px}.sales-live-metrics strong{font-size:20px;overflow-wrap:anywhere}
+.sales-history-list{display:grid;gap:8px}.sales-history-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px;border:1px solid #eee4e5;border-radius:10px}.sales-history-row small,.sales-history-timeline small{display:block;color:#757b85;margin-top:4px}.sales-history-row>div{min-width:0;overflow-wrap:anywhere}.sales-history-search{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.sales-history-search input{flex:1 1 220px;min-width:0;padding:10px;border:1px solid #d7d7da;border-radius:8px}.sales-history-pages{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin-top:15px}.sales-history-timeline{padding-inline-start:24px;display:grid;gap:12px}.sales-history-detail h3{margin:20px 0 10px}@media(max-width:480px){.sales-live,.sales-history-panel{padding:14px}.sales-live-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.sales-live-metrics strong{font-size:16px}}
+
+/* Desktop: fit order cards to the actual workspace, not a fixed monitor width.
+   The sidebar changes width at several breakpoints, so wrapping is driven by
+   available space rather than by the viewport alone. */
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-card.sd-store-card-v42,
+#appView[data-cartable-page="warehouse"] .wh38-store-pane .whsin22-card{
+  min-width:0;max-width:100%;box-sizing:border-box;flex-wrap:wrap;row-gap:8px;
+}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-actions,
+#appView[data-cartable-page="warehouse"] .wh38-store-pane .whsin22-actions{
+  flex-wrap:wrap;max-width:100%;min-width:0;
+}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-actions .btn,
+#appView[data-cartable-page="warehouse"] .wh38-store-pane .whsin22-actions .btn{
+  height:auto;min-height:32px;white-space:normal;text-align:center;line-height:1.5;
+}
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-card .sd-store-identity-v42 h3,
+#appView[data-cartable-page="sales"] .sales-store-pane-v43 .ssin21-customer,
+#appView[data-cartable-page="warehouse"] .wh38-store-pane .whsin22-store,
+#appView[data-cartable-page="warehouse"] .wh38-store-pane .whsin22-customer{
+  max-width:100%;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;
+}
+
+/* The four incoming-order facts can shrink into two columns on narrow cards. */
+#appView #content .wh38-incoming-summary-scroll{container:incoming-summary / inline-size}
+#appView #content .wh38-incoming-summary{min-width:0!important}
+#appView #content .wh38-incoming-cell>span{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere;line-height:1.6!important}
+@container incoming-summary (max-width:680px){
+  #appView #content .wh38-incoming-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+
+/* Audit trail has four columns; let text wrap in its half-width admin panel. */
+#appView #content .table-wrap table.audit-table{min-width:0;table-layout:fixed}
+#appView #content .audit-table th,#appView #content .audit-table td{padding:8px;overflow-wrap:anywhere}
+
+/* On short screens the sticky header would permanently take working space. */
+@media(max-height:750px){
+  #appView .workspace-header{position:static!important;padding-block:8px!important;min-height:0!important}
+  #appView .content{padding-top:14px!important;padding-bottom:28px!important}
+}
+
+/* A wide viewport can still have a narrow service pane beside the rail. */
+#appView #content .wh38-prep-item.sr318-row{flex-wrap:wrap!important}
+#appView #content .sr318-row>.sr318-ops{flex-wrap:wrap!important;max-width:100%!important;min-width:0!important}
+
+/* بخش‌های تنظیمات در سربرگ‌های جدا؛ بدون پیمایش افقی در صفحه‌های کوچک. */
+#appView #content .settings-tabs{display:flex;flex-wrap:wrap;gap:8px;padding:8px;border:1px solid var(--bt-line,#dce4eb);border-radius:15px;background:var(--bt-panel,#fff);margin-bottom:16px}
+#appView #content .settings-tabs [role="tab"]{flex:1 1 150px;min-width:0;min-height:44px;padding:8px 12px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--bt-ink,#263746);font:inherit;font-size:13px;font-weight:800;line-height:1.5;cursor:pointer}
+#appView #content .settings-tabs [role="tab"]:hover{background:var(--bt-brand-50,#fdf3f4)}
+#appView #content .settings-tabs [role="tab"][aria-selected="true"]{background:var(--bt-brand,#b40f23);color:#fff;border-color:var(--bt-brand,#b40f23)}
+#appView #content .settings-tabs [role="tab"]:focus-visible{outline:3px solid #365fba;outline-offset:2px}
+#appView #content .settings-panel[hidden]{display:none!important}
+#appView #content .settings-panel>.section-space:first-child{margin-top:0}
+@media(max-width:600px){#appView #content .settings-tabs [role="tab"]{flex-basis:120px}}
+
+/* پیام ارجاع باید در کارت و پنجرهٔ اصلاح خوانا و مستقل از یادداشت مشتری باشد. */
+.warehouse-return-note{box-sizing:border-box;min-width:0;max-width:100%;padding:9px 12px;margin:8px 0;border:1px solid #e9b7a3;border-radius:10px;background:#fff5ef;color:#713516;line-height:1.7;overflow-wrap:anywhere}
+.warehouse-return-note b,.warehouse-return-note span{display:block}
+.warehouse-return-note span{white-space:pre-wrap;font-size:13px}
+#appView .sd-store-card .warehouse-return-note{flex:1 1 100%}
+
+/* Automatic backup settings in the admin backup page. */
+.auto-backup-settings{display:grid;gap:10px;padding:16px;margin-bottom:18px;border:1px solid #d4dde5;border-radius:12px;background:#f6f8fa;min-width:0}
+.auto-backup-settings h3,.auto-backup-settings p{margin:0}.auto-backup-settings p{font-size:12px;line-height:1.8;color:#526272}
+.auto-backup-toggle{display:flex;align-items:center;gap:8px;font-weight:700}.auto-backup-toggle input{width:18px;height:18px}
+.auto-backup-settings .cust-field{display:grid;gap:5px;min-width:0}.auto-backup-settings input[name=directory]{width:100%;min-width:0;box-sizing:border-box}
+.auto-backup-status{display:grid;gap:4px;overflow-wrap:anywhere;font-size:12px}.auto-backup-error,#auto-backup-message{color:#a51d2f;overflow-wrap:anywhere}
+
+/* جزئیات سفارش فروشگاه: متن بلند و اقلام باید در محدودهٔ پنجره بمانند. */
+#modal .store-detail-modal,#modal .store-detail-modal *{min-width:0}
+#modal .store-detail-modal :is(p,small,strong,b,span){overflow-wrap:anywhere;word-break:normal}
+#modal .store-detail-modal .detail-modal-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))}
+#modal .store-detail-modal .detail-modal-grid>div,#modal .store-detail-modal .detail-item-row>div{min-width:0}
+#modal .store-detail-modal .detail-item-row{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+#modal .store-detail-modal .detail-item-row>div{flex:1 1 180px}
+#modal .store-detail-modal .detail-item-row b{white-space:normal}
+#modal .store-detail-modal .st-run-chip{white-space:normal;max-width:100%;overflow-wrap:anywhere}
+#modal .store-detail-note{padding:10px 12px;background:#f8f9fa;border:1px solid var(--line);border-radius:10px;margin:10px 0}
+#modal .store-detail-note p{margin:4px 0 0;white-space:pre-wrap}
+#modal .store-detail-items-title{font-size:15px;margin:14px 0 8px}
+
+/* نام‌های بدون فاصله در کارت‌ها و نمودارها نباید از کادر بیرون بزنند. */
+#appView #content .wh38-incoming-card .wh38-items>div>span:nth-child(2){min-width:0;white-space:normal!important;word-break:normal!important;overflow-wrap:anywhere!important}
+#appView #content .sd-flow-1line-id strong{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#appView #content .sd-fmeta{max-width:100%;white-space:normal}
+#appView #content .sd-fmeta b{min-width:0;overflow-wrap:anywhere}
+#appView #content .st38-hero-badge{min-width:0;max-width:100%}
+#appView #content .st38-hero-badge span{min-width:0;overflow-wrap:anywhere}
+#appView #content .dbc-name{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.5}
+#modal .store-detail-modal .detail-item-row strong{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+
+/* خلاصهٔ افقی سفارش؛ فقط فهرست خودش در نمایش باریک جابه‌جا می‌شود. */
+#appView #content :is(.order-compact-scroll,.st38-delivery-list){overflow-x:auto;max-width:100%;min-width:0}
+#appView #content .order-compact-row{display:flex!important;align-items:center!important;gap:12px!important;flex-wrap:nowrap!important;width:max-content!important;min-width:100%!important;padding:10px 12px!important;white-space:nowrap!important}
+#appView #content .order-compact-row>*{flex-shrink:0}
+#appView #content .order-compact-row>.badge{white-space:nowrap!important}
+#appView #content .dsp-list{overflow-x:auto;max-width:100%;min-width:0}
+#appView #content .dsp-card-compact{min-width:650px}
+#appView #content :is(.sales-delivery-column-list,.sr-ship-list){overflow-x:auto;max-width:100%;min-width:0}
+/* راننده: هویت، خلاصه و دکمه‌ها در یک ردیف قابل پیمایش بمانند. */
+#appView #content .dsp-list .dsp-card.dsp-card-compact{flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;width:max-content;min-width:100%;white-space:nowrap}
+#appView #content .dsp-card-compact .dsp-card-head{border:0;padding:0;gap:12px;align-items:center;flex-shrink:0}
+#appView #content .dsp-card-compact .dsp-card-head>div{display:flex;align-items:center;gap:8px;white-space:nowrap}
+#appView #content .dsp-card-compact .dsp-card-actions{flex-wrap:nowrap;flex-shrink:0}
+#modal .v21-detail-table strong{white-space:normal;overflow-wrap:anywhere}
+
+/* تحویل راننده: چهار سربرگ مستقل و فهرست کامل‌عرض. */
+#appView #content .sales-delivery-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;min-width:0}
+#appView #content .sales-delivery-tab{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;padding:13px 16px;border:1px solid var(--line,#dce4eb);border-radius:12px;background:#fff;color:var(--ink,#202a34);font:inherit;font-weight:800;cursor:pointer}
+#appView #content .sales-delivery-tab.active{border-color:var(--brand,#a91129);background:#fff2f3;color:var(--brand,#a91129)}
+#appView #content .sales-delivery-tab:focus-visible{outline:3px solid #678fce;outline-offset:2px}
+#appView #content .sales-delivery-tab b{display:grid;place-items:center;min-width:29px;height:29px;padding:0 6px;border-radius:9px;background:#f1f4f7}
+#appView #content .sales-delivery-panel{min-width:0;border:1px solid var(--line,#dce4eb);border-radius:14px;background:#fff;padding:14px}
+#appView #content .sales-delivery-panel[hidden]{display:none!important}
+#appView #content .sales-delivery-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+#appView #content .sales-delivery-panel-head h2{margin:0;font-size:17px}
+#appView #content .sales-delivery-panel-head p{margin:5px 0 0;color:var(--muted);font-size:12px}
+#appView #content .sales-delivery-panel-head>span{font-size:12px;color:var(--muted)}
+#appView #content .sales-delivery-panel .sales-delivery-column-list{min-height:80px;overflow-x:auto;max-width:100%;min-width:0}
+#appView #content .sales-delivery-pages{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding-top:12px}
+#modal .sales-store-delivery-lines{display:grid;gap:8px;padding:12px 18px}
+#modal .sales-store-delivery-line{display:flex;gap:8px 16px;flex-wrap:wrap;border:1px solid var(--line,#dce4eb);border-radius:9px;padding:10px;overflow-wrap:anywhere}
+@media(max-width:700px){#appView #content .sales-delivery-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}#appView #content .sales-delivery-tab{padding:10px 12px;font-size:12px}}
+
+/* وزن و عملیات در یک سطر؛ در نمایش باریک فقط همان فهرست اسکرول می‌شود. */
+#appView #content .sr318-rows{display:block!important;overflow-x:auto!important;max-width:100%;padding-bottom:4px!important}
+#appView #content .wh38-prep-item.sr318-row{width:max-content!important;min-width:100%!important;flex-wrap:nowrap!important;gap:6px!important;margin-bottom:4px}
+#appView #content .sr318-row>.sr318-name{flex:0 0 150px!important;max-width:150px!important}
+#appView #content .sr318-row>.sr318-weights{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:0 0 auto;padding:3px 6px;border:1px solid #dce4eb;border-radius:8px;background:#f7fafb}
+#appView #content .sr318-history-button{height:28px;min-height:28px!important;padding:2px 7px;font-size:11px;white-space:nowrap}
+#appView #content .sr318-row>.sr318-ops{flex:0 0 auto!important;max-width:none!important;flex-wrap:nowrap!important}
+#appView #content .sr318-row>.sr318-ops .btn{height:30px!important;white-space:nowrap!important}
+#appView #content .wh38-store-sheet-head{overflow-x:auto}
+#appView #content .wh38-store-sheet-head .wh38-store-head{width:max-content;min-width:100%;flex-wrap:nowrap;white-space:nowrap}
+#appView #content .wh38-store-sheet-head .wh38-store-name,#appView #content .wh38-store-sheet-head .wh38-store-meta{flex:0 0 auto;max-width:none;overflow:visible}
+#appView #content .gate-dispatch-vertical-list>.order-compact-row{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;width:max-content!important;min-width:100%!important}
+/* جزئیات راننده و فروشگاه: مشخصات در یک ردیف و جدول با پیمایش مستقل. */
+#modal .dsp-detail-head{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto;gap:6px}
+#modal .dsp-detail-head .dsp-head-cell{display:flex;flex-direction:row;align-items:center;gap:6px;min-width:max-content;min-height:0;padding:6px 9px}
+#modal .dsp-detail-head .dsp-head-cell>*{white-space:nowrap}
+#modal .store-shipment-meta{display:flex;align-items:center;gap:12px;overflow-x:auto;white-space:nowrap;padding:6px 0 10px}
+/* The delivered detail is rendered inside #modal, outside #appView #content.
+   Mirror its card layout here so adjacent summary spans never collapse together. */
+#modal .st38-delivered-details{box-sizing:border-box;width:100%;min-width:0;padding:15px;border:1px solid var(--bt-line-2,#dce4eb);border-radius:14px;background:#fff;box-shadow:0 5px 18px rgba(22,38,52,.04)}
+#modal .st38-delivered-details>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0;padding-bottom:11px;border-bottom:1px solid var(--bt-line-2,#e4ebf0)}
+#modal .st38-delivered-details>header>div{min-width:0}
+#modal .st38-delivered-details>header .st-run-chip{margin-inline-start:8px}
+#modal .st38-delivered-details>header .badge{flex:0 1 auto;max-width:100%;white-space:normal;text-align:center}
+#modal .st38-delivered-details h3{margin:4px 0 1px;font-size:15px}
+#modal .st38-delivered-details>header p{margin:3px 0 0;color:var(--bt-muted,#718393);font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+#modal .st38-delivered-details .st38-delivered-summary{display:flex;align-items:baseline;flex-wrap:wrap;gap:9px 20px;min-width:0;padding:11px 12px;border-radius:9px;background:#f2f7f9;font-size:12px}
+#modal .st38-delivered-details .st38-delivered-summary>span{display:flex;align-items:baseline;flex-wrap:wrap;gap:7px;min-width:0;max-width:100%;overflow-wrap:anywhere}
+#modal .st38-delivered-details .st38-delivered-summary>span b{color:var(--bt-ink,#263746);overflow-wrap:anywhere}
+#modal .st38-delivered-details>footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:12px;padding-top:11px;border-top:1px dashed var(--bt-line-2,#dce4eb)}
+#modal .st38-delivered-details>footer>.subtle{flex:1 1 260px;min-width:0;line-height:1.7}
+#modal .st38-delivered-details>footer>.btn{flex:0 1 auto;max-width:100%;white-space:normal}
+@media(max-width:700px){#modal .st38-delivered-details>header{flex-direction:column}#modal .st38-delivered-details>footer{align-items:stretch}#modal .st38-delivered-details>footer>.btn{width:100%;justify-content:center}}
+#modal .st38-delivered-items.table-wrap{display:block;overflow-x:auto;max-width:100%;margin:12px 0}
+#modal .store-shipment-table{min-width:620px;width:100%;border-collapse:collapse}
+#modal .store-shipment-table th,#modal .store-shipment-table td{padding:8px;border:1px solid #dce4eb;text-align:right;vertical-align:middle}
+#modal .store-shipment-table th{background:#f4f7f9;white-space:nowrap}
+#modal .sr38-hist{position:static;list-style:none;margin:0;padding:0;display:grid;gap:6px}
+#modal .sr38-hist li{display:flex;gap:10px;flex-wrap:wrap;padding:8px;border:1px solid #dce4eb;border-radius:8px}
+
+/* Every driver tab uses the same horizontal, independently scrollable row. */
+#appView #content .dsp-driver-stage .dsp-list{display:block!important;overflow-x:auto!important;max-width:100%;min-width:0}
+#appView #content .dsp-driver-stage .dsp-list>.dsp-card{display:flex!important;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;width:max-content!important;min-width:100%!important;white-space:nowrap!important;margin-bottom:8px}
+#appView #content .dsp-driver-stage .dsp-list>.dsp-card>*{flex-shrink:0}
+#appView #content .dsp-driver-stage .dsp-card-head,#appView #content .dsp-driver-stage .dsp-card-head>div,#appView #content .dsp-driver-stage .dsp-card-actions{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;white-space:nowrap!important}
+/* Receipt statuses belong to the same order summary, not a duplicate panel. */
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .sd-store-list-v40{display:block;overflow-x:auto;max-width:100%;min-width:0}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .ssin21-card.sd-store-card-v42{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;width:max-content!important;min-width:100%!important;max-width:none!important;white-space:nowrap!important;margin-bottom:8px}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .store-receipt-summary{display:inline-flex;flex:0 0 auto;flex-wrap:nowrap;align-items:center;gap:6px;margin:0;white-space:nowrap}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .store-receipt-summary .badge{white-space:nowrap}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .ssin21-actions{flex-wrap:nowrap;max-width:none}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .ssin21-actions .btn{white-space:nowrap}
+#appView #content .dsp-driver-stage .dsp-card-head>div{overflow:visible!important}
+#appView #content .dsp-driver-stage .dsp-card-head b{max-width:none!important;overflow:visible!important;text-overflow:clip!important}
+#appView #content .dsp-driver-stage .dsp-store-customer-box{max-width:none!important;white-space:nowrap!important}
+
+/* تأیید دریافت زیر دکمهٔ جزئیات و در عرض کارت؛ بدون نیاز به اسکرول افقی. */
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .sd-store-list-v40{overflow-x:hidden!important}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .ssin21-card.sd-store-card-v42{width:100%!important;min-width:0!important;max-width:100%!important;flex-wrap:wrap!important;white-space:normal!important}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .ssin21-actions{display:flex;flex-direction:column;align-items:flex-start;flex:1 1 240px;min-width:0;max-width:100%;white-space:normal}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .ssin21-history-buttons{display:flex;align-items:center;gap:6px;flex-wrap:wrap;max-width:100%}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .ssin21-actions .btn{height:auto;white-space:normal;max-width:100%}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .store-receipt-summary{display:flex;flex-wrap:wrap;max-width:100%;white-space:normal;margin:0}
+#appView[data-cartable-page="sales"] .sales-store-subpanel-v43[data-store-section="history"] .store-receipt-summary .badge{white-space:normal;overflow-wrap:anywhere}
+/* تفکیک دیداری سفارش‌های سابقهٔ راننده. */
+#appView #content .dsp-driver-stage .dsp-list>.dsp-card.order-compact-row{border-bottom:2px solid #aab8c6!important;margin-bottom:10px}
+
+/* گزارش و پشتیبان: تفکیک واضح ابزارها و وضعیت اولیه، بدون تغییر گردش کار */
+#appView #content .adm-report-placeholder{border:1px dashed #d4dde5;border-radius:14px;background:#f8fafc}
+#appView #content .adm-report-placeholder .sd-queue-empty{padding:44px 20px}
+#appView #content .adm-backup-layout .auto-backup-settings{margin:0}
+#appView #content .adm-backup-action{display:grid;gap:10px;min-width:0;padding:16px;border:1px solid #d4dde5;border-radius:12px;background:#fff}
+#appView #content .adm-backup-action h3,#appView #content .adm-backup-action p,#appView #content .adm-backup-list-title{margin:0}
+#appView #content .adm-backup-action h3,#appView #content .adm-backup-list-title{font-size:15px}
+#appView #content .adm-backup-action p{font-size:12px;line-height:1.8;color:#526272}
+#appView #content .adm-backup-action input[type=file]{max-width:100%;min-width:0}
+#appView #content .adm-backup-row-actions{display:flex;gap:6px;flex-wrap:wrap}
+/* در کنترل‌هایی که کادر مشترک ندارند نیز محل فوکوس صفحه‌کلید دیده شود. */
+#appView :is(input,select,textarea):not(.input-shell *):focus-visible,
+#modal :is(input,select,textarea):not(.input-shell *):focus-visible{outline:2px solid #a8172e!important;outline-offset:2px}
+
+/* پخش فروش: ردیف فشرده مانند سفارش‌های فروشگاه، با جداکنندهٔ هر مشخصه. */
+#appView #content .sales-delivery-summary-row{box-sizing:border-box;min-height:52px!important;padding:7px 14px!important;gap:0!important;border:1px solid var(--line,#dce4eb);border-radius:12px;background:#fff;margin-bottom:8px}
+#appView #content .sales-delivery-summary-row>.sales-distribution-cell{display:flex;align-items:center;min-height:32px;padding-inline:14px;flex-shrink:0}
+#appView #content .sales-delivery-summary-row>.sales-distribution-cell:first-child{padding-inline-start:0}
+#appView #content .sales-delivery-summary-row>.sales-distribution-cell+.sales-distribution-cell{border-inline-start:1px solid #cbd5df}
+#appView #content .sales-delivery-summary-row>.sales-distribution-identity{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-width:150px}
+#appView #content .sales-delivery-summary-row .sales-distribution-identity small{font-size:11.5px;color:var(--muted,#64748b)}
+#appView #content .sales-delivery-summary-row>.sales-distribution-actions{margin-inline-start:auto;padding-inline-end:0}
+
+/* در صف ترابری، استایل قدیمی dsp-card جهت را ستونی می‌کرد. */
+#appView #content #transportPlans .order-compact-row{flex-direction:row!important}
+#appView #content #transportPlans .tp-plan-list{overflow-x:auto;max-width:100%;min-width:0}
+/* v37.50.0 — ردیف‌های «آخرین فعالیت‌ها» در داشبورد مدیر دکمه‌اند و پروندهٔ کامل را باز می‌کنند */
+#appView .v26-activity-row{width:100%;background:none;border:0;border-bottom:1px solid #f0f1f3;border-radius:0;font:inherit;color:inherit;text-align:right;cursor:pointer;padding:12px 2px}
+#appView .v26-activity-row:last-child{border-bottom:0}
+#appView .v26-activity-row:hover,#appView .v26-activity-row:focus-visible{background:#fafbfc}
+#appView .v26-activity-row:focus-visible{outline:2px solid var(--bt-brand-200);outline-offset:-2px}
+#appView .v26-activity-row div small .badge{margin-inline-start:2px}
+/* کارتابل مدیر: ردیف‌های سوابق سفارش */
+#appView .adm-orders-list .adm-order-row{grid-template-columns:1fr 1.5fr 1.2fr 1.3fr .9fr auto;gap:10px;align-items:center;min-width:900px}
+#appView .sales-history-pages{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px}
+@media(max-width:900px){#appView .adm-orders-list{overflow-x:auto}}
+/* v37.50.0 — سربرگ‌های «ورودی / تخصیص‌یافته» در صفحهٔ سفارشات ترابری */
+#appView #content #transportPlans .tp-plan-tabs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:12px 0!important;overflow:visible!important}
+#appView #content #transportPlans .tp-plan-tabs .sd-tab{min-width:0!important;justify-content:space-between!important;gap:8px;text-align:right!important}
+#appView #content #transportPlans .tp-plan-tabs .sd-tab-copy strong{white-space:normal!important}
+#appView #content #transportPlans .tp-plan-tabs .sd-tab-copy small{white-space:normal!important;line-height:1.5}
+#appView #content #transportPlans .tp-plan-tabs .sd-tab-count{min-width:24px!important;display:inline-grid!important}
+@media(max-width:700px){#appView #content #transportPlans .tp-plan-tabs{grid-template-columns:minmax(0,1fr)}#appView #content #transportPlans .tp-plan-tabs .sd-tab-copy small{display:none!important}}
+
+/* جزئیات ترابری: مشخصات کنار هم، با شکست کنترل‌شده و بدون بریدن متن. */
+#modal .tp-detail{display:grid;gap:16px;min-width:0;max-width:100%}
+#modal .tp-detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0}
+#modal .tp-detail-cell{min-width:0;padding:9px 11px;border:1px solid var(--line,#dce4eb);border-radius:10px;background:#f9fafb}
+#modal .tp-detail-cell dt{font-size:12px;color:var(--muted,#667085);line-height:1.5}
+#modal .tp-detail-cell dd{margin:4px 0 0;font-weight:700;line-height:1.7;overflow-wrap:anywhere}
+#modal .tp-items{min-width:0}#modal .tp-items h3{font-size:15px;margin:0 0 7px}
+#modal .tp-items .table-wrap{max-width:100%;overflow-x:auto}
+#modal .tp-items-table{width:100%;border-collapse:collapse;table-layout:fixed}
+#modal .tp-items-table th,#modal .tp-items-table td{padding:8px;border:1px solid var(--line,#dce4eb);text-align:right;vertical-align:top;overflow-wrap:anywhere;white-space:normal}
+#modal .tp-items-table th:first-child{width:55px}#modal .tp-items-table th:last-child{width:30%}
+#modal .tp-assign{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;min-width:0}
+#modal .tp-assign label{display:grid;gap:4px;min-width:0}#modal .tp-assign select{width:100%;min-width:0;max-width:100%}
+#modal .tp-assign p{grid-column:1/-1;margin:0;overflow-wrap:anywhere}
+#modal .tp-detail .modal-actions{display:flex;flex-wrap:wrap;gap:8px}
+@media(max-width:700px){#modal .tp-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#modal .tp-assign{grid-template-columns:minmax(0,1fr)}}
+
+/* محتوای فرم‌ها از قاب و سلول جدا نشود؛ جدول‌ها و ردیف‌های افقی خودشان پیمایش دارند. */
+:is(#appView #content,#modal) :is(.field,.cust-field,.adm-field,.form-grid,.cust-form-grid){min-width:0;max-width:100%}
+:is(#appView #content,#modal) :is(.field,.cust-field,.adm-field)>:is(label,small,span){min-width:0;max-width:100%;overflow-wrap:anywhere}
+:is(#appView #content,#modal) form .btn{max-width:100%;height:auto;white-space:normal;line-height:1.5;overflow-wrap:anywhere}
+
+/* یک ردیف فشرده برای اطلاعات مشتری و روش تحویل؛ پیمایش فقط در خود ردیف است. */
+#appView #content .sd-oe-customer{display:block!important;min-width:0!important;max-width:100%!important;padding:4px 8px!important;margin-top:8px!important}
+#appView #content .onsite-customer-scroll{max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch}
+#appView #content .onsite-customer-scroll:focus-visible{outline:2px solid var(--bt-brand,#b3132a);outline-offset:-2px}
+#appView #content .onsite-customer-facts{display:flex;align-items:center;gap:0;width:max-content;min-width:100%;white-space:nowrap}
+#appView #content .onsite-customer-facts>div{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:5px;flex:0 0 auto;min-width:0;padding:2px 10px;border:0;border-inline-start:1px solid var(--bt-line,#dce4eb);border-radius:0;background:transparent;line-height:1.4}
+#appView #content .onsite-customer-facts>div:first-child{padding-inline-start:4px}
+#appView #content .onsite-customer-facts>div:last-child{border-inline-start:0}
+#appView #content .onsite-customer-facts>div>span:first-child{font-size:12px;color:var(--bt-muted,#667085);line-height:1.4}
+#appView #content .onsite-customer-facts strong{font-size:13px;line-height:1.4}
+#appView #content .onsite-customer-facts .sd-onsite-delivery{padding-block:0;min-width:0}
+#appView #content .onsite-customer-facts .transport-delivery-choice{display:flex;flex-direction:row;align-items:center;gap:7px;max-width:none;min-width:0}
+#appView #content .onsite-customer-facts .transport-delivery-choice>label{margin:0;white-space:nowrap}
+#appView #content .onsite-customer-facts .input-shell{box-sizing:border-box;width:190px;min-width:190px;max-width:190px;height:34px;min-height:34px}
+#appView #content .onsite-customer-facts .transport-delivery-choice small{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+
+/* جستجوی زندهٔ مشتری نگهبانی؛ نتایج واقعی، قابل انتخاب با ماوس و صفحه‌کلید. */
+#appView #content .gate-customer-results{display:grid;gap:4px;min-width:0;margin-top:5px}
+#appView #content .gate-customer-results:empty{display:none}
+#appView #content .gate-customer-result{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px;width:100%;min-width:0;padding:8px 10px;border:1px solid var(--bt-line,#dce4eb);border-radius:6px;background:#fff;color:inherit;text-align:right;cursor:pointer;overflow-wrap:anywhere}
+#appView #content .gate-customer-result:hover,#appView #content .gate-customer-result:focus-visible{border-color:var(--bt-brand,#b3132a);background:#fff7f7}
+#appView #content .gate-customer-result span{font-size:12px;color:var(--bt-muted,#667085)}
+#appView #content .gate-customer-results p{margin:3px 0;font-size:12px}
+
+/* یک قاب مستطیلی با گوشه‌های نرم برای همهٔ پلاک‌های ورودی، نمایشی و قدیمی. */
+.iran-plate.iran-plate,:is(#appView,#modal) .iran-plate.iran-plate{border-radius:4px!important;transform:none!important}
+.iran-plate-legacy{border-radius:4px!important}
+
+/* فرم فاکتور و تسویهٔ گردش پخش: شبکهٔ مستقل، هم‌اندازه و واکنش‌گرا. */
+:is(#appView #content,#modal #transportDeliveryWork) .tr-invoice-panel{box-sizing:border-box;min-width:0;max-width:100%;overflow:hidden}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-invoice-panel>.section-space{min-width:0;max-width:100%;overflow-x:auto}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-form{display:grid;gap:10px;min-width:0;max-width:100%;margin-top:12px}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-form :is(h3,h4,p){margin:0;line-height:1.7;overflow-wrap:anywhere}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-table-scroll{min-width:0;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-table-scroll table{width:100%;min-width:560px;table-layout:fixed;border-collapse:collapse}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-table-scroll th,:is(#appView #content,#modal #transportDeliveryWork) .tr-table-scroll td{padding:7px;vertical-align:middle;overflow-wrap:anywhere}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-invoice-table th:first-child{width:38%}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-return-table th:first-child{width:30%}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-form :is(input:not([type=checkbox]),select){box-sizing:border-box;width:100%;min-width:0;max-width:100%;min-height:38px;height:38px;margin:0;padding:0 9px;border:1px solid var(--bt-line-2,#d6e0e7);border-radius:8px;background-color:#fff;color:var(--bt-ink,#263746);font:inherit;line-height:normal}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-form input:focus-visible,:is(#appView #content,#modal #transportDeliveryWork) .tr-form select:focus-visible{outline:2px solid var(--bt-brand,#b3132a);outline-offset:1px}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-form input[type=checkbox]{width:18px;height:18px;min-width:18px;vertical-align:middle}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-adjustments{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-form .tr-field,:is(#appView #content,#modal #transportDeliveryWork) .tr-return-form>div>label{display:grid!important;grid-template-rows:auto 38px!important;align-content:end!important;gap:4px!important;min-width:0!important;width:100%;font-size:12px;line-height:1.5}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-form .tr-field>span{white-space:normal;overflow-wrap:anywhere}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-totals,:is(#appView #content,#modal #transportDeliveryWork) .tr-close-form [data-ts-sum]{padding:9px 11px;border:1px solid var(--bt-line,#dce4eb);border-radius:8px;background:#f7fafc;line-height:1.7}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-form [role=alert]:empty{display:none}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-form [role=alert]:not(:empty){padding:8px;color:#9d1c26;background:#fff4f4;border-radius:8px}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-close-form [data-ts-payments]{display:grid;gap:8px;min-width:0}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-payment-row{grid-template-columns:repeat(4,minmax(0,1fr))!important;align-items:end!important;gap:8px!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-payment-row [data-ts-extra]{display:contents!important}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-payment-row [data-ts-extra][hidden]{display:none!important}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-payment-row [data-ts-remove]{width:100%;min-width:0;min-height:38px;align-self:end}
+:is(#appView #content,#modal #transportDeliveryWork) .tr-form .modal-actions{display:flex;flex-wrap:wrap;gap:8px}
+@media(max-width:900px){:is(#appView #content,#modal #transportDeliveryWork) .tr-payment-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:420px){:is(#appView #content,#modal #transportDeliveryWork) .tr-adjustments{grid-template-columns:minmax(0,1fr)}:is(#appView #content,#modal #transportDeliveryWork) .tr-payment-row{grid-template-columns:minmax(0,1fr)!important}}
+
+/* قالب واحد خلاصه سفارش: سلول‌ها و دکمه‌ها در یک ارتفاع، پیمایش فقط در فهرست. */
+#appView #content :is(.phone-queue-list-v40,.sd-flow-list,.fx-list-grid,.stl-queue-panel .stl-queue-list,.stl-queue .stl-queue-list,.sales-store-subpanel-v43 .sd-store-list-v40,.wh38-store-pane .whsin22-list,.gt-exit-list,.sd-invoice-list){display:block!important;overflow-x:auto!important;max-width:100%;min-width:0}
+#appView #content :is(.order-summary-row,.sales-delivery-summary-row){box-sizing:border-box!important;display:flex!important;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;width:max-content!important;min-width:100%!important;max-width:none!important;height:54px!important;min-height:54px!important;max-height:54px!important;margin:0 0 8px!important;padding:7px 14px!important;gap:0!important;white-space:nowrap!important;border:1px solid var(--line,#dce4eb)!important;border-radius:12px!important;background:#fff;text-align:right}
+#appView #content :is(.order-summary-row,.sales-delivery-summary-row)>:is(.order-summary-cell,.sales-distribution-cell){box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:flex-start!important;flex:0 0 auto!important;height:38px!important;min-height:38px!important;max-height:38px!important;margin:0!important;padding:0 14px!important;white-space:nowrap!important;line-height:1.4!important;vertical-align:middle}
+#appView #content :is(.order-summary-row,.sales-delivery-summary-row)>:is(.order-summary-cell,.sales-distribution-cell):first-child{padding-inline-start:0!important}
+#appView #content :is(.order-summary-row,.sales-delivery-summary-row)>:is(.order-summary-cell,.sales-distribution-cell)+:is(.order-summary-cell,.sales-distribution-cell){border-inline-start:1px solid #cbd5df!important}
+#appView #content :is(.order-summary-row,.sales-delivery-summary-row)>:is(.order-summary-identity,.sales-distribution-identity){display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;min-width:150px!important;gap:0!important}
+#appView #content :is(.order-summary-identity,.sales-distribution-identity)>:is(strong,small,h3){display:block!important;max-width:none!important;margin:0!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;line-height:1.3!important}
+#appView #content :is(.order-summary-identity,.sales-distribution-identity)>small{font-size:11px;color:var(--muted,#64748b)}
+#appView #content :is(.order-summary-row,.sales-delivery-summary-row)>:is(.order-summary-actions,.sales-distribution-actions){display:inline-flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:6px!important;margin-inline-start:auto!important;padding-inline-end:0!important;max-width:none!important}
+#appView #content :is(.order-summary-row,.sales-delivery-summary-row) :is(.order-summary-actions,.sales-distribution-actions) .btn{box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;min-width:0!important;height:36px!important;min-height:36px!important;max-height:36px!important;margin:0!important;padding:0 12px!important;line-height:1.2!important;white-space:nowrap!important}
+#appView #content .order-summary-row .order-summary-deposit .deposit-summary,#appView #content .order-summary-row .order-summary-note .warehouse-return-note{display:inline-flex!important;align-items:center!important;flex-wrap:nowrap!important;gap:6px!important;min-height:0!important;height:auto!important;margin:0!important;padding:0!important;border:0!important;white-space:nowrap!important}
+#appView #content .order-summary-row :is(.deposit-summary,.warehouse-return-note)>*{white-space:nowrap!important}
+#appView #content .stl-queue-item.order-summary-row.active{background:var(--brand-050,#fff2f3)!important;border-color:var(--brand,#b3132a)!important}
+/* کادرهای اطلاعات محصول در پنجره جزئیات هم‌ارتفاع می‌مانند. */
+#modal .whd35-list .whd23-row:not(.whd35-headrow){align-items:stretch!important;grid-auto-rows:minmax(38px,auto)}
+#modal .whd35-list .whd23-row:not(.whd35-headrow) .whd23-box{box-sizing:border-box!important;min-height:38px!important;height:100%!important}
+#appView #content .order-summary-row :is(.ssin21-history-buttons,.store-receipt-summary){display:inline-flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:6px!important;max-width:none!important;white-space:nowrap!important}
+#appView #content .order-summary-row :is(.ssin21-history-buttons,.store-receipt-summary)>*{white-space:nowrap!important}
+#appView #content .order-summary-row :is(.ssin21-id,.whsin22-id){width:auto!important;max-width:none!important;flex:0 0 auto!important}
+/* همان ارتفاع و خط جداکننده برای ردیف‌های محموله و اسناد انبار نیز اعمال می‌شود. */
+#appView #content .order-compact-row:not(.order-summary-row):not(.sales-delivery-summary-row){box-sizing:border-box!important;display:flex!important;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important;width:max-content!important;min-width:100%!important;max-width:none!important;height:54px!important;min-height:54px!important;max-height:54px!important;margin:0 0 8px!important;padding:7px 14px!important;gap:0!important;white-space:nowrap!important;border:1px solid var(--line,#dce4eb)!important;border-radius:12px!important;background:#fff}
+#appView #content .order-compact-row:not(.order-summary-row):not(.sales-delivery-summary-row)>*{box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;flex:0 0 auto!important;height:38px!important;min-height:38px!important;max-height:38px!important;margin:0!important;padding-inline:14px!important;white-space:nowrap!important}
+#appView #content .order-compact-row:not(.order-summary-row):not(.sales-delivery-summary-row)>*:first-child{padding-inline-start:0!important}
+#appView #content .order-compact-row:not(.order-summary-row):not(.sales-delivery-summary-row)>*+*{border-inline-start:1px solid #cbd5df!important}
+#appView #content .order-compact-row:not(.order-summary-row):not(.sales-delivery-summary-row)>button{height:36px!important;min-height:36px!important;max-height:36px!important;padding:0 12px!important;line-height:1.2!important}
+/* خانه‌های مشخصات در جزئیات سفارش و جزئیات ترابری هم‌ارتفاع باشند؛ متن بلند بریده نمی‌شود. */
+#modal :is(.v21-detail-modal .detail-grid,.tp-detail-grid){align-items:stretch!important;grid-auto-rows:1fr!important}
+#modal :is(.v21-detail-modal .detail-grid,.tp-detail-grid)>div{box-sizing:border-box;min-height:64px;height:100%;min-width:0;overflow-wrap:anywhere}
+#appView #content .sales-history-list{display:block!important;max-width:100%;min-width:0;overflow-x:auto!important}
+#appView #content .order-summary-row .st-run-chips{display:inline-flex!important;flex-wrap:nowrap!important;align-items:center!important;white-space:nowrap!important}
+#appView #content .dsp-list .dsp-card.dsp-card-compact{box-sizing:border-box!important;height:54px!important;min-height:54px!important;max-height:54px!important;padding:7px 14px!important}
+#appView #content .dsp-list .dsp-card.dsp-card-compact :is(.dsp-card-head,.dsp-card-actions){height:38px!important;min-height:38px!important;max-height:38px!important;align-items:center!important}
+#appView #content .dsp-list .dsp-card.dsp-card-compact .btn{height:36px!important;min-height:36px!important;max-height:36px!important;white-space:nowrap!important}
+#appView #content .whh-day,#appView #content .whh-record{min-width:0;max-width:100%}
+#appView #content .whh-record{overflow-x:auto}
+#appView #content .whh-record .whh-details[hidden]{display:none!important}
+/* Equal-sized editable cells across all order-entry variants, without clipping suggestions. */
+#appView #content :is(#orderLines,#phone-lines,#future-lines,#store-lines,.sd-line) .sd-line-cell > .input-shell{box-sizing:border-box!important;height:44px!important;min-height:44px!important;max-height:44px!important}
+#appView #content :is(#orderLines,#phone-lines,#future-lines,#store-lines,.sd-line) .sd-line-cell > .input-shell :is(input,select){box-sizing:border-box!important;height:100%!important;min-height:0!important;max-height:100%!important}
+#appView #content .order-summary-row .store-receipt-summary{margin:0!important;align-self:center!important;flex-wrap:nowrap!important;white-space:nowrap!important}
+#appView #content #orderLines .sd-line.sd-line-compact .sd-line-cell > .input-shell{height:44px!important;min-height:44px!important;max-height:44px!important}
+#appView #content .order-summary-row > .order-summary-actions{flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important}
+/* Keep settlement failures visible and recoverable rather than leaving an empty panel. */
+#appView #content .stl-load-error{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px;margin:8px 0;border:1px solid #d98989;border-radius:10px;background:#fff5f5;color:#8f1d1d}
+#appView #content .stl-load-error span{flex:1 1 220px;white-space:normal;overflow-wrap:anywhere}
+
+/* صف باریک تسویه: اطلاعات اصلی در خود ستون، بدون پیمایش افقی. */
+#appView #content .stl-queue-panel .stl-queue-list,#appView #content .stl-queue .stl-queue-list{overflow-x:hidden!important;overflow-y:auto!important}
+#appView #content .stl-queue-list .stl-queue-item-card{box-sizing:border-box!important;display:flex!important;align-items:center!important;flex-wrap:nowrap!important;width:100%!important;min-width:0!important;max-width:100%!important;height:54px!important;min-height:54px!important;max-height:54px!important;margin:0 0 8px!important;padding:7px 10px!important;gap:0!important;text-align:right!important;overflow:hidden!important}
+#appView #content .stl-queue-list .stl-queue-customer{display:block!important;flex:1 1 0!important;min-width:0!important;max-width:none!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;font-weight:700!important}
+#appView #content .stl-queue-list .stl-queue-order{display:flex!important;flex:0 0 auto!important;align-items:center!important;gap:4px!important;min-width:0!important;max-width:57%!important;margin:0!important;padding:0 9px 0 0!important;border-inline-start:1px solid #cbd5df!important;white-space:nowrap!important;overflow:hidden!important;font-size:12px!important}
+#appView #content .stl-queue-list .stl-queue-order bdi{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+
+/* نگهبانی > پخش: جدول ستون‌دار؛ در نمایش باریک هر خانه با برچسب خودش می‌شکند. */
+#appView[data-cartable-page="gate"] #content .gate-dispatch-focus{box-sizing:border-box;max-width:100%;min-width:0}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-focus .gate-tab-context>p{min-width:0;overflow-wrap:anywhere}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table-wrap{box-sizing:border-box;width:100%;max-width:100%;min-width:0}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table{box-sizing:border-box;width:100%;max-width:100%;min-width:0;table-layout:fixed;border-collapse:separate;border-spacing:0;border:1px solid var(--line,#dce4eb);border-radius:12px;background:#fff}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td){box-sizing:border-box;min-width:0;padding:9px 6px;text-align:center;vertical-align:middle;white-space:normal!important;overflow-wrap:anywhere;line-height:1.55}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table th{background:#f6f8fa;color:var(--muted,#64748b);font-size:11px;font-weight:850}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table td{border-top:1px solid #e8edf1;color:var(--ink,#183044);font-size:12px;font-weight:700}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td):nth-child(1){width:13%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td):nth-child(2){width:8%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td):nth-child(3){width:10%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td):nth-child(4){width:8%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td):nth-child(5){width:7%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td):nth-child(6){width:9%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td):nth-child(7){width:8%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td):nth-child(8){width:13%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td):nth-child(9){width:5%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table :is(th,td):nth-child(10){width:19%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table .gate-dispatch-cell-customer strong{display:block;max-width:100%;overflow-wrap:anywhere}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table .gate-dispatch-cell-type>*{display:block}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table .gate-dispatch-table-note{margin-top:3px;color:var(--muted,#64748b);font-size:10px}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table .badge{box-sizing:border-box;max-width:100%;justify-content:center;white-space:normal!important;overflow-wrap:anywhere}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table-plate{display:flex;justify-content:center;min-width:0;max-width:100%}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table .gate-dispatch-cell-plate .iran-plate{box-sizing:border-box;display:grid!important;width:100%!important;max-width:116px;min-width:0!important;height:30px!important;margin:0!important;grid-template-columns:26px repeat(4,minmax(0,1fr))!important;--plate-h:26px}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table .gate-dispatch-table-actions{display:flex;align-items:stretch;justify-content:center;flex-wrap:wrap;gap:5px;min-width:0}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table .gate-dispatch-table-actions .btn{box-sizing:border-box;display:inline-flex;flex:1 1 130px;align-items:center;justify-content:center;max-width:100%;height:auto;min-width:0;min-height:34px;padding:5px 7px;line-height:1.4;text-align:center;white-space:normal!important;overflow-wrap:anywhere}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table-empty>td{padding:0;border:0}
+@media(max-width:1100px){
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-focus .gate-tab-context{align-items:flex-start;flex-wrap:wrap;gap:6px 12px;padding:12px 14px}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-focus .gate-tab-context>p{flex:1 1 220px}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-table{display:block;border:0;border-radius:0;background:transparent}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-table>thead{position:absolute!important;display:block!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-table>tbody{display:grid;gap:10px;width:100%;min-width:0}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-table>tbody>.gate-dispatch-table-row{box-sizing:border-box;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 8px;width:100%;min-width:0;padding:8px;border:1px solid var(--line,#dce4eb);border-radius:12px;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.04)}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-table>tbody>.gate-dispatch-table-row>td{display:grid!important;grid-template-columns:minmax(0,1fr);align-content:start;width:auto!important;min-width:0;padding:8px 7px;border:0!important;border-bottom:1px solid #edf0f3!important;text-align:right}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-table>tbody>.gate-dispatch-table-row>td::before{display:block;margin-bottom:4px;color:var(--muted,#64748b);font-size:10px;font-weight:850;line-height:1.5;content:attr(data-label)}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-table>tbody>.gate-dispatch-table-row>[data-field="customer"],#appView[data-cartable-page="gate"] #content .gate-dispatch-table>tbody>.gate-dispatch-table-row>[data-field="actions"]{grid-column:1/-1}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-table>tbody>.gate-dispatch-table-row>[data-field="actions"]{border-bottom:0!important}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-table>tbody>.gate-dispatch-table-empty{display:block!important;width:100%;border:1px solid var(--line,#dce4eb);border-radius:12px;background:#fff}
+ #appView[data-cartable-page="gate"] #content .gate-dispatch-table>tbody>.gate-dispatch-table-empty>td{display:block!important;width:100%;padding:0;border:0!important}
+}
+
+/* نگهبانی: فهرست شناور جستجوی مشتری و جزئیات وسیله */
+#appView #content .cust-code-entry{position:relative;min-width:0}
+#appView #content .gate-customer-results:not(:empty){position:absolute;z-index:40;inset-inline:0;top:100%;max-height:260px;overflow-y:auto;padding:6px;margin-top:2px;border:1px solid var(--bt-line,#dce4eb);border-radius:10px;background:#fff;box-shadow:0 10px 24px rgba(0,0,0,.15)}
+#appView #content .gate-customer-result{align-items:center}
+#appView #content .gate-customer-result span{overflow-wrap:anywhere}
+#appView #content #gateCarTypeField[hidden]{display:none!important}
+#appView #content .gate-history-search{display:grid;gap:6px;padding:14px 16px;background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:12px}
+#appView #content .gate-history-search input{width:100%;min-width:0}
+#appView #content .gate-history-search small{color:var(--muted);font-size:11px}
+#appView[data-cartable-page="gate"] .gate-dispatch-tabs{grid-template-columns:minmax(0,1fr)}
+/* فضای افقی بیشتری به کنترل خروج بده و اطلاعات را بدون پیمایش در شبکه بچین. */
+#appView[data-cartable-page="gate"]:has(.gt-exit-panel) .content{max-width:none!important}
+#appView[data-cartable-page="gate"]:has(.gt-exit-panel) .workspace{padding-inline:12px!important}
+#appView #content .gt-exit-list{overflow-x:hidden!important;padding:10px!important}
+#appView #content .gt-exit-card{box-sizing:border-box;display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;grid-template-rows:repeat(2,minmax(42px,auto));gap:0;align-items:stretch;width:100%;min-width:0;margin-bottom:8px;padding:6px;border:1px solid var(--line,#dce4eb);border-radius:12px;background:#fff}
+#appView #content .gt-exit-field{box-sizing:border-box;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:3px 8px;border-inline-start:1px solid #dce4eb;line-height:1.3}
+#appView #content .gt-exit-field small{font-size:10px;color:var(--muted,#64748b)}
+#appView #content .gt-exit-field>span{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:700}
+#appView #content .gt-exit-actions{grid-column:5;grid-row:1 / span 2;display:flex;align-items:center;justify-content:center;gap:5px;padding:4px}
+#appView #content .gt-exit-actions .btn{min-width:0;white-space:nowrap}
+@media(max-width:900px){#appView #content .gt-exit-card{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none}#appView #content .gt-exit-actions{grid-column:1/-1;grid-row:auto;justify-content:flex-start}}
+@media(max-width:480px){#appView #content .gt-exit-actions .btn{flex:1;padding-inline:6px}}
+@media(min-width:1600px){#appView #content .gt-exit-card{grid-template-columns:repeat(8,minmax(0,1fr)) auto;grid-template-rows:minmax(42px,auto)}#appView #content .gt-exit-actions{grid-column:9;grid-row:1}}
+
+/* فرم‌های نگهبانی و فروش: ردیف‌های کوتاه و استفاده از عرض کارتابل. */
+@media(min-width:641px){#appView #content .gt-entry-vehicle-fields{grid-template-columns:minmax(110px,.65fr) minmax(120px,.75fr) minmax(150px,1.3fr)!important}}
+#appView #content .sd-search input{border:0!important;box-shadow:none!important;background:transparent!important;min-height:0!important;height:100%!important;padding:0!important}
+#appView #content .sd-search input:focus{border:0!important;box-shadow:none!important}
+#appView[data-cartable-page="sales"]:has(#sales-v29-pane-remote:not([hidden]),#sales-v29-pane-flow:not([hidden]),#sales-v29-pane-settlement:not([hidden])) .content{max-width:none!important}
+#appView[data-cartable-page="sales"]:has(#sales-v29-pane-remote:not([hidden]),#sales-v29-pane-flow:not([hidden]),#sales-v29-pane-settlement:not([hidden])) .workspace{padding-inline:12px!important}
+#appView #content .telephone-form-v25{padding:16px!important}
+#appView #content .telephone-form-v25 .phone-form-title{display:block;margin:0 0 16px;padding:0 0 12px;border-bottom:1px solid var(--line)}
+#appView #content .telephone-form-v25 .phone-form-title h2{margin:0!important;line-height:1.5!important}
+#appView #content .sales-remote-customer-grid-v40 .transport-delivery-choice{min-width:0;margin:0}
+#appView #content .sales-remote-customer-grid-v40 .transport-delivery-choice small,#appView #content #futureOrderFormV25 .fx-top-grid .transport-delivery-choice small{display:block;line-height:1.4}
+@media(min-width:901px){#appView #content .sales-remote-customer-grid-v40{grid-template-columns:minmax(140px,.85fr) minmax(140px,.85fr) minmax(180px,1.3fr) minmax(180px,1fr)!important}#appView #content .sales-remote-place-v40{grid-column:auto!important}}
+@media(min-width:701px){#appView #content #futureOrderFormV25 .fx-top-grid>.fx-addr-field,#appView #content #futureOrderFormV25 .fx-top-grid>.transport-delivery-choice{grid-column:span 6!important}}
+@media(max-width:700px){#appView #content #futureOrderFormV25 .fx-top-grid>.transport-delivery-choice{grid-column:1/-1!important}}
+#appView #content .stl-layout{gap:10px!important}
+#appView #content .stl-pane{gap:10px!important}
+#appView [data-dash-role="sales"] .role-dash-card[data-sales-daily] strong{font-size:clamp(17px,1.5vw,25px)!important;line-height:1.4;overflow-wrap:anywhere}
+.sales-daily-detail{display:grid;gap:8px;line-height:1.8}.sales-daily-detail p{margin:2px 0;color:var(--muted,#64748b)}.sales-daily-row,.sales-daily-total{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:8px;border-bottom:1px solid var(--line,#dce4eb)}.sales-daily-row span{overflow-wrap:anywhere}.sales-daily-row b,.sales-daily-total b{text-align:left}.sales-daily-total{background:#f7fafc;border-radius:8px;font-weight:800}
+/* وزن‌کشی: جزئیات در پنجرهٔ جدا؛ ردیف محصول در همه عرض‌ها یک‌خطی و قابل پیمایش. */
+#appView #content .wh38-prep-items{grid-template-columns:minmax(980px,1fr)!important;overflow-x:auto!important}
+#appView #content .wh38-prep-item:not(.sr318-row){grid-template-columns:28px minmax(150px,1fr) minmax(125px,.8fr) minmax(140px,1fr) minmax(220px,1.3fr) 76px!important;grid-template-areas:none!important;align-items:start!important;gap:8px!important}
+#appView #content .wh38-prep-item:not(.sr318-row)>*{grid-area:auto!important}
+#appView #content .wh38-prep-item:not(.sr318-row) .wh38-cell-label{height:20px!important;min-height:20px!important;line-height:20px!important;white-space:nowrap!important}
+#appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-title,#appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-desc{height:44px!important;min-height:44px!important;padding-block:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-title strong,#appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-desc{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#appView #content .wh-weight-main{padding-inline:6px!important;gap:3px!important}
+#appView #content .wh-weight-main input{min-width:50px!important;flex:1 1 55px!important}
+#appView #content .wh-weight-open{flex:0 0 auto!important;white-space:nowrap!important;padding:3px 7px!important;min-height:30px!important;font-size:11px!important}
+#appView #content .wh-weight-inline-net{color:#14764a;font-size:10px;margin-inline-start:4px}
+#modal .modal-card:has(.wh-weight-dialog){width:min(1100px,96vw);max-width:1100px}
+#modal .wh-weight-dialog p{margin:0 0 10px;line-height:1.7}#modal .wh-weight-scroll{max-width:100%;overflow-x:auto}
+#modal .wh-weight-line{display:grid;grid-template-columns:repeat(7,minmax(86px,1fr)) minmax(80px,1fr) auto;align-items:end;gap:7px;min-width:780px;padding:8px 0;border-bottom:1px solid #e6ebef}
+#modal .wh-weight-line label,#modal .wh-weight-net{display:grid;gap:4px;min-width:0;font-size:11px;font-weight:700}
+#modal .wh-weight-line input{box-sizing:border-box;width:100%;height:38px;min-width:0;padding:4px 7px;border:1px solid #cfd8df;border-radius:8px;font:inherit;direction:ltr;text-align:right}
+#modal .wh-weight-net b{height:38px;display:flex;align-items:center;white-space:nowrap;color:#14764a}
+#modal .wh-weight-summary{padding:9px 0;font-weight:800}#modal [data-wt-error]{color:#a51c2b}#modal [data-wt-error]:empty{display:none}
+#appView #content .sr-weight-net{font-size:11px;color:#14764a;white-space:nowrap;flex:0 0 auto}
+/* نمایش انتخابی ناخالصی‌ها: هر نوبت یک ردیف قابل پیمایش باقی می‌ماند. */
+#modal .wh-weight-line{display:flex;flex-wrap:nowrap;align-items:end;width:max-content;min-width:100%;gap:7px}
+#modal .wh-weight-line .wh-gross{width:145px;flex:none}
+#modal .wh-tare-groups,#modal .wh-tare-group{display:flex;flex-wrap:nowrap;align-items:end;gap:6px;flex:none}
+#modal .wh-tare-kind{width:155px;flex:none}#modal .wh-tare-amount{width:105px;flex:none}
+#modal .wh-tare-amount[hidden]{display:none!important}
+#modal .wh-weight-line select{box-sizing:border-box;width:100%;height:38px;min-width:0;padding:4px 6px;border:1px solid #cfd8df;border-radius:8px;font:inherit;background:#fff}
+#modal .wh-weight-line .btn{flex:none;white-space:nowrap;min-height:38px}
+#modal .wh-weight-line .wh-weight-net{min-width:80px;flex:none}
+/* یک دکمهٔ مشترک برای افزودن ناخالصی به نوبت انتخاب‌شده، خارج از ردیف‌ها. */
+#modal .wh-weight-line.is-active{background:#f8fafc}
+#modal .wh-wt-select[aria-pressed=true]{border-color:var(--brand,#b3132a);color:var(--brand,#b3132a)}
+/* Reset the earlier narrow-screen named areas as well as the template: otherwise
+   the weight and stock controls can occupy the same implicit grid cell. */
+#appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-num,
+#appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-cell:nth-child(n),
+#appView #content .wh38-prep-item:not(.sr318-row)>.wh38-stock-cell{grid-area:auto!important}
+
+/* With no vehicle, leave only one horizontal purpose field and reclaim the plate area. */
+#appView #content .gt-entry-vehicle [hidden]{display:none!important}
+#appView #content .gt-entry-vehicle.is-no-vehicle{grid-template-columns:minmax(0,1fr)!important}
+#appView #content .gt-entry-vehicle.is-no-vehicle .gt-entry-vehicle-fields{grid-template-columns:minmax(0,1fr)!important}
+#appView #content .gt-entry-vehicle.is-no-vehicle .gt-entry-vehicle-fields .field{display:flex;flex-direction:row!important;align-items:center!important;gap:10px;min-width:0;width:100%}
+#appView #content .gt-entry-vehicle.is-no-vehicle .gt-entry-vehicle-fields label{white-space:nowrap;flex:0 0 auto;margin:0}
+#appView #content .gt-entry-vehicle.is-no-vehicle .gt-entry-vehicle-fields .input-shell{flex:1;min-width:0}
+
+/* Store delivery details show warehouse impurity weighings without exposing return/shortage fields. */
+#modal .st38-weighing-details{display:grid;gap:6px;min-width:220px}
+#modal .st38-weighing-record{display:grid;gap:4px;padding:7px;border:1px solid #e4e9ef;border-radius:8px;background:#f8fafc}
+#modal .st38-weighing-record> b{font-size:10.5px;color:#475467}
+#modal .st38-weighing-round{display:grid;gap:2px;padding:6px;border-radius:6px;background:#fff;font-size:10.5px;line-height:1.6;white-space:normal}
+#modal .st38-weighing-round>b{color:#344054}
+#modal .st38-weighing-legacy,#modal .st38-weighing-missing{color:#667085;font-size:10.5px;white-space:normal}
+
+/* Product price selection for a single-sheet printout. */
+#modal .price-pick{display:grid;gap:10px;min-width:0}
+#modal .price-pick p{margin:0}
+#modal .price-pick-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#modal .price-pick-controls input{flex:1 1 180px;min-width:0;border:1px solid #cfd6de;border-radius:8px;padding:9px;font:inherit}
+#modal .price-pick-list{max-height:45vh;overflow:auto;border:1px solid #e2e6ec;border-radius:8px}
+#modal .price-pick-item{display:flex;align-items:center;gap:9px;padding:8px;border-bottom:1px solid #edf0f3}
+#modal .price-pick-item[hidden]{display:none!important}
+#modal .price-pick-item span{flex:1;min-width:0;overflow-wrap:anywhere}
+#modal .price-pick-item small{white-space:nowrap;color:#667085}
+#modal .price-pick [data-price-error]:empty{display:none}
+
+/* جستجوی مشتری در سفارش غیرحضوری و برنامه‌ریزی‌شده */
+#appView #content .sales-customer-picker{position:relative;display:grid;gap:5px;margin:0 0 12px;min-width:0}
+#appView #content .sales-customer-picker input[type=search]{width:100%;min-width:0;box-sizing:border-box}
+#appView #content .sales-customer-results:empty{display:none}
+#appView #content .sales-customer-results:not(:empty){position:absolute;z-index:40;inset-inline:0;top:100%;max-height:240px;overflow:auto;padding:6px;background:#fff;border:1px solid var(--bt-line,#dce4eb);border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.15)}
+#appView #content .sales-customer-results button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:start;padding:9px;border:0;border-radius:7px;background:#fff;cursor:pointer}
+#appView #content .sales-customer-results button:hover,#appView #content .sales-customer-results button:focus-visible{background:#f2f4f7}
+#appView #content [data-sales-dispatch-place][hidden]{display:none!important}
+
+/* Full product names and readable card content; never ellipsize a weighing label. */
+#appView #content .sr318-row>.sr318-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere;line-height:1.8;max-height:none!important;height:auto!important;padding:6px 8px!important}
+.transport-plan-detail-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:12px 14px;margin:8px 0;border:1px solid var(--line,#dce4eb);border-radius:10px;line-height:1.9;max-width:100%;box-sizing:border-box}
+.transport-plan-detail-row>*{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#modal .field,#appView #content .field{min-width:0}
+#modal :is(input,textarea,select),#appView #content :is(input,textarea,select){box-sizing:border-box;max-width:100%}
+#modal :is(input:not([type=checkbox]):not([type=radio]),textarea,select),#appView #content :is(textarea,select){padding-inline:12px;line-height:1.7}
+#modal :is(p,h2,h3,td),#appView #content :is(.sd-panel p,.card p){overflow-wrap:anywhere}
+#appView #content .store-partial-customer-row{display:grid;grid-template-columns:minmax(160px,1fr) minmax(0,2fr);gap:14px;align-items:start}
+#appView #content .store-partial-customer-row>[data-store-customer]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0}
+#appView #content .store-partial-customer-row>[data-store-customer][hidden]{display:none!important}
+@media(max-width:600px){#appView #content .store-partial-customer-row{grid-template-columns:1fr}#appView #content .store-partial-customer-row>[data-store-customer]{grid-template-columns:1fr}}
+/* History actions wrap within their card rather than forcing horizontal scrolling. */
+#appView #content [data-store-section=history] .sd-store-list{width:100%!important;min-width:0!important;overflow:visible!important}
+#appView #content [data-store-section=history] .order-summary-row{display:flex!important;flex-wrap:wrap!important;width:100%!important;min-width:0!important;max-width:100%!important;height:auto!important;max-height:none!important;padding:12px 14px!important;gap:8px 12px!important;white-space:normal!important}
+#appView #content [data-store-section=history] .order-summary-row>*{height:auto!important;max-height:none!important;white-space:normal!important;min-width:0!important;max-width:100%!important;padding:4px 8px!important;overflow-wrap:anywhere}
+#appView #content [data-store-section=history] .order-summary-row :is(.ssin21-history-buttons,.store-receipt-summary,.order-summary-actions){display:flex!important;flex-wrap:wrap!important;white-space:normal!important;max-width:100%!important;gap:8px!important}
+#appView #content [data-store-section=history] .order-summary-row .btn{white-space:normal!important;height:auto!important;min-height:36px;padding:7px 10px!important}
+
+/* Fixed-column settlement pilot: headers above values; wrap rather than scroll. */
+#appView #content .v26-settlement-layout>section{min-width:0!important}
+#appView #content .v26-invoice-list{display:block!important;min-width:0!important;overflow:visible!important}
+#appView #content .settlement-invoice-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px;min-width:0!important}
+#appView #content .settlement-invoice-table :is(th,td){padding:10px 6px;border:1px solid var(--border,#ddd);white-space:normal!important;overflow-wrap:anywhere;vertical-align:top;text-align:right}
+#appView #content .settlement-invoice-table th{background:var(--surface-alt,#f3f5f7);position:sticky;top:0;z-index:1}
+#appView #content .settlement-invoice-table td:nth-child(6){white-space:nowrap!important;overflow:hidden}
+#appView #content .settlement-invoice-table td:nth-child(6) .badge{display:inline-flex!important;vertical-align:middle;max-width:65%;min-width:0;margin:0!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
+#appView #content .settlement-invoice-table td:nth-child(6) small{display:inline-block!important;vertical-align:middle;max-width:34%;margin:0 4px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap!important}
+#appView #content .settlement-invoice-table :is(.toolbar,.badge){display:flex;flex-wrap:wrap;min-width:0;white-space:normal!important}
+#appView #content .settlement-invoice-table .btn{min-width:0!important;white-space:normal!important;padding:5px!important}
+#appView #content #phoneOrderFormV25 .transport-delivery-choice,#appView #content #phoneOrderFormV25 [data-sales-dispatch-place]{order:0!important;grid-column:auto!important}
+
+/* Readable compact invoice grid: reserve room for one-line operations. */
+#appView #content .settlement-invoice-table{font-size:14px;font-weight:700}
+#appView #content .settlement-invoice-table :is(th,td){text-align:center!important;vertical-align:middle;padding:8px 4px;font-weight:700}
+#appView #content .settlement-invoice-table :is(th,td):nth-child(1){width:15%}
+#appView #content .settlement-invoice-table :is(th,td):nth-child(2){width:10%}
+#appView #content .settlement-invoice-table :is(th,td):nth-child(3),#appView #content .settlement-invoice-table :is(th,td):nth-child(4){width:7%}
+#appView #content .settlement-invoice-table :is(th,td):nth-child(5){width:12%}
+#appView #content .settlement-invoice-table :is(th,td):nth-child(6){width:24%}
+#appView #content .settlement-invoice-table :is(th,td):nth-child(7){width:25%}
+#appView #content .settlement-invoice-table td .badge{justify-content:center;font-size:13px;font-weight:700}
+#appView #content .settlement-invoice-table td .toolbar{display:flex!important;flex-wrap:nowrap!important;justify-content:center;align-items:center;gap:4px}
+#appView #content .settlement-invoice-table .btn{font-size:13px;font-weight:700;flex:0 1 auto;line-height:1.5}
+@media(max-width:900px){
+ #appView #content .settlement-invoice-table td .toolbar{overflow-x:auto;justify-content:flex-start;padding-bottom:4px}
+ #appView #content .settlement-invoice-table td .toolbar .btn{flex:0 0 auto;white-space:nowrap!important}
+ #appView #content .settlement-invoice-table :is(th,td):nth-child(1){width:14%}
+ #appView #content .settlement-invoice-table :is(th,td):nth-child(2){width:8%}
+ #appView #content .settlement-invoice-table :is(th,td):nth-child(3){width:6%}
+ #appView #content .settlement-invoice-table :is(th,td):nth-child(4){width:7%}
+ #appView #content .settlement-invoice-table :is(th,td):nth-child(5){width:11%}
+ #appView #content .settlement-invoice-table :is(th,td):nth-child(6){width:29%}
+ #appView #content .settlement-invoice-table :is(th,td):nth-child(7){width:25%}
+ #appView #content .settlement-invoice-table td:nth-child(6) .badge{max-width:54%;padding-inline:3px!important;font-size:9px!important}
+ #appView #content .settlement-invoice-table td:nth-child(6) small{max-width:42%;margin-inline:2px!important;font-size:8px!important}
+}
+@media(min-width:601px){
+ #appView #content .settlement-invoice-table td .toolbar{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));overflow:visible!important;justify-content:stretch;align-items:center;gap:4px}
+ #appView #content .settlement-invoice-table td .toolbar .btn{width:100%;max-width:100%;min-width:0!important;flex:none!important;white-space:nowrap!important;padding:4px 2px!important;gap:3px!important;font-size:12px!important;line-height:1.4}
+}
+/* Phone layout: issued invoices become readable, labeled cards instead of seven narrow columns. */
+@media(max-width:600px){
+ #appView #content .v26-invoice-list{padding:12px!important;overflow:visible!important;max-width:100%!important}
+ #appView #content .settlement-invoice-table{display:block!important;box-sizing:border-box;width:100%!important;table-layout:auto!important;border:0!important;border-collapse:separate!important}
+ #appView #content .settlement-invoice-table thead{display:none!important}
+ #appView #content .settlement-invoice-table tbody{display:grid!important;grid-template-columns:minmax(0,1fr);gap:10px}
+ #appView #content .settlement-invoice-table tbody tr{display:grid!important;box-sizing:border-box;grid-template-columns:repeat(2,minmax(0,1fr));width:100%!important;margin:0!important;border:1px solid var(--line,#dce4eb)!important;border-radius:12px;background:#fff;overflow:hidden}
+ #appView #content .settlement-invoice-table tbody tr td{display:flex!important;flex-direction:column;align-items:flex-start!important;justify-content:flex-start;box-sizing:border-box;width:auto!important;min-width:0!important;padding:9px 10px!important;border:0!important;border-bottom:1px solid var(--line,#dce4eb)!important;text-align:right!important;vertical-align:top;white-space:normal!important;overflow:visible!important;overflow-wrap:break-word!important;word-break:normal!important;line-height:1.7}
+ #appView #content .settlement-invoice-table tbody tr td::before{content:attr(data-label);display:block;max-width:100%;margin-bottom:4px;color:var(--muted,#67707d);font-size:11px;font-weight:800;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ #appView #content .settlement-invoice-table tbody tr td:nth-child(even):not(:nth-child(7)){border-right:1px solid var(--line,#dce4eb)!important}
+ #appView #content .settlement-invoice-table tbody tr td:nth-child(6){white-space:normal!important;overflow:visible!important}
+ #appView #content .settlement-invoice-table tbody tr td:nth-child(6) .badge{align-self:flex-start;max-width:100%!important;margin:0 0 4px!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.5}
+ #appView #content .settlement-invoice-table tbody tr td:nth-child(6) small{display:block!important;max-width:100%!important;margin:0!important;overflow:visible!important;text-overflow:clip!important;white-space:normal!important;font-size:11px!important;line-height:1.6}
+ #appView #content .settlement-invoice-table tbody tr td:nth-child(7){grid-column:1/-1;border-bottom:0!important}
+ #appView #content .settlement-invoice-table tbody tr td:nth-child(7) .toolbar{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));width:100%!important;min-width:0!important;gap:7px!important;overflow:visible!important;padding:0!important}
+ #appView #content .settlement-invoice-table tbody tr td:nth-child(7) .toolbar .btn{width:100%;max-width:100%;min-width:0!important;min-height:38px!important;flex:none!important;justify-content:center;white-space:nowrap!important;padding:6px 4px!important;gap:3px!important;font-size:12px!important;line-height:1.4}
+}
+
+/* Consistent cartable tables: identity, state and operations remain separate. */
+#appView #content .sales-distribution-table{width:100%;min-width:1000px;table-layout:fixed;border-collapse:collapse}
+#appView #content .sales-distribution-table :is(th,td){text-align:center;vertical-align:middle;font-size:14px;font-weight:700;padding:10px 7px;border:1px solid var(--line,#dce4eb);overflow-wrap:anywhere}
+#appView #content .sales-distribution-table th{background:var(--surface-alt,#f1f5f9)}
+#appView #content .sales-distribution-table tr.sales-delivery-summary-row{display:table-row!important;height:auto!important;min-height:0!important;max-height:none!important;width:auto!important;margin:0!important;padding:0!important;white-space:normal!important}
+#appView #content .sales-distribution-table tr.sales-delivery-summary-row>td{display:table-cell!important;height:auto!important;white-space:normal!important;border:1px solid var(--line,#dce4eb)!important}
+#appView #content .sales-distribution-table :is(th,td):first-child{width:19%}
+#appView #content .sales-distribution-table :is(th,td):nth-child(5){width:18%}
+#appView #content .sales-distribution-table td small{display:block}
+#appView #content .sales-delivery-column-list{overflow-x:auto;min-width:0}
+#remoteFullEdit .remote-edit-table{min-width:650px;width:100%}
+#remoteFullEdit .remote-edit-table :is(input,select){width:100%;min-width:70px;box-sizing:border-box}
+#remoteFullEdit .table-wrap{overflow-x:auto}
+#remoteFullEdit [data-re-error]{color:var(--danger,#b91c1c)}
+/* Shared order queues use equal column boundaries and a single horizontal action line. */
+#appView #content .order-summary-row{border-radius:0!important;margin-block:0!important;border-bottom:1px solid var(--line,#dce4eb)!important}
+#appView #content .order-summary-row>.order-summary-cell{justify-content:center!important;text-align:center!important;font-size:14px!important;font-weight:700!important}
+#appView #content .order-summary-row>.order-summary-identity{flex-basis:200px!important;min-width:200px!important}
+#appView #content .order-summary-row>.order-code{flex-basis:140px!important;min-width:140px!important}
+#appView #content .order-summary-row>.order-summary-date{flex-basis:190px!important;min-width:190px!important}
+#appView #content .order-summary-row>.order-summary-status{flex-basis:170px!important;min-width:170px!important}
+#appView #content .order-summary-row>.order-summary-actions{flex-wrap:nowrap!important;white-space:nowrap!important}
+
+/* v37.49.0 — warehouse preparation and weighing fit mobile/tablet widths;
+   desktop keeps its existing compact rows and dedicated scrolling behavior. */
+@media(max-width:1150px){
+  #appView #content .wh38-prep-items{grid-template-columns:minmax(0,1fr)!important;width:100%!important;min-width:0!important;max-width:100%!important;overflow-x:visible!important}
+  #appView #content .wh38-prep-item:not(.sr318-row){grid-template-columns:28px repeat(2,minmax(0,1fr))!important;grid-template-areas:'num product product' '. quantity description' '. weight stock'!important;align-items:start!important;gap:8px!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>*{grid-area:auto!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-num{grid-area:num!important;margin-top:25px!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-cell:nth-child(2){grid-area:product!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-cell:nth-child(3){grid-area:quantity!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-cell:nth-child(4){grid-area:description!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-cell:nth-child(5){grid-area:weight!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-stock-cell{grid-area:stock!important}
+  #appView #content .wh38-prep-item:not(.sr318-row) .wh38-cell-label{height:auto!important;min-height:20px!important;white-space:normal!important;overflow-wrap:anywhere!important;line-height:1.5!important}
+  #appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-title,#appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-desc{height:auto!important;min-height:44px!important;padding-block:7px!important;white-space:normal!important;overflow:visible!important;overflow-wrap:anywhere!important;text-overflow:clip!important;line-height:1.5!important}
+  #appView #content .wh38-prep-item:not(.sr318-row) .wh38-prep-title strong{white-space:normal!important;overflow:visible!important;overflow-wrap:anywhere!important;text-overflow:clip!important}
+  #appView #content .wh38-prep-item:not(.sr318-row) .wh38-req b{white-space:normal!important;overflow-wrap:anywhere!important}
+
+  #appView #content .wh38-store-sheet-head{overflow:visible!important}
+  #appView #content .wh38-store-sheet-head .wh38-store-head{display:flex!important;flex-wrap:wrap!important;width:100%!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow:visible!important;gap:6px!important}
+  #appView #content .wh38-store-sheet-head .wh38-store-head .order-code{flex:0 1 auto!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  #appView #content .wh38-store-sheet-head .wh38-store-name,#appView #content .wh38-store-sheet-head .wh38-store-meta{flex:1 1 140px!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow:visible!important;overflow-wrap:anywhere!important}
+  #appView #content .wh38-store-sheet-head .wh38-store-head .badge{flex:0 1 auto!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+
+  #appView #content .sr318-group{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+  #appView #content .sr318-group-head{min-width:0!important;max-width:100%!important;flex-wrap:wrap!important}
+  #appView #content .sr318-rows{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;min-width:0!important;max-width:100%!important;overflow-x:visible!important;overflow-y:visible!important;padding-bottom:0!important;box-sizing:border-box!important}
+  #appView #content .wh38-prep-item.sr318-row{display:flex!important;flex-wrap:wrap!important;align-items:center!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important;margin-bottom:4px!important;gap:6px!important}
+  #appView #content .wh38-prep-item.sr318-row>.wh38-prep-num{flex:0 0 24px!important;width:24px!important;min-width:24px!important;height:28px!important;margin:0!important}
+  #appView #content .sr318-row>.sr318-name{flex:1 1 calc(100% - 36px)!important;min-width:0!important;max-width:calc(100% - 32px)!important;white-space:normal!important;overflow:visible!important;overflow-wrap:anywhere!important;text-overflow:clip!important}
+  #appView #content .sr318-row>.st-run-chip{flex:0 1 auto!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  #appView #content .sr318-row>.sr318-req{flex:0 1 auto!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  #appView #content .sr318-row>.sr318-weights{display:flex!important;flex:1 1 100%!important;width:100%!important;min-width:0!important;max-width:100%!important;flex-wrap:wrap!important;align-items:center!important;white-space:normal!important;box-sizing:border-box!important}
+  #appView #content .sr318-row>.sr318-weights .sr318-wts{flex:1 1 auto!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  #appView #content .sr318-row>.sr318-weights .sr318-history-button{flex:0 0 auto!important;max-width:100%!important;white-space:normal!important}
+  #appView #content .sr318-row>span:not(.wh38-prep-num):not(.sr318-num):not(.st-run-chip):not(.sr318-weights){flex:1 1 auto!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  #appView #content .sr318-row>.sr318-final{flex:1 1 100%!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  #appView #content .sr318-row>.sr318-ops{display:flex!important;flex:1 1 100%!important;flex-wrap:wrap!important;align-items:stretch!important;gap:5px!important;width:100%!important;max-width:100%!important;min-width:0!important;margin-inline-start:0!important}
+  #appView #content .sr318-row>.sr318-ops .sr318-wbox{box-sizing:border-box!important;flex:1 1 120px!important;width:auto!important;min-width:110px!important;max-width:100%!important;height:auto!important;min-height:34px!important}
+  #appView #content .sr318-row>.sr318-ops .sr318-wbox input{box-sizing:border-box!important;flex:1 1 0!important;width:100%!important;min-width:0!important;max-width:100%!important}
+  #appView #content .sr318-row>.sr318-ops .btn{box-sizing:border-box!important;flex:1 1 120px!important;min-width:0!important;max-width:100%!important;height:auto!important;min-height:34px!important;padding:5px 7px!important;white-space:normal!important;line-height:1.35!important;text-align:center!important}
+  #appView #content .sr318-row>button{flex:0 1 auto!important;min-width:0!important;max-width:100%!important;height:auto!important;white-space:normal!important}
+  #appView #content .sr318-sendline{width:100%!important;min-width:0!important;max-width:100%!important;flex-wrap:wrap!important;overflow-x:visible!important}
+  #appView #content .sr318-sendline>*{min-width:0!important;max-width:100%!important;white-space:normal!important}
+  #appView #content .sr318-sendline .btn{max-width:100%!important;white-space:normal!important}
+  #appView #content .sr318-sendline .store-service-print{display:flex!important;flex-wrap:wrap!important;min-width:0!important;max-width:100%!important}
+  #appView #content .sr318-sendnote{min-width:0!important;white-space:normal!important;overflow-wrap:anywhere!important}
+
+  #modal .wh-weight-scroll{width:100%!important;min-width:0!important;max-width:100%!important;overflow-x:visible!important;overflow-y:visible!important}
+  #modal .wh-weight-line{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:start!important;gap:8px!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important;padding:8px 0!important}
+  #modal .wh-weight-line>.wh-wt-select{grid-column:1;min-width:0!important;width:100%!important;white-space:normal!important}
+  #modal .wh-weight-line>.wh-gross{grid-column:2;width:auto!important;min-width:0!important;max-width:100%!important}
+  #modal .wh-weight-line>.wh-tare-groups{grid-column:1/-1;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:6px!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+  #modal .wh-weight-line .wh-tare-group{display:grid!important;grid-template-columns:minmax(0,1fr) 38px!important;grid-template-areas:'kind remove' 'amount remove'!important;align-items:end!important;gap:6px!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+  #modal .wh-weight-line .wh-tare-kind{grid-area:kind!important;flex:none!important;width:100%!important;min-width:0!important;max-width:100%!important}
+  #modal .wh-weight-line .wh-tare-amount{grid-area:amount!important;flex:none!important;width:100%!important;min-width:0!important;max-width:100%!important}
+  #modal .wh-weight-line .wh-tare-group [data-wt-remove-tare]{grid-area:remove!important;align-self:stretch!important;min-width:38px!important;height:38px!important;padding-inline:8px!important;white-space:nowrap!important}
+  #modal .wh-weight-line>.wh-weight-net{grid-column:1;min-width:0!important;width:auto!important}
+  #modal .wh-weight-line>[data-wt-remove]{grid-column:2;justify-self:stretch!important;width:100%!important;min-width:0!important;white-space:normal!important}
+  #modal .wh-weight-line :is(select,input){box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important}
+}
+@media(max-width:620px){
+  #appView #content .wh38-prep-items{padding-inline:8px!important}
+  #appView #content .wh38-prep-item:not(.sr318-row){grid-template-columns:24px repeat(2,minmax(0,1fr))!important;gap:6px!important;padding-inline:8px!important}
+  #appView #content .wh38-prep-item:not(.sr318-row)>.wh38-prep-num{width:24px!important;height:24px!important;margin-top:25px!important}
+  #appView #content .wh-weight-main{height:auto!important;min-height:44px!important;flex-wrap:wrap!important;align-items:stretch!important;padding:4px 6px!important}
+  #appView #content .wh-weight-main input{flex:1 1 100%!important;width:100%!important;min-width:0!important;height:30px!important}
+  #appView #content .wh-weight-main .wh-weight-open{flex:1 1 auto!important;max-width:100%!important;white-space:normal!important}
+}

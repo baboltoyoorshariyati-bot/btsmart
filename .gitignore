@@ -1,0 +1,21 @@
+# Runtime data and secrets: never commit
+data/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+node_modules/
+build/
+dist/
+data-preview/
+
+# SQLite runtime files (never commit)
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+
+# Encrypted backup exports and interrupted private publications
+*.bte
+.bt-encrypted-*.partial

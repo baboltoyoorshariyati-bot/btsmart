@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>راهنمای نصب گامبهگام بابل طیور — Windows Server 2025</title>
+<style>
+  :root{
+    --ink:#16202b; --muted:#5b6b7b; --line:#dce4ec; --bg:#f5f8fb;
+    --brand:#0d7a5f; --brand2:#0a5c48; --warn:#a8590a; --warnbg:#fff7e8;
+    --okbg:#eaf7f1; --code:#f0f4f8;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:Tahoma,"Segoe UI",Arial,sans-serif; font-size:15px; line-height:1.95;
+  }
+  .wrap{max-width:940px;margin:0 auto;padding:28px 20px 80px}
+  header{
+    background:linear-gradient(120deg,var(--brand2),var(--brand));
+    color:#fff;border-radius:18px;padding:34px 34px 28px;margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(13,122,95,.18);
+  }
+  header h1{margin:0 0 8px;font-size:27px;line-height:1.5}
+  header p{margin:0;opacity:.93;font-size:15px}
+  .badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px;border-radius:100px;font-size:12px;margin-bottom:14px}
+  .print{float:left;background:#fff;color:var(--brand2);border:0;border-radius:10px;
+    padding:9px 18px;font-family:inherit;font-size:14px;font-weight:bold;cursor:pointer}
+  .print:hover{background:#eaf7f1}
+  section{background:#fff;border:1px solid var(--line);border-radius:16px;
+    padding:24px 28px;margin-bottom:20px;box-shadow:0 2px 10px rgba(20,40,60,.04)}
+  h2{font-size:20px;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid var(--okbg);color:var(--brand2)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--brand2)}
+  p{margin:9px 0}
+  .callout{background:var(--okbg);border-right:5px solid var(--brand);border-radius:12px;
+    padding:20px 24px;margin:0 0 20px}
+  .callout.big{font-size:17px}
+  .callout.warn{background:var(--warnbg);border-right-color:var(--warn)}
+  .big-answer{font-size:22px;font-weight:bold;color:var(--brand2);margin:0 0 8px}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:right;vertical-align:top}
+  th{background:#f0f6f3;color:var(--brand2);font-weight:bold}
+  tr:nth-child(even) td{background:#fafcfd}
+  code,.path{background:var(--code);border:1px solid #dde5ec;border-radius:6px;
+    padding:1px 6px;font-family:Consolas,"Courier New",monospace;font-size:13px;direction:ltr;display:inline-block}
+  pre{background:#12202c;color:#e9f2f7;border-radius:12px;padding:16px 18px;overflow-x:auto;
+    direction:ltr;text-align:left;font-family:Consolas,"Courier New",monospace;font-size:13px;line-height:1.7}
+  pre code{background:none;border:0;color:inherit;padding:0}
+  a{color:var(--brand);word-break:break-all}
+  .step{display:flex;gap:16px;margin:0 0 22px;align-items:flex-start}
+  .num{flex:0 0 42px;height:42px;border-radius:50%;background:var(--brand);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px}
+  .step-body{flex:1}
+  .step h3{margin:6px 0 6px}
+  ul,ol{margin:8px 0 8px;padding-inline-start:22px}
+  li{margin:5px 0}
+  .chk{font-size:19px;color:var(--brand);margin-left:8px}
+  .done{background:#f7fbf9;border-right:4px solid var(--brand);padding:14px 18px;border-radius:10px}
+  .tag{display:inline-block;background:#eef4f8;color:#40566a;border-radius:6px;
+    padding:2px 9px;font-size:12px;margin:0 3px}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+  @media print{
+    body{background:#fff;font-size:12px}
+    .wrap{max-width:none;padding:0}
+    header{box-shadow:none;background:var(--brand2)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .print{display:none}
+    section{box-shadow:none;page-break-inside:avoid;border-radius:8px;padding:14px 18px}
+    .callout,th,tr:nth-child(even) td,pre,code,.path{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    a{color:var(--brand2)}
+    @page{size:A4;margin:14mm}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <button class="print" onclick="window.print()">🖨️ چاپ / ذخیرهٔ PDF</button>
+  <span class="badge">ویندوز سرور ۲۰۲۵ • بدون کدنویسی • پورت ۸۰</span>
+  <h1>نصب گامبهگام سامانهٔ بابل طیور</h1>
+  <p>از دانلود تا اولین ورود — فقط با چند کلیک. نیازی به نصب SQLite، SQL Server یا هیچ درایوری نیست.</p>
+  <p style="margin-top:10px;font-size:13px;opacity:.85">نسخهٔ راهنما: فاز ۳ — ۲۸ اکتبر ۲۰۲۶</p>
+</header>
+
+<section class="callout big">
+  <p class="big-answer">❓ آیا باید SQLite نصب کنم؟ — خیر، اصلاً.</p>
+  <p><strong>SQLite یک نرمافزار سرور نیست که نصب شود</strong>؛ یک کتابخانه است که داخل خود <strong>Node.js نسخهٔ ۲۲٫۵ به بعد</strong> کامپایل شده است. نصبکننده Node.js را خودکار نصب میکند، پس SQLite هم همراهش میآید. دیتابیس فقط یک فایل است:</p>
+  <p style="text-align:center;margin:14px 0"><span class="path">C:\BabolToyor\data\baboltoyoor.db</span></p>
+  <p style="margin-bottom:0">نه سرویس SQL، نه <span class="tag">sqlite3.exe</span>، نه ODBC، نه نام کاربری/رمز جداگانه. <strong>هیچ چیزی از sqlite.org دانلود نکنید</strong> مگر اینکه خودتان خواسته باشید دیتابیس را با ابزار گرافیکی نگاه کنید (کاملاً اختیاری — بخش پرسشهای متداول).</p>
+</section>
+
+<section>
+  <h2>✅ چکلیست سریع</h2>
+  <table>
+    <tr><th style="width:44px">✔</th><th>کار</th><th>کجا</th></tr>
+    <tr><td><span class="chk">☐</span></td><td>دانلود بستهٔ نصب</td><td><a href="https://drive.google.com/drive/folders/1yE7kzOvH-ZGpKenysw8IzYPCE-nmS5JR">BabolToyor-Windows-Setup-1.1.6.zip</a></td></tr>
+    <tr><td><span class="chk">☐</span></td><td>(فقط سرور آفلاین) دانلود Node پورتابل</td><td><span class="path">node-v22.x.x-win-x64.zip</span> از <a href="https://nodejs.org/dist/">nodejs.org/dist</a></td></tr>
+    <tr><td><span class="chk">☐</span></td><td>کپی فایلها در یک پوشه</td><td><span class="path">C:\BabolToyor-Install</span></td></tr>
+    <tr><td><span class="chk">☐</span></td><td>استخراج ZIP</td><td>راستکلیک → Extract All</td></tr>
+    <tr><td><span class="chk">☐</span></td><td>اجرای نصبکننده</td><td>راستکلیک روی <span class="path">BabolToyor-Setup.cmd</span> → <strong>Run as administrator</strong></td></tr>
+    <tr><td><span class="chk">☐</span></td><td>UAC</td><td><strong>Yes</strong> را بزنید</td></tr>
+    <tr><td><span class="chk">☐</span></td><td>صبر کنید</td><td>تا پیام <span class="path">INSTALLATION FINISHED</span></td></tr>
+    <tr><td><span class="chk">☐</span></td><td>برداشتن رمز</td><td><span class="path">C:\BabolToyor\INSTALL-INFO.txt</span> — کاربر <span class="path">admin</span></td></tr>
+    <tr><td><span class="chk">☐</span></td><td>باز کردن سامانه</td><td><span class="path">http://localhost</span> (بدون پورت)</td></tr>
+    <tr><td><span class="chk">☐</span></td><td>تعویض اجباری رمز</td><td>رمز جدید را امن نگهدارید</td></tr>
+    <tr><td><span class="chk">☐</span></td><td>پاک کردن فایل رمز</td><td>حذف <span class="path">INSTALL-INFO.txt</span></td></tr>
+    <tr><td><span class="chk">☐</span></td><td>بررسی سلامت</td><td><span class="path">BabolToyor-Setup.cmd status</span> → <span class="path">HTTP 200 OK</span></td></tr>
+  </table>
+  <p class="done">✅ فقط ۴ مورد باید داشته باشید: <strong>ویندوز سرور ۲۰۲۵</strong>، <strong>دسترسی Administrator</strong>، <strong>فایلهای نصب</strong>، و <strong>اینترنت</strong> (فقط برای دانلود Node در صورتی که نصب نباشد).</p>
+</section>
+
+<section>
+  <h2>گام ۱ — دانلود فایلها</h2>
+
+  <h3>حالت الف: سرور به اینترنت وصل است (پیشنهادی)</h3>
+  <p>همین <strong>یک فایل</strong> کافی است:</p>
+  <p style="text-align:center"><a href="https://drive.google.com/drive/folders/1yE7kzOvH-ZGpKenysw8IzYPCE-nmS5JR"><strong>⬇️ دانلود BabolToyor-Windows-Setup-1.1.6.zip</strong></a><br>
+  <span style="font-size:13px;color:var(--muted)">حدود ۴٫۲ مگابایت • <a href="https://drive.google.com/drive/folders/1yE7kzOvH-ZGpKenysw8IzYPCE-nmS5JR">پوشهٔ انتشار Google Drive</a></span></p>
+  <p>نصبکننده خودش Node.js را از <strong>winget</strong> یا سایت رسمی <strong>nodejs.org</strong> میگیرد و چکسام SHA-256اش را چک میکند.</p>
+
+  <h3>حالت ب: سرور هیچ اینترنتی ندارد</h3>
+  <p>علاوه بر ZIP بالا، یک فایل دیگر هم لازم است: <strong>نسخهٔ پورتابل Node.js 22 LTS (64-bit)</strong>.</p>
+  <ul>
+    <li>بروید به <a href="https://nodejs.org/en/download">nodejs.org/en/download</a> → بخش <strong>Standalone Binary / Windows x64 (.zip)</strong>،
+        یا <a href="https://nodejs.org/dist/">nodejs.org/dist</a> → پوشهٔ <span class="path">v22.x.x/</span>.</li>
+    <li>فایلی شبیه <span class="path">node-v22.22.3-win-x64.zip</span> بگیرید (حتماً <strong>x64</strong>، حتماً <strong>zip</strong>).</li>
+    <li>آن را <strong>همانطور ZIPشده</strong> (بدون استخراج) کنار <span class="path">BabolToyor-Setup.cmd</span> بگذارید.</li>
+  </ul>
+  <p class="callout warn" style="margin-top:14px">در حالت آفلاین، نصبکننده هیچ چیزی روی ویندوز نصب نمیکند و هیچ اینترنتی لازم نیست. فایل MSI یا نسخهٔ ۳۲بیتی (x86) برای این حالت مناسب نیست.</p>
+</section>
+
+<section>
+  <h2>گام ۲ — انتقال و استخراج</h2>
+  <div class="step"><div class="num">۱</div><div class="step-body">
+    <h3>یک پوشهٔ ساده بسازید</h3>
+    <p>مثلاً <span class="path">C:\BabolToyor-Install</span> و فایلهای دانلودشده را با فلش، شبکه یا RDP به آن کپی کنید.</p>
+    <p>اگر ویندوز گفت فایل بلاک شده: راستکلیک → <strong>Properties</strong> → تیک <strong>Unblock</strong> → <strong>OK</strong>.</p>
+  </div></div>
+  <div class="step"><div class="num">۲</div><div class="step-body">
+    <h3>ZIP را استخراج کنید</h3>
+    <p>راستکلیک روی <span class="path">BabolToyor-Windows-Setup-1.1.6.zip</span> → <strong>Extract All...</strong> → <strong>Extract</strong>.</p>
+    <p>حالا باید این سه فایل <strong>کنار هم</strong> باشند:</p>
+<pre><code>C:\BabolToyor-Install\
+  ├── BabolToyor-Setup.cmd      ← نصبکننده
+  ├── app.zip                   ← فایلهای سامانه
+  └── README-INSTALL-fa.txt     ← راهنمای داخل بسته</code></pre>
+    <p>در حالت آفلاین، <span class="path">node-v22.x.x-win-x64.zip</span> هم همانجا باشد. <strong>app.zip را جدا نکنید و جابهجا نکنید.</strong></p>
+  </div></div>
+</section>
+
+<section>
+  <h2>گام ۳ — اجرای نصبکننده</h2>
+  <div class="step"><div class="num">۱</div><div class="step-body">
+    <h3>راستکلیک → Run as administrator</h3>
+    <p>روی <span class="path">BabolToyor-Setup.cmd</span> راستکلیک کنید و <strong>Run as administrator</strong> را بزنید. (دابلکلیک هم خودش UAC میدهد.)</p>
+  </div></div>
+  <div class="step"><div class="num">۲</div><div class="step-body">
+    <h3>پنجرهٔ UAC → Yes</h3>
+    <p>پیام «Do you want to allow this app to make changes?» → <strong>Yes</strong>. پنجرهٔ مشکی Command Prompt باز میشود؛ <strong>آن را نبندید.</strong></p>
+    <p style="font-size:13px;color:var(--muted)">اگر پیام Execution Policy یا SmartScreen آمد، نگران نباشید؛ فایل <span class="path">.cmd</span> با Bypass اجرا میشود. فقط Unblock گام ۲ را انجام دهید.</p>
+  </div></div>
+  <div class="step"><div class="num">۳</div><div class="step-body">
+    <h3>منتظر بمانید — ۲ تا ۱۰ دقیقه</h3>
+    <p>نصبکننده بهترتیب: Node.js 22.5+ (و همراهش SQLite)، آزادسازی پورت ۸۰ از IIS، کپی برنامه به <span class="path">C:\BabolToyor</span>، ساخت دیتابیس، باز کردن فایروال TCP 80، ساخت تسک اجرای خودکار با ریاستارت در خطا، ساخت رمز تصادفی مدیر، تست سلامت و میانبر دسکتاپ.</p>
+  </div></div>
+  <div class="step"><div class="num">۴</div><div class="step-body">
+    <h3>پیام موفقیت</h3>
+<pre><code>========================================================
+  INSTALLATION FINISHED
+  Open: http://localhost/   (no port needed)
+  User: admin
+  Initial password: ...
+  Full details (Persian): C:\BabolToyor\INSTALL-INFO.txt
+========================================================</code></pre>
+    <p>سپس یک کلید بزنید تا پنجره بسته شود.</p>
+  </div></div>
+</section>
+
+<section>
+  <h2>گام ۴ — اولین ورود</h2>
+  <div class="step"><div class="num">۱</div><div class="step-body">
+    <h3>باز کردن سامانه</h3>
+    <p>روی خود سرور: <span class="path">http://localhost</span> — از کامپیوتر دیگر: <span class="path">http://IP-سرور</span> (مثلاً <span class="path">http://192.168.1.50</span>). <strong>بدون نوشتن پورت.</strong></p>
+  </div></div>
+  <div class="step"><div class="num">۲</div><div class="step-body">
+    <h3>رمز اولیه</h3>
+    <p>فایل <span class="path">C:\BabolToyor\INSTALL-INFO.txt</span> را با Notepad باز کنید؛ نام کاربری <span class="path">admin</span> و رمز تصادفی داخلش است.</p>
+  </div></div>
+  <div class="step"><div class="num">۳</div><div class="step-body">
+    <h3>تعویض اجباری رمز</h3>
+    <p>سامانه در اولین ورود رمز جدید میخواهد. رمزی قوی (حداقل ۸ کاراکتر، حروف بزرگ و کوچک + عدد + نماد) انتخاب و در جای امنی یادداشت کنید.</p>
+    <p class="callout warn" style="margin-top:10px">🔒 بعد از تعویض رمز، فایل <span class="path">INSTALL-INFO.txt</span> را <strong>پاک کنید</strong> چون رمز اولیه داخلش است.</p>
+  </div></div>
+  <div class="step"><div class="num">۴</div><div class="step-body">
+    <h3>بررسی سلامت (اختیاری)</h3>
+    <p>در Command Prompt داخل همان پوشه:</p>
+<pre><code>cd /d C:\BabolToyor-Install
+BabolToyor-Setup.cmd status</code></pre>
+    <p>باید <span class="path">Port 80 : LISTENING</span> و <span class="path">Health : HTTP 200 OK</span> ببینید. ✅</p>
+  </div></div>
+</section>
+
+<section>
+  <h2>دستورات روزمره</h2>
+  <table>
+    <tr><th>دستور</th><th>کاربرد</th></tr>
+    <tr><td><span class="path">BabolToyor-Setup.cmd status</span></td><td>وضعیت سرویس، پورت ۸۰ و سلامت</td></tr>
+    <tr><td><span class="path">BabolToyor-Setup.cmd logs</span></td><td>۴۰ خط آخر لاگها (اولین جای عیبیابی)</td></tr>
+    <tr><td><span class="path">BabolToyor-Setup.cmd restart</span></td><td>راهاندازی مجدد</td></tr>
+    <tr><td><span class="path">BabolToyor-Setup.cmd uninstall</span></td><td>حذف سامانه — <strong>دادهها حفظ میشوند</strong></td></tr>
+    <tr><td><span class="path">BabolToyor-Setup.cmd help</span></td><td>همهٔ پارامترها</td></tr>
+  </table>
+  <h3>پشتیبانگیری (حتماً انجام دهید)</h3>
+<pre><code>cd /d C:\BabolToyor
+node scripts\backup-db.js D:\Backup\baboltoyoor.db</code></pre>
+  <p>ابزار داخلی خود سامانه، بدون نیاز به توقف سرویس و بدون نصب نرمافزار اضافی، یک کپی یکپارچه میگیرد (<span class="tag">VACUUM INTO</span>).</p>
+  <h3>ارتقا</h3>
+  <p>همان <span class="path">BabolToyor-Setup.cmd</span> جدید را دوباره اجرا کنید. <strong>data، .env، logs و رمز مدیر دستنخورده میمانند.</strong></p>
+</section>
+
+<section>
+  <h2>عیبیابی سریع</h2>
+  <table>
+    <tr><th>علامت</th><th>راهحل</th></tr>
+    <tr><td>صفحه باز نمیشود</td><td><span class="path">status</span> و بعد <span class="path">restart</span></td></tr>
+    <tr><td><span class="path">Health: NOT RESPONDING</span></td><td><span class="path">logs</span> را ببینید؛ معمولاً پورت اشغال یا نبود Node.js</td></tr>
+    <tr><td>هشدار SmartScreen / فایل بلاکشده</td><td>راستکلیک → Properties → تیک <strong>Unblock</strong></td></tr>
+    <tr><td>UAC رد شد</td><td>راستکلیک → <strong>Run as administrator</strong></td></tr>
+    <tr><td>خطای IIS / پورت ۸۰</td><td>نصبکننده خودکار متوقف میکند؛ لاگ <span class="path">install.log</span> را ببینید یا <span class="path">-NoAutoStopIis -Port 8080</span></td></tr>
+    <tr><td>از کلاینت وصل نمیشود</td><td>روی کلاینت: <span class="path">Test-NetConnection IP-سرور -Port 80</span>؛ قانون فایروال را چک کنید</td></tr>
+    <tr><td>رمز را گم کردم</td><td><span class="path">INSTALL-INFO.txt</span> و <span class="path">.env</span> را ببینید</td></tr>
+    <tr><td>سرور آفلاین، نصب گیر کرد</td><td><span class="path">node-v22.x.x-win-x64.zip</span> را کنار <span class="path">.cmd</span> بگذارید</td></tr>
+    <tr><td><span class="path">Node.js 22+ not found</span></td><td>بگذارید نصبکننده نسخهٔ جدید نصب کند؛ Node 20 کافی نیست</td></tr>
+  </table>
+  <p>محل لاگ نصب: <span class="path">C:\BabolToyor\logs\install.log</span></p>
+</section>
+
+<section>
+  <h2>پرسشهای متداول</h2>
+  <h3>۱) SQLite — کدام نسخه و از کجا؟</h3>
+  <p><strong>هیچکدام و از هیچ جا.</strong> ماژول <span class="path">node:sqlite</span> از Node.js 22.5.0 به بعد جزو خود Node است. نصبکننده خودش دیتابیس را میسازد. <a href="https://nodejs.org/docs/latest-v22.x/api/sqlite.html">مستندات رسمی Node.js</a>.</p>
+
+  <h3>۲) پس دقیقاً چه نرمافزاری نصب میشود؟</h3>
+  <p>فقط <strong>Node.js 22.5+ (ترجیحاً LTS)</strong> — و آن را هم نصبکننده انجام میدهد. اگر خواستید دستی بدهید: <a href="https://nodejs.org/en/download">nodejs.org/en/download</a> → <strong>LTS</strong> → <strong>Windows Installer (.msi) x64</strong>. نسخههای ۲۰ و قدیمیتر کار نمیکنند.</p>
+
+  <h3>۳) دلم میخواهد خود دیتابیس را ببینم (کاملاً اختیاری)</h3>
+  <p>بدون نصب چیز اضافی، از ابزار داخلی سامانه:</p>
+<pre><code>cd /d C:\BabolToyor
+node scripts\sql-query.js --stats
+node scripts\sql-query.js "SELECT order_no, status FROM orders"</code></pre>
+  <p>یا ابزار گرافیکی اختیاری: <a href="https://www.sqlite.org/download.html">صفحهٔ دانلود SQLite</a> → <strong>Precompiled Binaries for Windows</strong> → <span class="path">sqlite-tools-win-x64-3540100.zip</span> (SQLite <strong>3.54.1</strong>) را در <span class="path">C:\sqlite</span> استخراج کنید؛ یا <a href="https://sqlitebrowser.org/dl/">DB Browser for SQLite</a>. عدد انتهای نام فایل نسخه است (<span class="path">3540100</span> = ۳٫۵۴٫۱)؛ همیشه آخرین نسخهٔ همان صفحه را بگیرید. <strong>برای نصب سامانه لازم نیست.</strong></p>
+
+  <h3>۴) اطلاعات قبلی (db.json) چه میشود؟</h3>
+  <p>اولین اجرا خودکار به جداول SQL منتقل میکند و فایل قدیمی را به <span class="path">db.json.migrated-&lt;تاریخ&gt;</span> تغییر نام میدهد — چیزی از بین نمیرود.</p>
+
+  <h3>۵) امنیت</h3>
+  <p>پیشفرض HTTP روی پورت ۸۰ است (چون پورت نوشته نشود). رمزها هش میشوند، نشست و Audit لاگ دارند. اگر بعدها HTTPS/reverse proxy اضافه کردید، در <span class="path">.env</span> مقادیر <span class="path">COOKIE_SECURE=true</span> و <span class="path">TRUST_PROXY=true</span> را بگذارید.</p>
+</section>
+
+<section>
+  <h2>خلاصهٔ لینکها</h2>
+  <table>
+    <tr><th>مورد</th><th>لینک</th></tr>
+    <tr><td>پوشهٔ انتشار Google Drive</td><td><a href="https://drive.google.com/drive/folders/1yE7kzOvH-ZGpKenysw8IzYPCE-nmS5JR">فهرست دارایی‌های نسخه</a></td></tr>
+    <tr><td>بستهٔ آفلاین نصب</td><td><a href="https://drive.google.com/drive/folders/1yE7kzOvH-ZGpKenysw8IzYPCE-nmS5JR">BabolToyor-Windows-Setup-1.1.6.zip</a></td></tr>
+    <tr><td>فقط نصبکنندهٔ تکفایل</td><td><a href="https://drive.google.com/drive/folders/1yE7kzOvH-ZGpKenysw8IzYPCE-nmS5JR">BabolToyor-Setup-1.1.6.cmd</a></td></tr>
+    <tr><td>Node.js (فقط در صورت نصب دستی)</td><td><a href="https://nodejs.org/en/download">nodejs.org/en/download</a> — LTS، x64</td></tr>
+    <tr><td>Node پورتابل برای سرور آفلاین</td><td><a href="https://nodejs.org/dist/">nodejs.org/dist</a> → <span class="path">v22.x.x/</span> → <span class="path">node-v22.x.x-win-x64.zip</span></td></tr>
+    <tr><td>ابزار اختیاری SQLite</td><td><a href="https://www.sqlite.org/download.html">sqlite.org/download.html</a></td></tr>
+    <tr><td>مستند فنی دیتابیس</td><td><span class="path">docs/sqlite-database-fa.md</span></td></tr>
+  </table>
+</section>
+
+<footer>
+  سامانهٔ هوشمند بابل طیور • راهنمای نصب ویندوز سرور ۲۰۲۵ • فاز ۳<br>
+  اگر <span class="path">INSTALLATION FINISHED</span> را دیدید و صفحهٔ ورود بالا آمد، نصب موفق بوده — نه SQLite نصب کردهاید، نه کدی نوشتهاید. 🎉
+</footer>
+
+</div>
+</body>
+</html>

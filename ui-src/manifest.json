@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "bundles": [
+    {
+      "output": "public/app.js",
+      "parts": [
+        "ui-src/app/01-core-calendars.js",
+        "ui-src/app/02-shell-gate.js",
+        "ui-src/app/03-legacy-sales-admin.js",
+        "ui-src/app/04-session-notifications.js",
+        "ui-src/app/05-sales-store.js",
+        "ui-src/app/06-warehouse-documents.js",
+        "ui-src/app/07-dashboard-history.js",
+        "ui-src/app/08-sales-cache-navigation.js",
+        "ui-src/app/09-settlement.js",
+        "ui-src/app/10-weighbridge-history.js"
+      ]
+    },
+    {
+      "output": "public/ui2.js",
+      "parts": [
+        "ui-src/ui2/01-sales-orders.js",
+        "ui-src/ui2/02-invoice-edits.js",
+        "ui-src/ui2/03-delivery.js",
+        "ui-src/ui2/04-gate.js",
+        "ui-src/ui2/05-warehouse.js",
+        "ui-src/ui2/06-store-services.js",
+        "ui-src/ui2/07-dashboard-reports.js",
+        "ui-src/ui2/08-transport-invoices.js"
+      ]
+    }
+  ]
+}

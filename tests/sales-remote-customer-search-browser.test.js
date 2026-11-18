@@ -1,0 +1,30 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const {spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),net=require('node:net');
+const exe=process.env.BT_CHROMIUM_PATH;
+test('جستجوی مشتری و محل ارسال در سفارش غیرحضوری و روزهای آتی',{skip:!exe,timeout:100000},async()=>{
+ const {chromium}=require('playwright-core');const port=await new Promise(r=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>r(p));});});
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-sales-search-')),base=`http://127.0.0.1:${port}`;let browser;
+ const proc=spawn(process.execPath,['server.js'],{cwd:path.join(__dirname,'..'),env:{...process.env,HOST:'127.0.0.1',PORT:String(port),DATA_DIR:dir,ADMIN_INITIAL_PASSWORD:'Initial!2345'},stdio:['ignore','pipe','pipe']});
+ try{
+  await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(Error('startup')),15000);proc.stdout.on('data',d=>{if(String(d).includes('"listening"')){clearTimeout(t);resolve();}});proc.once('exit',c=>reject(Error('exit '+c)));});
+  browser=await chromium.launch({executablePath:exe,args:['--no-sandbox','--disable-dev-shm-usage']});const ctx=await browser.newContext({viewport:{width:390,height:900}}),page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const post=async(url,data)=>{const r=await ctx.request.post(base+url,{data});assert(r.ok(),url+' '+r.status()+' '+await r.text());return r.json();};
+  await post('/api/login',{username:'admin',password:'Initial!2345'});await post('/api/account/password',{currentPassword:'Initial!2345',newPassword:'Changed!2345'});
+  const customer=(await post('/api/customers',{name:'مشتری جستجو',phone:'09121112233'})).customer,other=(await post('/api/customers',{name:'مشتری دوم',phone:'09121112234'})).customer;
+  await page.goto(base,{waitUntil:'networkidle'});await page.evaluate(()=>go('sales','remote'));let form=page.locator('#phoneOrderFormV25');await form.waitFor();
+  const select=async(form,q)=>{await form.locator('.sales-customer-picker input[type=search]').fill(q);const result=form.locator('[data-sales-customer-index]').first();await result.waitFor();await result.click();};
+  await select(form,'09121112233');assert.equal(await form.locator('[name=customerId]').inputValue(),customer.id);assert.equal(await form.locator('[name=name]').inputValue(),customer.name);
+  assert.equal(await form.locator('[data-sales-dispatch-place]').isVisible(),false);await form.locator('[data-delivery-mode]').selectOption('DELIVERY');assert.equal(await form.locator('[data-sales-dispatch-place]').isVisible(),true);await form.locator('[name=dispatchPlace]').fill('آدرس');await form.locator('[data-delivery-mode]').selectOption('PICKUP');assert.equal(await form.locator('[data-sales-dispatch-place]').isVisible(),false);assert.equal(await form.locator('[name=dispatchPlace]').isDisabled(),true);
+  const product=form.locator('[data-op-product-search="phone-0"]');await product.fill('01');await form.locator('[data-op-suggest="phone-0"] button').first().waitFor();await product.press('ArrowDown');await product.press('Enter');await form.locator('[data-op-qty="phone-0"]').fill('2');
+  const response=page.waitForResponse(r=>r.url().endsWith('/api/orders/remote')&&r.request().method()==='POST');await form.locator('[type=submit]').click();const remote=await response;assert.equal(remote.status(),201,await remote.text());const order=(await remote.json()).order;assert.equal(order.customerId,customer.id);assert.equal(order.dispatchPlace,'');
+  await page.evaluate(()=>go('sales','future'));form=page.locator('#futureOrderFormV25');await form.waitFor();await select(form,customer.code);assert.equal(await form.locator('[name=customerId]').inputValue(),customer.id);await form.locator('[name=phone]').fill('09121112235');assert.equal(await form.locator('[name=customerId]').inputValue(),customer.id);await form.locator('[data-sales-customer-clear]').click();assert.equal(await form.locator('[name=customerId]').inputValue(),'');await select(form,customer.code);
+  await form.locator('[data-delivery-mode]').selectOption('PICKUP');assert.equal(await form.locator('[data-sales-dispatch-place]').isVisible(),false);assert.equal(await form.locator('[name=dispatchPlace]').isDisabled(),true);
+  const date=form.locator('.jalali-date-input[data-target=deliveryDate]');await date.fill(await page.evaluate(()=>isoToJalali(nextDayIso())));await date.dispatchEvent('input');
+  const fp=form.locator('[data-op-product-search="future-0"]');await fp.fill('01');await form.locator('[data-op-suggest="future-0"] button').first().waitFor();await fp.press('ArrowDown');await fp.press('Enter');await form.locator('[data-op-qty="future-0"]').fill('2');
+  const futureResponse=page.waitForResponse(r=>r.url().endsWith('/api/orders/remote')&&r.request().method()==='POST');await form.locator('[type=submit]').click();const future=await futureResponse;assert.equal(future.status(),201,await future.text());const scheduled=(await future.json()).order;assert.equal(scheduled.customerId,customer.id);assert.equal(scheduled.dispatchPlace,'');
+  const payload={name:customer.name,phone:other.phone,customerId:customer.id,deliveryMode:'PICKUP',deliveryDate:scheduled.deliveryDate,scheduledDate:scheduled.scheduledDate,scheduledTime:'08:00',items:[{productId:'p01',requestedQty:1,requestedUnit:'کیلوگرم'}]};const bad=await ctx.request.post(base+'/api/orders/remote',{data:payload});assert.equal(bad.status(),409,await bad.text());
+  const invalid=await ctx.request.post(base+'/api/orders/remote',{data:{...payload,customerId:'missing',phone:customer.phone}});assert.equal(invalid.status(),400);
+  const all=await ctx.request.get(base+'/api/customers?q='+encodeURIComponent('مشتری جستجو'));assert.equal((await all.json()).customers.length,1);assert.deepEqual(errors,[]);
+ }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
+});

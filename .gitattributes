@@ -1,0 +1,4 @@
+# Keep source bytes reproducible on Windows (including the embedded PowerShell payload).
+* text=auto eol=lf
+# Generated Windows launcher is already CRLF: preserve its exact checked-in bytes.
+*.cmd -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

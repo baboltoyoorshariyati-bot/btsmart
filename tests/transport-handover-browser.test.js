@@ -1,0 +1,51 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const {spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),net=require('node:net');
+const executablePath=process.env.BT_CHROMIUM_PATH;
+test('سند پخش آزمایشی: دریافت توسط راننده از انبار جدا از امضای مشتری است',{skip:!executablePath,timeout:90000},async()=>{
+ const {chromium}=require('playwright-core');const port=await new Promise(r=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>r(p));});});
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-transport-doc-')),base=`http://127.0.0.1:${port}`;
+ const proc=spawn(process.execPath,['server.js'],{cwd:path.join(__dirname,'..'),env:{...process.env,HOST:'127.0.0.1',PORT:String(port),DATA_DIR:dir,ADMIN_INITIAL_PASSWORD:'Initial!2345',BT_EXPERIMENTAL_TRANSPORT_WORKFLOW:'1'},stdio:['ignore','pipe','pipe']});let browser;
+ try{
+  await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(Error('startup timeout')),15000);proc.stdout.on('data',d=>{if(String(d).includes('"listening"')){clearTimeout(t);resolve();}});proc.once('exit',c=>reject(Error('server exit '+c)));});
+  browser=await chromium.launch({executablePath,args:['--no-sandbox','--disable-dev-shm-usage']});const admin=await browser.newContext(),wh=await browser.newContext({viewport:{width:1280,height:900}}),sales=await browser.newContext(),transport=await browser.newContext();
+  await wh.addInitScript(()=>{if(window!==window.top)window.print=()=>{window.parent.__prints=(window.parent.__prints||0)+1;};});
+  const post=async(ctx,url,data)=>{const r=await ctx.request.post(base+url,{data});assert(r.ok(),url+' '+r.status()+' '+await r.text());return r.json();};
+  await post(admin,'/api/login',{username:'admin',password:'Initial!2345'});await post(admin,'/api/account/password',{currentPassword:'Initial!2345',newPassword:'Changed!2345'});
+  for(const [username,roleCode] of [['wh1','warehouse'],['sale1','sales'],['dispatch1','dispatch']])await post(admin,'/api/admin/users',{username,roleCode,fullName:username,position:'تست',password:'Changed!2345',mustChangePassword:false});
+  await post(wh,'/api/login',{username:'wh1',password:'Changed!2345'});await post(sales,'/api/login',{username:'sale1',password:'Changed!2345'});await post(transport,'/api/login',{username:'dispatch1',password:'Changed!2345'});
+  const driver=(await post(transport,'/api/transport/drivers',{fullName:'راننده آزمایش',phone:'09121112233'})).driver;
+  const vehicle=(await post(transport,'/api/transport/vehicles',{vehicleType:'وانت',plate:'12ب34567'})).vehicle;
+  assert((await transport.request.put(base+`/api/transport/drivers/${driver.id}/resources`,{data:{vehicleId:vehicle.id,paymentDeviceId:''}})).ok());
+  const day=new Date(),date=`${day.getFullYear()}-${String(day.getMonth()+1).padStart(2,'0')}-${String(day.getDate()).padStart(2,'0')}`;
+  const o=(await post(sales,'/api/orders/remote',{name:'مشتری آزمایش',phone:'09121112234',dispatchPlace:'بابل',scheduledDate:date,scheduledAt:date+'T00:00',transportWorkflow:true,deliveryMode:'DELIVERY',items:[{productId:'p01',requestedQty:4,requestedUnit:'کیلوگرم'}]})).order;
+  await post(wh,`/api/orders/${o.id}/warehouse/accept`,{});await post(wh,`/api/orders/${o.id}/warehouse`,{items:[{itemId:o.items[0].id,deliveredKg:2.5}]});
+  const page=await wh.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(base+'/',{waitUntil:'networkidle'});await page.evaluate(()=>go('warehouse','delivered'));
+  const row=page.locator('.wh-delivered-row').filter({hasText:'مشتری آزمایش'});await row.waitFor();assert.match(await row.innerText(),/در انتظار تعیین راننده/);assert(await row.locator('[data-action=wh-delivered-details]').isDisabled());
+  await post(transport,`/api/transport/plans/${o.id}/assign`,{driverId:driver.id,vehicleId:vehicle.id});await page.evaluate(()=>whDeliveredLoad());await row.getByText('در انتظار تحویل به راننده').waitFor();
+  await row.locator('[data-action=wh-delivered-details]').click();const modal=page.locator('#modal.open');await modal.locator('.whd-doc').waitFor();let text=await modal.innerText();assert.match(text,/مشتری آزمایش/);assert.match(text,/راننده آزمایش/);assert.match(text,/امضاء راننده پخش هنگام دریافت از انبار/);assert.doesNotMatch(text,/امضاء مشتری پس از تحویل/);assert.doesNotMatch(text,/امانت/);assert.doesNotMatch(text,/قیمت|تومان/);
+  for(const width of [1280,390,320]){await page.setViewportSize({width,height:900});const m=await modal.locator('.whd-doc').evaluate(e=>({scroll:e.scrollWidth,client:e.clientWidth}));assert(m.scroll<=m.client+1,JSON.stringify(m));}
+  let state=await (await sales.request.get(base+`/api/orders/${o.id}`)).json();assert.equal(state.order.transportHandovers,undefined);assert.equal(state.order.status,'SETTLEMENT_PENDING');assert.equal(state.order.payments.length,0);
+  page.once('dialog',dialog=>dialog.accept());await modal.locator('[data-wh-handover]').click();await row.getByText('تحویل به راننده ثبت شد').waitFor();
+  const frame=page.frameLocator('iframe[title="سند آماده چاپ"]');await frame.locator('.whd-doc').waitFor();for(let attempt=0;attempt<100&&(await page.evaluate(()=>window.__prints||0))<1;attempt++)await page.waitForTimeout(100);assert.equal(await page.evaluate(()=>window.__prints),1);text=await frame.locator('.whd-doc').innerText();assert.match(text,/راننده آزمایش/);assert.doesNotMatch(text,/امضاء مشتری پس از تحویل/);assert.match(text,/امضاء راننده پخش هنگام دریافت از انبار/);
+  state=await (await sales.request.get(base+`/api/orders/${o.id}`)).json();assert.equal(state.order.transportHandovers['0'].physicalHandoverConfirmed,true);assert.equal(state.order.transportHandovers['0'].signedPaperConfirmed,false);assert.equal(state.order.status,'SETTLEMENT_PENDING');assert.equal(state.order.payments.length,0);assert.deepEqual(errors,[]);
+
+  // The manager uses the actual warehouse navigation, finishes weighing, then
+  // records physical delivery and prints the recorded snapshot immediately.
+  const second=(await post(sales,'/api/orders/remote',{name:'مشتری مدیر',phone:'09121112235',dispatchPlace:'بابل',scheduledDate:date,scheduledAt:date+'T00:00',transportWorkflow:true,deliveryMode:'DELIVERY',items:[{productId:'p01',requestedQty:4,requestedUnit:'کیلوگرم'}]})).order;
+  await post(wh,`/api/orders/${second.id}/warehouse/accept`,{});await post(transport,`/api/transport/plans/${second.id}/assign`,{driverId:driver.id,vehicleId:vehicle.id});
+  await admin.addInitScript(()=>{if(window!==window.top)window.print=()=>{window.parent.__prints=(window.parent.__prints||0)+1;};});
+  const manager=await admin.newPage();manager.on('pageerror',e=>errors.push(e.message));await manager.goto(base+'/',{waitUntil:'networkidle'});
+  await manager.locator('#railNav [data-admin-cartable=warehouse]').click();await manager.locator('#railNav [data-role-page=warehouse][data-cartable=preparing]').click();
+  await manager.locator(`[data-action=wh38-start][data-id="${second.id}"]`).click();await manager.locator('[data-wh38-weight]').fill('3.25');manager.once('dialog',d=>d.accept());await manager.locator(`[data-action=wh38-finalize][data-id="${second.id}"]`).click();
+  const managerFrame=manager.frameLocator('iframe[title="سند آماده چاپ"]');await managerFrame.locator('.whd-doc').waitFor();for(let attempt=0;attempt<100&&(await manager.evaluate(()=>window.__prints||0))<1;attempt++)await manager.waitForTimeout(100);assert.equal(await manager.evaluate(()=>window.__prints),1);assert.match(await managerFrame.locator('.whd-doc').innerText(),/راننده آزمایش/);
+  const after=(await (await sales.request.get(base+`/api/orders/${second.id}`)).json()).order;assert.equal(after.transportHandovers['0'].signedPaperConfirmed,false);assert.equal(after.transportHandovers['0'].document.items[0].deliveredKg,3.25);assert.equal(after.payments.length,0);
+  const salePage=await sales.newPage();await salePage.goto(base+'/',{waitUntil:'networkidle'});await salePage.locator('#railNav [data-cartable=settlement][data-role-page=sales]').click();await salePage.locator(`[data-stl=select][data-id="${second.id}"]`).click();await salePage.locator('[data-ti-price]').waitFor();assert.deepEqual(errors,[]);
+  // Sending without an assigned driver is rejected, without finalizing weights.
+  const third=(await post(sales,'/api/orders/remote',{name:'مشتری بدون راننده',phone:'09121112236',dispatchPlace:'بابل',scheduledDate:date,scheduledAt:date+'T00:00',transportWorkflow:true,deliveryMode:'DELIVERY',items:[{productId:'p01',requestedQty:4,requestedUnit:'کیلوگرم'}]})).order;
+  await manager.locator('iframe[title="سند آماده چاپ"]').evaluate(f=>f.contentWindow.dispatchEvent(new Event('afterprint')));await manager.locator('iframe[title="سند آماده چاپ"]').waitFor({state:'detached'});
+  await post(wh,`/api/orders/${third.id}/warehouse/accept`,{});await manager.locator('#railNav [data-role-page=warehouse][data-cartable=preparing]').click();await manager.locator(`[data-action=wh38-start][data-id="${third.id}"]`).click();await manager.locator('[data-wh38-weight]').fill('4');manager.once('dialog',d=>d.accept());const blocked=manager.waitForResponse(r=>r.url().endsWith(`/api/orders/${third.id}/warehouse`)&&r.request().method()==='POST');await manager.locator(`[data-action=wh38-finalize][data-id="${third.id}"]`).click();assert.equal((await blocked).status(),409);assert.equal((await (await sales.request.get(base+`/api/orders/${third.id}`)).json()).order.status,'WAREHOUSE_PREPARING');
+  await post(transport,`/api/transport/plans/${third.id}/assign`,{driverId:driver.id,vehicleId:vehicle.id});manager.once('dialog',d=>d.accept());await manager.locator(`[data-action=wh38-finalize][data-id="${third.id}"]`).click();await manager.frameLocator('iframe[title="سند آماده چاپ"]').locator('.whd-doc').waitFor();assert.deepEqual(errors,[]);
+
+ }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
+});

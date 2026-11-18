@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#b40f23">
+  <title>بابل طیور | سامانه عملیات</title>
+  <!-- v37.33.0: پک رسمی لوگوی بابل طیور — آیکن تب مرورگر و نصب روی موبایل -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/design.css?v=37.48.1">
+  <link rel="stylesheet" href="/mobile.css">
+  <!-- v37.3: لایهٔ یکپارچه‌ساز طراحی؛ آخرین stylesheet و مرجع نهایی توکن‌ها -->
+  <link rel="stylesheet" href="/theme.css?v=37.48.0">
+  <link rel="stylesheet" href="/form-layout.css?v=37.3.18">
+  <link rel="stylesheet" href="/invoice-compact.css?v=37.3.21">
+  <link rel="stylesheet" href="/warehouse-document.css?v=37.50.0">
+  <link rel="stylesheet" href="/fonts.css?v=37.3.18">
+  <link rel="stylesheet" href="/compatibility.css?v=37.50.0">
+  <link rel="stylesheet" href="/transport-resources.css">
+  <link rel="stylesheet" href="/responsive.css">
+</head>
+<body>
+  <div id="loginView" class="login-page">
+    <section class="login-stage">
+      <div class="login-hero">
+        <div class="login-logo-badge"><img src="/logo.png" alt="بابل طیور"></div>
+        <div class="login-org">کشتارگاه صنعتی بابل طیور</div>
+        <div class="login-tag"><i></i> سامانه یکپارچهٔ عملیات</div>
+      </div>
+      <div class="login-card">
+        <div class="login-title">خوش آمدید</div>
+        <div class="login-subtitle">برای ورود، حساب کاربری واحد خود را وارد کنید.</div>
+        <form id="loginForm" class="auth-form" autocomplete="on">
+            <div class="field">
+              <label for="username">نام کاربری</label>
+              <div class="input-shell"><span class="field-icon"><svg class="svg" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.3 3.5-6 8-6s7.2 1.7 8 6"/></svg></span><input id="username" name="username" autocomplete="username" placeholder="نام کاربری"></div>
+            </div>
+            <div class="field">
+              <label for="password">رمز عبور</label>
+              <div class="input-shell"><span class="field-icon"><svg class="svg" width="18" height="18" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><input id="password" name="password" type="password" autocomplete="current-password" placeholder="رمز عبور"><button type="button" class="input-action" id="showPassword" aria-label="نمایش رمز"></button></div>
+            </div>
+            <div id="loginMsg" class="form-error" role="alert"></div>
+            <button class="btn btn-primary btn-lg btn-full" type="submit"><span>ورود</span><span class="btn-arrow">←</span></button>
+          </form>
+      </div>
+      <div class="login-credit">تهیه شده توسط واحد انفورماتیک بابل طیور · نسخهٔ <span id="releaseVersion" dir="ltr">1.1.6</span></div>
+    </section>
+  </div>
+
+  <div id="appView" class="app hidden">
+    <aside class="rail">
+      <button id="railCloseBtn" class="rail-close-btn" type="button" aria-label="بستن منوی ناوبری"><svg class="svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="rail-top">
+        <div class="rail-logo logo-frame"><img src="/logo.png" alt="بابل طیور"></div>
+        <div class="rail-brand"><strong>بابل طیور</strong></div>
+      </div>
+      <!-- v37.3.3: تاریخ و ساعت از هدر به ستون کناری، زیر لوگو منتقل شد -->
+      <div class="rail-clock" id="railClock" role="timer" aria-label="تاریخ و ساعت امروز">
+        <div class="rail-clock-date"><span id="railWeekday"></span><b id="currentDate"></b></div>
+        <strong class="rail-clock-time" id="railTime">--:--</strong>
+      </div>
+      <nav id="railNav" class="rail-nav" aria-label="ابزارهای سامانه"></nav>
+    </aside>
+
+    <main class="workspace">
+      <header class="workspace-header">
+        <button id="railToggleBtn" class="icon-btn rail-toggle-btn" type="button" aria-label="باز کردن منوی ناوبری" aria-expanded="false" aria-controls="railNav"><svg class="svg" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <div class="header-main">
+          <div class="header-kicker" id="headerKicker">مرکز کنترل</div>
+          <h1 id="pageTitle">داشبورد مدیریتی</h1>
+          <p id="pageSubtitle">نمای کلی و وضعیت لحظه‌ای عملیات</p>
+        </div>
+        <div class="header-actions">
+          <div class="header-profile" id="headerProfile">
+            <span class="header-avatar" id="headerAvatar" aria-hidden="true">م</span>
+            <div class="header-profile-text"><strong id="headerUser">مدیر سیستم</strong><span id="headerRole">مدیر سیستم</span></div>
+            <button class="icon-btn notification-btn" id="bell" type="button" aria-label="اعلان‌های عملیاتی" title="اعلان‌های عملیاتی"><span id="bellIcon" class="bell-icon"></span><span class="notification-label" aria-hidden="true">اعلان‌ها</span><b id="bellCount" class="hidden">0</b></button>
+            <button type="button" class="icon-btn header-pass" id="changePasswordBtn" aria-label="تغییر رمز عبور" title="تغییر رمز عبور"><svg class="svg" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></button>
+            <button type="button" class="btn btn-secondary btn-sm header-logout" aria-label="خروج از حساب کاربری" title="خروج از حساب کاربری" data-logout><svg class="svg" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg><span>خروج</span></button>
+          </div>
+        </div>
+      </header>
+      <section id="content" class="content"></section>
+    </main>
+    <div id="railBackdrop" class="rail-backdrop" hidden></div>
+  </div>
+
+  <div id="notificationPanel" class="notification-popover hidden"></div>
+  <div id="modal" class="modal-root"></div>
+  <div id="toast" class="toast"></div>
+  <script src="/persian-print-digits.js"></script>
+  <script src="/print-frame.js"></script>
+  <script src="/signature-pad.js"></script>
+  <script src="/connection-status.js"></script>
+  <script src="/app.js?v=37.50.0"></script>
+  <script src="/ui2.js?v=37.50.0"></script>
+  <script src="/customers-ui.js"></script>
+  <script src="/admin-ui.js?v=37.50.0"></script>
+  <script src="/dispatch-ui.js?v=37.50.0"></script>
+  <script src="/transport-resources.js"></script>
+  <script src="/ui-polish.js"></script>
+</body>
+</html>
