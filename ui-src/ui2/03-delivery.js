@@ -245,8 +245,8 @@ function paintSalesPaneV29(tab,data){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]))||sdEmpty('truck','سفارشی در جریان نیست','هر سفارشی که به انبار ارسال شود در این فهرست قرار می‌گیرد.');
   }else if(tab==='settlement'){
     const all=salesAllInSettlement(data.orders||[]);
-    const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(all.filter(o=>o.status==='SETTLEMENT_PENDING'));
-    const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(all.filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status)&&!o.payment?.archived))); // v37.5.0
+    const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
+    const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(salesSettlementIssuedOrders(all)); // v37.5.0 // v37.6.1
   }else if(tab==='delivery'){
     pane.innerHTML=renderSalesDeliveryV38(data.dispatchDeliveries||{});
   }else if(tab==='future'){

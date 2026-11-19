@@ -2521,7 +2521,9 @@ function salesFutureOrders(orders){
   const todayIso=today();
   return orders.filter(o=>o.orderType==='REMOTE'&&o.status==='SCHEDULED_REMOTE'&&String(o.scheduledDate||'')>=todayIso).sort((a,b)=>String(a.scheduledAt||'').localeCompare(String(b.scheduledAt||'')));
 }
-function salesAllInSettlement(orders){return orders.filter(o=>o.orderType!=='STORE'&&!(o.status==='SETTLEMENT_PENDING'&&o.transportWorkflow===1&&o.deliveryMode==='DELIVERY'&&o.transportInvoice)&&((['SETTLEMENT_PENDING','SETTLED','EXITED'].includes(o.status)&&!['DELIVERED','SALES_FINALIZED','CLOSED'].includes(o.dispatch?.status))||((o.payments||[]).length>0&&!['SETTLEMENT_PENDING','SETTLED','EXITED'].includes(o.status)))).sort((a,b)=>String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||'')))} // v37.6.0 // v37.5.0 — فاکتورهای هر سرویس سفارش فروشگاه بسته‌شده هم دیده می‌شوند
+// v37.6.1 — سفارش پخش پس از صدور فاکتور از این مجموعه حذف نمی‌شود؛ تا چاپ برگهٔ ارسال در
+// صف تسویه می‌ماند و بعد از آن در فهرست «فاکتورهای صادرشده» نمایش داده می‌شود.
+function salesAllInSettlement(orders){return orders.filter(o=>o.orderType!=='STORE'&&((['SETTLEMENT_PENDING','SETTLED','EXITED'].includes(o.status)&&!['DELIVERED','SALES_FINALIZED','CLOSED'].includes(o.dispatch?.status))||((o.payments||[]).length>0&&!['SETTLEMENT_PENDING','SETTLED','EXITED'].includes(o.status)))).sort((a,b)=>String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||'')))} // v37.6.0 // v37.5.0 — فاکتورهای هر سرویس سفارش فروشگاه بسته‌شده هم دیده می‌شوند
 
 
 function salesEmptyV25(name,title,subtitle){return `<div class="sales-empty-v25"><div>${icon(name,28)}</div><strong>${esc(title)}</strong><span>${esc(subtitle)}</span></div>`}
@@ -3431,6 +3433,8 @@ async function salesV29ClickHandler(e){
     if(a==='clear-signature'){clearSignature();return;}
     if(a==='invoice')return previewInvoice(el.dataset.id,Number(el.dataset.run)||null);
     if(a==='print-invoice')return printInvoice(el.dataset.id,Number(el.dataset.run)||null);
+    if(a==='transport-invoice-open')return selectSettlement(el.dataset.id); // v37.6.1 — ردیف فاکتور صادرشدهٔ پخش
+    if(a==='transport-shipment-print')return transportShipmentNotePrint(el.dataset.id); // v37.6.1
     if(a==='sales-invoice-edit')return salesInvoiceEditOpen(el.dataset.id,el.dataset.paymentId);
     if(a==='sales-warehouse-edit-request')return salesWarehouseEditRequestOpen(el.dataset.id,el.dataset.paymentId);
     if(a==='print-store-service')return printStoreService(el.dataset.id,Number(el.dataset.run));
@@ -3572,8 +3576,8 @@ function paintSalesPaneV29(tab,data){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]));
   }else if(tab==='settlement'){
     const all=salesAllInSettlement(data.orders||[]);
-    const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(all.filter(o=>o.status==='SETTLEMENT_PENDING'));
-    const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(all.filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status))));
+    const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
+    const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(salesSettlementIssuedOrders(all));
   }else if(tab==='delivery'){
     pane.innerHTML=renderSalesDeliveryV38(data.dispatchDeliveries||{});
   }else if(tab==='future'){
@@ -3763,9 +3767,14 @@ function stlFooterHtml(o){
   </div></div>${dispatched?`<div class="stl-dispatch-lock"><b>مرحلهٔ بعد</b><span>تأیید خروج راننده توسط نگهبان؛ سپس ثبت تحویل و بازبینی نهایی فروش در تب پخش.</span></div>`:''}</footer>`;
 }
 function stlEmptyHtml(){ return `<div class="stl-empty"><div class="stl-empty-ico">${icon('receipt',24)}</div><b>یک سفارش از فهرست انتخاب کنید</b><span>بعد از انتخاب، اقلام، قیمت‌ها و ثبت تسویه در این بخش انجام می‌شود.</span></div>`; }
+// v37.6.1 — همان مرزِ لایهٔ زنده (ui2) در رندر پشتیبان هم رعایت می‌شود: با چاپ برگهٔ ارسال،
+// فاکتور صادرشده است و سفارش از صف تسویه به فهرست فاکتورهای صادرشده می‌رود.
+function salesTransportInvoiceIssued(o){const inv=o&&o.transportInvoice;return !!inv&&(inv.status==='CLOSED'||!!inv.printedAt);}
+function salesSettlementPendingOrders(orders){return (orders||[]).filter(o=>o.status==='SETTLEMENT_PENDING'&&!salesTransportInvoiceIssued(o));}
+function salesSettlementIssuedOrders(orders){return (orders||[]).filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status)&&!o.payment?.archived)||salesTransportInvoiceIssued(o));}
 function renderSalesSettlementV25(orders){
-  const pending = orders.filter(o=>o.status==='SETTLEMENT_PENDING');
-  const finalized = orders.filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status)&&!o.payment?.archived)); // v37.5.0 — فاکتور هر سرویس هم در فهرست است
+  const pending = salesSettlementPendingOrders(orders);
+  const finalized = salesSettlementIssuedOrders(orders); // v37.5.0 — فاکتور هر سرویس هم در فهرست است
   return `<section class="v26-sales-pane stl-pane">
     <div class="stl-layout">
       <aside class="stl-queue"><div class="stl-block-head"><span class="stl-eyebrow">04 / SETTLEMENT</span><h2>سفارش‌های آماده تسویه</h2></div><div class="v26-settlement-list stl-queue-list">${settlementPendingRowsV27(pending)}</div></aside>

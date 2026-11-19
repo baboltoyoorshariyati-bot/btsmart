@@ -1611,3 +1611,55 @@
 }
 #appView #content .stl-row .stl-warehouse-note svg {flex:0 0 auto!important;margin-top:3px!important;color:var(--bt-amber,#975f00)!important}
 #appView #content .stl-row .stl-warehouse-note b {color:var(--bt-ink)!important;font-weight:800!important}
+
+/* v37.6.1 — «توضیح انبار برای فروش» دقیقاً هم‌اندازهٔ کادر «توضیحات ردیف».
+   ریشهٔ ایراد: قاعدهٔ `#appView #content .wh38-prep-item:not(.sr318-row)>*{grid-area:auto}`
+   (دو شناسه + دو کلاس) از قاعدهٔ `.wh38-note-cell{grid-column:1/-1}` (دو شناسه + یک کلاس)
+   مشخصهٔ بالاتری داشت و ستونِ کادر را به چیدمان خودکار برمی‌گرداند؛ در نتیجه کادر در
+   ستون ۲۸ پیکسلیِ شمارهٔ ردیف می‌افتاد و «مربع کوچک» می‌شد. این بلوک هم ستون هفتم را
+   به ردیف اضافه می‌کند و هم با مشخصهٔ بالاتر، کادر را کنار سایر کادرها هم‌اندازه می‌کند. */
+#appView #content .wh38-prep-items.wh38-prep-items{grid-template-columns:minmax(1040px,1fr)!important}
+#appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row){
+  grid-template-columns:28px minmax(140px,1fr) minmax(115px,.8fr) minmax(130px,1fr) minmax(210px,1.3fr) 76px minmax(130px,1fr)!important;
+}
+#appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row)>.wh38-note-cell{
+  grid-column:auto!important;grid-row:auto!important;
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  gap:6px!important;align-content:start!important;
+  min-width:0!important;width:auto!important;max-width:100%!important;
+}
+#appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row)>.wh38-note-cell>.wh38-note-box{
+  box-sizing:border-box!important;display:flex!important;align-items:center!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  height:44px!important;min-height:44px!important;
+  padding:0 10px!important;margin:0!important;gap:6px!important;
+  border:1px solid var(--bt-line-2)!important;border-radius:10px!important;
+  background:var(--bt-panel)!important;box-shadow:none!important;
+}
+#appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row)>.wh38-note-cell>.wh38-note-box:focus-within{
+  border-color:var(--bt-brand)!important;box-shadow:var(--bt-ring)!important;
+}
+#appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row)>.wh38-note-cell>.wh38-note-box>textarea{
+  flex:1 1 0!important;box-sizing:border-box!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  height:42px!important;min-height:42px!important;max-height:42px!important;
+  padding:2px 0!important;margin:0!important;
+  border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;
+  background:transparent!important;appearance:none!important;
+  font:inherit!important;font-size:12.5px!important;line-height:1.5!important;
+  color:var(--bt-ink)!important;text-align:start!important;direction:rtl!important;
+  white-space:pre-wrap!important;overflow-wrap:anywhere!important;
+  resize:none!important;overflow-y:auto!important;
+}
+#appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row)>.wh38-note-cell>.wh38-note-box>.wh38-note-count{
+  flex:0 0 auto!important;font-size:10.5px!important;color:var(--bt-muted)!important;text-align:center!important;padding:0!important;
+}
+/* در چیدمان دو‌ستونی موبایل/تبلت، کادر توضیح یک ردیف کامل زیر همان قلم می‌ماند. */
+@media(max-width:1150px){
+  #appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row)>.wh38-note-cell{
+    grid-column:1/-1!important;grid-area:auto!important;grid-column:1/-1!important;
+  }
+}
+@media(max-width:640px){
+  #appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row)>.wh38-note-cell>.wh38-note-box{padding:0 8px!important}
+}

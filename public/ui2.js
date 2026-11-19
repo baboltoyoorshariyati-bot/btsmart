@@ -290,9 +290,15 @@ function renderSalesFlowV25(orders){
 }
 
 /* ---------- تب ۴: تسویه ---------- */
+// v37.6.1 — مرز «آماده تسویه» و «فاکتور صادرشده» در گردش پخش:
+// به‌محض چاپ برگهٔ ارسال، فاکتور صادرشده است؛ سفارش از صف تسویه بیرون می‌رود و
+// در فهرست فاکتورهای صادرشده می‌نشیند (پیش از این در هیچ‌کدام دیده نمی‌شد).
+function salesTransportInvoiceIssued(o){const inv=o&&o.transportInvoice;return !!inv&&(inv.status==='CLOSED'||!!inv.printedAt);}
+function salesSettlementPendingOrders(orders){return (orders||[]).filter(o=>o.status==='SETTLEMENT_PENDING'&&!salesTransportInvoiceIssued(o));}
+function salesSettlementIssuedOrders(orders){return (orders||[]).filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status)&&!o.payment?.archived)||salesTransportInvoiceIssued(o));}
 function renderSalesSettlementV25(orders){
-  const pending=orders.filter(o=>o.status==='SETTLEMENT_PENDING');
-  const finalized=orders.filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status)&&!o.payment?.archived)); // v37.5.0 — فاکتور هر سرویس سفارش فروشگاه هم دیده می‌شود
+  const pending=salesSettlementPendingOrders(orders);
+  const finalized=salesSettlementIssuedOrders(orders); // v37.5.0 — فاکتور هر سرویس سفارش فروشگاه هم دیده می‌شود
   return `<section class="sd-pane stl-pane">
     <div class="stl-layout">
       <aside class="sd-panel stl-queue-panel">
@@ -315,7 +321,15 @@ function settlementPendingRowsV27(rows){
  }).join('')||'<div class="stl-q-empty">سفارشی در انتظار تسویه نیست.</div>';
 }
 
+function transportIssuedInvoiceRow(o){
+ const inv=o.transportInvoice||{},departed=!!o.transportDeparture,closed=inv.status==='CLOSED'||o.status==='CLOSED';
+ const status=closed?'<span class="badge green">فاکتور بسته شد</span>':departed?'<span class="badge green">در راه</span>':'<span class="badge orange">در انتظار خروج</span>';
+ const stamp=inv.closedAt||o.transportDeparture?.at||inv.printedAt||inv.createdAt;
+ const actions=`<button class="btn btn-secondary btn-sm" data-action="transport-invoice-open" data-id="${esc(o.id)}">${icon('eye',13)} فاکتور</button><button class="btn btn-primary btn-sm" data-action="transport-shipment-print" data-id="${esc(o.id)}">${icon('receipt',13)} برگهٔ ارسال</button>`;
+ return `<tr data-transport-invoice="${esc(o.id)}"><td data-label="نام مشتری">${esc(storeAwareOrderName(o))}</td><td data-label="شماره تماس">${esc(fa(storeAwareOrderPhone(o)))}</td><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="شماره فاکتور">${esc(fa(inv.invoiceNumber||'—'))}</td><td data-label="مبلغ / نوع سند">${money(inv.totalAmount||0)}</td><td data-label="وضعیت و تاریخ">${status}<small>${esc(formatDateTime24(stamp||''))}</small></td><td data-label="عملیات"><div class="toolbar">${actions}</div></td></tr>`;
+}
 function invoiceRowsV27(rows){
+ const transportRows=rows.filter(o=>salesTransportInvoiceIssued(o)&&!((o.payments||[]).length)).map(transportIssuedInvoiceRow).join('');
  const body=rows.flatMap(o=>(o.payments&&o.payments.length>1?o.payments:[o.payment]).filter(Boolean).map(pay=>{
   const run=pay.deliveryRun||null;
   const edit=(o.documentEdits||[]).slice().reverse().find(row=>row.paymentId===pay.id);
@@ -333,7 +347,8 @@ function invoiceRowsV27(rows){
   const badges=`${status}${review?'<span class="badge orange">نیازمند بازبینی فروش</span>':''}`;
   return `<tr><td data-label="نام مشتری">${esc(storeAwareOrderName(o))}</td><td data-label="شماره تماس">${esc(fa(storeAwareOrderPhone(o)))}</td><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="شماره فاکتور">${esc(fa(pay.invoiceNumber||'—'))}${run?` · ${o.storeOrderKind==='PARTIAL'?'جزئی':'سرویس '+fa(run)}`:''}</td><td data-label="مبلغ / نوع سند">${o.orderType==='STORE'?'سند وزنی — بدون مبلغ':money(pay.totalAmount||0)}</td><td data-label="وضعیت و تاریخ">${badges}<small>${esc(formatDateTime24(pay.verifiedAt||o.updatedAt||o.createdAt))}</small></td><td data-label="عملیات"><div class="toolbar">${actions}</div></td></tr>`;
  })).join('');
- return body?`<table class="settlement-invoice-table"><thead><tr>${['نام مشتری','شماره تماس','شماره سفارش','شماره فاکتور','مبلغ / نوع سند','وضعیت و تاریخ','عملیات'].map(t=>`<th scope="col">${t}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>`:sdEmpty('receipt','فاکتور نهایی‌شده‌ای وجود ندارد','پس از تسویه، فاکتور در این فهرست قرار می‌گیرد.');
+ const allRows=transportRows+body;
+ return allRows?`<table class="settlement-invoice-table"><thead><tr>${['نام مشتری','شماره تماس','شماره سفارش','شماره فاکتور','مبلغ / نوع سند','وضعیت و تاریخ','عملیات'].map(t=>`<th scope="col">${t}</th>`).join('')}</tr></thead><tbody>${allRows}</tbody></table>`:sdEmpty('receipt','فاکتور نهایی‌شده‌ای وجود ندارد','پس از تسویه یا چاپ برگهٔ ارسال، فاکتور در این فهرست قرار می‌گیرد.');
 }
 const DOCUMENT_EDIT_METHODS=[['CASH','نقدی'],['POS','پوز'],['CARD_TRANSFER','کارت‌به‌کارت'],['CHECK','چک'],['CREDIT','معوق']];
 function documentEditNumber(value){const raw=en(String(value??'')).trim().replace(/٫/g,'.').replace(/[٬,\s]/g,'');if(!raw)return null;return /^\d+(?:\.\d+)?$/.test(raw)?Number(raw):NaN;}
@@ -791,8 +806,8 @@ function paintSalesPaneV29(tab,data){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]))||sdEmpty('truck','سفارشی در جریان نیست','هر سفارشی که به انبار ارسال شود در این فهرست قرار می‌گیرد.');
   }else if(tab==='settlement'){
     const all=salesAllInSettlement(data.orders||[]);
-    const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(all.filter(o=>o.status==='SETTLEMENT_PENDING'));
-    const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(all.filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status)&&!o.payment?.archived))); // v37.5.0
+    const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
+    const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(salesSettlementIssuedOrders(all)); // v37.5.0 // v37.6.1
   }else if(tab==='delivery'){
     pane.innerHTML=renderSalesDeliveryV38(data.dispatchDeliveries||{});
   }else if(tab==='future'){
@@ -2201,8 +2216,23 @@ async function transportShipmentNotePrint(id){
  try{
   const data=await api('/api/orders/'+encodeURIComponent(id)),order=data.order;
   if(!order?.transportInvoice||!order.transportHandovers?.['0']?.document)throw Error('برگه ارسال پس از صدور فاکتور و ثبت سند انبار در دسترس است.');
-  return BTPrintFrame.html(BTPrintDigits.documentHtml(`<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><link rel="stylesheet" href="/fonts.css"><link rel="stylesheet" href="/design.css"><link rel="stylesheet" href="/invoice-compact.css?v=37.3.21"><title>برگه ارسال ${esc(fa(order.orderNo||'—'))}</title><style>body{margin:0;padding:12mm;font-family:"Vazirmatn",Tahoma,sans-serif}@page{size:A4;margin:0}</style></head><body>${transportShipmentNoteHtml(order)}<script src="/print-ready.js"><\/script></body></html>`));
+  const requested=BTPrintFrame.html(BTPrintDigits.documentHtml(`<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><link rel="stylesheet" href="/fonts.css"><link rel="stylesheet" href="/design.css"><link rel="stylesheet" href="/invoice-compact.css?v=37.3.21"><title>برگه ارسال ${esc(fa(order.orderNo||'—'))}</title><style>body{margin:0;padding:12mm;font-family:"Vazirmatn",Tahoma,sans-serif}@page{size:A4;margin:0}</style></head><body>${transportShipmentNoteHtml(order)}<script src="/print-ready.js"><\/script></body></html>`));
+  if(requested)await transportShipmentNoteMarkPrinted(id);
+  return requested;
  }catch(e){toast(e.message);return false;}
+}
+// v37.6.1 — چاپ برگهٔ ارسال، سفارش را از «آماده تسویه» به «فاکتورهای صادرشده» می‌برد.
+// نشانهٔ چاپ روی فاکتور ثبت می‌شود تا این جابه‌جایی برای همهٔ کاربران و پس از رفرش هم بماند.
+async function transportShipmentNoteMarkPrinted(id){
+ try{await api('/api/sales/transport-invoices/'+encodeURIComponent(id)+'/printed',{method:'POST',body:'{}'});}catch(_){return;}
+ try{
+  const fresh=await fetchSalesCache(true);
+  if(app.page==='sales'&&app.sub.sales==='settlement'){
+   paintSalesPaneV29('settlement',fresh);
+   if(stl.orderId===id&&$('#stlMain'))void stlOpen(id);
+  }
+  if(typeof refreshIndicators==='function')await refreshIndicators();
+ }catch(_){}
 }
 
 // Register transport payment and optional returns in one sales action.
@@ -2247,7 +2277,7 @@ function transportSalesInvoicePanel(order,host=$('#stlMain'),reload=()=>stlOpen(
  if(!hand){host.innerHTML='<section class="sd-panel sd-pad"><h2>فاکتور پخش</h2><p>در انتظار ثبت تحویل فیزیکی کالا به راننده در انبار.</p></section>';return;}
  if(invoice){
   const canRecordPayment=!!onClosed&&!!order.transportDeparture;
-  const stage=canRecordPayment?transportClosureFormHtml(order):order.transportDeparture?'<p>خروج ثبت شده است؛ ثبت پرداختی در کارتابل پخش انجام می‌شود.</p>':'<p>فاکتور صادر شد؛ برگهٔ ارسال را چاپ کنید. ثبت خروج در کارتابل نگهبانی انجام می‌شود.</p>';
+  const stage=canRecordPayment?transportClosureFormHtml(order):order.transportDeparture?'<p>خروج ثبت شده است؛ ثبت پرداختی در کارتابل پخش انجام می‌شود.</p>':invoice.printedAt?'<p>برگهٔ ارسال چاپ شد و فاکتور در فهرست «فاکتورهای صادرشده» ثبت است؛ ثبت خروج در کارتابل نگهبانی انجام می‌شود.</p>':'<p>فاکتور صادر شد؛ برگهٔ ارسال را چاپ کنید. ثبت خروج در کارتابل نگهبانی انجام می‌شود.</p>';
   const deviceWarning=canRecordPayment&&stl.devicesError?`<div class="stl-load-error" role="alert"><b>فهرست دستگاه‌های پوز دریافت نشد.</b><span>سایر روش‌های پرداخت قابل استفاده‌اند؛ برای انتخاب پوز، فهرست دستگاه‌ها را دوباره دریافت کنید.</span><button type="button" class="btn btn-secondary btn-sm" data-ts-devices-retry>دریافت دوباره دستگاه‌ها</button></div>`:'';
   const shipmentPrintButton=!order.transportDeparture?`<button type="button" class="btn btn-primary" data-ti-shipment-print>چاپ برگهٔ ارسال</button>`:'';
   host.innerHTML=`<section class="sd-panel sd-pad tr-invoice-panel"><h2>فاکتور پخش ${esc(fa(invoice.invoiceNumber))}</h2>${transportOrderServiceHtml(order,false)}${shipmentPrintButton}${deviceWarning}${stage}</section>`;

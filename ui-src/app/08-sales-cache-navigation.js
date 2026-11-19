@@ -299,6 +299,8 @@ async function salesV29ClickHandler(e){
     if(a==='clear-signature'){clearSignature();return;}
     if(a==='invoice')return previewInvoice(el.dataset.id,Number(el.dataset.run)||null);
     if(a==='print-invoice')return printInvoice(el.dataset.id,Number(el.dataset.run)||null);
+    if(a==='transport-invoice-open')return selectSettlement(el.dataset.id); // v37.6.1 — ردیف فاکتور صادرشدهٔ پخش
+    if(a==='transport-shipment-print')return transportShipmentNotePrint(el.dataset.id); // v37.6.1
     if(a==='sales-invoice-edit')return salesInvoiceEditOpen(el.dataset.id,el.dataset.paymentId);
     if(a==='sales-warehouse-edit-request')return salesWarehouseEditRequestOpen(el.dataset.id,el.dataset.paymentId);
     if(a==='print-store-service')return printStoreService(el.dataset.id,Number(el.dataset.run));
@@ -440,8 +442,8 @@ function paintSalesPaneV29(tab,data){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]));
   }else if(tab==='settlement'){
     const all=salesAllInSettlement(data.orders||[]);
-    const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(all.filter(o=>o.status==='SETTLEMENT_PENDING'));
-    const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(all.filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status))));
+    const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
+    const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(salesSettlementIssuedOrders(all));
   }else if(tab==='delivery'){
     pane.innerHTML=renderSalesDeliveryV38(data.dispatchDeliveries||{});
   }else if(tab==='future'){
