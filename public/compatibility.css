@@ -1618,9 +1618,11 @@
    مشخصهٔ بالاتری داشت و ستونِ کادر را به چیدمان خودکار برمی‌گرداند؛ در نتیجه کادر در
    ستون ۲۸ پیکسلیِ شمارهٔ ردیف می‌افتاد و «مربع کوچک» می‌شد. این بلوک هم ستون هفتم را
    به ردیف اضافه می‌کند و هم با مشخصهٔ بالاتر، کادر را کنار سایر کادرها هم‌اندازه می‌کند. */
-#appView #content .wh38-prep-items.wh38-prep-items{grid-template-columns:minmax(1040px,1fr)!important}
-#appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row){
-  grid-template-columns:28px minmax(140px,1fr) minmax(115px,.8fr) minmax(130px,1fr) minmax(210px,1.3fr) 76px minmax(130px,1fr)!important;
+@media(min-width:1151px){
+  #appView #content .wh38-prep-items.wh38-prep-items{grid-template-columns:minmax(1040px,1fr)!important}
+  #appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row){
+    grid-template-columns:28px minmax(140px,1fr) minmax(115px,.8fr) minmax(130px,1fr) minmax(210px,1.3fr) 76px minmax(130px,1fr)!important;
+  }
 }
 #appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row)>.wh38-note-cell{
   grid-column:auto!important;grid-row:auto!important;
