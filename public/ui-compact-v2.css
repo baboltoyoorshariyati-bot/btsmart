@@ -331,3 +331,106 @@ body #toast { bottom: 96px !important; }
 @media (prefers-reduced-motion: reduce) {
   #appView #content .btn { transition: none !important; }
 }
+
+/* =============================================================================
+   ۹) فاز ۳ — گام‌های شماره‌دار فرم (details/summary) و جدول → کارت
+   ============================================================================= */
+
+/* گام‌ها */
+#appView #content .bt2-steps { display: grid !important; gap: 10px !important; }
+#appView #content details.bt2-step {
+  border: 1px solid var(--bt2-line) !important;
+  border-radius: var(--bt2-radius) !important;
+  background: #fff;
+  padding: 0 !important;
+  overflow: hidden;
+}
+#appView #content details.bt2-step[open] { box-shadow: 0 8px 22px rgba(20, 30, 40, .06); }
+#appView #content details.bt2-step > summary.bt2-step-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 52px !important;
+  padding: 0 12px !important;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  background: var(--bt2-soft);
+  border-bottom: 1px solid transparent;
+}
+#appView #content details.bt2-step[open] > summary.bt2-step-head {
+  background: #fff;
+  border-bottom-color: var(--bt2-line);
+}
+#appView #content details.bt2-step > summary.bt2-step-head::-webkit-details-marker { display: none; }
+#appView #content .bt2-step-no {
+  flex: 0 0 auto;
+  width: 26px; height: 26px;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  background: var(--bt2-brand);
+  color: #fff;
+  font-size: 12.5px; font-weight: 1000;
+}
+#appView #content details.bt2-step:not([open]) .bt2-step-no { background: #c9d0d8; }
+#appView #content .bt2-step-title { flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 900; color: var(--bt2-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#appView #content .bt2-step-chev {
+  flex: 0 0 auto; width: 10px; height: 10px;
+  border-right: 2px solid var(--bt2-muted);
+  border-bottom: 2px solid var(--bt2-muted);
+  transform: rotate(45deg);
+  transition: transform .16s ease;
+}
+#appView #content details.bt2-step[open] .bt2-step-chev { transform: rotate(-135deg); }
+#appView #content .bt2-step-body { padding: 12px !important; display: grid; gap: 12px !important; }
+#appView #content .bt2-step-body > * { min-width: 0 !important; }
+#appView #content .bt2-step-head:focus-visible { outline: 2px solid var(--bt2-brand); outline-offset: -3px; }
+
+/* جدول → کارت (فقط جدول‌هایی که اسکریپت فاز ۳ علامت زده است) */
+@media (max-width: 900px) {
+  #appView #content table[data-bt2-card] {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  #appView #content table[data-bt2-card] > thead { display: none !important; }
+  #appView #content table[data-bt2-card] > tbody { display: block !important; width: 100% !important; }
+  #appView #content table[data-bt2-card] > tbody > tr {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    margin: 0 0 8px !important;
+    padding: 8px 10px !important;
+    background: #fff;
+    border: 1px solid var(--bt2-line) !important;
+    border-radius: 12px !important;
+  }
+  #appView #content table[data-bt2-card] > tbody > tr > td {
+    display: flex !important;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 3px 0 !important;
+    border: 0 !important;
+    white-space: normal !important;
+    text-align: right !important;
+    font-size: 12.5px !important;
+  }
+  #appView #content table[data-bt2-card] > tbody > tr > td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    max-width: 45%;
+    color: var(--bt2-muted);
+    font-size: 11.5px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #appView #content table[data-bt2-card] > tbody > tr > td:empty { display: none !important; }
+  #appView #content table[data-bt2-card] > tbody > tr > td[data-label=""]::before { content: none; }
+}

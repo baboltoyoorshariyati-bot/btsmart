@@ -12,4 +12,10 @@
   l.rel = 'stylesheet';
   l.href = '/ui-compact-v2.css?v=37.6.0';
   document.head.appendChild(l);
+
+  // فاز ۳: گام‌بندی فرم‌ها و تبدیل جدول به کارت (فقط نمایشی)
+  var s = document.createElement('script');
+  s.src = '/ui-compact-v2-enhance.js?v=37.6.0';
+  s.defer = true;
+  document.head.appendChild(s);
 })();
