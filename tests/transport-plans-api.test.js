@@ -131,6 +131,15 @@ test('ارسال برنامه‌ریزی ترابری مستقل از انبار
   assert.equal((await call('GET',`/api/sales/transport-invoices/${third.id}`,null,transport)).status,403);
   assert.equal((await ok('GET',`/api/sales/transport-invoices/${third.id}`,null,sales)).invoice.invoiceNumber,invoice.invoiceNumber);
   let still=(await ok('GET',`/api/orders/${third.id}`,null,sales)).order;assert.equal(still.payments.length,0);assert.equal(still.status,'SETTLEMENT_PENDING');assert.equal(still.transportDeparture,undefined);
+  // v37.6.1 — چاپ برگهٔ ارسال فاکتور را «صادرشده» می‌کند؛ ثبت آن تک‌بار و فقط با نقش فروش است.
+  assert.equal((await call('POST',`/api/sales/transport-invoices/${third.id}/printed`,{},wh)).status,403);
+  assert.equal((await call('POST',`/api/sales/transport-invoices/${third.id}/printed`,{},gate)).status,403);
+  const printed=(await ok('POST',`/api/sales/transport-invoices/${third.id}/printed`,{},sales)).invoice;
+  assert(printed.printedAt, 'printedAt must be recorded');assert.equal(printed.status,'PREPARED');
+  const reprinted=(await ok('POST',`/api/sales/transport-invoices/${third.id}/printed`,{},sales)).invoice;
+  assert.equal(reprinted.printedAt,printed.printedAt,'printing is recorded once and stays idempotent');
+  still=(await ok('GET',`/api/orders/${third.id}`,null,sales)).order;
+  assert.equal(still.transportInvoice.printedAt,printed.printedAt);assert.equal(still.payments.length,0);assert.equal(still.status,'SETTLEMENT_PENDING');
   assert.equal((await call('POST',`/api/gate/transport-shipments/${third.id}/depart`,{invoicePaperGiven:true,invoiceNumber:invoice.invoiceNumber},sales)).status,403);
   assert.equal((await call('POST',`/api/transport/shipments/${third.id}/depart`,{invoicePaperGiven:true,invoiceNumber:invoice.invoiceNumber},transport)).status,403);const gateQueue=await ok('GET','/api/gate/dispatch',null,gate);const gateShipment=gateQueue.leaving.find(x=>x.id===third.id&&x.gateTransportShipment);assert(gateShipment);assert(!JSON.stringify(gateShipment).includes('unitPrice'));assert(!JSON.stringify(gateShipment).includes('invoiceNumber'));assert((await ok('GET','/api/workload',null,gate)).counts.gateDispatchPending>0);
   const departure=(await ok('POST',`/api/gate/transport-shipments/${third.id}/depart`,{},gate)).departure;

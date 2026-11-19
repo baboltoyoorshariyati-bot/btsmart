@@ -74,9 +74,14 @@ function stlFooterHtml(o){
   </div></div>${dispatched?`<div class="stl-dispatch-lock"><b>مرحلهٔ بعد</b><span>تأیید خروج راننده توسط نگهبان؛ سپس ثبت تحویل و بازبینی نهایی فروش در تب پخش.</span></div>`:''}</footer>`;
 }
 function stlEmptyHtml(){ return `<div class="stl-empty"><div class="stl-empty-ico">${icon('receipt',24)}</div><b>یک سفارش از فهرست انتخاب کنید</b><span>بعد از انتخاب، اقلام، قیمت‌ها و ثبت تسویه در این بخش انجام می‌شود.</span></div>`; }
+// v37.6.1 — همان مرزِ لایهٔ زنده (ui2) در رندر پشتیبان هم رعایت می‌شود: با چاپ برگهٔ ارسال،
+// فاکتور صادرشده است و سفارش از صف تسویه به فهرست فاکتورهای صادرشده می‌رود.
+function salesTransportInvoiceIssued(o){const inv=o&&o.transportInvoice;return !!inv&&(inv.status==='CLOSED'||!!inv.printedAt);}
+function salesSettlementPendingOrders(orders){return (orders||[]).filter(o=>o.status==='SETTLEMENT_PENDING'&&!salesTransportInvoiceIssued(o));}
+function salesSettlementIssuedOrders(orders){return (orders||[]).filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status)&&!o.payment?.archived)||salesTransportInvoiceIssued(o));}
 function renderSalesSettlementV25(orders){
-  const pending = orders.filter(o=>o.status==='SETTLEMENT_PENDING');
-  const finalized = orders.filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status)&&!o.payment?.archived)); // v37.5.0 — فاکتور هر سرویس هم در فهرست است
+  const pending = salesSettlementPendingOrders(orders);
+  const finalized = salesSettlementIssuedOrders(orders); // v37.5.0 — فاکتور هر سرویس هم در فهرست است
   return `<section class="v26-sales-pane stl-pane">
     <div class="stl-layout">
       <aside class="stl-queue"><div class="stl-block-head"><span class="stl-eyebrow">04 / SETTLEMENT</span><h2>سفارش‌های آماده تسویه</h2></div><div class="v26-settlement-list stl-queue-list">${settlementPendingRowsV27(pending)}</div></aside>

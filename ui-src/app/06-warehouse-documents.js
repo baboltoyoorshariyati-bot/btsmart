@@ -212,7 +212,9 @@ function salesFutureOrders(orders){
   const todayIso=today();
   return orders.filter(o=>o.orderType==='REMOTE'&&o.status==='SCHEDULED_REMOTE'&&String(o.scheduledDate||'')>=todayIso).sort((a,b)=>String(a.scheduledAt||'').localeCompare(String(b.scheduledAt||'')));
 }
-function salesAllInSettlement(orders){return orders.filter(o=>o.orderType!=='STORE'&&!(o.status==='SETTLEMENT_PENDING'&&o.transportWorkflow===1&&o.deliveryMode==='DELIVERY'&&o.transportInvoice)&&((['SETTLEMENT_PENDING','SETTLED','EXITED'].includes(o.status)&&!['DELIVERED','SALES_FINALIZED','CLOSED'].includes(o.dispatch?.status))||((o.payments||[]).length>0&&!['SETTLEMENT_PENDING','SETTLED','EXITED'].includes(o.status)))).sort((a,b)=>String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||'')))} // v37.6.0 // v37.5.0 — فاکتورهای هر سرویس سفارش فروشگاه بسته‌شده هم دیده می‌شوند
+// v37.6.1 — سفارش پخش پس از صدور فاکتور از این مجموعه حذف نمی‌شود؛ تا چاپ برگهٔ ارسال در
+// صف تسویه می‌ماند و بعد از آن در فهرست «فاکتورهای صادرشده» نمایش داده می‌شود.
+function salesAllInSettlement(orders){return orders.filter(o=>o.orderType!=='STORE'&&((['SETTLEMENT_PENDING','SETTLED','EXITED'].includes(o.status)&&!['DELIVERED','SALES_FINALIZED','CLOSED'].includes(o.dispatch?.status))||((o.payments||[]).length>0&&!['SETTLEMENT_PENDING','SETTLED','EXITED'].includes(o.status)))).sort((a,b)=>String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||'')))} // v37.6.0 // v37.5.0 — فاکتورهای هر سرویس سفارش فروشگاه بسته‌شده هم دیده می‌شوند
 
 
 function salesEmptyV25(name,title,subtitle){return `<div class="sales-empty-v25"><div>${icon(name,28)}</div><strong>${esc(title)}</strong><span>${esc(subtitle)}</span></div>`}

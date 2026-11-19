@@ -9,8 +9,12 @@ test('تسویه فروش همان سفارش‌های قابل نمایش را 
  const n=id=>({targetRole:'sales',type:'TRANSPORT_ASSIGNED',entityType:'order',entityId:id});assert.equal(c.notificationSection(n('5')),'flow');assert.equal(c.notificationSection(n('1')),'settlement');assert.equal(c.notificationSection(n('3')),'stores');orders[0].status='CLOSED';assert.equal(c.notificationSection(n('1')),'delivery');orders[0].status='SETTLEMENT_PENDING';
  const editNotif={targetRole:'warehouse',type:'WAREHOUSE_DOCUMENT_EDIT_REQUESTED',entityType:'order',entityId:'6'};assert.equal(c.notificationSection(editNotif),'document-edits');editOrder.documentEdits[0].status='COMPLETED';assert.equal(c.notificationSection(editNotif),null);
  const counts=(await c.handler({user:{roleCode:'sales'}})).body.counts;assert.equal(counts.salesSettlement,2);
- orders[0].transportWorkflow=1;orders[0].deliveryMode='DELIVERY';orders[0].transportInvoice={status:'PREPARED'};assert.equal(c.notificationSection(n('1')),'delivery');assert.equal(c.notificationSection({...n('1'),type:'WAREHOUSE_DONE'}),'delivery');assert.equal((await c.handler({user:{roleCode:'sales'}})).body.counts.salesSettlement,1);
- const ctx={};vm.createContext(ctx);vm.runInContext(app.slice(app.indexOf('function salesAllInSettlement('),app.indexOf(' // v37.6.0',app.indexOf('function salesAllInSettlement('))),ctx);assert.deepEqual(Array.from(ctx.salesAllInSettlement(orders),x=>x.id),['2']);
+ orders[0].transportWorkflow=1;orders[0].deliveryMode='DELIVERY';orders[0].transportInvoice={status:'PREPARED'};assert.equal(c.notificationSection(n('1')),'delivery');assert.equal(c.notificationSection({...n('1'),type:'WAREHOUSE_DONE'}),'delivery');
+ // v37.6.1 — تا چاپ برگهٔ ارسال، سفارش پخش هنوز در صف تسویه است؛ با ثبت چاپ از صف بیرون می‌رود.
+ assert.equal((await c.handler({user:{roleCode:'sales'}})).body.counts.salesSettlement,2);
+ orders[0].transportInvoice={status:'PREPARED',printedAt:'2026-01-01T10:00:00Z'};
+ assert.equal((await c.handler({user:{roleCode:'sales'}})).body.counts.salesSettlement,1);
+ const ctx={};vm.createContext(ctx);vm.runInContext(app.slice(app.indexOf('function salesAllInSettlement('),app.indexOf(' // v37.6.0',app.indexOf('function salesAllInSettlement('))),ctx);assert.deepEqual(Array.from(ctx.salesAllInSettlement(orders),x=>x.id),['1','2']);
 });
 test('پاسخ قدیمی workload شمارنده تازه را بازنویسی نمی‌کند و شمارنده کارتابل پخش اعلان خوانده‌نشده را نشان می‌دهد',async()=>{
  const pending=[];const badges=[];const c={app:{user:{id:'u'},workload:{}},api:url=>new Promise(resolve=>pending.push({url,resolve})),$$:selector=>selector==='[data-sales-count]'?badges:[],qty:String,applyNotifSnapshot:d=>{c.app.notifSnapshot=d},$:()=>null,renderNav(){},icon(){return ''},normalizeRole:x=>x};
