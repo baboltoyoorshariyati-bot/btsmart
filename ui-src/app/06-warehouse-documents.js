@@ -75,6 +75,7 @@ async function openOrderDetails(id){
         <div><span>تعداد اقلام</span><b>${qty(activeItems.length)} قلم</b></div>
         <div><span>مقدار درخواستی</span><b>${qty(totalRequested)}</b></div>
         <div><span>وزن تحویلی</span><b>${qty(totalDelivered)} کیلوگرم</b></div>
+        <div><span>محل ارسال</span><b>${esc(o.dispatchPlace||'—')}</b></div>
       </div>
       ${o.transportWorkflow===1?`<p><b>روش تحویل:</b> ${o.deliveryMode==='DELIVERY'?'ارسال توسط پخش':'تحویل در انبار'}</p>`:''}
       ${depositSummaryHtml(o.deposit)}

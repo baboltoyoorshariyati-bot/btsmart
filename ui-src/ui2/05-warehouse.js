@@ -12,7 +12,10 @@ function wh38IncomingHeader(o){
   const name=storeAwareOrderName(o);
   const created=formatDateTime24(o.createdAt);
   const updated=formatDateTime24(o.updatedAt||o.createdAt);
-  const contact=o.orderType==='STORE'?(o.dispatchPlace||''):(storeAwareOrderPhone(o));
+  // محل ارسال را واحد فروش تعیین می‌کند؛ «محله» پروندهٔ مشتری معیار تحویل نیست.
+  const place=String(o.dispatchPlace||'').trim();
+  const contact=[storeAwareOrderPhone(o),place?`محل ارسال: ${place}`:''].filter(Boolean).join(' • ');
+  const storeContact=place;
   return `<div class="wh38-incoming-heading"><div class="sd-chips"><span class="order-code">${esc(fa(o.orderNo||'—'))}</span>${sdTypeBadge(o)}</div>${badge(o.status)}</div>
     <div class="wh38-incoming-summary-scroll"><div class="wh38-incoming-summary">
       <div class="wh38-incoming-cell wh38-incoming-customer"><b>${o.orderType==='STORE'?'فروشگاه':'مشتری'}</b><h3 title="${esc(name)}">${esc(name)}</h3></div>
@@ -20,7 +23,7 @@ function wh38IncomingHeader(o){
       <div class="wh38-incoming-cell"><b>ثبت</b><span title="${esc(created)}">${esc(created)}</span></div>
       <div class="wh38-incoming-cell"><b>آخرین اقدام</b><span title="${esc(updated)}">${esc(updated)}</span></div>
     </div></div>
-    <p class="wh38-incoming-contact">${esc(contact||'محل ارسال ثبت نشده')}${o.deliveryDate?` <span class="wh38-delivery-date"> • تاریخ تحویل: <b>${esc(dateLabel(o.deliveryDate))}</b></span>`:''}</p>`;
+    <p class="wh38-incoming-contact">${esc((o.orderType==='STORE'?storeContact:contact)||'محل ارسال ثبت نشده')}${o.deliveryDate?` <span class="wh38-delivery-date"> • تاریخ تحویل: <b>${esc(dateLabel(o.deliveryDate))}</b></span>`:''}</p>`;
 }
 /* v37.9.0 — Warehouse > Stores: horizontal sub-tabs (like Guard/Sales) + vertical forms.
    The order header is deliberately one line: order no. + store + items + time (+place).
@@ -187,7 +190,8 @@ function whDocumentTares(line){
  return batches||incomplete?batches+incomplete:'<span class="whd-tare-empty">—</span>';
 }
 function whDocumentProducts(lines,print=false){
- lines=Array.isArray(lines)?lines:[];
+ // اقلام ناموجود انبار در سند انبار نمی‌آیند (نه در چاپ و نه در فهرست اسناد).
+ lines=(Array.isArray(lines)?lines:[]).filter(line=>!line||!line.outOfStock);
  let grams=0,unknown=!lines.length;
  const rows=lines.map((line,index)=>{
   const available=!line.outOfStock, n=line.deliveredKg==null?NaN:Number(line.deliveredKg);
@@ -433,7 +437,9 @@ function wh38Sheet(o){
       <div class="wh38-prep-cell"><span class="wh38-cell-label">توضیحات ردیف</span><div class="wh38-cell-box wh38-prep-desc" title="${esc(it.description||'بدون توضیح')}">${esc(it.description||'بدون توضیح')}</div></div>
       <div class="wh38-prep-cell wh38-weight"><label class="wh38-cell-label" for="wh38-weight-${esc(it.id)}">وزن خالص (کیلوگرم)</label><div class="wh38-cell-box wh-weight-main"><input id="wh38-weight-${esc(it.id)}" type="text" inputmode="decimal" autocomplete="off" aria-label="وزن خالص ${esc(it.product?.name||'محصول')} به کیلوگرم" data-wh38-weight="${it.id}" placeholder="۰٫۰۰۰"><button type="button" class="btn btn-secondary btn-sm wh-weight-open" data-action="wh-weight-details">ناخالصی</button></div></div>
       <div class="wh38-stock-cell"><span class="wh38-cell-label">عدم موجودی</span><label class="wh38-oos" title="عدم موجودی ${esc(it.product?.name||'محصول')}"><input type="checkbox" aria-label="عدم موجودی ${esc(it.product?.name||'محصول')}" data-wh38-oos="${it.id}"></label></div>
-      <div class="wh38-note-cell"><label class="wh38-cell-label" for="wh38-note-${esc(it.id)}">توضیح انبار برای فروش</label><div class="wh38-note-box"><input id="wh38-note-${esc(it.id)}" type="text" maxlength="300" autocomplete="off" placeholder="اختیاری — مثلاً: دو کارتن نمدار بود" aria-label="توضیح انبار برای فروش دربارهٔ ${esc(it.product?.name||'محصول')}" data-wh38-note="${it.id}" value="${esc(it.warehouseNote||'')}"><span class="wh38-note-count" data-wh38-note-count aria-hidden="true"></span></div></div>
+      <div class="wh38-note-cell"><label class="wh38-cell-label" for="wh38-note-${esc(it.id)}">توضیح انبار برای فروش</label>
+<div class="wh38-note-box"><textarea id="wh38-note-${esc(it.id)}" rows="2" maxlength="300" autocomplete="off" dir="auto" placeholder="اختیاری — مثلاً: دو کارتن نمدار بود" aria-label="توضیح انبار برای فروش دربارهٔ ${esc(it.product?.name||'محصول')}" data-wh38-note="${it.id}">${esc(it.warehouseNote||'')}</textarea><span class="wh38-note-count" data-wh38-note-count aria-hidden="true"></span></div></div>
+
     </article>`).join('')}</div>
     <div class="wh38-sheet-foot"><div><span>جمع وزن نهایی</span><strong id="wh38Total">۰ کیلوگرم</strong></div>
       <div class="toolbar"><button type="button" class="btn btn-secondary btn-lg" data-action="wh38-save-draft" data-id="${o.id}">ذخیره وزن‌ها</button><button type="button" class="btn btn-secondary btn-lg" data-action="wh38-return" data-id="${o.id}">${icon('arrow',16)} ارجاع به فروش</button><button type="button" class="btn btn-primary btn-lg" data-action="wh38-finalize" data-id="${o.id}">${icon('send',17)} ${app.features?.pickupStaging&&o.deliveryMode==='PICKUP'&&o.orderType==='REMOTE'?'ثبت وزن و تحویل واقعی و چاپ':'ثبت وزن، تحویل و چاپ سند'}</button></div></div>

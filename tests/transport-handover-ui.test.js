@@ -124,7 +124,12 @@ test('سربرگ برگه ارسال پخش مو‌به‌مو همان سربر
  for(const label of ['نام مشتری','شماره تماس','محل ارسال','شماره سفارش','شماره فاکتور','تاریخ'])assert(note.includes(`<span>${label}</span>`),label);
  assert.match(note,/inv38-sheet inv38-compact inv38-distribution/);
  assert.doesNotMatch(note,/inv38-brand|<img/);
- assert.match(note,/برگه ارسال پخش/);
  assert.match(note,/W-9/);
- assert.doesNotMatch(note,/قیمت|ریال/);
+ // برگهٔ ارسال پخش حالا همان بدنهٔ «فاکتور تحویل» است: جدول قیمت/مبلغ، جمع‌بندی مالی
+ // و اظهارنامهٔ تحویل با جای امضای تحویل‌گیرنده.
+ for(const label of ['محصول','وزن ارسالی','قیمت هر کیلو','مبلغ','جمع اقلام','تخفیفات','اضافات','مبلغ فاکتور','جمع وزن ارسالی'])assert(note.includes(label),label);
+ assert.match(note,/class="inv38-delivery-declaration"/);
+ assert.match(note,/data-[a-z-]*signature|inv38-delivery-signature/);
+ assert.match(note,/۱٬۰۰۰|1000/);
+ assert.match(note,/۲٬۰۰۰|2000/);
 });

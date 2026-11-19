@@ -19,11 +19,12 @@ test('all available customer details are retained with escaped text and visit fa
  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
  const c={esc,fa:v=>String(v).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]),plateViewHtml:v=>`<span class="iran-plate">${esc(v)}</span>`};vm.createContext(c);vm.runInContext(source,c);
  const order={orderNo:'000123',dispatchPlace:'مقصد',visit:{vehicleType:'وانت',district:'بابل'},customer:{name:'<script>نام</script>',code:'C-00001',phone:'09123456789',plate:'12 ب 345 - 67',phone2:'09350000000',nationalId:'1234567890',company:'شرکت',address:'نشانی',notes:'یادداشت'}};
- const fields=c.orderCustomerFields(order);assert.equal(fields.length,13);
- const values=fields.map(f=>f[1]);for(const value of ['000123','09123456789','09350000000','1234567890','شرکت','نشانی','یادداشت','وانت','بابل','مقصد'])assert(values.includes(value));
+ // v1.1.9 — «محله» پروندهٔ مشتری دیگر نمایش داده نمی‌شود؛ فقط «محل ارسال» فروش می‌ماند.
+ const fields=c.orderCustomerFields(order);assert.equal(fields.length,12);
+ const values=fields.map(f=>f[1]);for(const value of ['000123','09123456789','09350000000','1234567890','شرکت','نشانی','یادداشت','وانت','مقصد'])assert(values.includes(value));assert(!values.includes('بابل'));
  const html=c.orderCustomerStripHtml(order);assert(!html.includes('<script>'));assert(html.includes('&lt;script&gt;'));assert(html.includes('iran-plate'));
- assert.equal((html.match(/class="bt-customer-field"/g)||[]).length,13);
- assert.equal(c.orderCustomerFields({customer:{},orderNo:'000001'}).length,8);
+ assert.equal((html.match(/class="bt-customer-field"/g)||[]).length,12);
+ assert.equal(c.orderCustomerFields({customer:{},orderNo:'000001'}).length,7);
 });
 test('return is beside driver, in the same visual and keyboard order, preserving dispatch guard',()=>{
  const dispatch=app.slice(app.indexOf("function stlDispatchControls(o,returnControl='')"),app.indexOf('function stlEmptyHtml()'));

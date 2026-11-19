@@ -2384,6 +2384,7 @@ async function openOrderDetails(id){
         <div><span>تعداد اقلام</span><b>${qty(activeItems.length)} قلم</b></div>
         <div><span>مقدار درخواستی</span><b>${qty(totalRequested)}</b></div>
         <div><span>وزن تحویلی</span><b>${qty(totalDelivered)} کیلوگرم</b></div>
+        <div><span>محل ارسال</span><b>${esc(o.dispatchPlace||'—')}</b></div>
       </div>
       ${o.transportWorkflow===1?`<p><b>روش تحویل:</b> ${o.deliveryMode==='DELIVERY'?'ارسال توسط پخش':'تحویل در انبار'}</p>`:''}
       ${depositSummaryHtml(o.deposit)}
@@ -3702,6 +3703,8 @@ function stlFormatPriceInput(input){
   input.setSelectionRange(position,position);
 }
 function stlActive(it){ return !it.voided && !it.skip; }
+// اقلام ناموجود انبار در فاکتور و فرم تسویه نمایش داده نمی‌شوند (قیمتی هم ندارند).
+function stlBilledItems(){ return stl.items.filter(it=>!it.outOfStock); }
 function stlSubtotal(){ return stl.items.filter(stlActive).reduce((s,i)=>s+Math.round(i.delivered*i.price),0); }
 function stlTotal(){ return stlSubtotal()-Number(stl.discountAmount||0)+Number(stl.additionsAmount||0); }
 function stlDeposit(){return stl.order?.deposit?.status==='RECEIVED'?Number(stl.order.deposit.amount||0)-Number(stl.order.deposit.refundedAmount||0):0;}
@@ -3729,14 +3732,14 @@ function stlItemsOf(o, prices){
 function orderCustomerFields(o){
   const c=o.customer||{},v=o.visit||{};
   const plate=typeof formatDispatchVehiclePlate==='function'?formatDispatchVehiclePlate(c.plate,'بدون پلاک'):(c.plate||'بدون پلاک');
-  const fields=[['نام مشتری',c.name||o.storeName||'—'],['کد مشتری',c.code||'—'],['شماره تماس',c.phone||'—'],['پلاک',plate],['نوع وسیله',c.vehicleType||v.vehicleType||'—'],['محله',c.district||v.district||'—'],['محل ارسال',o.dispatchPlace||c.address||'—'],['شماره سفارش',o.orderNo||'—']];
+  const fields=[['نام مشتری',c.name||o.storeName||'—'],['کد مشتری',c.code||'—'],['شماره تماس',c.phone||'—'],['پلاک',plate],['نوع وسیله',c.vehicleType||v.vehicleType||'—'],['محل ارسال',o.dispatchPlace||'—'],['شماره سفارش',o.orderNo||'—']];
   for(const [label,value] of [['شماره دوم',c.phone2],['کد ملی',c.nationalId],['شرکت / واحد',c.company],['نشانی مشتری',c.address],['یادداشت مشتری',c.notes]]){
     if(value&&String(value).trim())fields.push([label,value]);
   }
   return fields;
 }
 function orderCustomerStripHtml(o,settlement=false){
-  const fields=orderCustomerFields(o).map(([label,value])=>[label,label==='شماره سفارش'?fa(value):value]).filter(([label])=>!settlement||!['نوع وسیله','پلاک','محله','محل ارسال'].includes(label));
+  const fields=orderCustomerFields(o).map(([label,value])=>[label,label==='شماره سفارش'?fa(value):value]).filter(([label])=>!settlement||!['نوع وسیله','پلاک','محل ارسال'].includes(label));
   return `<div class="bt-customer-strip-scroll" role="region" aria-label="مشخصات مشتری" tabindex="0"><div class="bt-customer-strip" style="--customer-fields:${fields.length}">${fields.map(([label,value])=>`<div class="bt-customer-field" tabindex="0" title="${esc(label)}: ${esc(value)}" aria-label="${esc(label)}: ${esc(value)}"><b>${esc(label)}</b><span>${label==='پلاک'?plateViewHtml(o.customer?.plate,'بدون پلاک',true):esc(value)}</span></div>`).join('')}</div></div>`;
 }
 function stlDispatchControls(o,returnControl=''){
@@ -3832,7 +3835,7 @@ function stlFormHtml(o){
     <div class="stl-section">
       ${approvedBanner}
       <div class="stl-section-head"><h3>${icon('scale',17)} اقلام و قیمت‌گذاری</h3><span class="stl-hint-inline">${priceApproved?'قیمت تأییدشده برای راننده قفل شده است.':'قیمت واحد را بر اساس هر کیلوگرم وارد و پیش از ارسال بازبینی کنید.'}</span></div>
-      <div class="stl-table">${stl.items.length?`<div class="stl-grid-head"><span>قلم</span><span>وزن تحویلی</span><span>قیمت هر کیلو</span><span>مبلغ</span><span>لغو</span></div>`:''}${stl.items.map(stlRowHtml).join('') || '<div class="stl-q-empty">قلمی برای این سفارش ثبت نشده است.</div>'}</div>
+      <div class="stl-table">${stlBilledItems().length?`<div class="stl-grid-head"><span>قلم</span><span>وزن تحویلی</span><span>قیمت هر کیلو</span><span>مبلغ</span><span>لغو</span></div>`:''}${stlBilledItems().map(stlRowHtml).join('') || '<div class="stl-q-empty">قلم تحویل‌شده‌ای برای این سفارش ثبت نشده است.</div>'}</div>
       <div class="stl-weight-summary">جمع وزن تحویلی: <b id="stlTotalKg">${qty(stlKg())} کیلوگرم</b></div>
     </div>
     <div class="stl-invoice-bottom"><div class="stl-totals stl-financial-column">${stlAdjustmentsHtml(o)}</div><div class="stl-verification-column">
@@ -3852,7 +3855,7 @@ function stlPaintForm(){
   stlRecalc(); stlBindPayments();
 }
 function stlRecalc(){
-  stl.items.forEach(it=>{
+  stlBilledItems().forEach(it=>{
     const amt = document.querySelector(`[data-stl-amount="${CSS.escape(it.id)}"]`);
     if(amt) amt.textContent = money(stlActive(it)?Math.round(it.delivered*it.price):0);
     const row = document.querySelector(`[data-stl-row="${CSS.escape(it.id)}"]`);
@@ -3980,7 +3983,7 @@ async function stlRefundExcess(){
 async function stlSubmit(){
   if(!stl.orderId || stl.busy) return;
   const errs=stlValidate(); stlShowErrors(errs); if(errs.length) return;
-  const items=stl.items.map(it=>({ itemId:it.id, unitPrice: (it.voided||it.skip)?0:Number(it.price||0), cancelled: !!(it.voided||it.skip) }));
+  const items=stlBilledItems().map(it=>({ itemId:it.id, unitPrice: (it.voided||it.skip)?0:Number(it.price||0), cancelled: !!(it.voided||it.skip) }));
   const btn=document.getElementById('stlSubmitBtn'); stl.busy=true; if(btn){ btn.disabled=true; btn.textContent='در حال صدور فاکتور...'; }
   try{
     const d=await api('/api/orders/'+stl.orderId+'/settle',{method:'POST',body:JSON.stringify({items,discountAmount:stl.discountAmount,additionsAmount:stl.additionsAmount,settlementMethods:stlCollectPayments()})});
@@ -4402,7 +4405,7 @@ async function openWarehouseHistoryOrder(id){
     const detailCell=(label,value)=>`<div class="whh-detail-cell"><small>${label}</small><b>${value||'—'}</b></div>`;
     const customerFields=[
       ['کد مشتری',c.code],['نام و نام خانوادگی',c.name],['شماره تماس',c.phone],['شماره تماس دوم',c.phone2],['کد ملی',c.nationalId],
-      ['شرکت / واحد',c.company],['پلاک',c.plate],['نوع وسیله',c.vehicleType],['نوع خودرو',c.carType],['محله',c.district],['نشانی',c.address],['یادداشت مشتری',c.notes],
+      ['شرکت / واحد',c.company],['پلاک',c.plate],['نوع وسیله',c.vehicleType],['نوع خودرو',c.carType],['نشانی',c.address],['یادداشت مشتری',c.notes],
     ].map(([label,value])=>detailCell(label,esc(label.includes('تماس')||label==='کد ملی'||label==='کد مشتری'?fa(value||''):value||'—'))).join('');
     const orderFields=[
       detailCell('نوع سفارش',esc(typeLabels[o.orderType]||o.orderType||'—')),
@@ -4421,7 +4424,7 @@ async function openWarehouseHistoryOrder(id){
     openModal(`جزئیات سفارش ${fa(o.orderNo||'')}`,`<div class="whh-order-detail">
       <section><h3>مشخصات سفارش</h3><div class="whh-detail-grid">${orderFields}</div><p class="whh-detail-actor"><b>ثبت‌کنندهٔ سفارش:</b> ${esc(whhActorName(o.createdBy))}</p></section>
       <section><h3>اطلاعات کامل مشتری</h3><div class="whh-detail-grid">${customerFields}</div></section>
-      ${visit.id?`<section><h3>اطلاعات مراجعهٔ مرتبط</h3><div class="whh-detail-grid">${detailCell('هدف مراجعه',esc(visit.purpose||'—'))}${detailCell('پلاک ثبت‌شده در مراجعه',esc(visit.plate||'—'))}${detailCell('نوع وسیله',esc(visit.vehicleType||'—'))}${detailCell('محله',esc(visit.district||'—'))}<p class="whh-detail-actor"><b>ثبت‌کنندهٔ مراجعه:</b> ${esc(whhActorName(visit.createdBy))}</p></div></section>`:''}
+      ${visit.id?`<section><h3>اطلاعات مراجعهٔ مرتبط</h3><div class="whh-detail-grid">${detailCell('هدف مراجعه',esc(visit.purpose||'—'))}${detailCell('پلاک ثبت‌شده در مراجعه',esc(visit.plate||'—'))}${detailCell('نوع وسیله',esc(visit.vehicleType||'—'))}${detailCell('محل ارسال',esc(o.dispatchPlace||'—'))}<p class="whh-detail-actor"><b>ثبت‌کنندهٔ مراجعه:</b> ${esc(whhActorName(visit.createdBy))}</p></div></section>`:''}
       <section><h3>اقلام و وزن‌کشی</h3>${whhHistoryItemsHtml(data.items||[])}</section>
       <section><h3>مراحل سفارش</h3><ol class="whh-order-timeline">${stages}</ol></section>
       <section><h3>همهٔ رویدادهای ثبت‌شده</h3><ol class="whh-order-events">${events}</ol></section>

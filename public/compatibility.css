@@ -1083,13 +1083,31 @@
 #appView .adm-orders-list .adm-order-row{grid-template-columns:1fr 1.5fr 1.2fr 1.3fr .9fr auto;gap:10px;align-items:center;min-width:900px}
 #appView .sales-history-pages{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px}
 @media(max-width:900px){#appView .adm-orders-list{overflow-x:auto}}
-/* v37.50.0 — سربرگ‌های «ورودی / تخصیص‌یافته» در صفحهٔ سفارشات ترابری */
-#appView #content #transportPlans .tp-plan-tabs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:12px 0!important;overflow:visible!important}
-#appView #content #transportPlans .tp-plan-tabs .sd-tab{min-width:0!important;justify-content:space-between!important;gap:8px;text-align:right!important}
-#appView #content #transportPlans .tp-plan-tabs .sd-tab-copy strong{white-space:normal!important}
-#appView #content #transportPlans .tp-plan-tabs .sd-tab-copy small{white-space:normal!important;line-height:1.5}
-#appView #content #transportPlans .tp-plan-tabs .sd-tab-count{min-width:24px!important;display:inline-grid!important}
-@media(max-width:700px){#appView #content #transportPlans .tp-plan-tabs{grid-template-columns:minmax(0,1fr)}#appView #content #transportPlans .tp-plan-tabs .sd-tab-copy small{display:none!important}}
+/* سربرگ‌های «ورودی / تخصیص‌یافته» در صفحهٔ سفارشات ترابری:
+   دو دکمهٔ مستقل و کنار هم (افقی) در همهٔ عرض‌ها؛ هرگز زیر هم نمی‌روند. */
+#appView #content #transportPlans .tp-plan-tabs{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-auto-flow:column!important;grid-auto-columns:minmax(0,1fr)!important;
+  align-items:stretch!important;gap:8px!important;margin:12px 0!important;
+  overflow:visible!important;min-width:0!important;max-width:100%!important;
+}
+#appView #content #transportPlans .tp-plan-tabs .sd-tab{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:space-between!important;gap:8px!important;
+  min-width:0!important;max-width:100%!important;height:auto!important;min-height:48px!important;
+  padding:8px 10px!important;text-align:right!important;white-space:normal!important;
+}
+#appView #content #transportPlans .tp-plan-tabs .sd-tab-copy{min-width:0!important;flex:1 1 auto!important}
+#appView #content #transportPlans .tp-plan-tabs .sd-tab-copy strong{white-space:normal!important;overflow-wrap:anywhere!important;font-size:13px!important}
+#appView #content #transportPlans .tp-plan-tabs .sd-tab-copy small{white-space:normal!important;line-height:1.5!important;overflow-wrap:anywhere!important}
+#appView #content #transportPlans .tp-plan-tabs .sd-tab-count{min-width:24px!important;display:inline-grid!important;flex:0 0 auto!important}
+/* روی صفحهٔ باریک، توضیح هر سربرگ پنهان می‌شود تا خود دو سربرگ کنار هم بمانند. */
+@media(max-width:700px){
+  #appView #content #transportPlans .tp-plan-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-flow:column!important;gap:6px!important}
+  #appView #content #transportPlans .tp-plan-tabs .sd-tab{padding:7px 8px!important;min-height:44px!important;gap:6px!important}
+  #appView #content #transportPlans .tp-plan-tabs .sd-tab-copy small{display:none!important}
+  #appView #content #transportPlans .tp-plan-tabs .sd-tab-copy strong{font-size:12.5px!important}
+}
 
 /* جزئیات ترابری: مشخصات کنار هم، با شکست کنترل‌شده و بدون بریدن متن. */
 #modal .tp-detail{display:grid;gap:16px;min-width:0;max-width:100%}
@@ -1552,32 +1570,37 @@
   #appView #content .wh-weight-main .wh-weight-open{flex:1 1 auto!important;max-width:100%!important;white-space:normal!important}
 }
 
-/* توضیح انبار برای هر محصول در برگهٔ وزن‌کشی؛ واحد فروش آن را فقط می‌خواند. */
+/* توضیح انبار برای هر محصول در برگهٔ وزن‌کشی؛ واحد فروش آن را فقط می‌خواند.
+   فیلد به‌صورت کادر چندخطی تمام‌عرض است تا در دسکتاپ و موبایل قابل نوشتن بماند. */
 #appView #content .wh38-note-cell {
-  grid-column:1/-1!important;display:grid!important;gap:6px!important;
-  grid-template-columns:minmax(0,1fr)!important;min-width:0!important;
+  grid-column:1/-1!important;display:grid!important;gap:5px!important;
+  grid-template-columns:minmax(0,1fr)!important;min-width:0!important;width:100%!important;
 }
 #appView #content .wh38-note-box {
-  box-sizing:border-box!important;display:flex!important;align-items:center!important;
-  width:100%!important;min-width:0!important;height:40px!important;min-height:40px!important;
-  gap:8px!important;padding:0 10px!important;margin:0!important;
+  box-sizing:border-box!important;display:flex!important;align-items:flex-start!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;gap:6px!important;
+  padding:7px 9px!important;margin:0!important;
   border:1px solid var(--bt-line-2)!important;border-radius:10px!important;
   background:var(--bt-panel)!important;box-shadow:none!important;
 }
-#appView #content .wh38-note-box input {
-  flex:1 1 auto!important;min-width:0!important;width:100%!important;
-  height:38px!important;min-height:0!important;padding:0!important;margin:0!important;
-  border:0!important;border-radius:0!important;outline:0!important;background:transparent!important;
-  font:inherit!important;font-size:13px!important;font-weight:600!important;
-  color:var(--bt-ink)!important;text-align:start!important;direction:rtl!important;
-}
-#appView #content .wh38-note-box input::placeholder {color:var(--bt-muted)!important;font-weight:400!important}
 #appView #content .wh38-note-box:focus-within {border-color:var(--bt-brand)!important;box-shadow:var(--bt-ring)!important}
-#appView #content .wh38-note-count {flex:0 0 auto!important;font-size:11px!important;color:var(--bt-muted)!important;text-align:center!important}
+#appView #content .wh38-note-box textarea,#appView #content .wh38-note-cell textarea {
+  display:block!important;box-sizing:border-box!important;
+  flex:1 1 auto!important;width:100%!important;min-width:0!important;max-width:100%!important;
+  height:auto!important;min-height:52px!important;max-height:160px!important;
+  padding:2px 0!important;margin:0!important;
+  border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;
+  background:transparent!important;appearance:none!important;
+  font:inherit!important;font-size:13px!important;line-height:1.9!important;
+  color:var(--bt-ink)!important;text-align:start!important;direction:rtl!important;
+  white-space:pre-wrap!important;overflow-wrap:anywhere!important;resize:vertical!important;
+}
+#appView #content .wh38-note-box textarea::placeholder {color:var(--bt-muted)!important;font-weight:400!important}
+#appView #content .wh38-note-count {flex:0 0 auto!important;font-size:11px!important;color:var(--bt-muted)!important;text-align:center!important;padding-top:6px!important}
 @media(max-width:640px){
   #appView #content .wh38-note-cell {grid-column:1/-1!important;grid-area:auto!important}
-  #appView #content .wh38-note-box {flex-wrap:wrap!important;padding:6px 8px!important}
-  #appView #content .wh38-note-box input {flex:1 1 100%!important;height:32px!important;text-align:start!important}
+  #appView #content .wh38-note-box {padding:6px 8px!important}
+  #appView #content .wh38-note-box textarea,#appView #content .wh38-note-cell textarea {min-height:64px!important;font-size:13px!important}
 }
 /* توضیح انبار در ردیف اقلام فرم تسویهٔ فروش؛ خواندنی و بدون امکان ویرایش. */
 #appView #content .stl-row .stl-warehouse-note {
