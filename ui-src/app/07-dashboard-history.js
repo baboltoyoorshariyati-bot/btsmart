@@ -153,7 +153,8 @@ function salesHistoryOrderItems(items){
  return `<div class="table-wrap"><table class="table sales-history-items"><thead><tr><th>کالا</th><th>مقدار درخواستی</th><th>وضعیت انبار</th><th>وزن نهایی</th></tr></thead><tbody>${(items||[]).map(item=>{
   const runs=[...(item.runR1||[]).map(row=>({...row,service:'سرویس اول'})),...(item.runR2||[]).map(row=>({...row,service:'سرویس دوم'}))];
   const weightLog=runs.length?`<details class="sales-history-event-details"><summary>سوابق وزن‌کشی و کاربران</summary>${runs.map(row=>`<p>${row.service}: ${qty(row.kg)} کیلوگرم · ${esc(formatDateTime24(row.at))} · ${esc(row.byName||row.by||'ثبت‌کننده نامشخص')}</p>${row.weighings?`<pre dir="ltr">${esc(JSON.stringify(row.weighings,null,2))}</pre>`:''}`).join('')}</details>`:'';
-  return `<tr><td><b>${esc(item.productName||'—')}</b>${item.description?`<small>${esc(item.description)}</small>`:''}</td><td>${qty(item.requestedQty)} ${esc(item.requestedUnit||'')}</td><td>${esc(item.warehouseStatus||item.itemStatus||'—')}</td><td>${item.deliveredKg==null?'—':`${qty(item.deliveredKg)} کیلوگرم`}${weightLog}</td></tr>`;
+  const whNote=String(item.warehouseNote||'').trim();
+  return `<tr><td><b>${esc(item.productName||'—')}</b>${item.description?`<small>${esc(item.description)}</small>`:''}${whNote?`<small class="stl-warehouse-note" title="توضیح انبار${item.warehouseNoteByName?` — ${esc(item.warehouseNoteByName)}`:''}">${icon('clipboard',12)} <b>توضیح انبار:</b> ${esc(whNote)}</small>`:''}</td><td>${qty(item.requestedQty)} ${esc(item.requestedUnit||'')}</td><td>${esc(item.warehouseStatus||item.itemStatus||'—')}</td><td>${item.deliveredKg==null?'—':`${qty(item.deliveredKg)} کیلوگرم`}${weightLog}</td></tr>`;
  }).join('')||'<tr><td colspan="4">ریز اقلام در دسترس نیست.</td></tr>'}</tbody></table></div>`;
 }
 async function openSalesHistory(id){

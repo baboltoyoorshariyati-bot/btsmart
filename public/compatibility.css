@@ -1551,3 +1551,40 @@
   #appView #content .wh-weight-main input{flex:1 1 100%!important;width:100%!important;min-width:0!important;height:30px!important}
   #appView #content .wh-weight-main .wh-weight-open{flex:1 1 auto!important;max-width:100%!important;white-space:normal!important}
 }
+
+/* توضیح انبار برای هر محصول در برگهٔ وزن‌کشی؛ واحد فروش آن را فقط می‌خواند. */
+#appView #content .wh38-note-cell {
+  grid-column:1/-1!important;display:grid!important;gap:6px!important;
+  grid-template-columns:minmax(0,1fr)!important;min-width:0!important;
+}
+#appView #content .wh38-note-box {
+  box-sizing:border-box!important;display:flex!important;align-items:center!important;
+  width:100%!important;min-width:0!important;height:40px!important;min-height:40px!important;
+  gap:8px!important;padding:0 10px!important;margin:0!important;
+  border:1px solid var(--bt-line-2)!important;border-radius:10px!important;
+  background:var(--bt-panel)!important;box-shadow:none!important;
+}
+#appView #content .wh38-note-box input {
+  flex:1 1 auto!important;min-width:0!important;width:100%!important;
+  height:38px!important;min-height:0!important;padding:0!important;margin:0!important;
+  border:0!important;border-radius:0!important;outline:0!important;background:transparent!important;
+  font:inherit!important;font-size:13px!important;font-weight:600!important;
+  color:var(--bt-ink)!important;text-align:start!important;direction:rtl!important;
+}
+#appView #content .wh38-note-box input::placeholder {color:var(--bt-muted)!important;font-weight:400!important}
+#appView #content .wh38-note-box:focus-within {border-color:var(--bt-brand)!important;box-shadow:var(--bt-ring)!important}
+#appView #content .wh38-note-count {flex:0 0 auto!important;font-size:11px!important;color:var(--bt-muted)!important;text-align:center!important}
+@media(max-width:640px){
+  #appView #content .wh38-note-cell {grid-column:1/-1!important;grid-area:auto!important}
+  #appView #content .wh38-note-box {flex-wrap:wrap!important;padding:6px 8px!important}
+  #appView #content .wh38-note-box input {flex:1 1 100%!important;height:32px!important;text-align:start!important}
+}
+/* توضیح انبار در ردیف اقلام فرم تسویهٔ فروش؛ خواندنی و بدون امکان ویرایش. */
+#appView #content .stl-row .stl-warehouse-note {
+  display:flex!important;align-items:flex-start!important;gap:4px!important;
+  margin-top:4px!important;padding:3px 7px!important;border-radius:7px!important;
+  background:var(--bt-amber-bg,#fff4dc)!important;color:var(--bt-ink-2)!important;
+  font-size:10.5px!important;line-height:1.7!important;overflow-wrap:anywhere!important;
+}
+#appView #content .stl-row .stl-warehouse-note svg {flex:0 0 auto!important;margin-top:3px!important;color:var(--bt-amber,#975f00)!important}
+#appView #content .stl-row .stl-warehouse-note b {color:var(--bt-ink)!important;font-weight:800!important}
