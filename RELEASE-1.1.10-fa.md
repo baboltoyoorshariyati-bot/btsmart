@@ -20,7 +20,7 @@
 
 ## دریافت و نصب
 - [پوشهٔ دارایی‌های نسخهٔ 1.1.10 در Google Drive](https://drive.google.com/drive/folders/19yZkJp6_AGCLp_rFVNef9jqZmrdS_b-_)
-- بستهٔ پایهٔ برنامه برای نصب‌کنندهٔ تک‌فایل (`BabolToyor-App-1.1.10-bootstrap.zip`): <https://drive.google.com/uc?export=download&id=1v6uyGScry181XpZTqthvrr5lrQx--vM8>
+- بستهٔ پایهٔ برنامه برای نصب‌کنندهٔ تک‌فایل (`BabolToyor-App-1.1.10-bootstrap.zip`): <https://drive.google.com/uc?export=download&id=1OxtAfGMBDH674FqjXJ7jvbJcuLG0OdQh>
 - بستهٔ نصب پیشنهادی: `BabolToyor-Windows-Setup-1.1.10.zip`؛ ZIP را کامل استخراج کنید و فایل‌های داخل را کنار هم نگه دارید.
 - نصب‌کنندهٔ تک‌فایل: `BabolToyor-Setup-1.1.10.cmd`؛ برای دریافت برنامه و Node.js به اینترنت نیاز دارد.
 - بستهٔ مستقل برنامه: `BabolToyor-App-1.1.10.zip`.
