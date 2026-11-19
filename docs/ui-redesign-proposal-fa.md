@@ -117,7 +117,7 @@
 
 | موبایل ۳۷۵px | دسکتاپ کوچک ۸۰۰px |
 |---|---|
-| ![](prototype/proto-375.png) | ![](prototype/proto-800.png) |
+| ![](prototype/after-375-viewport.png) | ![](prototype/after-800-viewport.png) |
 
 فایل زندهٔ پیش‌نمایش: [`docs/prototype/ui-compact.html`](prototype/ui-compact.html) — در مرورگر باز کنید و پنجره را کوچک/بزرگ کنید.
 
@@ -183,3 +183,19 @@
 ### پیوست: فایل‌های مرتبط
 - گزارش علت‌یابی نارسپانسیو بودن: [`docs/responsive-800x600-report-fa.md`](../responsive-800x600-report-fa.md)
 - پیش‌نمایش زندهٔ پیشنهاد: [`docs/prototype/ui-compact.html`](prototype/ui-compact.html)
+
+
+---
+
+## پیوست تصویری: مقایسهٔ «قبل / بعد»
+
+| # | موضوع | تصویر |
+|---|---|---|
+| ۰ | نمای کلی پوسته (موبایل + دسکتاپ کوچک) | ![](prototype/cmp0.png) |
+| ۱ | صف سفارش‌های انبار (۸۰۰px) | ![](prototype/cmp1.png) |
+| ۲ | برگهٔ آماده‌سازی و وزن‌کشی (۳۷۵px) | ![](prototype/cmp2.png) |
+| ۳ | صف تلفنی داخل فرم فروش | ![](prototype/cmp3.png) |
+| ۴ | فرم چندبخشی → سه گام | ![](prototype/cmp4.png) |
+| ۵ | جدول → کارت و وضعیت‌ها | ![](prototype/cmp5.png) |
+
+صفحهٔ مقایسهٔ کامل: [`docs/prototype/compare.html`](prototype/compare.html) — با مرورگر باز کنید.

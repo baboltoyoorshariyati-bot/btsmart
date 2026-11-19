@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>مقایسهٔ قبل و بعد — پیشنهاد رابط کاربری</title>
+<style>
+  @font-face{font-family:'Vazirmatn';src:url('/home/user/btsmart/public/fonts/Vazirmatn-Variable.woff2') format('woff2');font-weight:100 900;font-display:swap}
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef1f5;font-family:Vazirmatn,Tahoma,sans-serif;color:#1d2733;direction:rtl}
+  .wrap{width:900px;margin:0 auto;padding:24px}
+  .cmp{background:#fff;border:1px solid #e3e8ee;border-radius:18px;overflow:hidden;margin-bottom:24px;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+  .cmp>header{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid #e3e8ee;background:#fbfcfd}
+  .cmp>header .n{width:28px;height:28px;border-radius:9px;background:#1d2733;color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+  .cmp>header b{flex:1;font-size:16px}
+  .cmp>header small{color:#6b7684;font-size:12px;font-weight:700}
+  .part{padding:14px 18px 18px}
+  .tag{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:800;margin:6px 0 8px}
+  .tag.before{background:#fdecea;color:#b42318}
+  .tag.after{background:#e7f6ee;color:#0f7a4d}
+  img{width:100%;border:1px solid #e3e8ee;border-radius:12px;display:block}
+  figure{margin:0}
+  figure.phone{width:392px;margin:0 auto}
+  figure.phone img{width:392px}
+  figcaption{font-size:11.5px;color:#6b7684;text-align:center;margin-top:6px}
+  .why{display:flex;gap:8px;align-items:flex-start;margin-top:10px;background:#f4f6f8;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.7;color:#475467}
+  .why b{color:#1d2733}
+  .side{display:flex;gap:16px;align-items:flex-start;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+  .note{font-size:12px;color:#6b7684;padding:0 4px 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section class="cmp" id="cmp0">
+    <header><span class="n">۰</span><b>نمای کلی پوسته</b><small>موبایل + دسکتاپ کوچک</small></header>
+    <div class="part">
+      <div class="side">
+        <figure class="phone" style="width:330px"><img src="after-375-viewport.png" alt="موبایل" style="width:330px"><figcaption>موبایل ۳۷۵×۶۶۷ — هدر ۵۶px، تب‌بار پایین، نوار عملیات چسبان</figcaption></figure>
+        <figure class="phone" style="width:470px"><img src="after-800-viewport.png" alt="دسکتاپ کوچک" style="width:470px"><figcaption>دسکتاپ کوچک ۸۰۰×۶۰۰ — ریل ۷۲px، کارت‌های دوستونه</figcaption></figure>
+      </div>
+      <div class="why"><b>تفاوت اصلی با امروز:</b> هدر از ۱۳۳ به ۵۶ پیکسل رسیده (۲۵٪ ارتفاع دید آزاد می‌شود) و نوار عملیات پایین صفحه همیشه در دسترس است.</div>
+    </div>
+  </section>
+
+  <section class="cmp" id="cmp1">
+    <header><span class="n">۱</span><b>صف سفارش‌های انبار</b><small>۸۰۰×۶۰۰</small></header>
+    <div class="part">
+      <span class="tag before">قبل — ردیف ۱۱۰۶ پیکسل، دکمه بیرون کادر</span>
+      <img src="../resp800-wh-incoming-right-end.png" alt="قبل">
+      <span class="tag after">بعد — کارت سه‌خطی، یک دکمهٔ اصلی + «⋯»</span>
+      <img src="part-sec-queue-800.png" alt="بعد">
+      <div class="why"><b>چه چیزی حل شد:</b> دیگر هیچ اسکرول افقی نیست؛ دکمهٔ اصلی روی هر کارت تمام‌عرض است؛ وضعیت با چیپ رنگی در یک نگاه خوانده می‌شود.</div>
+    </div>
+  </section>
+
+  <section class="cmp" id="cmp2">
+    <header><span class="n">۲</span><b>برگهٔ آماده‌سازی و وزن‌کشی</b><small>موبایل ۳۷۵px</small></header>
+    <div class="part">
+      <span class="tag before">قبل — چهار دکمهٔ هم‌وزن، راهنمای پنج‌خطی، دکمهٔ نهایی زیر خط دید</span>
+      <figure class="phone" style="width:520px"><img src="../resp800-wh-sheet-800x520.png" alt="قبل" style="width:520px"><figcaption>نمای واقعی ۸۰۰×۵۲۰ (ارتفاع واقعی مرورگر)</figcaption></figure>
+      <span class="tag after">بعد — راهنمای یک‌خطی، ورودی درشت، چیپ نوبت‌ها، نوار عملیات چسبان</span>
+      <figure class="phone"><img src="part-sec-sheet-375.png" alt="بعد"><figcaption>عرض واقعی موبایل ۳۷۵ پیکسل</figcaption></figure>
+      <div class="why"><b>چه چیزی حل شد:</b> «ثبت وزن و چاپ سند» همیشه پایین صفحه است؛ تعداد نوبت‌های ثبت‌شده روی هر قلم دیده می‌شود؛ متن راهنما جمع شده و فقط یک خط می‌ماند.</div>
+    </div>
+  </section>
+
+  <section class="cmp" id="cmp3">
+    <header><span class="n">۳</span><b>صف تلفنی داخل فرم فروش</b><small>۸۰۰px</small></header>
+    <div class="part">
+      <span class="tag before">قبل — کارت ۱۲۳۳ پیکسل در کادر ۶۶۶ پیکسل (نیمهٔ کارت بیرون کادر)</span>
+      <img src="../resp800-sales-phone-queue.png" alt="قبل">
+      <span class="tag after">بعد — همان اطلاعات در کارت، همه‌چیز در کادر</span>
+      <figure class="phone"><img src="part-sec-queue-375.png" alt="بعد"><figcaption>عرض واقعی موبایل ۳۷۵ پیکسل</figcaption></figure>
+      <div class="why"><b>چه چیزی حل شد:</b> اطلاعات مشتری، شمارهٔ سفارش، تاریخ و دکمهٔ عملیات در یک کارت جمع شده و بدون کشیدن افقی در دسترس است.</div>
+    </div>
+  </section>
+
+  <section class="cmp" id="cmp4">
+    <header><span class="n">۴</span><b>فرم چندبخشی → سه گام</b><small>۳۷۵px</small></header>
+    <div class="part">
+      <span class="tag after">بعد — گام فعال باز، گام‌های بعدی جمع‌شده</span>
+      <figure class="phone"><img src="part-sec-form-375.png" alt="بعد"><figcaption>عرض واقعی موبایل ۳۷۵ پیکسل</figcaption></figure>
+      <div class="why"><b>چه چیزی حل شد:</b> کاربر فقط فیلدهای همان گام را می‌بیند (فرم ۱۹۶۱ پیکسلی به سه بخش کوتاه شکسته می‌شود) و می‌داند کجاست و قدم بعدی چیست.</div>
+    </div>
+  </section>
+
+  <section class="cmp" id="cmp5">
+    <header><span class="n">۵</span><b>جدول → کارت و وضعیت‌ها</b><small>۳۷۵px</small></header>
+    <div class="part">
+      <span class="tag after">بعد — فاکتور/سابقه به کارت با چهار فیلد کلیدی</span>
+      <figure class="phone"><img src="part-sec-table-375.png" alt="بعد"><figcaption>عرض واقعی موبایل ۳۷۵ پیکسل</figcaption></figure>
+      <span class="tag after">بعد — چهار وضعیت با یک زبان رنگی و حالت خالی روشن</span>
+      <figure class="phone"><img src="part-sec-states-375.png" alt="بعد"><figcaption>عرض واقعی موبایل ۳۷۵ پیکسل</figcaption></figure>
+      <div class="why"><b>چه چیزی حل شد:</b> جدول‌های پهن (min-width ۱۰۰۰px) در صفحهٔ کوچک به کارت تبدیل می‌شوند؛ رنگ وضعیت‌ها یکسان و قابل یادگیری است.</div>
+    </div>
+  </section>
+
+  <p class="note">تصاویر «قبل» از اجرای واقعی نسخهٔ ۱.۱.۱۰ گرفته شده‌اند؛ تصاویر «بعد» از فایل پیش‌نمایش <code>docs/prototype/ui-compact.html</code>.</p>
+</div>
+</body>
+</html>
