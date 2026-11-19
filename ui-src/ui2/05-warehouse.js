@@ -425,7 +425,7 @@ function wh38Sheet(o){
     <div class="wh38-sheet-head wh38-sheet-head-compact"><div class="wh38-sheet-heading"><span class="stl-eyebrow">آماده‌سازی و تحویل</span>${badge(o.status)}</div>${orderCustomerStripHtml(o)}${o.deliveryDate?`<div class="wh38-sheet-delivery-date">تاریخ تحویل: <b>${esc(dateLabel(o.deliveryDate))}</b></div>`:''}</div>
     ${app.features?.pickupStaging&&o.visit?.status==='PICKUP_PRESENT'?`<div class="wh38-note"><b>تحویل‌گیرنده: ${esc(o.visit.recipient?.name||'—')}</b><span>تماس: ${esc(fa(o.visit.recipient?.phone||'—'))} • ${esc([o.visit.recipient?.vehicleType,o.visit.recipient?.carType,o.visit.recipient?.plate].filter(Boolean).join(' — '))}</span></div>`:''}
     <div class="wh38-progress"><span class="done">۱ سفارش ورودی</span><i></i><span class="active">۲ آماده‌سازی</span><i></i><span>۳ ارسال به تسویه فروش</span></div>
-    <div class="wh38-note"><b>وزن آماده‌سازی</b><span>وزن‌ها را پیش از مراجعه ذخیره کنید؛ ذخیره به‌معنای تحویل یا ارسال به تسویه نیست. برای هر قلم وزن خالص را وارد کنید؛ برای محاسبه از وزن ناخالص و سبد، کارتن، راک یا گاری روی «ناخالصی» بزنید. اقلام ناموجود را با «عدم موجودی» مشخص کنید. <strong data-wh38-draft-status aria-live="polite">${o.warehouseWeightDraft?.revision?'وزن آماده‌سازی ذخیره شده است.':'تغییرات را با دکمه ذخیره ثبت کنید.'}</strong></span></div>
+    <div class="wh38-note"><b>وزن آماده‌سازی</b><span>وزن‌ها را پیش از مراجعه ذخیره کنید؛ ذخیره به‌معنای تحویل یا ارسال به تسویه نیست. برای هر قلم وزن خالص را وارد کنید؛ برای محاسبه از وزن ناخالص و سبد، کارتن، راک یا گاری روی «ناخالصی» بزنید. اقلام ناموجود را با «عدم موجودی» مشخص کنید. «توضیح انبار برای فروش» اختیاری است و پس از ثبت، در فرم تسویهٔ فروش کنار همان محصول دیده می‌شود. <strong data-wh38-draft-status aria-live="polite">${o.warehouseWeightDraft?.revision?'وزن آماده‌سازی ذخیره شده است.':'تغییرات را با دکمه ذخیره ثبت کنید.'}</strong></span></div>
     <div class="wh38-prep-items">${items.map((it,k)=>`<article class="wh38-prep-item">
       <div class="wh38-prep-num">${fa(String(k+1))}</div>
       <div class="wh38-prep-cell"><span class="wh38-cell-label">محصول</span><div class="wh38-cell-box wh38-prep-title" title="${esc(it.product?.name||'—')}"><strong>${esc(it.product?.name||'—')}</strong></div></div>
@@ -433,6 +433,7 @@ function wh38Sheet(o){
       <div class="wh38-prep-cell"><span class="wh38-cell-label">توضیحات ردیف</span><div class="wh38-cell-box wh38-prep-desc" title="${esc(it.description||'بدون توضیح')}">${esc(it.description||'بدون توضیح')}</div></div>
       <div class="wh38-prep-cell wh38-weight"><label class="wh38-cell-label" for="wh38-weight-${esc(it.id)}">وزن خالص (کیلوگرم)</label><div class="wh38-cell-box wh-weight-main"><input id="wh38-weight-${esc(it.id)}" type="text" inputmode="decimal" autocomplete="off" aria-label="وزن خالص ${esc(it.product?.name||'محصول')} به کیلوگرم" data-wh38-weight="${it.id}" placeholder="۰٫۰۰۰"><button type="button" class="btn btn-secondary btn-sm wh-weight-open" data-action="wh-weight-details">ناخالصی</button></div></div>
       <div class="wh38-stock-cell"><span class="wh38-cell-label">عدم موجودی</span><label class="wh38-oos" title="عدم موجودی ${esc(it.product?.name||'محصول')}"><input type="checkbox" aria-label="عدم موجودی ${esc(it.product?.name||'محصول')}" data-wh38-oos="${it.id}"></label></div>
+      <div class="wh38-note-cell"><label class="wh38-cell-label" for="wh38-note-${esc(it.id)}">توضیح انبار برای فروش</label><div class="wh38-note-box"><input id="wh38-note-${esc(it.id)}" type="text" maxlength="300" autocomplete="off" placeholder="اختیاری — مثلاً: دو کارتن نمدار بود" aria-label="توضیح انبار برای فروش دربارهٔ ${esc(it.product?.name||'محصول')}" data-wh38-note="${it.id}" value="${esc(it.warehouseNote||'')}"><span class="wh38-note-count" data-wh38-note-count aria-hidden="true"></span></div></div>
     </article>`).join('')}</div>
     <div class="wh38-sheet-foot"><div><span>جمع وزن نهایی</span><strong id="wh38Total">۰ کیلوگرم</strong></div>
       <div class="toolbar"><button type="button" class="btn btn-secondary btn-lg" data-action="wh38-save-draft" data-id="${o.id}">ذخیره وزن‌ها</button><button type="button" class="btn btn-secondary btn-lg" data-action="wh38-return" data-id="${o.id}">${icon('arrow',16)} ارجاع به فروش</button><button type="button" class="btn btn-primary btn-lg" data-action="wh38-finalize" data-id="${o.id}">${icon('send',17)} ${app.features?.pickupStaging&&o.deliveryMode==='PICKUP'&&o.orderType==='REMOTE'?'ثبت وزن و تحویل واقعی و چاپ':'ثبت وزن، تحویل و چاپ سند'}</button></div></div>
@@ -442,16 +443,25 @@ function wh38Sheet(o){
     const row=saved.get(el.dataset.wh38Weight);if(row){const check=$(`#wh38Body [data-wh38-oos="${el.dataset.wh38Weight}"]`);if(row.outOfStock){check.checked=true;el.disabled=true;}else{el.value=String(row.deliveredKg);if(Array.isArray(row.weighings)&&row.weighings.length){whWeighingDrafts.set(el,row.weighings.map(x=>({...x})));el.readOnly=true;}}}
     el.addEventListener('input',()=>{wh38Total();const status=$('#wh38Body [data-wh38-draft-status]');if(status)status.textContent='تغییرات جدید هنوز ذخیره نشده است.';});
   });
+  $$('#wh38Body [data-wh38-note]').forEach(el=>{
+    const row=saved.get(el.dataset.wh38Note);
+    if(row&&typeof row.note==='string')el.value=row.note;
+    const count=el.parentElement.querySelector('[data-wh38-note-count]');
+    const paint=()=>{if(count)count.textContent=el.value.trim()?fa(String(el.value.trim().length)):'';};
+    paint();
+    el.addEventListener('input',()=>{paint();const status=$('#wh38Body [data-wh38-draft-status]');if(status)status.textContent='تغییرات جدید هنوز ذخیره نشده است.';});
+  });
   $$('#wh38Body [data-wh38-oos]').forEach(ch=>ch.addEventListener('change',()=>{ const w=$(`#wh38Body [data-wh38-weight="${ch.dataset.wh38Oos}"]`); if(w){w.disabled=ch.checked; if(ch.checked){w.value='';w.readOnly=false;whWeighingDrafts.delete(w);}} wh38Total();const status=$('#wh38Body [data-wh38-draft-status]');if(status)status.textContent='تغییرات جدید هنوز ذخیره نشده است.'; }));
   wh38Total();
 }
 async function wh38SaveDraft(id){
   const selected=app.wh38.sheetOrder;if(!selected||selected.id!==id)return toast('سفارش مجدداً باز شود.');
+  const noteOf=id=>{const el=$(`#wh38Body [data-wh38-note="${id}"]`);return el?el.value:'';};
   const collect=()=>$$('#wh38Body [data-wh38-weight]').flatMap(w=>{
     const out=$(`#wh38Body [data-wh38-oos="${w.dataset.wh38Weight}"]`)?.checked||false;
-    if(out)return [{itemId:w.dataset.wh38Weight,outOfStock:true}];
+    if(out)return [{itemId:w.dataset.wh38Weight,outOfStock:true,note:noteOf(w.dataset.wh38Weight)}];
     if(!w.value.trim())return [];
-    return [{itemId:w.dataset.wh38Weight,outOfStock:false,deliveredKg:whWeightNet(w),...(whWeighingDrafts.has(w)?{weighings:whWeightPayload(w)}:{})}];
+    return [{itemId:w.dataset.wh38Weight,outOfStock:false,deliveredKg:whWeightNet(w),note:noteOf(w.dataset.wh38Weight),...(whWeighingDrafts.has(w)?{weighings:whWeightPayload(w)}:{})}];
   });
   const items=collect();
   if(items.some(x=>!x.outOfStock&&(!Number.isFinite(x.deliveredKg)||x.deliveredKg<=0)))return toast('وزن‌های واردشده باید معتبر و مثبت باشند.');
@@ -460,7 +470,8 @@ async function wh38SaveDraft(id){
 }
 function wh38Total(){ const total=$$('#wh38Body [data-wh38-weight]').reduce((s,e)=>s+(e.disabled?0:whWeightNet(e)),0); const el=$('#wh38Total'); if(el)el.textContent=Number.isFinite(total)?qty(total)+' کیلوگرم':'وزن نامعتبر'; }
 async function wh38Finalize(id){
-  const items=$$('#wh38Body [data-wh38-weight]').map(w=>{ const out=$(`#wh38Body [data-wh38-oos="${w.dataset.wh38Weight}"]`)?.checked||false; return {itemId:w.dataset.wh38Weight, deliveredKg:out?0:whWeightNet(w), outOfStock:out,...(!out?{weighings:whWeightPayload(w)}:{})}; });
+  const noteOf=id=>{const el=$(`#wh38Body [data-wh38-note="${id}"]`);return el?el.value:'';};
+  const items=$$('#wh38Body [data-wh38-weight]').map(w=>{ const out=$(`#wh38Body [data-wh38-oos="${w.dataset.wh38Weight}"]`)?.checked||false; return {itemId:w.dataset.wh38Weight, deliveredKg:out?0:whWeightNet(w), outOfStock:out, note:noteOf(w.dataset.wh38Weight), ...(!out?{weighings:whWeightPayload(w)}:{})}; });
   if(!items.length)return toast('قلمی برای ثبت وزن وجود ندارد.');
   if(items.some(x=>!x.outOfStock&&(!Number.isFinite(x.deliveredKg)||x.deliveredKg<=0)))return toast('برای همه اقلام موجود وزن نهایی معتبر وارد کنید.');
   let result;

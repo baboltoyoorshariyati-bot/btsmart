@@ -34,7 +34,7 @@ function stlItemsOf(o, prices){
     // Pending settlement should start from today's product-list price; stale or
     // zero item snapshots must not force sales staff to re-enter that price.
     const price = listedPrice > 0 ? listedPrice : (savedPrice > 0 ? savedPrice : 0);
-    return { id:i.id, productId:i.productId, name:i.product?.name || i.productId || 'کالا', status, voided, skip:false, delivered, outOfStock: !voided && (status === 'OUT_OF_STOCK' || delivered <= 0), price };
+    return { id:i.id, productId:i.productId, name:i.product?.name || i.productId || 'کالا', status, voided, skip:false, delivered, outOfStock: !voided && (status === 'OUT_OF_STOCK' || delivered <= 0), price, warehouseNote: String(i.warehouseNote||''), warehouseNoteByName: String(i.warehouseNoteByName||'') };
   });
 }
 // A compact, read-only row of all available customer details (shared by warehouse/sales).
@@ -95,7 +95,7 @@ function stlRowHtml(it){
   const note = it.voided ? 'لغو شده در انبار' : (it.outOfStock ? 'ناموجود در انبار' : (priceLocked ? 'قیمت توسط فروش تأیید شده' : ''));
   const needs = stlActive(it) && it.delivered > 0 && !(it.price > 0);
   return `<div class="stl-row ${it.voided?'is-void':''} ${it.skip?'is-skip':''} ${needs?'needs-price':''}" data-stl-row="${esc(it.id)}">
-    <div class="stl-cell stl-cell-name"><b>${esc(it.name)}</b>${note?`<small>${esc(note)}</small>`:''}</div>
+    <div class="stl-cell stl-cell-name"><b>${esc(it.name)}</b>${note?`<small>${esc(note)}</small>`:''}${it.warehouseNote?`<small class="stl-warehouse-note" title="توضیح انبار${it.warehouseNoteByName?` — ${esc(it.warehouseNoteByName)}`:''}">${icon('clipboard',12)} <b>توضیح انبار:</b> ${esc(it.warehouseNote)}</small>`:''}</div>
     <div class="stl-cell"><span class="stl-label">تحویلی</span><span class="stl-kg">${qty(it.delivered)} کیلوگرم</span></div>
     <div class="stl-cell"><span class="stl-label">قیمت هر کیلو (ریال)</span><input class="stl-input" type="text" inputmode="numeric" autocomplete="off" data-stl-price="${esc(it.id)}" value="${esc(stlFmtPrice(it.price))}" ${dis} placeholder="${it.outOfStock?'—':'۰'}"></div>
     <div class="stl-cell"><span class="stl-label">مبلغ</span><b class="stl-amount" data-stl-amount="${esc(it.id)}">${money(stlActive(it)?Math.round(it.delivered*it.price):0)}</b></div>
