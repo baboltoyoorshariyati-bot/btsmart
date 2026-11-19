@@ -343,7 +343,7 @@ async function openWarehouseHistoryOrder(id){
     const detailCell=(label,value)=>`<div class="whh-detail-cell"><small>${label}</small><b>${value||'—'}</b></div>`;
     const customerFields=[
       ['کد مشتری',c.code],['نام و نام خانوادگی',c.name],['شماره تماس',c.phone],['شماره تماس دوم',c.phone2],['کد ملی',c.nationalId],
-      ['شرکت / واحد',c.company],['پلاک',c.plate],['نوع وسیله',c.vehicleType],['نوع خودرو',c.carType],['محله',c.district],['نشانی',c.address],['یادداشت مشتری',c.notes],
+      ['شرکت / واحد',c.company],['پلاک',c.plate],['نوع وسیله',c.vehicleType],['نوع خودرو',c.carType],['نشانی',c.address],['یادداشت مشتری',c.notes],
     ].map(([label,value])=>detailCell(label,esc(label.includes('تماس')||label==='کد ملی'||label==='کد مشتری'?fa(value||''):value||'—'))).join('');
     const orderFields=[
       detailCell('نوع سفارش',esc(typeLabels[o.orderType]||o.orderType||'—')),
@@ -362,7 +362,7 @@ async function openWarehouseHistoryOrder(id){
     openModal(`جزئیات سفارش ${fa(o.orderNo||'')}`,`<div class="whh-order-detail">
       <section><h3>مشخصات سفارش</h3><div class="whh-detail-grid">${orderFields}</div><p class="whh-detail-actor"><b>ثبت‌کنندهٔ سفارش:</b> ${esc(whhActorName(o.createdBy))}</p></section>
       <section><h3>اطلاعات کامل مشتری</h3><div class="whh-detail-grid">${customerFields}</div></section>
-      ${visit.id?`<section><h3>اطلاعات مراجعهٔ مرتبط</h3><div class="whh-detail-grid">${detailCell('هدف مراجعه',esc(visit.purpose||'—'))}${detailCell('پلاک ثبت‌شده در مراجعه',esc(visit.plate||'—'))}${detailCell('نوع وسیله',esc(visit.vehicleType||'—'))}${detailCell('محله',esc(visit.district||'—'))}<p class="whh-detail-actor"><b>ثبت‌کنندهٔ مراجعه:</b> ${esc(whhActorName(visit.createdBy))}</p></div></section>`:''}
+      ${visit.id?`<section><h3>اطلاعات مراجعهٔ مرتبط</h3><div class="whh-detail-grid">${detailCell('هدف مراجعه',esc(visit.purpose||'—'))}${detailCell('پلاک ثبت‌شده در مراجعه',esc(visit.plate||'—'))}${detailCell('نوع وسیله',esc(visit.vehicleType||'—'))}${detailCell('محل ارسال',esc(o.dispatchPlace||'—'))}<p class="whh-detail-actor"><b>ثبت‌کنندهٔ مراجعه:</b> ${esc(whhActorName(visit.createdBy))}</p></div></section>`:''}
       <section><h3>اقلام و وزن‌کشی</h3>${whhHistoryItemsHtml(data.items||[])}</section>
       <section><h3>مراحل سفارش</h3><ol class="whh-order-timeline">${stages}</ol></section>
       <section><h3>همهٔ رویدادهای ثبت‌شده</h3><ol class="whh-order-events">${events}</ol></section>

@@ -7,7 +7,9 @@ test('only settlement omits transport/customer location fields',()=>{
  const c={esc:String,plateViewHtml:v=>`<span class="iran-plate">${v}</span>`,fa:v=>String(v).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])};vm.createContext(c);vm.runInContext(fn(app,'orderCustomerFields')+'\n'+fn(app,'orderCustomerStripHtml'),c);
  const o={orderNo:'000123',customer:{name:'مشتری',phone:'0912',vehicleType:'وانت',plate:'12ب34567',district:'محله نمونه'},dispatchPlace:'ارسال نمونه'};
  const full=c.orderCustomerStripHtml(o),short=c.orderCustomerStripHtml(o,true);assert(short.includes('۰۰۰۱۲۳'));assert.equal(o.orderNo,'000123');
- for(const label of ['نوع وسیله','پلاک','محله','محل ارسال']){assert(full.includes(`<b>${label}</b>`));assert(!short.includes(`<b>${label}</b>`));}
+ // v1.1.9 — «محله» از مشخصات مشتری حذف شده؛ «محل ارسال» فروش تنها معیار آدرس است.
+ for(const label of ['نوع وسیله','پلاک','محل ارسال']){assert(full.includes(`<b>${label}</b>`));assert(!short.includes(`<b>${label}</b>`));}
+ assert(!full.includes('<b>محله</b>'));
  for(const label of ['نام مشتری','شماره تماس','شماره سفارش'])assert(short.includes(`<b>${label}</b>`));
 });
 test('invoice numbers are Persian without display padding, without changing stored data',()=>{

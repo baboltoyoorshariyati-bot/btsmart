@@ -1,7 +1,7 @@
 function storeRunInvoiceLines(o,p){
   const priceLines=Array.isArray(p?.priceLines)?p.priceLines:[];
   if(priceLines.length) return priceLines.map(x=>({productName:x.productName,deliveredKg:Number(x.deliveredKg??0)}));
-  const items=(o.items||[]).filter(i=>i.itemStatus!=='CANCELLED');
+  const items=(o.items||[]).filter(i=>i.itemStatus!=='CANCELLED'&&i.itemStatus!=='OUT_OF_STOCK');
   const run=p?.deliveryRun||null;
   if(run===1||run===2){
     const key=run===1?'runR1':'runR2';
@@ -33,24 +33,40 @@ async function transportDraftPrint(id){
 }
 // The printed handover note and the dispatch invoice share one identity block,
 // so the sheet is assembled from the exact invoice header markup and labels.
+/* برگهٔ ارسال پخش دقیقاً با همان چیدمان «فاکتور تحویل» چاپ می‌شود:
+   همان سربرگ، همان جدول اقلام با وزن و مبلغ، همان جمع‌بندی مالی و همان
+   اظهارنامه/جای امضای تحویل‌گیرنده؛ تفاوت فقط ردیف اطلاعات تحویل به راننده است. */
 function transportShipmentNoteHtml(order){
  const invoice=order.transportInvoice||{},hand=order.transportHandovers?.['0']||{},doc=hand.document||{};
  const source=Array.isArray(invoice.priceLines)&&invoice.priceLines.length?invoice.priceLines:(doc.items||[]).filter(i=>!i.outOfStock&&Number(i.deliveredKg)>0);
- const lines=source.map(i=>({productName:i.productName||'—',deliveredKg:Number(i.deliveredKg||0)}));
- const totalKg=lines.reduce((sum,line)=>sum+line.deliveredKg,0),driver=hand.driverName||invoice.driverName||'—';
- const customerName=invoice.customerName||order.customer?.name||'—',customerPhone=invoice.customerPhone||order.customer?.phone||'—';
- const rows=lines.map((line,index)=>`<tr><td>${fa(String(index+1))}</td><td><b>${esc(line.productName)}</b></td><td>${qty(line.deliveredKg)} کیلوگرم</td></tr>`).join('');
- const header=`<div class="inv38-head"><div class="inv38-meta inv38-distribution-meta"><div class="inv38-distribution-contacts"><div><span>نام مشتری</span><b>${esc(customerName)}</b></div><div><span>شماره تماس</span><b class="inv38-phone" dir="ltr">${esc(fa(customerPhone))}</b></div></div><div><span>محل ارسال</span><b>${esc(order.dispatchPlace||'—')}</b></div><div><span>شماره سفارش</span><b>${esc(fa(order.orderNo||'—'))}</b></div><div><span>شماره فاکتور</span><b>${esc(fa(invoice.invoiceNumber||'—'))}</b></div><div><span>تاریخ</span><b>${esc(dt(invoice.createdAt||order.createdAt))}</b></div></div></div>`;
- const handover=`<div class="inv38-cust tr-shipment-handover"><div><span>راننده</span><b>${esc(driver)}</b></div><div><span>خودرو و پلاک</span><b>${esc(hand.vehicleType||'—')} ${esc(fa(hand.vehiclePlate||''))}</b></div><div><span>سند انبار</span><b>${esc(fa(doc.warehouseDocumentNo||'—'))}</b></div></div>`;
- return `<div class="inv38-sheet inv38-compact inv38-distribution tr-shipment-note">${header}<div class="inv38-rule"></div>${handover}<div class="inv38-table-scroll"><table class="inv38-table"><thead><tr><th>#</th><th>محصول</th><th>وزن ارسالی</th></tr></thead><tbody>${rows||'<tr><td colspan="3">قلمی برای ارسال ثبت نشده است.</td></tr>'}</tbody><tfoot><tr><th colspan="2">جمع وزن ارسالی</th><th>${qty(totalKg)} کیلوگرم</th></tr></tfoot></table></div><div class="tr-shipment-note-footer"><p>برگه ارسال پخش همراه محموله است و به‌تنهایی ثبت پرداخت یا تأیید دریافت محسوب نمی‌شود.</p><div><span>نام و امضای تحویل‌گیرنده</span><span>تاریخ و ساعت تحویل</span></div></div></div>`;
+ const lines=source.map(i=>{const kg=Number(i.deliveredKg||0),unitPrice=Number(i.unitPrice||0);return {productName:i.productName||'—',deliveredKg:kg,unitPrice,amount:Number(i.amount??Math.round(kg*unitPrice))||0};});
+ const totalKg=lines.reduce((sum,line)=>sum+line.deliveredKg,0);
+ const subtotal=lines.reduce((sum,line)=>sum+line.amount,0);
+ const discount=Number(invoice.discountAmount||0),additions=Number(invoice.additionsAmount||0);
+ const total=Number.isFinite(Number(invoice.totalAmount))?Number(invoice.totalAmount):subtotal-discount+additions;
+ const driver=hand.driverName||invoice.driverName||'—';
+ const customerNameRaw=String(invoice.customerName||order.customer?.name||'').trim(),customerPhoneRaw=String(invoice.customerPhone||order.customer?.phone||'').trim();
+ const customerName=esc(customerNameRaw||'—'),customerPhone=esc(customerPhoneRaw||'—');
+ const header=`<div class="inv38-head"><div class="inv38-meta inv38-distribution-meta"><div class="inv38-distribution-contacts"><div><span>نام مشتری</span><b>${customerName}</b></div><div><span>شماره تماس</span><b class="inv38-phone" dir="ltr">${customerPhone}</b></div></div><div><span>محل ارسال</span><b>${esc(order.dispatchPlace||'—')}</b></div><div><span>شماره سفارش</span><b>${esc(fa(order.orderNo||'—'))}</b></div><div><span>شماره فاکتور</span><b>${esc(fa(invoice.invoiceNumber||'—'))}</b></div><div><span>تاریخ</span><b>${esc(dt(invoice.createdAt||order.createdAt))}</b></div></div></div>`;
+ const handover=`<div class="inv38-cust tr-shipment-handover"><div><span>راننده</span><b>${esc(driver)}</b></div><div><span>خودرو و پلاک</span><b>${esc(hand.vehicleType||'—')} ${esc(fa(hand.vehiclePlate||''))}</b></div><div><span>سند انبار</span><b dir="ltr">${esc(fa(doc.warehouseDocumentNo||'—'))}</b></div></div>`;
+ const rows=lines.map((line,index)=>`<tr><td>${fa(String(index+1))}</td><td><b>${esc(line.productName)}</b></td><td>${qty(line.deliveredKg)} کیلوگرم</td><td>${line.unitPrice>0?money(line.unitPrice):'—'}</td><td>${line.amount>0?money(line.amount):'—'}</td></tr>`).join('');
+ const table=`<p class="inv38-scroll-hint">برای مشاهده همه ستون‌های اقلام، جدول را افقی پیمایش کنید.</p><div class="inv38-table-scroll" role="region" aria-label="اقلام برگهٔ ارسال"><table class="inv38-table"><thead><tr><th>#</th><th>محصول</th><th>وزن ارسالی</th><th>قیمت هر کیلو</th><th>مبلغ</th></tr></thead><tbody>${rows||'<tr><td colspan="5">قلمی برای ارسال ثبت نشده است.</td></tr>'}</tbody><tfoot><tr><th colspan="2">جمع وزن ارسالی</th><th colspan="3">${qty(totalKg)} کیلوگرم</th></tr></tfoot></table></div>`;
+ const totals=`<div class="inv38-bottom"><div class="inv38-total"><div class="inv38-total-box"><div><span>جمع اقلام</span><b>${money(subtotal)}</b></div><div><span>تخفیفات</span><b>${money(discount)}</b></div><div><span>اضافات</span><b>${money(additions)}</b></div><div class="inv38-total-final"><span>مبلغ فاکتور</span><b>${money(total)}</b></div></div></div></div>`;
+ const signature=`<div class="inv38-verify">${transportDeliverySignatureHtml(customerNameRaw||'—',driver)}</div>`;
+ // عنوان کوتاه سند تا راننده/انباردار برگهٔ ارسال را از فاکتور مشتری تشخیص دهد؛
+ // سربرگ و بدنه مو‌به‌مو همان فاکتور تحویل است.
+ const title=`<div class="tr-shipment-title"><b>برگه ارسال پخش</b><span>همراه محموله — نسخهٔ راننده</span></div>`;
+ return `<div class="inv38-sheet inv38-compact inv38-distribution inv38-settlement tr-shipment-note">${title}${header}<div class="inv38-rule"></div>${handover}${table}${totals}${signature}
+   <div class="tr-shipment-note-footer"><p>این برگه همراه محموله است و به‌تنهایی ثبت پرداخت یا تأیید دریافت محسوب نمی‌شود.</p></div></div>`;
 }
 async function transportShipmentNotePrint(id){
  try{
   const data=await api('/api/orders/'+encodeURIComponent(id)),order=data.order;
   if(!order?.transportInvoice||!order.transportHandovers?.['0']?.document)throw Error('برگه ارسال پس از صدور فاکتور و ثبت سند انبار در دسترس است.');
-  return BTPrintFrame.html(BTPrintDigits.documentHtml(`<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><link rel="stylesheet" href="/fonts.css"><link rel="stylesheet" href="/design.css"><link rel="stylesheet" href="/invoice-compact.css?v=37.3.21"><title>برگه ارسال ${esc(fa(order.orderNo||'—'))}</title><style>body{margin:0;padding:12mm;font-family:"Vazirmatn",Tahoma,sans-serif}.tr-shipment-note-footer{margin-top:22px}.tr-shipment-note-footer>p{margin:0}.tr-shipment-note-footer>div{display:flex;justify-content:space-between;gap:24px;margin-top:32px}.tr-shipment-note-footer>div span{flex:1;border-top:1px solid #555;padding-top:8px;text-align:center}@page{size:A4;margin:0}</style></head><body>${transportShipmentNoteHtml(order)}<script src="/print-ready.js"><\/script></body></html>`));
+  return BTPrintFrame.html(BTPrintDigits.documentHtml(`<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><link rel="stylesheet" href="/fonts.css"><link rel="stylesheet" href="/design.css"><link rel="stylesheet" href="/invoice-compact.css?v=37.3.21"><title>برگه ارسال ${esc(fa(order.orderNo||'—'))}</title><style>body{margin:0;padding:12mm;font-family:"Vazirmatn",Tahoma,sans-serif}@page{size:A4;margin:0}</style></head><body>${transportShipmentNoteHtml(order)}<script src="/print-ready.js"><\/script></body></html>`));
  }catch(e){toast(e.message);return false;}
 }
+
 // Register transport payment and optional returns in one sales action.
 async function openTransportDeliveryWork(id){
  const notices=captureEntityNotices('order',id);
@@ -181,7 +197,7 @@ function invoiceHtml(o,paySel){
     const totalKg=lines.reduce((sum,x)=>sum+Number(x.deliveredKg??0),0);
     return `<div class="inv38-sheet inv38-compact"><div class="inv38-head"><div class="inv38-brand"><img src="/logo.png" alt="بابل طیور"><div><b>بابل طیور</b><span>سند تحویل وزنی فروشگاه — بدون مبلغ</span></div></div><div class="inv38-meta"><div><span>شماره سند</span><b>${esc(fa(p.invoiceNumber||'—'))}</b></div><div><span>تاریخ ثبت</span><b>${esc(dt(p.verifiedAt||o.createdAt))}</b></div><div><span>شماره سفارش</span><b>${esc(fa(o.orderNo||'—'))}${run?` · سرویس ${run===2?'دوم':'اول'}`:''}</b></div></div></div><div class="inv38-rule"></div><div class="inv38-cust"><div><span>فروشگاه</span><b>${esc(o.storeName||'—')}</b></div><div><span>محل تحویل</span><b>${esc(o.dispatchPlace||'—')}</b></div><div><span>وضعیت</span><b>سند وزنی — خارج از مسیر پرداخت</b></div></div><div class="inv38-table-scroll" role="region" tabindex="0"><table class="inv38-table"><thead><tr><th>#</th><th>محصول</th><th>وزن تحویلی</th></tr></thead><tbody>${lines.map((i,k)=>`<tr><td>${fa(String(k+1))}</td><td><b>${esc(i.productName||'—')}</b></td><td>${qty(i.deliveredKg)} کیلوگرم</td></tr>`).join('')}</tbody></table></div><div class="inv38-bottom"><div class="inv38-total"><div class="inv38-total-box"><div><span>جمع وزن محموله</span><b>${qty(totalKg)} کیلوگرم</b></div><div class="grand"><span>نوع سند</span><b>سند تحویل وزنی</b></div><div style="margin-top:6px"><small>این سند صرفاً وزن تحویل‌شده را اعلام می‌کند و ارزش ریالی ندارد.</small></div></div></div><div class="inv38-verify"><div class="inv38-verify-box"><div class="inv38-verify-grid"><div class="inv38-vitem"><span>امضاء</span><strong>${signatureContact}</strong></div></div></div></div></div></div>`;
   }
-  const items=o.transportWorkflow===1&&Array.isArray(o.transportInvoice?.priceLines)?o.transportInvoice.priceLines.map(l=>({product:{name:l.productName},deliveredKg:l.deliveredKg,unitPrice:l.unitPrice,finalAmount:l.amount})):(o.items||[]).filter(i=>i.itemStatus!=='CANCELLED').map(i=>{const snap=pickupDoc?.items?.find(x=>x.itemId===i.id);return snap?{...i,product:{...i.product,name:snap.productName}}:i;});
+  const items=o.transportWorkflow===1&&Array.isArray(o.transportInvoice?.priceLines)?o.transportInvoice.priceLines.map(l=>({product:{name:l.productName},deliveredKg:l.deliveredKg,unitPrice:l.unitPrice,finalAmount:l.amount})):(o.items||[]).filter(i=>i.itemStatus!=='CANCELLED'&&i.itemStatus!=='OUT_OF_STOCK').map(i=>{const snap=pickupDoc?.items?.find(x=>x.itemId===i.id);return snap?{...i,product:{...i.product,name:snap.productName}}:i;});
   const subtotal=items.reduce((sum,i)=>sum+n(i.finalAmount),0);
   const returns=Math.max(0,n(p.returnDeduction||0));
   const difference=n(p.totalAmount)-subtotal+returns;
