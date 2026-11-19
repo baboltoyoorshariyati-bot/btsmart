@@ -234,7 +234,7 @@ f4c90de789d4778fac94644c9ff05510ebf42a2f4cd09113e6651c99c0d64d42  ./public/dispa
 4e3fa217d38fdafc1fea4414ceb58ca5e662cf0ab5fa735a8c8c20e8b42cad92  ./public/fonts/Vazirmatn-Variable.woff2
 a85456faaed8f29d884bfb2dc3148dffbf22d22ecff589176764cfe2679a1e3f  ./public/form-layout.css
 a44b7c742bb69b4b24af00e59996b456a06304e5a1d5dacfe05a996b8b76b642  ./public/index.html
-76821c3e2b6ac6172dfb0ca3ecdf1491ec3b58215c194f8ef5a5a5834e85ced1  ./public/invoice-compact.css
+284700944c4c628fee6cf7edc6517cd83bbf20d597c1891b4436f21b05a86982  ./public/invoice-compact.css
 9d4dcd4cfd5d138724c576ebe2e285394819346e756990876d20ed0d4ef6f6c0  ./public/invoice-print.html
 538d7d1fe00569ec69cac470798012076eeb5da5ac5b5c5c500022548196ae35  ./public/invoice-print.js
 ce7499a71c2bbb2f0029fa4a723527fe37b537c43dce85b8b2b1db4662888290  ./public/logo-with-text.png
@@ -255,7 +255,7 @@ dad9e3a7a6a848ec16537af8c3791f7953a7b3930129b4d78b13321897a83901  ./public/style
 1c3c8acb1737d78bfe539fa704a14b3256b4c298a0eebea9f40702fb0ff6e090  ./public/transport-resources.css
 e8e2e4411bb9197e5a1959f21252abf359260fa3ec8d550a6bc0bc39b3b5ad9c  ./public/transport-resources.js
 76d033745f0f2c81f43397aefcbbe49174eee07982df15cfee4ca4d976f3c4d2  ./public/ui-polish.js
-c12d3dde8c1979cbac452000136154acb84e1d7383b130b253c32ef7fb5c3088  ./public/ui2.js
+b039172cb38da547c66b797b2b5dea7008889dc33128e4d2763beec726d641a7  ./public/ui2.js
 4e880225ffbbb1902744190fb7d4ff7629ff2ca77ffd8467d631299910cb6246  ./public/warehouse-document.css
 4b269249e5f812b46eddbff935cd736332a3c9b597c0c3380fad2bddb36213ba  ./scripts/arena-release-build.py
 b7e67493ccf5bf21eba5721eea612c4236ee6a7f271d34f5a68818ca1c120ab4  ./scripts/backup-db.js
@@ -447,10 +447,10 @@ f97311106e0b60855f70294fabc7f87a4128cce41210b82c88664234adf13742  ./tests/ticket
 c346c7709e811dbf49eb72c0d242e7c7151a3ab391be120810442007f123fe9b  ./tests/tls-manager.test.js
 9980473eb8abde55adb0a21ecaf7956a4190531cab02b381f8820ccbf4755078  ./tests/transport-desk-browser.test.js
 9f029371e9daa31922f02ff955e3be93f3e4c8d16bbb754e081549337f66a008  ./tests/transport-entry-ui.test.js
-87d265a8e7d96b6a0a0adb1c0a2afcc327b09c5364bd3ccabded78e84a5c38e3  ./tests/transport-financial-layout-browser.test.js
+76ce3ead5eecfe54052a8ac9cd7d78d186a83f2ad96da82d5ee9edb1b7f17fee  ./tests/transport-financial-layout-browser.test.js
 f139635a0a3c60bde65e85b5b9f2048b91d655ca2369cfd1232dc41ef5b9a65d  ./tests/transport-fleet-assignment-api.test.js
 d863ab4511d7a6a8bea37759edb9888f46e2c31540b895d93d121a7384afe08f  ./tests/transport-handover-browser.test.js
-05f9ded915ccc4de18ccaf4b66f1132b5ac8293f97bc2fa3e8f631dabd624894  ./tests/transport-handover-ui.test.js
+7e978182fea79687353766dd1714bdc42f293e116e5206882452a4f7709e24ea  ./tests/transport-handover-ui.test.js
 836478e81af2e979e3de2aed4972a20c4bc5d26c3d734987f0d3f99594d9acec  ./tests/transport-nav-selection.test.js
 bcb07b718ff8f248d4eb51adcb8088a85f00575f9018d0009aa047755d4b3b51  ./tests/transport-planning.test.js
 ffbe1ad3367f87a81413513b4c83c9b6ec9fc5c02ac38ab2927c22b3e6b4bb31  ./tests/transport-plans-api.test.js
@@ -464,7 +464,7 @@ f8326e81872b63c91075dc283a7cba96c6d13f4906b23af0559972167dd63f57  ./tests/ui-sou
 518b2de413ac1c228024513780c7cdff0feaba955af0e64000754f1b1b96b9bf  ./tests/ui-text-sweep-browser.test.js
 27302aad62d8b18b29aa684a771deb0e45a71cf04cffadea2f2a90667aae6255  ./tests/unit-reports-backups.test.js
 b25de95201af45a02ca191b2bc757581a5c8df0a5168782696579031572d994d  ./tests/warehouse-cartable-followup.test.js
-7981bdd4ac0f0b431dcc5785f782fbdb9801944b2a374e70fb4a6b2fbbcd6f2f  ./tests/warehouse-delivered-browser.test.js
+1a29a81406408f5a71a4866a8526d2c90ee6a14b1c2e651147cbb7e5a3b4ad8e  ./tests/warehouse-delivered-browser.test.js
 09f3545d6a80bf890e08b39531d3c0b9bac8d1c1a95a5eba430fdc35faf35383  ./tests/warehouse-delivered.test.js
 79f6cb137059ef30a9dc1932fe5456203344b55a98f07e4b1cc45043fe725858  ./tests/warehouse-document-layout.test.js
 52da83cdef44dba46af4658995b95e870788364aa9a3abae7aede5d0efa20f56  ./tests/warehouse-document-numbers.test.js
@@ -508,7 +508,7 @@ d891828c4c9bfdae34efdaeacaa1668b42b52fc2e650fcb62b71989ee79c0432  ./ui-src/ui2/0
 a10dfbd82352719e285e7b686eff96d372fffe4cc146f046e0113cbcd6504cb7  ./ui-src/ui2/05-warehouse.js
 abc8c46c9bb3bed4eae426db7aab8662f5f176b8a07b3767bd52a86141f725d6  ./ui-src/ui2/06-store-services.js
 aa522800999201e723f17616f8b5d0b503029b549cc7240af720247a6bf9fe30  ./ui-src/ui2/07-dashboard-reports.js
-3df1e951b6ef98a51c5aaa6ff9b8f4ef3390f6918ef397ab137a52482fdc2bdd  ./ui-src/ui2/08-transport-invoices.js
+e849820938afc8db631adc539878756be3c90f35c5291546c689c714d678e8c1  ./ui-src/ui2/08-transport-invoices.js
 cbe0548f44f0278831f81de32b00453c7a47f5dd268a7b7b1f52432150c4efe9  ./vendor/acme/README.md
 39d3a3a7217c520f52370a6421bfeb06902ad08a3b6f19f5331963595e6fd45b  ./vendor/acme/THIRD-PARTY-LICENSES.txt
 14fa0bd54ccc2d15bf3c4f1d6b64e63914503ada596cb8b5fc8f4bebcd6d89b8  ./vendor/acme/acme-client.cjs

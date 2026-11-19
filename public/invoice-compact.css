@@ -177,3 +177,9 @@ body.invoice-print{margin:0;padding:8px;background:#fff}
  .inv38-compact.inv38-pickup-recipient .inv38-head{display:block!important;width:100%}
  .inv38-compact.inv38-pickup-recipient .inv38-pickup-recipient-meta{grid-template-columns:minmax(0,1.15fr) minmax(0,.95fr) minmax(0,1.1fr) minmax(0,.95fr) minmax(0,.8fr) minmax(0,.8fr) minmax(0,.95fr);gap:2px}
 }
+
+/* برگهٔ ارسال پخش: عنوان کوتاه بالای سربرگ فاکتور تا سند از فاکتور مشتری قابل تشخیص باشد. */
+.tr-shipment-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 5px;padding:4px 8px;border:1px solid #d8dee5;border-radius:6px;background:#f4f6f8;break-inside:avoid}
+.tr-shipment-title b{font-size:12px;font-weight:800;color:#111;line-height:1.5}
+.tr-shipment-title span{font-size:9.5px;color:#52606d;line-height:1.5}
+@media print{.tr-shipment-title{margin-bottom:4px}}

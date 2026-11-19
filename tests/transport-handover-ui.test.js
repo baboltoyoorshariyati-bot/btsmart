@@ -128,6 +128,8 @@ test('سربرگ برگه ارسال پخش مو‌به‌مو همان سربر
  // برگهٔ ارسال پخش حالا همان بدنهٔ «فاکتور تحویل» است: جدول قیمت/مبلغ، جمع‌بندی مالی
  // و اظهارنامهٔ تحویل با جای امضای تحویل‌گیرنده.
  for(const label of ['محصول','وزن ارسالی','قیمت هر کیلو','مبلغ','جمع اقلام','تخفیفات','اضافات','مبلغ فاکتور','جمع وزن ارسالی'])assert(note.includes(label),label);
+ // عنوان کوتاه سند بیرون از سربرگ است تا سربرگ مو‌به‌مو همان فاکتور بماند.
+ assert.match(note,/<div class="tr-shipment-title"><b>برگه ارسال پخش<\/b>/);
  assert.match(note,/class="inv38-delivery-declaration"/);
  assert.match(note,/data-[a-z-]*signature|inv38-delivery-signature/);
  assert.match(note,/۱٬۰۰۰|1000/);
