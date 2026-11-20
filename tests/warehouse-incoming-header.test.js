@@ -3,7 +3,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
-const ui=read('public/ui2.js'),app=read('public/app.js'),css=read('public/form-layout.css');
+const ui=read('public/ui2.js'),app=read('public/app.js'),css=read('public/form-layout.css'),btcss=read('public/bt-table.css');
 const helper=ui.slice(ui.indexOf('function wh38IncomingHeader(o)'),ui.indexOf('function wh38List(orders,kind)'));
 test('incoming header has four equal cells with customer and metadata in one row',()=>{
  assert.equal((helper.match(/class="wh38-incoming-cell/g)||[]).length,4);
@@ -20,12 +20,19 @@ test('incoming and preparing lists are one shared bt-table with the fixed column
  assert.match(table,/class="bt-table wh-orders-table"/);
  assert.match(table,/<th scope="col">شماره سفارش<\/th><th scope="col">نام مشتری<\/th><th scope="col">تاریخ سفارش<\/th><th scope="col">تاریخ تحویل<\/th><th scope="col" class="bt-col-actions">عملیات<\/th>/, 'ترتیب ستون‌ها');
  for(const label of ['شماره سفارش','نام مشتری','تاریخ سفارش','تاریخ تحویل','عملیات'])assert.match(table,new RegExp('data-label="'+label+'"'));
+ // همهٔ دکمه‌های قبلی سر جای خودشان در همان ردیف هستند
  assert.match(table,/data-action="wh38-order-details"/);
- assert.doesNotMatch(table,/data-action="wh38-start"/);          // جدول تک‌دکمه‌ای است
+ assert.match(table,/data-action="wh38-start"/);
+ assert.match(table,/data-action="pickup-cancel"/);
+ assert.match(table,/class="bt-actions"/);
  assert.doesNotMatch(table,/class="wh38-meta"/);
  assert.doesNotMatch(list,/data-action="wh38-accept"/);
- // عملیات ثانویه از جدول به صفحهٔ جزئیات منتقل شده و از دست نرفته است
- assert.match(app,/data-wh-start-order/);assert.match(app,/data-wh-pickup-cancel/);
+ // «تاریخ تحویل» فقط تاریخ است و ساعت ندارد
+ assert.match(table,/data-label="تاریخ تحویل"><span class="bt-cell-main">\$\{btDate\(delivery\)\}<\/span><\/td>/);
+ // عرض ستون‌ها اندازهٔ متن است، نه درصد ثابت
+ assert.match(btcss,/\.wh-orders-table\{table-layout:auto;width:auto;max-width:100%\}/);
+ assert.match(btcss,/\.wh-orders-table th,\.wh-orders-table td\{width:1%;white-space:nowrap\}/);
+ assert.doesNotMatch(btcss,/\.wh-orders-table td:nth-child\(1\)\{width:16%\}/);
  assert.match(css,/\.wh38-incoming-card \{[\s\S]*?padding:10px 12px!important/);
 });
 test('customer strings are escaped, cancelled items excluded, updated time falls back to created time',()=>{

@@ -69,7 +69,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
      assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row',`warehouse/${width} row display`);
      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`warehouse/${width} page overflow`);
      const btn=row.locator('[data-action=wh38-order-details]');await btn.scrollIntoViewIfNeeded();assert.equal(await btn.isVisible(),true,`warehouse/${width} action`);
-     assert.equal(await row.locator('[data-action=wh38-start]').count(),0,'جدول تک‌دکمه‌ای است');
+     assert.equal(await row.locator('.bt-actions [data-action=wh38-order-details]').count(),1,'دکمهٔ جزئیات در ستون عملیات');
     }
     continue;
    }

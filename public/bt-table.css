@@ -41,12 +41,19 @@
 .bt-table th.bt-col-actions,.bt-table td.bt-col-actions{width:18%;text-align:center}
 .bt-table td.bt-col-actions .btn{white-space:nowrap}
 
-/* ستون‌های «سفارش‌های ورودی / در حال آماده‌سازی» انبار */
-.wh-orders-table th:nth-child(1),.wh-orders-table td:nth-child(1){width:16%}
-.wh-orders-table th:nth-child(2),.wh-orders-table td:nth-child(2){width:30%}
-.wh-orders-table th:nth-child(3),.wh-orders-table td:nth-child(3){width:18%}
-.wh-orders-table th:nth-child(4),.wh-orders-table td:nth-child(4){width:18%}
-.wh-orders-table th:nth-child(5),.wh-orders-table td:nth-child(5){width:18%}
+/* ستون‌های «سفارش‌های ورودی / در حال آماده‌سازی» انبار
+   قاعدهٔ کارفرما: عرض هر ستون دقیقاً اندازهٔ متن همان ستون باشد، نه بیشتر.
+   پس چیدمان ثابت درصدی کنار گذاشته شد: table-layout:auto + nowrap + width:1%
+   هر ستون را به اندازهٔ محتوایش جمع می‌کند؛ فقط ستون نام مشتری کشسان است
+   تا نام‌های بلند جدول را از عرض صفحه بیرون نبرند. */
+.wh-orders-table{table-layout:auto;width:auto;max-width:100%}
+.wh-orders-table th,.wh-orders-table td{width:1%;white-space:nowrap}
+.wh-orders-table th:nth-child(2),.wh-orders-table td:nth-child(2){width:auto;max-width:320px}
+.wh-orders-table td:nth-child(2) .bt-cell-main{overflow:hidden;text-overflow:ellipsis}
+
+/* چند دکمه در ستون عملیات */
+.bt-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:nowrap}
+.bt-cell-note{display:inline-block;color:var(--muted);font-size:10.5px;white-space:nowrap}
 
 /* -------- ≤۹۰۰px: هر ردیف یک کارت با برچسب ستون -------- */
 @media (max-width:900px){
@@ -61,7 +68,8 @@
   .bt-cell-main,.bt-cell-sub{text-align:left;white-space:normal;overflow:visible;text-overflow:clip}
   .bt-table td.bt-col-actions{width:auto;padding-top:6px;justify-content:flex-start}
   .bt-table td.bt-col-actions::before{display:none}
-  .bt-table td.bt-col-actions .btn{width:100%}
+  .bt-actions{width:100%;flex-wrap:wrap;justify-content:stretch}
+  .bt-actions .btn{flex:1 1 auto;min-width:140px}
 }
 
 /* ============================================================================

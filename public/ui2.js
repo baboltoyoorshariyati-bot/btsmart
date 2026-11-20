@@ -1176,15 +1176,19 @@ function wh38OrdersTable(orders,kind){
   const rows=orders.map(o=>{
     const name=storeAwareOrderName(o)||'—';
     const delivery=o.deliveryDate||o.scheduledDate||'';
-    const deliverySub=delivery?(btTime(o.scheduledAt)||'زمان‌بندی‌شده'):'ثبت نشده';
-    // v1.1.12 — هر ردیف فقط مقدار همان ستون را نشان می‌دهد؛ نشان وضعیت، تعداد اقلام،
-    // نوع و تلفن از ستون‌های «شماره سفارش» و «نام مشتری» حذف شدند.
+    // v1.1.12 — همهٔ دکمه‌های قبلی همان ردیف برگشتند (جزئیات / شروع آماده‌سازی /
+    // ثبت انصراف) و فقط «تاریخ تحویل» بدون ساعت نمایش داده می‌شود.
+    const actions=[
+      `<button type="button" class="btn btn-secondary btn-sm" data-action="wh38-order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>`,
+      app.features?.pickupStaging&&o.visit?.status==='PICKUP_PRESENT'&&!o.pickupCancellation?`<button type="button" class="btn btn-secondary btn-sm" data-action="pickup-cancel" data-id="${esc(o.id)}">ثبت انصراف بدون تحویل</button>`:'',
+      o.pickupCancellation?.status==='PENDING_SALES'?'<span class="bt-cell-note">در انتظار تأیید انصراف فروش</span>':kind==='incoming'?'':`<button type="button" class="btn btn-primary btn-sm" data-action="wh38-start" data-id="${esc(o.id)}">شروع آماده‌سازی</button>`
+    ].filter(Boolean).join('');
     return `<tr data-order="${esc(o.id)}">
       <td data-label="شماره سفارش"><span class="bt-cell-main order-code">${esc(fa(o.orderNo||'—'))}</span></td>
       <td data-label="نام مشتری"><span class="bt-cell-main" title="${esc(name)}">${esc(name)}</span></td>
       <td data-label="تاریخ سفارش"><span class="bt-cell-main">${btDate(o.createdAt)}</span><span class="bt-cell-sub">${btTime(o.createdAt)||'—'}</span></td>
-      <td data-label="تاریخ تحویل"><span class="bt-cell-main">${btDate(delivery)}</span><span class="bt-cell-sub">${deliverySub}</span></td>
-      <td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-secondary btn-sm" data-action="wh38-order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button></td>
+      <td data-label="تاریخ تحویل"><span class="bt-cell-main">${btDate(delivery)}</span></td>
+      <td data-label="عملیات" class="bt-col-actions"><div class="bt-actions">${actions}</div></td>
     </tr>`;
   }).join('');
   return `<div class="bt-table-wrap"><table class="bt-table wh-orders-table">
