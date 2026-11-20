@@ -480,7 +480,7 @@ da68b01c03add64443439ac843b0786fa76bfdc97fe3c0cad945eb6d10c231bf  ./tests/wareho
 cb6f89c10444e8f700f440c8c827a815cd024b230e150f63534cb5061d840a4b  ./tests/warehouse-note-box-layout.test.js
 7862d5c4d0638546085dc4436721c5b476d8fb6c73969466db9c75fcb9010295  ./tests/warehouse-preparation-layout.test.js
 4a13722752f39f32458ceab87eb322c22b81920ecc7536093498d0cfb81c6434  ./tests/warehouse-prices-ui.test.js
-f14558077b8181ac8c84f230a2c0c0aa8041d6bb980670283d8f04f215a1029d  ./tests/warehouse-return-message-browser.test.js
+a0b4909168bafe77259811a3852a84e7716ea55b3950fcc96e294c28b8963be3  ./tests/warehouse-return-message-browser.test.js
 1c6c56c3459d0188aa73ad267041c7dd0390dec37d99108ecf8961006f61be24  ./tests/warehouse-return-message.test.js
 9061630993ed04c4a2a22771285af1ea1f9a91256211c92f5b638dda839b2aaa  ./tests/warehouse-store-details-prep-sheet.test.js
 bd008165ecb7b62905291797be3f12f82835e9487a0cdc5b5213ba10018f914c  ./tests/warehouse-store-document-browser.test.js
