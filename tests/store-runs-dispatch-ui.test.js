@@ -113,12 +113,12 @@ test('store delivery separates net and gross; no impurity leaves an empty cell',
  const make=(weighings,extra={})=>({orderType:'STORE',items:[],dispatch:{run:1,lines:[{itemId:'i',deliveredKg:8,netKg:6,productName:'مرغ',weighings,...extra}]}});
  let html=c.st38DeliveredDetails(make([{grossKg:10,netKg:8,tareKg:2,rackKg:2}]));
  assert.match(html,/<th>خالص \(کیلوگرم\)<\/th><th>ناخالص \(کیلوگرم\)<\/th>/);
- assert.match(html,/<td>۸<\/td><td>۱۰<\/td>/,'outgoing net must not subtract later returns');
+ assert.match(html,/<td data-label="خالص \(کیلوگرم\)">۸<\/td><td data-label="ناخالص \(کیلوگرم\)">۱۰<\/td>/,'outgoing net must not subtract later returns');
  html=c.st38DeliveredDetails(make([{grossKg:8,netKg:8,tareKg:0}]));
- assert.match(html,/<td>۸<\/td><td>۸<\/td><td><\/td>/);
+ assert.match(html,/<td data-label="خالص \(کیلوگرم\)">۸<\/td><td data-label="ناخالص \(کیلوگرم\)">۸<\/td><td data-label="ناخالصی‌های ثبت‌شده در توزین انبار"><\/td>/);
  assert.equal(c.st38WeighingDetailsHtml(null,1,{weighings:[{grossKg:8,netKg:8,tareKg:0}]}),'');
  assert.equal(c.st38WeighingDetailsHtml({runR1:[{kg:8}]},1),'');
  html=c.st38DeliveredDetails(make(undefined));assert.match(html,/وزن ناخالص در سابقه موجود نیست/);
  const corrected=make([{grossKg:10,tareKg:2,rackKg:2}]);corrected.storeDocumentCorrections={'1':[{itemId:'i',deliveredKg:7,missingWeighings:true}]};
- html=c.st38DeliveredDetails(corrected);assert.match(html,/<td>۷<\/td>/);assert.doesNotMatch(html,/راک:/);
+ html=c.st38DeliveredDetails(corrected);assert.match(html,/<td data-label="خالص \(کیلوگرم\)">۷<\/td>/);assert.doesNotMatch(html,/راک:/);
 });

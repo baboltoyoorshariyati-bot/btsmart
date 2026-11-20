@@ -71,8 +71,9 @@ test('راننده: کارت سادهٔ فروشگاه بدون اقلام، ب�
  assert.match(dsp,/function dspQtyInvoiceMarkup/); // فاکتور وزنی همچنان برای کارت‌های تحویل‌شده می‌ماند
 });
 
-test('نگهبانی: برچسب فروشگاه/بدون مبلغ روی کارت خروج‌های ارسال',()=>{
- assert.match(dsp,/dsp-card-storefree/);
+test('نگهبانی: برچسب فروشگاه/بدون مبلغ روی جدول خروج‌های ارسال',()=>{
+ assert.match(dsp,/function gateLegacyTable/);
+ assert.match(dsp,/فروشگاه — بدون مبلغ/);
  assert.match(dsp,/data-gate="details"/);
  assert.match(dsp,/if \(el\.dataset\.gate === 'details'\) return dspOrderDetails/);
 });

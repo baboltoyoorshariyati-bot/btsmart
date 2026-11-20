@@ -79,7 +79,7 @@ test('فرم وزن‌کشی انبار برای هر محصول ورودی تو
  const warehouse=fs.readFileSync(path.join(__dirname,'../public/ui2.js'),'utf8');
  const settlement=fs.readFileSync(path.join(__dirname,'../public/app.js'),'utf8');
  const css=fs.readFileSync(path.join(__dirname,'../public/compatibility.css'),'utf8');
- assert.match(warehouse,/data-wh38-note="\$\{it\.id\}"/);
+ assert.match(warehouse,/data-wh38-note="\$\{esc\(it\.id\)\}"/);
  assert.match(warehouse,/توضیح انبار برای فروش/);
  assert.match(warehouse,/note:noteOf\(w\.dataset\.wh38Weight\)/);
  assert.match(warehouse,/if\(row&&typeof row\.note==='string'\)el\.value=row\.note/);

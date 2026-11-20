@@ -151,3 +151,139 @@
   #appView #content .sd-store-table td.bt-col-actions{flex-wrap:wrap}
   #appView #content .sd-store-table td[data-label="فروشگاه"]{flex-wrap:wrap}
 }
+
+/* فهرست‌های فروش: داده‌های بلند و عملیات در محدودهٔ سلول می‌مانند. */
+#appView #content .sd-flow-table .bt-flow-notes{display:flex;flex-direction:column;gap:4px;min-width:0;overflow-wrap:anywhere}
+#appView #content .sd-flow-table .bt-flow-notes > *{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+#appView #content :is(.sd-flow-table,.phone-queue-table) td{overflow-wrap:anywhere}
+#appView #content :is(.sd-flow-table,.phone-queue-table) td.bt-col-actions{width:23%}
+@media (max-width:900px){
+  #appView #content :is(.sd-flow-table,.phone-queue-table) .bt-cell-main{min-width:0;max-width:100%;overflow-wrap:anywhere}
+  #appView #content :is(.sd-flow-table,.phone-queue-table) td.bt-col-actions{width:auto}
+}
+
+/* سند تحویل و محمولهٔ فروشگاه داخل مودال، بدون حداقل عرض قدیمی. */
+#modal .bt-table.store-shipment-table{min-width:0;width:100%;table-layout:fixed}
+#modal .bt-table.store-shipment-table td{min-width:0;overflow-wrap:anywhere}
+@media (max-width:900px){
+  #modal .bt-table.store-shipment-table td{flex-wrap:wrap;gap:4px}
+  #modal .bt-table.store-shipment-table td::before{max-width:100%;white-space:normal}
+}
+
+/* نوبت‌های محاسبهٔ وزن: فیلدها و ناخالصی‌های هر نوبت در سلول مستقل. */
+#modal .wh-weight-table{table-layout:fixed;min-width:0}
+#modal .wh-weight-table th:nth-child(1){width:10%}
+#modal .wh-weight-table th:nth-child(2){width:18%}
+#modal .wh-weight-table th:nth-child(3){width:42%}
+#modal .wh-weight-table th:nth-child(4){width:12%}
+#modal .wh-weight-table th:nth-child(5){width:18%}
+#modal .wh-weight-table .wh-weight-table-row.is-active td{background:#f8fafc}
+#modal .wh-weight-table label{display:grid;gap:4px;min-width:0;font-size:11px;font-weight:700}
+#modal .wh-weight-table :is(input,select){box-sizing:border-box;width:100%;height:38px;min-width:0;max-width:100%;padding:4px 7px;border:1px solid #cfd8df;border-radius:8px;font:inherit}
+#modal .wh-weight-table input{direction:ltr;text-align:right}
+#modal .wh-weight-table .wh-tare-groups{display:flex;flex-direction:column;align-items:stretch;gap:6px;min-width:0;width:100%}
+#modal .wh-weight-table .wh-tare-group{display:flex;flex-wrap:wrap;align-items:end;gap:6px;min-width:0;max-width:100%}
+#modal .wh-weight-table .wh-tare-kind{flex:1 1 110px;width:auto;min-width:0}
+#modal .wh-weight-table .wh-tare-amount{flex:1 1 75px;width:auto;min-width:0}
+#modal .wh-weight-table .wh-tare-remove{flex:0 0 auto;min-height:38px}
+@media (max-width:900px){
+  #modal .wh-weight-table td{flex-wrap:wrap}
+  #modal .wh-weight-table td::before{max-width:100%;white-space:normal}
+  #modal .wh-weight-table :is(.wh-gross,.wh-tare-groups){width:100%;min-width:0}
+}
+
+/* اقلام آماده‌سازی انبار: هر کنترل داخل ستون مرتبط قرار دارد. */
+#appView #content .wh-prep-table{table-layout:fixed}
+#appView #content .wh-prep-table th:first-child{width:5%}
+#appView #content .wh-prep-table th:nth-child(5){width:22%}
+#appView #content .wh-prep-table th:nth-child(6){width:9%}
+#appView #content .wh-prep-table td{min-width:0;overflow-wrap:anywhere}
+#appView #content .wh-prep-table :is(.wh38-weight,.wh38-cell-box,.wh38-note-box){min-width:0;max-width:100%;width:100%;box-sizing:border-box}
+#appView #content .wh-prep-table .wh38-cell-label{display:block}
+#appView #content .wh-prep-table .wh38-note-box{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;padding:0 8px}
+#appView #content .wh-prep-table textarea{width:100%;min-width:0;min-height:42px;resize:vertical;border:0;background:transparent;font:inherit}
+@media(max-width:900px){
+  #appView #content .wh-prep-table td{flex-wrap:wrap}
+  #appView #content .wh-prep-table td::before{white-space:normal}
+  #appView #content .wh-prep-table :is(.wh38-weight,.wh38-note-box,.wh38-cell-box){width:100%}
+}
+
+/* اقلام سرویس‌های فروشگاه؛ عملیات هر محصول در همان ردیف باقی می‌ماند. */
+#appView #content .sr318-table{table-layout:fixed}
+#appView #content .sr318-table th:first-child{width:5%}
+#appView #content .sr318-table th:last-child{width:35%}
+#appView #content .sr318-table td{min-width:0;overflow-wrap:anywhere}
+#appView #content .sr318-table .sr318-product{display:block;white-space:normal;overflow-wrap:anywhere}
+#appView #content .sr318-table .sr318-weights{display:flex;flex-wrap:wrap;gap:4px;min-width:0;max-width:100%;white-space:normal}
+#appView #content .sr318-table .sr318-wts{white-space:normal;overflow-wrap:anywhere}
+#appView #content .sr318-table .sr-table-ops{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0;max-width:100%}
+#appView #content .sr318-table .sr-table-weight{display:flex;align-items:center;gap:4px;min-width:0;max-width:100%}
+#appView #content .sr318-table .sr-table-weight input{width:90px;min-width:0;max-width:100%;height:38px}
+#appView #content .sr318-table .sr318-final{white-space:normal;overflow-wrap:anywhere}
+@media(max-width:900px){
+  #appView #content .sr318-table td{flex-wrap:wrap}
+  #appView #content .sr318-table td::before{white-space:normal}
+  #appView #content .sr318-table .sr-table-ops{width:100%}
+}
+
+/* سوابق سفارش مدیر */
+#appView #content .adm-orders-table td{min-width:0;overflow-wrap:anywhere}
+@media(max-width:900px){
+  #appView #content .adm-orders-table td{flex-wrap:wrap}
+  #appView #content .adm-orders-table .bt-cell-main,#appView #content .adm-orders-table .bt-cell-sub{min-width:0;overflow-wrap:anywhere}
+}
+
+/* فهرست برنامه‌ریزی ترابری */
+#appView #content .tp-plan-table td{min-width:0;overflow-wrap:anywhere}
+@media(max-width:900px){#appView #content .tp-plan-table td{flex-wrap:wrap}}
+
+/* کارتابل راننده */
+#appView #content .dsp-driver-table td{min-width:0;overflow-wrap:anywhere}
+#appView #content .dsp-driver-table .dsp-table-summary,#appView #content .dsp-driver-table .dsp-table-actions{display:flex;flex-wrap:wrap;gap:5px;min-width:0;max-width:100%}
+#appView #content .dsp-driver-table .dsp-table-actions .btn{white-space:normal}
+@media(max-width:900px){#appView #content .dsp-driver-table td{flex-wrap:wrap}}
+#appView #content .dsp-driver-table .bt-cell-main{white-space:normal;overflow-wrap:anywhere;overflow:visible}
+#appView #content .dsp-dispatch-table td{min-width:0;overflow-wrap:anywhere}
+@media(max-width:900px){#appView #content .dsp-dispatch-table td{flex-wrap:wrap}}
+#appView #content .dsp-driver-stage .dsp-driver-table .dsp-store-customer-box{max-width:100%!important;white-space:normal!important;min-width:0;flex-wrap:wrap}
+/* سرویس‌های ارسال‌شده از انبار به فروش */
+#appView #content .sr-ship-table tr.sr-ship-row{display:table-row}
+#appView #content .sr-ship-table td{min-width:0;overflow-wrap:anywhere}
+@media(max-width:900px){#appView #content .sr-ship-table tr.sr-ship-row{display:block}#appView #content .sr-ship-table td{flex-wrap:wrap}}
+#appView #content :is(.wh-early-pickup-table,.gt-pickup-search-table) td{min-width:0;overflow-wrap:anywhere}
+@media(max-width:900px){#appView #content :is(.wh-early-pickup-table,.gt-pickup-search-table) td{flex-wrap:wrap}}
+/* سفارش‌های ثبت‌شده و محموله‌های فروشگاه */
+#appView #content .st-registered-list{display:block;width:100%;min-width:0}
+#appView #content :is(.st-registered-table,.st-delivery-table) td{min-width:0;overflow-wrap:anywhere}
+#appView #content .st-table-progress,#appView #content .st-table-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+#appView #content .st-registered-table .st-registered-service{white-space:normal}
+@media(max-width:900px){#appView #content :is(.st-registered-table,.st-delivery-table) td{flex-wrap:wrap}#appView #content .st-registered-scroll{overflow:visible}}
+/* اسناد تحویل مشتری و اسناد سرویس فروشگاه در انبار */
+#appView #content :is(.wh-delivered-table,.wh-store-document-table) tr.wh-delivered-row{min-width:0}
+#appView #content :is(.wh-delivered-table,.wh-store-document-table) td{min-width:0;overflow-wrap:anywhere}
+@media(max-width:900px){#appView #content :is(.wh-delivered-table,.wh-store-document-table) td{flex-wrap:wrap}}
+/* سفارش‌های آینده و سوابق فروش */
+#appView #content :is(.future-order-table,.sales-history-table) td{min-width:0;overflow-wrap:anywhere}
+#appView #content .future-order-table td small{display:block}
+#appView #content .fx-table-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+@media(max-width:900px){#appView #content :is(.future-order-table,.sales-history-table) td{flex-wrap:wrap}}
+#appView #content .dsp-returns-table td{min-width:0;overflow-wrap:anywhere}
+@media(max-width:900px){#appView #content .dsp-returns-table td{flex-wrap:wrap}}
+/* جدول خروج قدیمی در خانه و ستون‌های پخش نگهبانی */
+#appView #content .gate-legacy-table td{min-width:0;overflow-wrap:anywhere}
+#appView #content .gate-legacy-actions{display:flex;flex-wrap:wrap;gap:6px}
+#appView #content .gate-dispatch-col .gate-legacy-table,#appView #content .gate-dispatch-col .gate-legacy-table tbody,#appView #content .gate-dispatch-col .gate-legacy-table tr,#appView #content .gate-dispatch-col .gate-legacy-table td{display:block;width:auto}
+#appView #content .gate-dispatch-col .gate-legacy-table thead{display:none}
+#appView #content .gate-dispatch-col .gate-legacy-table tr{height:auto;margin:0 0 8px;padding:6px 4px;border:1px solid var(--line);border-radius:12px}
+#appView #content .gate-dispatch-col .gate-legacy-table td{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#appView #content .gate-dispatch-col .gate-legacy-table td::before{content:attr(data-label);font-size:10.5px;font-weight:900;color:#6b7280}
+#appView #content .gate-dispatch-col .gate-legacy-table td.bt-col-actions::before{display:none}
+#appView #content .gate-dispatch-col .bt-table-wrap{overflow:visible;border:0}
+@media(max-width:900px){#appView #content .gate-legacy-table td{flex-wrap:wrap}}
+/* مراجعه‌های منتظر فروش و خروج‌های نگهبانی */
+#appView #content .gt-waiting-list{display:block}
+#appView #content :is(.gt-waiting-table,.gt-exit-table,.gt-pickup-exit-table) td{min-width:0;overflow-wrap:anywhere}
+#appView #content .gt-pickup-exit-table .gt-check{white-space:normal}
+@media(max-width:900px){#appView #content :is(.gt-waiting-table,.gt-exit-table,.gt-pickup-exit-table) td{flex-wrap:wrap}}
+#appView #content .wh-document-edit-table td{min-width:0;overflow-wrap:anywhere}
+@media(max-width:900px){#appView #content .wh-document-edit-table td{flex-wrap:wrap}}

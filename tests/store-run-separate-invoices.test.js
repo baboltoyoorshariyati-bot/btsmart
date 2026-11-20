@@ -96,7 +96,7 @@ test('برگهٔ سرویس‌های انبار: هر ردیف تک‌خطی و 
   const sheet = ui.slice(ui.indexOf('function sr38Sheet(o)'), ui.indexOf('async function sr38Post'));
   assert.match(sheet, /data-sr318-group="\$\{run\}"/);
   assert.match(sheet, /sr318-sendline">\$\{sr38SendBtn\(o,1,sr\.items\)\}\$\{sr38SendBtn\(o,2,sr\.items\)\}/, 'هر دو دکمهٔ ارسال در یک خط');
-  assert.match(sheet, /class="sr38-ops sr318-ops"/, 'کنترل‌های هر ردیف در یک محفظهٔ خطی');
+  assert.match(sheet, /class="sr-table-ops"/, 'کنترل‌های هر ردیف در یک محفظهٔ خطی');
   assert.match(sheet, /data-sr38-weight/);
   assert.doesNotMatch(sheet, /data-sr38-decision|تصمیم پایان روز/, 'تصمیم پایان روز از برگهٔ سرویس حذف شده است (v37.33.0)');
   assert.match(sheet, /wh38-store-sheet-head">\$\{wh38StoreHeader\(o\)\}/);

@@ -24,15 +24,16 @@ test('مرورگر: یک کارتابل ترابری، منابع مستقل و 
   const dash=page.locator('[data-dash-role=dispatch]');await dash.waitFor();assert.equal((await dash.locator('.role-dash-card').filter({hasText:'رانندگان فعال'}).locator('strong').innerText()).trim(),'۱');assert.equal((await dash.locator('.role-dash-card').filter({hasText:'سفارش‌های در برنامه'}).locator('strong').innerText()).trim(),'۱');
   const unpaired=(await post(transport,'/api/transport/drivers',{fullName:'راننده بدون خودرو',phone:'09121117777'})).driver,vehicle2=(await post(transport,'/api/transport/vehicles',{vehicleType:'وانت',plate:'22ب34567'})).vehicle;
   await dash.locator('[data-cartable=transport-resources]').click();await page.locator('#content').getByText('راننده مستقل').first().waitFor();await active('transport-resources');
-  await page.locator('#railNav [data-cartable=orders]').click();await page.locator('#transportPlans .dsp-card').filter({hasText:'مشتری کارتابل'}).waitFor();await active('orders');
+  await page.locator('#railNav [data-cartable=orders]').click();await page.locator('#transportPlans .tp-plan-row').filter({hasText:'مشتری کارتابل'}).waitFor();await active('orders');
   await page.locator('#railNav [data-cartable=dashboard]').click();await page.locator('[data-dash-role=dispatch]').waitFor();await active('dashboard');
   await page.locator('#railNav [data-cartable=reports]').click();await active('reports');
-  await page.locator('#railNav [data-cartable=orders]').click();await page.locator('#transportPlans .dsp-card').filter({hasText:'مشتری کارتابل'}).waitFor();await active('orders');
-  assert.equal(await page.locator('#transportPlans .dsp-card').filter({hasText:'مشتری کارتابل'}).count(),1);assert.equal(await page.locator('[data-legacy-dispatch]').count(),0);
+  await page.locator('#railNav [data-cartable=orders]').click();await page.locator('#transportPlans .tp-plan-row').filter({hasText:'مشتری کارتابل'}).waitFor();await active('orders');
+  assert.equal(await page.locator('#transportPlans .tp-plan-row').filter({hasText:'مشتری کارتابل'}).count(),1);assert.equal(await page.locator('[data-legacy-dispatch]').count(),0);
   for(const width of [1280,768,390,320]){
    await page.setViewportSize({width,height:900});
-   const row=await page.locator('#transportPlans .dsp-card').filter({hasText:'مشتری کارتابل'}).evaluate(el=>{const children=[...el.children].map(x=>x.getBoundingClientRect()),list=el.parentElement,rect=list.getBoundingClientRect();return{direction:getComputedStyle(el).flexDirection,firstTop:children[0].top,secondTop:children[1].top,listWidth:rect.width,viewport:document.documentElement.clientWidth,overflow:getComputedStyle(list).overflowX,canScroll:list.scrollWidth>list.clientWidth,button:!!el.querySelector('[data-tp=details]')};});
-   assert.equal(row.direction,'row',`order row direction ${width}`);assert(Math.abs(row.firstTop-row.secondTop)<20,`order fields horizontal ${width}`);assert(row.listWidth<=row.viewport+1,`scroll container in viewport ${width}`);assert.equal(row.overflow,'auto');assert(row.button);if(width===320)assert(row.canScroll,`narrow rows scroll independently`);
+   const row=page.locator('#transportPlans .tp-plan-row').filter({hasText:'مشتری کارتابل'}),table=page.locator('#transportPlans .tp-plan-table');
+   assert.equal(await table.locator('> thead th').count(),6);assert.equal(await row.locator('td[data-label]').count(),6);assert.equal(await row.evaluate(el=>getComputedStyle(el).display),width<=900?'block':'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`page overflow ${width}`);assert.equal(await row.locator('[data-tp=details]').count(),1);
+
   }
   await page.setViewportSize({width:1280,height:900});
   await page.locator(`#transportPlans [data-tp=details][data-id="${order.id}"]`).click();await page.locator('#tpAssign').waitFor();
@@ -43,9 +44,9 @@ test('مرورگر: یک کارتابل ترابری، منابع مستقل و 
   assert.equal(await page.locator('#tpAssign select').count(),1);assert.equal(await page.locator('#tpAssign select option').count(),2);assert.equal(await page.locator(`#tpAssign option[value="${unpaired.id}"]`).count(),0);assert.match(await page.locator('#tpAssign select[name=driverId] option').nth(1).innerText(),/راننده مستقل.*۱۲ب۳۴۵۶۷/);
   await page.locator('#tpAssign select[name=driverId]').selectOption(driver.id);assert((await transport.request.put(base+`/api/transport/drivers/${driver.id}/resources`,{data:{vehicleId:vehicle2.id,paymentDeviceId:''}})).ok());await page.locator('#tpAssign button[type=submit]').click();await page.locator('#tpAssign [role=alert]').getByText(/مطابقت ندارد/).waitFor();assert.equal((await (await sales.request.get(base+`/api/orders/${order.id}`)).json()).order.transportAssignments['0'],undefined);
   await page.locator('#modal .modal-close').click();await page.locator('[data-tp=refresh]').click();await page.locator(`#transportPlans [data-tp=details][data-id="${order.id}"]`).click();assert.match(await page.locator('#tpAssign select[name=driverId] option').nth(1).innerText(),/راننده مستقل.*۲۲ب۳۴۵۶۷/);await page.locator('#tpAssign select[name=driverId]').selectOption(driver.id);await page.locator('#tpAssign button[type=submit]').click();
-  await page.locator('#transportPlans .dsp-card').filter({hasText:'راننده مستقل'}).waitFor({state:'detached'});
+  await page.locator('#transportPlans .tp-plan-row').filter({hasText:'راننده مستقل'}).waitFor({state:'detached'});
   await page.locator('#transportPlans [data-tp=plan-tab][data-tab=assigned]').click();
-  await page.locator('#transportPlans .dsp-card').filter({hasText:'راننده مستقل'}).waitFor();
+  await page.locator('#transportPlans .tp-plan-row').filter({hasText:'راننده مستقل'}).waitFor();
   const response=await sales.request.get(base+`/api/orders/${order.id}`),data=await response.json();assert.equal(data.order.transportAssignments['0'].driverId,driver.id);assert.equal(data.order.transportAssignments['0'].vehicleId,vehicle2.id);assert.deepEqual(errors,[]);
  }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });

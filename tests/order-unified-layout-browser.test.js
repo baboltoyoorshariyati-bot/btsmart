@@ -23,7 +23,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     document.querySelector('#appView').dataset.cartablePage=kind.startsWith('warehouse')?'warehouse':kind==='gate'?'gate':kind.startsWith('store')?'store':kind==='transport'?'drivers':'sales';
     const wrap=x=>`<div class="order-compact-scroll">${x}</div>`;
     if(kind==='remote')html=`<div class="phone-queue-list-v40">${remotePhoneQueueRowsV40([o]).html}</div>`;
-    if(kind==='flow')html=`<div class="sd-flow-list">${sdFlowCard(o,0)}</div>`;
+    if(kind==='flow')html=`<div class="sd-flow-list">${salesFlowRowsV27([o])}</div>`;
     if(kind==='future')html=`<div class="fx-list-grid">${futureOrderRowsV25([o])}</div>`;
     if(kind==='settlement')html=`<div class="stl-queue-list">${settlementPendingRowsV27([{...o,status:'SETTLEMENT_PENDING'}])}</div>`;
     if(kind==='sales-store'){app.salesStoreTab='incoming';html=renderSalesStoresV41([store],{});}
@@ -31,20 +31,26 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     if(kind==='warehouse-store-incoming')html=`<div class="wh38-store-pane">${wh38StoreList([store],'incoming')}</div>`;
     if(kind==='warehouse-store-preparing')html=`<div class="wh38-store-pane">${wh38StoreList([{...store,status:'WAREHOUSE_PREPARING'}],'preparing')}</div>`;
     if(kind==='delivery')html='<div class="table-wrap"><table class="table sales-distribution-table"><tbody>'+salesDeliverySummaryRow({...o,transportService:{label:'در مسیر',run:0,driverName:'راننده نمونه',lines:[]}})+'</tbody></table></div>';
-    if(kind==='transport')html=wrap(transportPlanRows([{...o,customerName:o.customer.name,services:[{run:0,assignment:{driverName:'راننده نمونه',vehicleType:'وانت',vehiclePlate:'12ب34567'},departed:true}]}]));
-    if(kind==='store-registered')html=wrap(stRegisteredRow(store));
-    if(kind==='store-delivery')html=wrap(st38Row({...store,dispatch:{run:1,status:'IN_TRANSIT',lines:[]}}));
-    if(kind==='store-delivered')html=wrap(st38DeliveredRow({...store,dispatch:{run:2,status:'DELIVERED',lines:[]}}));
+    if(kind==='transport')html=transportPlanTable(transportPlanRows([{...o,customerName:o.customer.name,services:[{run:0,assignment:{driverName:'راننده نمونه',vehicleType:'وانت',vehiclePlate:'12ب34567'},departed:true}]}]));
+    if(kind==='store-registered')html=stRegisteredTable([store]);
+    if(kind==='store-delivery')html=stDeliveryTable([{...store,dispatch:{run:1,status:'IN_TRANSIT',lines:[]}}]);
+    if(kind==='store-delivered')html=stDeliveryTable([{...store,dispatch:{run:2,status:'DELIVERED',lines:[]}}],true);
     if(kind==='gate')html=renderGateExit([{...o,status:'SETTLED'}]);
-    if(kind==='gate-dispatch')html=wrap(gateDispatchCard({...o,dispatch:{status:'DRIVER_EXIT_REPORTED',driverName:'راننده نمونه',driverPlate:'12ب34567'}},'exit'));
-    if(kind==='legacy-dispatch')html=wrap(dspDispatchCard({...o,dispatch:{status:'ASSIGNED',driverName:'راننده نمونه'}}));
-    if(kind==='sales-history')html=`<div class="sales-history-list">${salesHistoryRow({...o,customerName:o.customer.name,phone:o.customer.phone,invoiceCount:1})}</div>`;
-    if(kind==='warehouse-document')html=wrap(whDeliveredRow({...o,customerName:o.customer.name,itemCount:2,deliveredKg:20,completedAt:o.createdAt,warehouseDocumentNo:'W-100'}));
-    if(kind==='store-document')html=wrap(whStoreDocumentRow({...o,orderId:o.id,storeName:'فروشگاه',itemCount:2,driverName:'راننده',run:1,warehouseDocumentNo:'W-100'}));
+    if(kind==='gate-dispatch')html=gateLegacyTable(gateDispatchCard({...o,dispatch:{status:'DRIVER_EXIT_REPORTED',driverName:'راننده نمونه',driverPlate:'12ب34567'}},'exit'));
+    if(kind==='legacy-dispatch')html=dspDispatchTable(dspDispatchCard({...o,dispatch:{status:'ASSIGNED',driverName:'راننده نمونه'}}));
+    if(kind==='sales-history')html=`<div class="sales-history-list">${salesHistoryTable([{...o,customerName:o.customer.name,phone:o.customer.phone,invoiceCount:1}])}</div>`;
+    if(kind==='warehouse-document')html=whDeliveredTable([{...o,customerName:o.customer.name,itemCount:2,deliveredKg:20,completedAt:o.createdAt,warehouseDocumentNo:'W-100'}]);
+    if(kind==='store-document')html=whStoreDocumentTable([{...o,orderId:o.id,storeName:'فروشگاه',itemCount:2,driverName:'راننده',run:1,warehouseDocumentNo:'W-100'}]);
     if(kind==='warehouse-history')html=whhBody({from:'2026-10-28',to:'2026-10-28',summary:{orders:1},returns:[],rows:[{...o,day:'2026-10-28',customerName:o.customer.name,customerPhone:o.customer.phone,itemCount:2,deliveredKg:20,completedAt:o.createdAt,completedBy:'کاربر انبار',outOfStock:0,items:[]}]});
     if(kind==='invoice')html=`<div class="sd-invoice-list">${invoiceRowsV27([{...o,status:'SETTLED'}])}</div>`;
     el.innerHTML=html;
    },kind);
+   if(['store-registered','store-delivery','store-delivered','warehouse-document','store-document','future','sales-history','gate-dispatch','gate'].includes(kind)){
+    const selectors={'store-registered':'.st-registered-table','store-delivery':'.st-delivery-table','store-delivered':'.st-delivery-table','warehouse-document':'.wh-delivered-table','store-document':'.wh-store-document-table','future':'.future-order-table','sales-history':'.sales-history-table','gate-dispatch':'.gate-legacy-table','gate':'.gt-exit-table'};
+    const table=page.locator(selectors[kind]),row=table.locator('tbody tr').first();await waitFor(row,`${kind}-table`);
+    for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${kind}/${width} page overflow`);const button=row.locator('button').first();await button.scrollIntoViewIfNeeded();assert(await button.isVisible());assert(await button.evaluate(e=>{const r=e.getBoundingClientRect();return r.left>=-1&&r.right<=innerWidth+1;}),`${kind}/${width} action outside viewport`);}
+    continue;
+   }
    if(kind==='delivery'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;const row=page.locator('.sales-distribution-table tr');await row.waitFor();assert.equal(await row.locator('td').count(),8);assert.equal(await row.evaluate(e=>getComputedStyle(e).display),'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}continue;}
    if(kind==='invoice'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;const table=page.locator('.settlement-invoice-table');await table.waitFor();assert.equal(await table.locator('th').count(),7);assert(await table.evaluate(e=>e.scrollWidth<=e.clientWidth+1));}continue;}
    if(kind==='warehouse-store-incoming'||kind==='warehouse-store-preparing'){
@@ -66,12 +72,39 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     assert.equal(await table.locator('> thead th').count(),6,'ستون‌های جدول سوابق انبار');
     assert.deepEqual(await table.locator('> thead th').allInnerTexts(),['تاریخ و ساعت','شماره سفارش','نام مشتری','وزن تحویلی','ثبت‌کننده','عملیات']);
     for(const width of [1280,768,390,320]){
-     await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
+     await page.setViewportSize({width,height:900});if(width<640)await page.waitForTimeout(350);step=`${kind}/${width}`;
      const row=table.locator('tbody tr[data-order]').first();await waitFor(row,`whh-row ${width}`);
      assert.equal(await row.locator('td').count(),6,`whh/${width} cells`);
      assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row',`whh/${width} row display`);
      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`whh/${width} page overflow`);
      const btn=row.locator('[data-whh-order-details], [data-whh-detail]').first();await btn.scrollIntoViewIfNeeded();assert.equal(await btn.isVisible(),true,`whh/${width} action`);
+    }
+    continue;
+   }
+   if(kind==='legacy-dispatch'){
+    const table=page.locator('#content .dsp-dispatch-table');await waitFor(table,'dispatch-table');
+    assert.equal(await table.locator('> thead th').count(),7);
+    for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;const row=table.locator('tbody tr[data-order]').first();assert.equal(await row.locator('td[data-label]').count(),7);assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert(await row.locator('[data-dsp=details]').isVisible());}
+    continue;
+   }
+   if(kind==='transport'){
+    const table=page.locator('#content .tp-plan-table');await waitFor(table,'transport-table');
+    assert.deepEqual(await table.locator('> thead th').allInnerTexts(),['مشتری / فروشگاه','شماره سفارش','سرویس','وضعیت','راننده و خودرو','عملیات']);
+    for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;const row=table.locator('tbody tr[data-order]').first();assert.equal(await row.locator('td[data-label]').count(),6);assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert(await row.locator('[data-tp=details]').isVisible());}
+    continue;
+   }
+   if(kind==='remote'||kind==='flow'){
+    const table=page.locator(kind==='remote'?'#content .phone-queue-table':'#content .sd-flow-table');await waitFor(table,`${kind}-table`);
+    const headers=kind==='remote'?['نام مشتری','شماره سفارش','تاریخ','وضعیت','اقلام','عملیات']:['نام مشتری','شماره سفارش','تاریخ','وضعیت','مشخصات','عملیات'];
+    assert.deepEqual(await table.locator('> thead th').allInnerTexts(),headers);
+    for(const width of [1280,768,390,320]){
+     await page.setViewportSize({width,height:900});if(width<640)await page.waitForTimeout(350);step=`${kind}/${width}`;
+     const row=table.locator('tbody tr[data-order]').first();await waitFor(row,`${kind}-row`);
+     assert.equal(await row.locator('td').count(),6);
+     assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row');
+     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${kind}/${width} page overflow`);
+     const btn=row.locator('[data-action=order-details]');await btn.scrollIntoViewIfNeeded();assert(await btn.isVisible());
+     const hit=await btn.evaluate(e=>{const r=e.getBoundingClientRect(),h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {ok:!!h&&(h===e||e.contains(h)),rect:r.toJSON(),hit:h?.outerHTML.slice(0,300)}});assert(hit.ok,`${kind}/${width} hit target ${JSON.stringify(hit)}`);
     }
     continue;
    }

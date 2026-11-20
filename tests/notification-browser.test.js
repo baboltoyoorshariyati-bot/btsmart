@@ -44,6 +44,8 @@ test('مرورگر: اعلان، مقصد دقیق، شمارنده و پاسخ 
   await page.locator('#bell').click();await page.locator(`[data-action="open-notification"][data-type="STORE_RUN_R2_SENT"][data-entity-id="${order.id}"]`).click();
   const shipment=page.locator(`[data-action="sr-ship-open"][data-order="${order.id}"][data-run="2"]`);await shipment.waitFor();
   assert.equal(await shipment.evaluate(e=>e.closest('.sr-ship-row').classList.contains('notif-target-highlight')),true);
+  for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});const layout=await shipment.evaluate(e=>{const row=e.closest('tr'),table=e.closest('table'),box=table.getBoundingClientRect();return {row:getComputedStyle(row).display,table:table.tagName,overflow:document.documentElement.scrollWidth-innerWidth,left:box.left,right:box.right};});assert.equal(layout.table,'TABLE');assert.equal(layout.row,width>900?'table-row':'block');assert(layout.overflow<=1,`shipment overflow at ${width}: ${layout.overflow}`);assert(layout.left>=-1&&layout.right<=width+1,`shipment table outside viewport at ${width}`);}
+  await page.setViewportSize({width:1280,height:900});
   await page.evaluate(()=>{closeModal();paintDriver({driver:{},assigned:[{id:'x',dispatch:{status:'ASSIGNED'},items:[]}],inTransit:[],delivered:[],history:[]});});
   const count=page.locator('[data-dsp-driver-tab="assigned"] .sd-tab-count');assert.equal(await count.innerText(),'۱');assert.notEqual(await count.evaluate(e=>getComputedStyle(e).display),'none');
   await page.evaluate(()=>{document.querySelector('#content').innerHTML=gateDispatchTabsHtml({awaitingDriver:[{}],leaving:[{},{}],inTransit:[]},'awaiting');app.sub.gate='dispatch';updateGateDispatchInCartable({awaitingDriver:[],leaving:[{}],inTransit:[{}]});});

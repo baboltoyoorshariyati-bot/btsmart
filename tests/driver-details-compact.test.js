@@ -29,8 +29,8 @@ test('مسیر جزئیات سفارش برای راننده باز است ول�
 
 test('کارت ورودی راننده فشرده و تک‌ردیفی است و جزئیات کامل به پنجره منتقل شده', () => {
   const card = dsp.slice(dsp.indexOf('function dspDriverCard'), dsp.indexOf('function dspDoneCard'));
-  assert.match(card, /dsp-card-compact/);
-  assert.match(card, /dsp-card-actions/);
+  assert.match(card, /dsp-driver-row/);
+  assert.match(card, /dsp-table-actions/);
   assert.match(card, /جزئیات محموله/);
   assert.doesNotMatch(card, /dspInvoiceMarkup\(/, 'جدول کامل فاکتور نباید روی کارت ورودی باشد');
   assert.doesNotMatch(card, /dsp-items/, 'فهرست اقلام نباید روی کارت ورودی باشد');

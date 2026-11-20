@@ -193,8 +193,16 @@ function sdStoreCard(o){
 }
 function remotePhoneQueueRowsV40(orders){
   const queue=(Array.isArray(orders)?orders:[]).filter(o=>o&&o.orderType==='REMOTE'&&['WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES','SETTLEMENT_PENDING'].includes(o.status));
-  const rows=queue.map(o=>orderSummaryRow(o,{className:'phone-queue-card-v40',statusHtml:badge(o.status),itemCount:activeItemsOf(o).length,extras:[{html:`شماره تماس: ${esc(storeAwareOrderPhone(o)||'—')}`}],actionsHtml:`<button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>${canSalesEditRemote(o)?`<button type="button" class="btn btn-secondary btn-sm" data-action="future-edit" data-id="${esc(o.id)}">ویرایش سفارش</button>`:''}`})).join('');
-  return {queue,html:rows||salesEmptyV25('phone','سفارش تلفنی فعالی در روند نیست','پس از ثبت سفارش غیرحضوری، اینجا قابل پیگیری است.')};
+  const rows=queue.map(o=>`<tr data-order="${esc(o.id)}">
+    <td data-label="نام مشتری"><span class="bt-cell-main">${esc(storeAwareOrderName(o)||'—')}</span><span class="bt-cell-sub">${esc(storeAwareOrderPhone(o)||'—')}</span></td>
+    <td data-label="شماره سفارش"><bdi>${esc(fa(o.orderNo||'—'))}</bdi></td>
+    <td data-label="تاریخ">${esc(formatDateTime24(o.createdAt))}</td>
+    <td data-label="وضعیت">${badge(o.status)}</td>
+    <td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td>
+    <td data-label="عملیات" class="bt-col-actions"><div class="bt-actions"><button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>${canSalesEditRemote(o)?`<button type="button" class="btn btn-secondary btn-sm" data-action="future-edit" data-id="${esc(o.id)}">ویرایش سفارش</button>`:''}</div></td>
+  </tr>`).join('');
+  const empty=`<tr><td colspan="6">${salesEmptyV25('phone','سفارش تلفنی فعالی در روند نیست','پس از ثبت سفارش غیرحضوری، اینجا قابل پیگیری است.')}</td></tr>`;
+  return {queue,html:`<div class="bt-table-wrap"><table class="bt-table phone-queue-table"><caption class="bt-caption">سفارش‌های تلفنی در روند</caption><thead><tr><th scope="col">نام مشتری</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ</th><th scope="col">وضعیت</th><th scope="col">اقلام</th><th scope="col">عملیات</th></tr></thead><tbody>${rows||empty}</tbody></table></div>`};
 }
 function renderSalesRemoteV32(orders){
   const all=Array.isArray(orders)?orders:[];
@@ -286,19 +294,29 @@ async function pickupApprove(id,button){
 }
 function sdFlowCard(o,idx){
  const items=activeItemsOf(o);
- const extras=[{html:`شماره تماس: ${esc(storeAwareOrderPhone(o)||'—')}`},{html:`محل ارسال: ${esc(o.dispatchPlace||'ثبت نشده')}`},{html:`آخرین اقدام: ${esc(formatDateTime24(o.updatedAt||o.createdAt))}`}];
- if(o.scheduledAt)extras.push({html:`زمان ارسال: ${esc(salesOrderDateTime(o))}`});
- if(o.storeRun&&o.storeRun.enabled)extras.push({html:sr38Chips(o)});
- if(o.status==='RETURNED_TO_SALES'&&o.warehouseReturn?.reason)extras.push({html:warehouseReturnNoteHtml(o),className:'order-summary-note'});
+ const notes=[`<span>شماره تماس: ${esc(storeAwareOrderPhone(o)||'—')}</span>`,`<span>محل ارسال: ${esc(o.dispatchPlace||'ثبت نشده')}</span>`,`<span>آخرین اقدام: ${esc(formatDateTime24(o.updatedAt||o.createdAt))}</span>`];
+ if(o.scheduledAt)notes.push(`<span>زمان ارسال: ${esc(salesOrderDateTime(o))}</span>`);
+ if(o.storeRun&&o.storeRun.enabled)notes.push(sr38Chips(o));
+ if(o.status==='RETURNED_TO_SALES'&&o.warehouseReturn?.reason)notes.push(warehouseReturnNoteHtml(o));
  const actions=`<button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>${pickupSalesActions(o)}${o.status==='RETURNED_TO_SALES'&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button class="btn btn-secondary btn-sm" data-action="edit-returned-order" data-id="${esc(o.id)}">${icon('edit',14)} اصلاح سفارش</button><button class="btn btn-primary btn-sm" data-action="resubmit-order" data-id="${esc(o.id)}">${icon('send',14)} ارسال مجدد به انبار</button>`:''}`;
- return orderSummaryRow(o,{className:`sd-flow-card sd-flow-card-1line ${sdStatusAccent(o.status)}`,statusHtml:badge(o.status),itemCount:items.length,extras:[{html:sdTypeBadge(o)},...extras],actionsHtml:actions});
+ return `<tr class="sd-flow-row ${sdStatusAccent(o.status)}" data-order="${esc(o.id)}">
+   <td data-label="نام مشتری"><span class="bt-cell-main"><strong>${esc(storeAwareOrderName(o)||'—')}</strong></span></td>
+   <td data-label="شماره سفارش"><bdi>${esc(fa(o.orderNo||'—'))}</bdi></td>
+   <td data-label="تاریخ">${esc(formatDateTime24(o.createdAt))}</td>
+   <td data-label="وضعیت">${badge(o.status)} ${sdTypeBadge(o)} <span>${qty(items.length)} قلم</span></td>
+   <td data-label="مشخصات"><div class="bt-flow-notes">${notes.join('')}</div></td>
+   <td data-label="عملیات" class="bt-col-actions"><div class="bt-actions">${actions}</div></td>
+ </tr>`;
 }
-function salesFlowRowsV27(orders){ return (orders||[]).map(sdFlowCard).join(''); }
+function salesFlowRowsV27(orders){
+ const rows=(orders||[]).map(sdFlowCard).join('');
+ return `<div class="bt-table-wrap"><table class="bt-table sd-flow-table"><caption class="bt-caption">سفارش‌های در جریان</caption><thead><tr><th scope="col">نام مشتری</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ</th><th scope="col">وضعیت</th><th scope="col">مشخصات</th><th scope="col">عملیات</th></tr></thead><tbody>${rows||`<tr><td colspan="6">${sdEmpty('truck','سفارشی در جریان نیست','هر سفارشی که به انبار ارسال شود در این فهرست قرار می‌گیرد.')}</td></tr>`}</tbody></table></div>`;
+}
 function renderSalesFlowV25(orders){
   return `<section class="sd-pane"><section class="sd-panel">
     <div class="sd-head"><div class="sd-head-main"><span class="sd-head-ico" style="background:var(--blue-bg);color:var(--blue)">${icon('truck',20)}</span><div><h2>سفارش‌های در جریان</h2><p>تمام سفارش‌هایی که به انبار ارسال شده‌اند یا برای اصلاح برگشته‌اند.</p></div></div><div class="sd-count"><strong>${qty(orders.length)}</strong><span>سفارش</span></div></div>
     <div class="sd-flow-toolbar"><span class="sd-live"><i></i> مرتب بر اساس آخرین اقدام</span><span class="sd-legend"><span><i class="orange"></i>در صف انبار</span><span><i class="purple"></i>در حال آماده‌سازی</span><span><i class="gray"></i>برگشت به فروش</span></span></div>
-    <div class="v26-flow-list sd-flow-list" style="padding:10px 14px 12px">${salesFlowRowsV27(orders)||sdEmpty('truck','سفارشی در جریان نیست','هر سفارشی که به انبار ارسال شود در این فهرست قرار می‌گیرد.')}</div>
+    <div class="v26-flow-list sd-flow-list" style="padding:10px 14px 12px">${salesFlowRowsV27(orders)}</div>
   </section></section>`;
 }
 
