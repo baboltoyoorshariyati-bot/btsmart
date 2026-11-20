@@ -67,5 +67,10 @@ npm test → 732 تست · 685 قبولی · 0 شکست · 47 رد‌شده
 
 ## پیوست
 
+- **دادهٔ نمونه برای بازبینی چشمی:** [`scripts/demo-seed.js`](../scripts/demo-seed.js)
+  ```bash
+  BASE=http://127.0.0.1:3080 ADMIN_PASS='…' node scripts/demo-seed.js
+  ```
+  ۶ مشتری، ۴ مراجعهٔ نگهبانی، ۴ سفارش حضوری (۲ در حال آماده‌سازی)، ۶ سفارش تلفنی (۳ فعال امروز + ۳ روزهای بعد) و سه کاربر نقش‌دار می‌سازد؛ همه از راه API عمومی (بدون نوشتن مستقیم در دیتابیس).
 - ابزار سنجه: [`scripts/verify-css-cascade.js`](../scripts/verify-css-cascade.js)
 - گزارش فاز ۴: [`ui-phase4-report-fa.md`](ui-phase4-report-fa.md) · فاز ۳: [`ui-phase3-report-fa.md`](ui-phase3-report-fa.md)
