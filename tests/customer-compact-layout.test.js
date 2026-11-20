@@ -40,6 +40,6 @@ test('preparing headers are unchanged and settlement queue shows customer/order 
  assert.match(list,/return wh38OrdersTable\(orders,kind\)/);assert.match(table,/class="bt-table wh-orders-table"/);
  assert.match(table,/data-action="wh38-order-details"/);assert.match(table,/data-action="wh38-start"/);
  assert.doesNotMatch(table,/class="wh38-meta"/);assert.match(app,/data-wh-start-order/);
- assert.match(ui,/stl-queue-item-card/);
+ assert.match(ui,/stl-queue-table/);
  assert.match(css,/overflow-x:hidden!important;overflow-y:auto!important/);
 });

@@ -25,7 +25,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     if(kind==='remote')html=`<div class="phone-queue-list-v40">${remotePhoneQueueRowsV40([o]).html}</div>`;
     if(kind==='flow')html=`<div class="sd-flow-list">${sdFlowCard(o,0)}</div>`;
     if(kind==='future')html=`<div class="fx-list-grid">${futureOrderRowsV25([o])}</div>`;
-    if(kind==='settlement')html=`<aside class="stl-queue-panel" style="width:min(330px,100%)"><div class="stl-queue-list">${settlementPendingRowsV27([{...o,status:'SETTLEMENT_PENDING'}])}</div></aside>`;
+    if(kind==='settlement')html=`<div class="stl-queue-list">${settlementPendingRowsV27([{...o,status:'SETTLEMENT_PENDING'}])}</div>`;
     if(kind==='sales-store'){app.salesStoreTab='incoming';html=renderSalesStoresV41([store],{});}
     if(kind==='warehouse')html=wh38List([o],'incoming');
     if(kind==='warehouse-store-incoming')html=`<div class="wh38-store-pane">${wh38StoreList([store],'incoming')}</div>`;
@@ -75,6 +75,22 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     }
     continue;
    }
+   if(kind==='settlement'||kind==='sales-store'){
+    const table=page.locator(kind==='settlement'?'#content .stl-queue-table':'#content .sd-store-table:visible');
+    await waitFor(table,`${kind}-table`);
+    const headers=kind==='settlement'?['نام مشتری','شماره سفارش','تاریخ','اقلام','عملیات']:['فروشگاه','شماره سفارش','تاریخ','وضعیت','اقلام','عملیات'];
+    assert.deepEqual(await table.locator('> thead th').allInnerTexts(),headers);
+    for(const width of [1280,768,390,320]){
+     await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
+     const row=table.locator('tbody tr').first();await waitFor(row,`${kind}-row ${width}`);
+     assert.equal(await row.locator('td').count(),headers.length);
+     assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row');
+     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${kind}/${width} page overflow`);
+     const btn=row.locator(kind==='settlement'?'button[data-action=select-settlement]':'[data-action=store-order-details-v25]');
+     await btn.scrollIntoViewIfNeeded();assert.equal(await btn.isVisible(),true,`${kind}/${width} action`);
+    }
+    continue;
+   }
    if(kind==='warehouse'){
     const table=page.locator('#content .bt-table');await waitFor(table,'warehouse-table');
     assert.equal(await table.locator('> thead th').count(),5,'ستون‌های جدول انبار');
@@ -94,7 +110,6 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
     const row=page.locator('#content .order-summary-row:visible,#content .sales-delivery-summary-row:visible,#content .stl-queue-item:visible,#content .gt-exit-card:visible').first();await waitFor(row,`generic-row ${kind}/${width}`);
     const g=await row.evaluate(el=>{const r=el.getBoundingClientRect(),cells=[...el.children].filter(x=>x.matches('.order-summary-cell,.sales-distribution-cell')),buttons=[...el.querySelectorAll('.order-summary-actions .btn,.sales-distribution-actions .btn')].filter(x=>x.offsetParent!==null);return {height:r.height,cells:cells.map(x=>({h:x.getBoundingClientRect().height,cy:x.getBoundingClientRect().top+x.getBoundingClientRect().height/2,top:x.getBoundingClientRect().top,bottom:x.getBoundingClientRect().bottom})),buttons:buttons.map(x=>({h:x.getBoundingClientRect().height,top:x.getBoundingClientRect().top,bottom:x.getBoundingClientRect().bottom})),top:r.top,bottom:r.bottom,scroll:document.documentElement.scrollWidth,viewport:innerWidth};});
-    if(kind==='settlement'){const q=await row.evaluate(el=>({row:el.getBoundingClientRect().width,content:el.scrollWidth,list:el.parentElement.clientWidth-parseFloat(getComputedStyle(el.parentElement).paddingLeft)-parseFloat(getComputedStyle(el.parentElement).paddingRight),scroll:el.parentElement.scrollWidth,client:el.parentElement.clientWidth,title:el.title,aria:el.getAttribute('aria-label')}));assert(q.scroll<=q.client+1,JSON.stringify(q));assert(q.row<=q.list+1,`کارت از فهرست پهن‌تر است ${JSON.stringify(q)}`);if(q.content<=q.row+2)assert(q.row<=q.content+2,`عرض کارت به اندازهٔ متن نیست ${JSON.stringify(q)}`);assert.match(q.title,/مشتری آزمایشی با نام بسیار طولانی/);assert.equal(q.aria,q.title);}
     if(kind==='gate'){const q=await row.evaluate(el=>({row:el.scrollWidth,client:el.clientWidth,list:el.parentElement.scrollWidth,listClient:el.parentElement.clientWidth}));assert(q.row<=q.client+1&&q.list<=q.listClient+1,JSON.stringify(q));continue;}
     assert(Math.abs(g.height-54)<1,`${kind}/${width} row ${JSON.stringify(g)}`);for(const c of g.cells){assert(Math.abs(c.h-38)<1,`${kind}/${width} cell ${JSON.stringify(g)}`);assert(c.top>=g.top-1&&c.bottom<=g.bottom+1,`${kind}/${width} bounds ${JSON.stringify(g)}`);}for(const b of g.buttons){assert(Math.abs(b.h-36)<1,`${kind}/${width} button ${JSON.stringify(g)}`);assert(b.top>=g.top-1&&b.bottom<=g.bottom+1,`${kind}/${width} bounds ${JSON.stringify(g)}`);}assert(g.scroll<=g.viewport+1,`${kind}/${width} page overflow ${JSON.stringify(g)}`);
    }

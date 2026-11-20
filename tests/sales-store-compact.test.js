@@ -7,12 +7,14 @@ const ui = fs.readFileSync(path.join(root, 'public/ui2.js'), 'utf8');
 const app = fs.readFileSync(path.join(root, 'public/app.js'), 'utf8');
 const css = fs.readFileSync(path.join(root, 'public/theme.css'), 'utf8');
 
-test('تب فروشگاه فروش، خلاصهٔ عمودی سه‌فیلدی دارد و جزئیات را جداگانه باز می‌کند', () => {
+test('تب فروشگاه فروش، جدول فروشگاه دارد و جزئیات را جداگانه باز می‌کند', () => {
   const start = ui.indexOf('function renderSalesStoresV41');
   const end = ui.indexOf('/* ---------- تب ۳:', start);
   assert.ok(start >= 0 && end > start);
   const view = ui.slice(start, end);
-  assert.match(view, /sd-store-identity-v42[\s\S]*?o\.storeName[\s\S]*?شماره سفارش[\s\S]*?o\.orderNo[\s\S]*?تاریخ[\s\S]*?o\.createdAt/);
+  // جدول bt-table: نام فروشگاه ← شماره سفارش ← تاریخ ← وضعیت ← اقلام ← عملیات
+  assert.match(view, /class="bt-table sd-store-table"/);
+  assert.match(view, /data-label="فروشگاه"[\s\S]*?o\.storeName[\s\S]*?data-label="شماره سفارش"[\s\S]*?o\.orderNo[\s\S]*?data-label="تاریخ"[\s\S]*?o\.createdAt/);
   assert.match(view, /data-action="store-order-details-v25"/);
   assert.doesNotMatch(view, /sd-store-summary-v41|sdStoreTotalsLine\(o\)|sdStoreInvoiceChips\(o\)/);
   assert.match(app, /if\(a==='store-order-details-v25'\)return openOrderDetails\(el\.dataset\.id\)/);

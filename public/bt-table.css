@@ -116,13 +116,38 @@
 }
 
 /* ============================================================================
-   صف تسویه — کارت به اندازهٔ متن، نه تمام‌عرض (درخواست کارفرما)
-   اعلان قفل‌شدهٔ width:100%!important در compatibility.css دست‌نخورده است؛
-   اینجا با اولویت انتخابگر بالاتر فقط عرض را به fit-content می‌بریم.
-   ارتفاع ۵۴px، overflow-x:hidden و سه‌نقطه‌شدن نام (قفل‌های همان تست) پابرجاست:
-   نام بلند با max-width:100% و ellipsis کوتاه می‌شود، نه با پهن‌شدن کادر.
+   صف تسویه — جدول واقعی (درخواست کارفرما: «آن هم جدول شود»)
+   اعلان‌های قفل‌شدهٔ compatibility.css (width/height/overflow/text-overflow
+   روی stl-queue-*) دست‌نخورده‌اند؛ این جدول از آن‌ها استفاده نمی‌کند.
+   چیدمان: ستون نام مشتری به اندازهٔ متن، بقیه ستون‌ها auto.
    ========================================================================== */
-#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card{width:fit-content!important;max-width:100%!important}
-#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card{min-width:0}
-#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card .stl-queue-customer{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card .stl-queue-order{white-space:nowrap}
+#appView #content .stl-layout-table{display:flex;flex-direction:column;align-items:stretch;gap:16px}
+#appView #content .stl-layout-table .stl-main{width:100%;min-width:0}
+#appView #content .stl-queue-panel-table{width:100%;max-width:100%}
+#appView #content .stl-queue-table{width:100%}
+#appView #content .stl-queue-table tbody tr{cursor:pointer}
+#appView #content .stl-queue-table tbody tr:hover{background:var(--brand-50,#f0f7ff)}
+#appView #content .stl-queue-table tbody tr.active{background:var(--brand-100,#e0efff)}
+#appView #content .stl-queue-table .bt-cell-main{font-weight:600}
+
+/* ============================================================================
+   صف حضوری فروش — جدول (جایگزین کارت sd-queue-row)
+   ========================================================================== */
+#appView #content .sd-queue-table{width:100%}
+#appView #content .sd-queue-table .bt-cell-main{font-weight:600}
+#appView #content .sd-queue-table .bt-cell-sub{color:var(--muted);font-size:12px}
+
+/* ============================================================================
+   کارتابل فروشگاه — جدول (جایگزین کارت sd-store-card-v42)
+   ========================================================================== */
+#appView #content .sd-store-table{width:100%}
+#appView #content .sd-store-table .bt-cell-main{font-weight:600}
+#appView #content .sd-store-table .bt-cell-sub{color:var(--muted);font-size:12px}
+#appView #content .sd-store-table .bt-cell-notes{margin-top:6px;display:flex;flex-direction:column;gap:4px;min-width:0;max-width:100%}
+#appView #content .sd-store-table .store-receipt-summary{display:flex;flex-wrap:wrap;min-width:0;max-width:100%;white-space:normal}
+#appView[data-cartable-page="sales"] #content .sales-store-subpanel-v43[data-store-section="history"] .sd-store-table .store-receipt-summary .badge{max-width:100%;white-space:normal!important;overflow-wrap:anywhere}
+#appView #content .sd-store-table .bt-col-actions .btn{margin:2px}
+@media (max-width:900px){
+  #appView #content .sd-store-table td.bt-col-actions{flex-wrap:wrap}
+  #appView #content .sd-store-table td[data-label="فروشگاه"]{flex-wrap:wrap}
+}
