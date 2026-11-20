@@ -6,12 +6,14 @@ function btDate(v){ const s=String(v||''); return /^\d{4}-\d{2}-\d{2}/.test(s)?d
 function btTime(v){ const m=String(v||'').match(/[T ](\d{2}):(\d{2})/); return m?fa(m[1]+':'+m[2]):''; }
 function wh38OrdersTable(orders,kind){
   const rows=orders.map(o=>{
-    const name=storeAwareOrderName(o), phone=storeAwareOrderPhone(o), count=activeItemsOf(o).length;
+    const name=storeAwareOrderName(o)||'—';
     const delivery=o.deliveryDate||o.scheduledDate||'';
     const deliverySub=delivery?(btTime(o.scheduledAt)||'زمان‌بندی‌شده'):'ثبت نشده';
+    // v1.1.12 — هر ردیف فقط مقدار همان ستون را نشان می‌دهد؛ نشان وضعیت، تعداد اقلام،
+    // نوع و تلفن از ستون‌های «شماره سفارش» و «نام مشتری» حذف شدند.
     return `<tr data-order="${esc(o.id)}">
-      <td data-label="شماره سفارش"><span class="bt-cell-main order-code">${esc(fa(o.orderNo||'—'))}</span><span class="bt-cell-sub">${badge(o.status)}</span></td>
-      <td data-label="نام مشتری"><span class="bt-cell-main" title="${esc(name||'—')}">${esc(name||'—')}</span><span class="bt-cell-sub">${qty(count)} قلم • ${esc(o.orderType==='STORE'?'فروشگاه':'تلفنی')}${phone&&phone!=='—'?` • ${esc(fa(phone))}`:''}</span></td>
+      <td data-label="شماره سفارش"><span class="bt-cell-main order-code">${esc(fa(o.orderNo||'—'))}</span></td>
+      <td data-label="نام مشتری"><span class="bt-cell-main" title="${esc(name)}">${esc(name)}</span></td>
       <td data-label="تاریخ سفارش"><span class="bt-cell-main">${btDate(o.createdAt)}</span><span class="bt-cell-sub">${btTime(o.createdAt)||'—'}</span></td>
       <td data-label="تاریخ تحویل"><span class="bt-cell-main">${btDate(delivery)}</span><span class="bt-cell-sub">${deliverySub}</span></td>
       <td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-secondary btn-sm" data-action="wh38-order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button></td>
