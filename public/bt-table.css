@@ -48,6 +48,7 @@
    تا نام‌های بلند جدول را از عرض صفحه بیرون نبرند. */
 .wh-orders-table{table-layout:auto;width:auto;max-width:100%}
 .wh-orders-table th,.wh-orders-table td{width:1%;white-space:nowrap}
+.wh-orders-table th.bt-col-actions,.wh-orders-table td.bt-col-actions{width:1%}
 .wh-orders-table th:nth-child(2),.wh-orders-table td:nth-child(2){width:auto;max-width:320px}
 .wh-orders-table td:nth-child(2) .bt-cell-main{overflow:hidden;text-overflow:ellipsis}
 
