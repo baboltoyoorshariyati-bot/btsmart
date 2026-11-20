@@ -30,13 +30,16 @@ test('gate entry form is fully cleared after a successful visit registration',()
 
 test('onsite order lines are compact single-row lines like the store form',()=>{
   const lines=slice(ui,'function renderOrderLines()','function updateOrderDraftSummary()');
-  assert.match(lines,/class="sd-line sd-line-compact"/);
-  assert.match(lines,/<input type="text" data-description=/);
-  assert.doesNotMatch(lines,/<textarea data-description/);
+  assert.match(lines,/renderDraftLinesTable/);
+  const draft=slice(ui,'function renderDraftLinesTable','/* ---------- تب ۲:');
+  assert.match(draft,/<table class="bt-table draft-lines-table"/);
+  assert.match(draft,/<tr data-line=/);
+  assert.match(draft,/<input type="text"/);
+  assert.doesNotMatch(draft,/<textarea/);
   assert.doesNotMatch(lines,/<label>محصول/);
   // همان قراردادهای داده‌ای قبلی حفظ شده‌اند
   for(const attr of ['data-product-search','data-suggest-for','data-qty','data-unit','data-description','data-action="remove-line"'])
-    assert.ok(lines.includes(attr),attr);
+    assert.ok(draft.includes(attr.replace('data-action="remove-line"','remove-line')),attr);
   // استایل فشردهٔ اختصاصی صفحهٔ حضوری در آخرین شیوه‌نامه است
   assert.match(compat,/v37\.40\.0/);
   assert.match(compat,/#appView #content #orderLines \.sd-line\.sd-line-compact\{display:flex!important/);

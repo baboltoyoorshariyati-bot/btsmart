@@ -48,8 +48,8 @@ test('فرم راننده: شماره تماس الزامی، نام بانک پ
   const app = read('public/app.js');
   assert.match(ui, /<span>شماره تماس راننده \*<\/span><input name="phone" required[^>]*inputmode="tel"/);
   assert.match(ui, /<span>نام بانک پوز<\/span><input name="posBank"[^>]*list="drvPosBanks"/);
-  assert.match(ui, /<small>شماره تماس<\/small>\$\{driverPhoneHtml\(x\.phone\)\}/);
-  assert.match(ui, /<small>پایانه پوز \/ بانک<\/small>\$\{driverPosHtml\(x\)\}/);
+  assert.match(ui, /data-label="شماره تماس"><div class="adm-cell">\$\{driverPhoneHtml\(x\.phone\)\}/);
+  assert.match(ui, /data-label="پایانه پوز \/ بانک"><div class="adm-cell">\$\{driverPosHtml\(x\)\}/);
   assert.match(app, /function driverPosHtml\(d\)\{[\s\S]*?drv-pos-term[\s\S]*?drv-pos-bank/);
   assert.match(app, /const BT_POS_BANKS=\['بانک ملت','بانک ملی'/);
   const dsp = read('public/dispatch-ui.js');

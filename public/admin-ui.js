@@ -70,6 +70,11 @@ function admBindClose() {
 }
 function admActiveBadge(on) { return `<span class="badge ${on ? 'green' : 'gray'}">${on ? 'فعال' : 'غیرفعال'}</span>`; }
 
+function admTable(headers, rows, empty){
+ if(!rows.length)return empty;
+ return `<div class="bt-table-wrap"><table class="bt-table adm-data-table"><caption class="bt-caption">${headers.join('، ')}</caption><thead><tr>${headers.map(h=>`<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+}
+
 /* ---------- کاربران ---------- */
 async function renderUsersPage() {
   const d = await api('/api/admin/users');
@@ -84,14 +89,14 @@ async function renderUsersPage() {
 function paintUsers() {
   const q = admNorm(adm.q);
   const rows = adm.users.filter((u) => !q || admNorm(`${u.fullName} ${u.username} ${u.position || ''} ${u.storeName || ''}`).includes(q));
-  $('#admList').innerHTML = rows.map((u) => `<article class="adm-row">
-      <div class="adm-cell"><small>نام کامل</small><b>${admE(u.fullName)}</b><span>${admE(u.position || '—')}</span></div>
-      <div class="adm-cell"><small>نام کاربری</small><b dir="ltr">${admE(u.username)}</b></div>
-      <div class="adm-cell"><small>نقش</small><b>${admE(ADM_ROLES[u.roleCode] || u.roleCode)}</b>${u.storeName ? `<span>${admE(u.storeName)}${u.branchNo&&u.storeName!=='فروشگاه شعبه 1 حمزه کلا'?` · شعبهٔ ${admE(String(u.branchNo))}`:''}</span>` : ''}</div>
-      <div class="adm-cell adm-actions">${admActiveBadge(u.isActive)}
+  $('#admList').innerHTML = admTable(['نام کامل', 'نام کاربری', 'نقش', 'عملیات'], rows.map((u) => `<tr class="adm-row">
+      <td data-label="نام کامل"><div class="adm-cell"><b>${admE(u.fullName)}</b><span>${admE(u.position || '—')}</span></div></td>
+      <td data-label="نام کاربری"><div class="adm-cell"><b dir="ltr">${admE(u.username)}</b></div></td>
+      <td data-label="نقش"><div class="adm-cell"><b>${admE(ADM_ROLES[u.roleCode] || u.roleCode)}</b>${u.storeName ? `<span>${admE(u.storeName)}${u.branchNo&&u.storeName!=='فروشگاه شعبه 1 حمزه کلا'?` · شعبهٔ ${admE(String(u.branchNo))}`:''}</span>` : ''}</div></td>
+      <td data-label="عملیات"><div class="adm-cell adm-actions">${admActiveBadge(u.isActive)}
         <button class="btn btn-secondary btn-sm" type="button" data-adm="user-edit" data-id="${admE(u.id)}">${icon('edit', 14)} ویرایش</button>
         ${u.isActive ? `<button class="btn btn-secondary btn-sm" type="button" data-adm="user-delete" data-id="${admE(u.id)}">${icon('trash', 14)} حذف</button>` : ''}
-      </div></article>`).join('') || sdEmpty('users', 'کاربری پیدا نشد', 'عبارت جستجو را تغییر دهید یا کاربر جدید بسازید.');
+      </div></td></tr>`), sdEmpty('users', 'کاربری پیدا نشد', 'عبارت جستجو را تغییر دهید یا کاربر جدید بسازید.'));
 }
 function userFormHtml(u, drivers = [], vehicles = [], devices = [], branches = []) {
   const role = u?.roleCode || 'gate';
@@ -213,17 +218,17 @@ async function renderDriversPage() {
 function paintDrivers() {
   const q = admNorm(adm.q);
   const rows = adm.drivers.filter((x) => !q || admNorm(`${x.fullName} ${x.phone || ''} ${x.plate} ${x.vehicleType} ${x.posTerminal} ${x.posBank || ''}`).includes(q));
-  $('#admList').innerHTML = rows.map((x) => `<article class="adm-row drv-row">
-      <div class="adm-cell"><small>نام راننده</small><b>${admE(x.fullName)}</b></div>
-      <div class="adm-cell"><small>شماره تماس</small>${driverPhoneHtml(x.phone)}</div>
-      <div class="adm-cell"><small>نوع خودرو</small><span>${admE(x.vehicleType || '—')}</span></div>
-      <div class="adm-cell"><small>پلاک خودرو</small>${plateViewHtml(x.plate, '—', true)}</div>
-      <div class="adm-cell"><small>پایانه پوز / بانک</small>${driverPosHtml(x)}</div>
-      <div class="adm-cell adm-actions">${admActiveBadge(x.isActive)}
+  $('#admList').innerHTML = admTable(['نام راننده', 'شماره تماس', 'نوع خودرو', 'پلاک خودرو', 'پایانه پوز / بانک', 'عملیات'], rows.map((x) => `<tr class="adm-row drv-row">
+      <td data-label="نام راننده"><div class="adm-cell"><b>${admE(x.fullName)}</b></div></td>
+      <td data-label="شماره تماس"><div class="adm-cell">${driverPhoneHtml(x.phone)}</div></td>
+      <td data-label="نوع خودرو"><div class="adm-cell"><span>${admE(x.vehicleType || '—')}</span></div></td>
+      <td data-label="پلاک خودرو"><div class="adm-cell">${plateViewHtml(x.plate, '—', true)}</div></td>
+      <td data-label="پایانه پوز / بانک"><div class="adm-cell">${driverPosHtml(x)}</div></td>
+      <td data-label="عملیات"><div class="adm-cell adm-actions">${admActiveBadge(x.isActive)}
         ${adm.canManage?`<button class="btn btn-secondary btn-sm" type="button" data-adm="drv-records" data-id="${admE(x.id)}">${icon('receipt', 14)} سوابق</button>`:''}
         ${adm.canEditDrivers && !x.vehicleId && !x.paymentDeviceId?`<button class="btn btn-secondary btn-sm" type="button" data-adm="drv-edit" data-id="${admE(x.id)}">${icon('edit', 14)} ویرایش</button>`:''}
         ${adm.canManage?`<button class="btn btn-secondary btn-sm" type="button" data-adm="drv-delete" data-id="${admE(x.id)}">${icon('trash', 14)} حذف</button>`:''}
-      </div></article>`).join('') || sdEmpty('truck', 'هنوز راننده‌ای ساخته نشده است', 'از «مدیریت ← کاربران ← کاربر جدید» با نقش «راننده» اولین راننده را بسازید؛ مشخصات خودرو و پوزش همان‌جا وارد می‌شود.');
+      </div></td></tr>`), sdEmpty('truck', 'هنوز راننده‌ای ساخته نشده است', 'از «مدیریت ← کاربران ← کاربر جدید» با نقش «راننده» اولین راننده را بسازید؛ مشخصات خودرو و پوزش همان‌جا وارد می‌شود.'));
 }
 function openDriverForm(x) {
   openModal(x ? `ویرایش راننده ${x.fullName}` : 'راننده جدید', admModalForm('admDriverForm', `<div class="cust-form-grid">
@@ -270,18 +275,17 @@ async function renderDriverRecords() {
     .map(([l, v]) => `<div class="drv-chip"><small>${l}</small><b>${v}</b></div>`).join('');
   const dayHtml = data.days.map((g) => `<section class="drv-day">
       <header class="drv-day-head"><b dir="ltr">${admE(g.day)}</b><span>${fa(g.totals.count)} تحویل • مرجوعی ${qty(g.totals.returnKg)} • کسری ${qty(g.totals.shortageKg)} کیلو</span></header>
-      ${g.deliveries.map((r) => `<article class="adm-row drv-del">
-        <div class="adm-cell"><small>سفارش</small><b dir="ltr">${admE(r.orderNo)}</b><span>${admE(formatDateTime24(r.deliveredAt))}</span></div>
-        <div class="adm-cell"><small>مشتری</small><b>${admE(r.customerName)}</b><span dir="ltr">${admE(r.customerPhone || '')}</span></div>
-        <div class="adm-cell"><small>راننده</small><b>${admE(r.driverName)}</b>${plateViewHtml(r.driverPlate, '—', true)}</div>
-        <div class="adm-cell"><small>تسویه</small><span class="badge ${r.settlementType === 'CASH' ? 'green' : 'blue'}">${r.settlementType === 'CASH' ? 'نقدی' : 'معوق'}</span><span>${r.hasReturn ? 'دارای مرجوعی' : 'بدون مرجوعی'} • ${r.hasShort ? 'دارای کسری' : 'بدون کسری'}</span></div>
-        <div class="adm-cell adm-actions"><span>تحویلی ${qty(r.totalKg)} • خالص ${qty(r.netKg)} کیلو</span>
-          <details class="drv-lines"><summary>جزئیات اقلام</summary>
-            <div class="table-wrap"><table class="adm-table"><thead><tr><th>کالا</th><th>تحویلی</th><th>مرجوعی</th><th>کسری</th><th>خالص</th><th>علت</th></tr></thead>
+      ${admTable(['سفارش','مشتری','راننده','تسویه','مقادیر'],g.deliveries.map((r) => `<tr class="adm-row drv-del">
+        <td data-label="سفارش"><div class="adm-cell"><b dir="ltr">${admE(r.orderNo)}</b><span>${admE(formatDateTime24(r.deliveredAt))}</span></div></td>
+        <td data-label="مشتری"><div class="adm-cell"><b>${admE(r.customerName)}</b><span dir="ltr">${admE(r.customerPhone || '')}</span></div></td>
+        <td data-label="راننده"><div class="adm-cell"><b>${admE(r.driverName)}</b>${plateViewHtml(r.driverPlate, '—', true)}</div></td>
+        <td data-label="تسویه"><div class="adm-cell"><span class="badge ${r.settlementType === 'CASH' ? 'green' : 'blue'}">${r.settlementType === 'CASH' ? 'نقدی' : 'معوق'}</span><span>${r.hasReturn ? 'دارای مرجوعی' : 'بدون مرجوعی'} • ${r.hasShort ? 'دارای کسری' : 'بدون کسری'}</span></div></td>
+        <td data-label="مقادیر">تحویلی ${qty(r.totalKg)} • خالص ${qty(r.netKg)} کیلو</td></tr>
+        <tr class="drv-detail-row"><td colspan="5" data-label="جزئیات اقلام"><details class="drv-lines"><summary>جزئیات اقلام</summary>
+            <div class="bt-table-wrap"><table class="bt-table drv-lines-table"><caption class="bt-caption">اقلام تحویل راننده</caption><thead><tr><th>کالا</th><th>تحویلی</th><th>مرجوعی</th><th>کسری</th><th>خالص</th><th>علت</th></tr></thead>
             <tbody>${r.lines.map((l) => `<tr><td data-label="کالا">${admE(l.productName)}</td><td data-label="تحویلی">${qty(l.deliveredKg)}</td><td data-label="مرجوعی">${qty(l.returnKg)}</td><td data-label="کسری">${qty(l.shortageKg)}</td><td data-label="خالص">${qty(l.netKg)}</td><td data-label="علت">${admE(l.reason || '—')}</td></tr>`).join('')}</tbody></table></div>
             ${r.note ? `<p class="adm-note">یادداشت: ${admE(r.note)}</p>` : ''}
-          </details>
-        </div></article>`).join('')}
+          </details></td></tr>`),'<div class="empty">تحویلی ثبت نشده است.</div>')}
     </section>`).join('') || sdEmpty('receipt', 'سابقه‌ای در این بازه نیست', 'بازه تاریخ یا فیلترها را تغییر دهید.');
   $('#drvRecords').innerHTML = `<section class="sd-panel adm-panel">
     <div class="sd-head"><div class="sd-head-main"><span class="sd-head-ico">${icon('receipt', 20)}</span><div><h2>سوابق سفارش‌های رانندگان</h2><p>تحویل‌ها و مرجوعی‌ها به تفکیک روز، راننده، نوع تسویه و کسری وزن.</p></div></div></div>
@@ -349,16 +353,16 @@ async function renderProductsPage() {
 function paintProducts() {
   const q = admNorm(adm.q);
   const rows = adm.products.filter((x) => !q || admNorm(`${x.name} ${x.quickCode}`).includes(q));
-  $('#admList').innerHTML = rows.map((x) => `<article class="adm-row adm-row-prod${x.isActive ? '' : ' is-inactive'}">
-      <div class="adm-cell"><small>کد سریع</small><b class="cust-code">${admE(x.quickCode)}</b></div>
-      <div class="adm-cell"><small>محصول</small><b>${admE(fa(x.name))}</b><span>واحد: ${admE(x.defaultUnit)}</span></div>
-      <div class="adm-cell"><small>قیمت امروز (ریال)</small>
+  $('#admList').innerHTML = admTable(['کد سریع', 'محصول', 'قیمت امروز (ریال)', 'عملیات'], rows.map((x) => `<tr class="adm-row adm-row-prod${x.isActive ? '' : ' is-inactive'}">
+      <td data-label="کد سریع"><div class="adm-cell"><b class="cust-code">${admE(x.quickCode)}</b></div></td>
+      <td data-label="محصول"><div class="adm-cell"><b>${admE(fa(x.name))}</b><span>واحد: ${admE(x.defaultUnit)}</span></div></td>
+      <td data-label="قیمت امروز (ریال)"><div class="adm-cell">
         <div class="adm-price"><input type="text" inputmode="numeric" data-price-for="${admE(x.id)}" aria-label="قیمت امروز ${admE(x.name)} (ریال)" value="${admE(admFormatPrice(adm.todayPrices[x.id] ?? ''))}" placeholder="مثلاً ۲۵۰٬۰۰۰" autocomplete="off">
-        <button class="btn btn-primary btn-sm" type="button" data-adm="prod-price" data-id="${admE(x.id)}">ثبت قیمت</button></div></div>
-      <div class="adm-cell adm-actions">${admActiveBadge(x.isActive)}
+        <button class="btn btn-primary btn-sm" type="button" data-adm="prod-price" data-id="${admE(x.id)}">ثبت قیمت</button></div></div></td>
+      <td data-label="عملیات"><div class="adm-cell adm-actions">${admActiveBadge(x.isActive)}
         <button class="btn btn-secondary btn-sm" type="button" data-adm="prod-edit" data-id="${admE(x.id)}">${icon('edit', 14)} ویرایش</button>
         ${admIsCatalogAdmin() ? `<button class="btn btn-secondary btn-sm" type="button" data-adm="prod-delete" data-id="${admE(x.id)}">${icon('trash', 14)} حذف</button>` : ''}
-      </div></article>`).join('') || sdEmpty('receipt', 'محصولی پیدا نشد', 'محصول جدید ثبت کنید.');
+      </div></td></tr>`), sdEmpty('receipt', 'محصولی پیدا نشد', 'محصول جدید ثبت کنید.'));
   admBindPriceInputs();
   // Enter در کادر قیمت = «ثبت قیمت»
   $$('[data-price-for]', $('#admList')).forEach((inp) => inp.addEventListener('keydown', (e) => {
@@ -502,18 +506,7 @@ function paintActivity() {
   const q = admNorm($('#actText')?.value || '');
   const rows = adm.activity.filter((a) => !q || admNorm(`${a.action} ${admActionLabel(a.action)} ${admEntityLabel(a.entityType)} ${a.username} ${JSON.stringify(a.details || {})}`).includes(q));
   $('#actCount').textContent = `${fa(rows.length)} رکورد`;
-  $('#admList').innerHTML = rows.map((a) => `<details class="adm-row adm-act">
-      <summary>
-        <span class="adm-cell"><small>زمان</small><b>${dt(a.createdAt)}</b></span>
-        <span class="adm-cell"><small>کاربر</small><b dir="ltr">${admE(a.username || 'سیستم')}</b><span dir="ltr">${admE(a.ip || '')}</span></span>
-        <span class="adm-cell"><small>عملیات</small><b>${admE(admActionLabel(a.action))}</b><span dir="ltr" class="adm-code">${admE(a.action)}</span></span>
-        <span class="adm-cell"><small>موجودیت</small><b>${admE(admEntityLabel(a.entityType))}</b><span dir="ltr">${admE(a.entityId ? String(a.entityId).slice(0, 12) : '')}</span></span>
-      </summary>
-      <div class="adm-detail">${(a.entityType==='order'&&a.entityId)||(a.entityType==='order_item'&&a.details?.orderId)?`<button type="button" class="btn btn-secondary btn-sm" data-admin-order-history="${admE(a.entityType==='order'?a.entityId:a.details.orderId)}">${icon('eye',14)} نمایش مسیر کامل سفارش</button>`:''}<div><small>شناسه‌ی کامل موجودیت</small><code dir="ltr">${admE(a.entityId || '—')}</code></div>
-        <div><small>مرورگر</small><code dir="ltr">${admE(a.userAgent || '—')}</code></div>
-        <div><small>جزئیات</small><pre dir="ltr">${admE(JSON.stringify(a.details || {}, null, 2))}</pre></div>
-        <div><small>شماره‌ی ردیف و هش</small><code dir="ltr">#${fa(a.seq || 0)} • ${admE(String(a.hash || '').slice(0, 24))}…</code></div></div>
-    </details>`).join('') || sdEmpty('fingerprint', 'فعالیتی پیدا نشد', 'فیلترها را تغییر دهید.');
+  $('#admList').innerHTML = admTable(['زمان','کاربر','عملیات','موجودیت','جزئیات'],rows.map((a)=>`<tr class="adm-row"><td data-label="زمان">${dt(a.createdAt)}</td><td data-label="کاربر"><b dir="ltr">${admE(a.username||'سیستم')}</b><br><span dir="ltr">${admE(a.ip||'')}</span></td><td data-label="عملیات"><b>${admE(admActionLabel(a.action))}</b><br><span dir="ltr">${admE(a.action)}</span></td><td data-label="موجودیت"><b>${admE(admEntityLabel(a.entityType))}</b><br><span dir="ltr">${admE(a.entityId?String(a.entityId).slice(0,12):'')}</span></td><td data-label="جزئیات"><details><summary>نمایش جزئیات</summary><div class="adm-detail">${(a.entityType==='order'&&a.entityId)||(a.entityType==='order_item'&&a.details?.orderId)?`<button type="button" class="btn btn-secondary btn-sm" data-admin-order-history="${admE(a.entityType==='order'?a.entityId:a.details.orderId)}">${icon('eye',14)} نمایش مسیر کامل سفارش</button>`:''}<div><small>شناسه‌ی کامل موجودیت</small><code dir="ltr">${admE(a.entityId||'—')}</code></div><div><small>مرورگر</small><code dir="ltr">${admE(a.userAgent||'—')}</code></div><div><small>جزئیات</small><pre dir="ltr">${admE(JSON.stringify(a.details||{},null,2))}</pre></div><div><small>شماره‌ی ردیف و هش</small><code dir="ltr">#${fa(a.seq||0)} • ${admE(String(a.hash||'').slice(0,24))}…</code></div></div></details></td></tr>`),sdEmpty('fingerprint','فعالیتی پیدا نشد','فیلترها را تغییر دهید.'));
 }
 
 /* ---------- گزارش پیشرفته ---------- */
@@ -590,7 +583,7 @@ async function runReport() {
     adm.report = r; adm.reportQuery=JSON.parse(JSON.stringify(dr));
     $('#repSummary').textContent = `${fa(r.total)} ردیف یافت شد؛ نمایش ${fa(Math.min(r.rows.length,300))} ردیف اول. خروجی CSV کامل براساس همین فیلترها از سرور دریافت می‌شود.`;
     const shown = r.rows.slice(0, 300);
-    $('#repResult').innerHTML = shown.length ? `<div class="adm-table-wrap"><table class="adm-table"><thead><tr>${r.columns.map((c) => `<th>${admE(c.label)}</th>`).join('')}</tr></thead>
+    $('#repResult').innerHTML = shown.length ? `<div class="adm-table-wrap bt-table-wrap"><table class="adm-table bt-table adm-report-table"><caption class="bt-caption">نتیجه گزارش</caption><thead><tr>${r.columns.map((c) => `<th>${admE(c.label)}</th>`).join('')}</tr></thead>
       <tbody>${shown.map((row) => `<tr>${r.columns.map((c) => `<td data-label="${admE(c.label)}">${/plate/i.test(c.key)?plateViewHtml(row[c.key],'—',true):admE(fmtRepCell(c.key, row[c.key]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
       : sdEmpty('reports', 'نتیجه‌ای یافت نشد', 'بازه‌ی تاریخ یا فیلترها را تغییر دهید.');
   } catch (err) { $('#repMsg').textContent = err.message; }
@@ -633,7 +626,7 @@ function printReport() {
 
 async function renderPaymentDevicesPage(){
  const d=await api('/api/admin/payment-devices');adm.paymentDevices=d.devices||[];
- $('#content').innerHTML=admHead('receipt','دستگاه‌های پوز','تعریف چند دستگاه و نگهداری سوابق؛ فقط دستگاه‌های فعال در فرم‌های تسویه قابل انتخاب هستند.',adm.paymentDevices.length,`<button class="btn btn-primary" data-adm="pos-new">＋ افزودن دستگاه پوز</button>`)+`<div class="notice">شماره پایانه باید یکتا باشد. برای دستگاه بی‌سیم شماره سیم‌کارت الزامی است. برای حفظ تاریخچه، دستگاه استفاده‌شده را غیرفعال کنید، نه حذف.</div><div id="posList" class="adm-list">${adm.paymentDevices.map(x=>`<article class="user-card"><div class="user-card-main"><div class="user-card-copy"><div class="user-card-title"><strong>${admE(x.title)}</strong>${admActiveBadge(x.isActive)}</div><div class="user-meta"><span>پایانه: <b>${admE(fa(x.terminalNumber))}</b></span><span>بانک: <b>${admE(x.bank)}</b></span><span>اتصال: <b>${x.connection==='wireless'?'بی‌سیم':'سیمی'}</b></span><span>سیم‌کارت: <b>${admE(x.simNumber||'—')}</b></span><span>مدل: <b>${admE(x.model)}</b></span></div></div></div><div class="user-card-actions"><button class="btn btn-secondary btn-sm" data-adm="pos-edit" data-id="${admE(x.id)}">ویرایش</button><button class="btn btn-secondary btn-sm" data-adm="pos-toggle" data-id="${admE(x.id)}" data-active="${!x.isActive}">${x.isActive?'غیرفعال‌سازی':'فعال‌سازی'}</button></div></article>`).join('')||'<div class="empty">دستگاهی تعریف نشده است.</div>'}</div></section>`;
+ $('#content').innerHTML=admHead('receipt','دستگاه‌های پوز','تعریف چند دستگاه و نگهداری سوابق؛ فقط دستگاه‌های فعال در فرم‌های تسویه قابل انتخاب هستند.',adm.paymentDevices.length,`<button class="btn btn-primary" data-adm="pos-new">＋ افزودن دستگاه پوز</button>`)+`<div class="notice">شماره پایانه باید یکتا باشد. برای دستگاه بی‌سیم شماره سیم‌کارت الزامی است. برای حفظ تاریخچه، دستگاه استفاده‌شده را غیرفعال کنید، نه حذف.</div><div id="posList" class="adm-list">${admTable(['دستگاه','پایانه','بانک و مدل','اتصال','وضعیت','عملیات'],adm.paymentDevices.map(x=>`<tr class="adm-row"><td data-label="دستگاه">${admE(x.title)}</td><td data-label="پایانه">${admE(fa(x.terminalNumber))}</td><td data-label="بانک و مدل">${admE(x.bank)} • ${admE(x.model)}</td><td data-label="اتصال">${x.connection==='wireless'?'بی‌سیم':'سیمی'} • ${admE(x.simNumber||'—')}</td><td data-label="وضعیت">${admActiveBadge(x.isActive)}</td><td data-label="عملیات"><div class="adm-cell adm-actions"><button class="btn btn-secondary btn-sm" data-adm="pos-edit" data-id="${admE(x.id)}">ویرایش</button><button class="btn btn-secondary btn-sm" data-adm="pos-toggle" data-id="${admE(x.id)}" data-active="${!x.isActive}">${x.isActive?'غیرفعال‌سازی':'فعال‌سازی'}</button></div></td></tr>`),'<div class="empty">دستگاهی تعریف نشده است.</div>')}</div></section>`;
  bindAdm('payment-devices');
 }
 function openPaymentDeviceForm(device){const d=device||{};const body=`<div class="fields"><label class="cust-field"><span>عنوان دستگاه *</span><input name="title" required maxlength="80" value="${admE(d.title||'')}"></label><label class="cust-field"><span>شماره پایانه *</span><input name="terminalNumber" required maxlength="40" value="${admE(d.terminalNumber||'')}" dir="ltr"></label><label class="cust-field"><span>بانک مقصد *</span><input name="bank" required maxlength="80" value="${admE(d.bank||'')}"></label><label class="cust-field"><span>مدل دستگاه *</span><input name="model" required maxlength="80" value="${admE(d.model||'')}"></label><label class="cust-field"><span>نوع اتصال</span><select name="connection"><option value="wired" ${d.connection!=='wireless'?'selected':''}>سیمی</option><option value="wireless" ${d.connection==='wireless'?'selected':''}>بی‌سیم</option></select></label><label class="cust-field" id="posSimWrap" ${d.connection==='wireless'?'':'hidden'}><span>شماره سیم‌کارت *</span><input name="simNumber" maxlength="20" value="${admE(d.simNumber||'')}" dir="ltr" placeholder="09…"></label>${device?`<label class="adm-check"><input type="checkbox" name="isActive" ${d.isActive?'checked':''}> دستگاه فعال</label>`:''}</div>`;openModal(device?'ویرایش دستگاه پوز':'تعریف دستگاه پوز',admModalForm('posDeviceForm',body,device?'ذخیره تغییرات':'ثبت دستگاه'));admBindClose();const form=$('#posDeviceForm');form.querySelector('[name=connection]').onchange=e=>{form.querySelector('#posSimWrap').hidden=e.target.value!=='wireless'};form.onsubmit=async e=>{e.preventDefault();const b=Object.fromEntries(new FormData(form));b.isActive=form.querySelector('[name=isActive]')?.checked??true;try{await api('/api/admin/payment-devices'+(device?'/'+device.id:''),{method:device?'PUT':'POST',body:JSON.stringify(b)});toast('دستگاه ذخیره شد.');closeModal();renderPaymentDevicesPage()}catch(err){$('#admFormMsg').textContent=err.message}};}
@@ -643,7 +636,7 @@ async function renderResourcePage(kind){
  const vehicle=kind==='vehicle', endpoint=vehicle?'transport-vehicles':'store-branches';
  const data=await api('/api/admin/'+endpoint); const rows=vehicle?data.vehicles:data.branches;
  adm.resources=rows; adm.resourceKind=kind;
- $('#content').innerHTML=admHead(vehicle?'truck':'store',vehicle?'خودروهای ترابری':'شعب فروشگاه',vehicle?'خودروها را جداگانه تعریف کنید؛ خودروی باسکول از این فهرست مستقل است.':'شمارهٔ شعبه مبنای شماره‌گذاری سفارش‌های فروشگاه است.',rows.length,`<button class="btn btn-primary" data-adm="resource-new">＋ افزودن</button>`)+`<div class="notice">${vehicle?'پس از تعریف، خودرو را در حساب راننده انتخاب کنید.':'پس از تعریف، شعبه را در حساب فروشگاه انتخاب کنید. حساب‌های قدیمی خودکار ادغام نمی‌شوند.'}</div><div class="adm-list">${rows.map(x=>`<article class="adm-row"><div class="adm-cell"><b>${admE(vehicle?x.vehicleType:x.name)}</b>${vehicle?plateViewHtml(x.plate,'—',true):x.name==='فروشگاه شعبه 1 حمزه کلا'?'':`<span>${admE('شعبه '+fa(x.branchNo))}</span>`}</div><div class="adm-cell adm-actions">${admActiveBadge(x.isActive)}<button class="btn btn-secondary btn-sm" data-adm="resource-edit" data-id="${admE(x.id)}">ویرایش</button></div></article>`).join('')||'<div class="empty">هنوز موردی تعریف نشده است.</div>'}</div></section>`;
+ $('#content').innerHTML=admHead(vehicle?'truck':'store',vehicle?'خودروهای ترابری':'شعب فروشگاه',vehicle?'خودروها را جداگانه تعریف کنید؛ خودروی باسکول از این فهرست مستقل است.':'شمارهٔ شعبه مبنای شماره‌گذاری سفارش‌های فروشگاه است.',rows.length,`<button class="btn btn-primary" data-adm="resource-new">＋ افزودن</button>`)+`<div class="notice">${vehicle?'پس از تعریف، خودرو را در حساب راننده انتخاب کنید.':'پس از تعریف، شعبه را در حساب فروشگاه انتخاب کنید. حساب‌های قدیمی خودکار ادغام نمی‌شوند.'}</div><div class="adm-list">${admTable([vehicle?'خودرو':'شعبه','وضعیت','عملیات'],rows.map(x=>`<tr class="adm-row"><td data-label="${vehicle?'خودرو':'شعبه'}"><b>${admE(vehicle?x.vehicleType:x.name)}</b> ${vehicle?plateViewHtml(x.plate,'—',true):x.name==='فروشگاه شعبه 1 حمزه کلا'?'':`<span>${admE('شعبه '+fa(x.branchNo))}</span>`}</td><td data-label="وضعیت">${admActiveBadge(x.isActive)}</td><td data-label="عملیات"><button class="btn btn-secondary btn-sm" data-adm="resource-edit" data-id="${admE(x.id)}">ویرایش</button></td></tr>`),'<div class="empty">هنوز موردی تعریف نشده است.</div>')}</div></section>`;
  bindAdm(endpoint);
 }
 function openResourceForm(item){
@@ -727,7 +720,7 @@ async function renderBackupsPage() {
       <button class="btn btn-secondary" type="button" id="backup-upload">افزودن فایل پشتیبان</button>
       <p>فایل دانلودشدهٔ پشتیبان را انتخاب کنید. پس از بررسی، فایل به فهرست اضافه می‌شود؛ بازیابی جداگانه با دکمهٔ «بازیابی» و تأیید رمز انجام می‌شود.</p>
       <div id="backup-message" role="status"></div></section>
-    </div><div class="adm-rep-main"><h3 class="adm-backup-list-title">نسخه‌های پشتیبان</h3><div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>نام نسخه</th><th>زمان</th><th>حجم (بایت)</th><th>عملیات</th></tr></thead><tbody>
+    </div><div class="adm-rep-main"><h3 class="adm-backup-list-title">نسخه‌های پشتیبان</h3><div class="adm-table-wrap bt-table-wrap"><table class="adm-table bt-table adm-backups-table"><caption class="bt-caption">نسخه‌های پشتیبان</caption><thead><tr><th>نام نسخه</th><th>زمان</th><th>حجم (بایت)</th><th>عملیات</th></tr></thead><tbody>
       ${backups.map(b => `<tr><td data-label="نام نسخه">${admE(b.name)}${b.automatic?' <small>(خودکار)</small>':''}</td><td data-label="زمان">${admE(dt(b.createdAt))}</td><td data-label="حجم (بایت)">${admE(b.size)}</td><td data-label="عملیات"><div class="adm-backup-row-actions"><a class="btn btn-secondary btn-sm" href="/api/admin/backups/${encodeURIComponent(b.name)}/download">دانلود</a> <button class="btn btn-secondary btn-sm" type="button" data-backup-restore="${admE(b.name)}">بازیابی</button></div></td></tr>`).join('') || '<tr><td colspan="4">هنوز نسخه‌ای ساخته نشده است.</td></tr>'}
     </tbody></table></div>${automaticCount>200?`<p>فهرست فقط ۲۰۰ پشتیبان خودکار جدیدتر را نشان می‌دهد؛ بقیه در پوشهٔ مقصد محفوظ‌اند و با بارگذاری قابل بازیابی هستند.</p>`:''}<div id="backup-confirm"></div></div></div></section>`;
   $('#auto-backup-form').onsubmit = async e => {
