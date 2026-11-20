@@ -39,9 +39,10 @@ test('مرورگر: دسکتاپ کوچک و بزرگ، کارت‌ها و پن�
    }
    await page.locator('.sd-store-card-v42 [data-action=store-order-details-v25]').click();await page.locator('#modal.open .modal-card').waitFor();
    assert.ok(await page.locator('#modal .modal-card').evaluate(e=>e.scrollWidth<=e.clientWidth+1),`sales modal ${width}`);await page.locator('#modal .modal-close').click();
-   await page.evaluate(()=>go('warehouse','incoming'));const row=page.locator('.wh38-incoming-card').first();await row.waitFor();await page.evaluate(()=>{clearInterval(app.wh38.timer);app.wh38.timer=null});
-   await check('.wh38-incoming-card',`incoming ${width}x${height}`);
-   assert.equal(await row.evaluate(e=>getComputedStyle(e).flexWrap),'nowrap');
+   await page.evaluate(()=>go('warehouse','incoming'));const row=page.locator('.wh-orders-table tbody tr').first();await row.waitFor();await page.evaluate(()=>{clearInterval(app.wh38.timer);app.wh38.timer=null});
+   const rowGeom=await row.evaluate(e=>{const r=e.getBoundingClientRect();return {buttons:[...e.querySelectorAll('button')].map(b=>{const x=b.getBoundingClientRect();return {l:x.left-r.left,r:r.right-x.right,t:x.top-r.top,b:r.bottom-x.bottom};})};});
+   assert.ok(rowGeom.buttons.length>0&&rowGeom.buttons.every(x=>Math.min(x.l,x.r,x.t,x.b)>=-1),`incoming ${width}x${height} controls outside row ${JSON.stringify(rowGeom)}`);
+   assert.equal(await page.locator('.bt-table-wrap').first().evaluate(e=>e.scrollWidth<=e.clientWidth+1||['auto','scroll'].includes(getComputedStyle(e).overflowX)),true,`incoming list scroll containment ${width}`);
    for(const action of ['wh38-order-details']){
     const button=row.locator(`[data-action=${action}]`);await button.scrollIntoViewIfNeeded();assert.equal(await button.isVisible(),true);
     assert.equal(await button.evaluate(e=>{const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return r.left>=-1&&r.right<=innerWidth+1&&!!hit&&(hit===e||e.contains(hit));}),true,`incoming ${action} ${width}`);

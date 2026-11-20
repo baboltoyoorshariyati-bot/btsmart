@@ -58,6 +58,21 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     }
     continue;
    }
+   if(kind==='warehouse'){
+    const table=page.locator('#content .bt-table');await table.waitFor();
+    assert.equal(await table.locator('thead th').count(),5,'ستون‌های جدول انبار');
+    assert.deepEqual(await table.locator('thead th').allInnerTexts(),['شماره سفارش','نام مشتری','تاریخ سفارش','تاریخ تحویل','عملیات']);
+    for(const width of [1280,768,390,320]){
+     await page.setViewportSize({width,height:900});
+     const row=table.locator('tbody tr').first();await row.waitFor();
+     assert.equal(await row.locator('td').count(),5,`warehouse/${width} cells`);
+     assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row',`warehouse/${width} row display`);
+     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`warehouse/${width} page overflow`);
+     const btn=row.locator('[data-action=wh38-order-details]');await btn.scrollIntoViewIfNeeded();assert.equal(await btn.isVisible(),true,`warehouse/${width} action`);
+     assert.equal(await row.locator('.bt-actions [data-action=wh38-order-details]').count(),1,'دکمهٔ جزئیات در ستون عملیات');
+    }
+    continue;
+   }
    for(const width of [1280,768,390,320]){
     await page.setViewportSize({width,height:900});
     const row=page.locator('#content .order-summary-row:visible,#content .sales-delivery-summary-row:visible,#content .stl-queue-item:visible,#content .gt-exit-card:visible').first();await row.waitFor();
