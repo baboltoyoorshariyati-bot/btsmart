@@ -330,7 +330,7 @@ function settlementPendingRowsV27(rows){
  const body=rows.map(o=>{
   const name=storeAwareOrderName(o),number=fa(o.orderNo||'—');
   const description=`${name}، شماره سفارش ${number}، تاریخ ${formatDateTime24(o.createdAt)}، ${qty(activeItemsOf(o).length)} قلم، آماده تسویه`;
-  return `<tr class="stl-queue-row ${stl.orderId===o.id?'active':''}" data-stl="select" data-action="select-settlement" data-id="${esc(o.id)}" title="${esc(description)}" aria-label="${esc(description)}">
+  return `<tr class="stl-queue-row ${stl.orderId===o.id?'active':''}" data-action="select-settlement" data-id="${esc(o.id)}" title="${esc(description)}" aria-label="${esc(description)}">
     <td data-label="نام مشتری"><span class="bt-cell-main">${esc(name)}</span></td>
     <td data-label="شماره سفارش"><bdi>${esc(number)}</bdi></td>
     <td data-label="تاریخ">${formatDateTime24(o.createdAt)}</td>

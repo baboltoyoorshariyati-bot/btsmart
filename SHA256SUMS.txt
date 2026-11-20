@@ -224,9 +224,9 @@ aebc418b4d559390680c227a7845f1d4991b171244be6011d4d121ebad02f0df  ./package.json
 a1405a8a27eb1a40cafaf4b2e16b42bab69bac72c31c457cb1e3613b9c79d32f  ./public/admin-ui.js
 2064099995191f01a76ac032a1f70bf14fa4f33ead4b74b44c9a0786f14f4a7e  ./public/android-chrome-192x192.png
 a0bd3b3fd14e7b3ef311543c910bfeb861346022e258f3d65474aec2a5b5b4f3  ./public/android-chrome-512x512.png
-2764177c089d7873c123b26b91f99400cbccd2f7b6287e22ab468dec6f189c6d  ./public/app.js
+e88d2314cd5ce7ad3ee5b845e3713e143d809443a0fa5c416ac688b6492e9b09  ./public/app.js
 cea98dba58c31f5d95773c711c10b626d0253a7281d7bfa0d9928b9c99650110  ./public/apple-touch-icon.png
-11fb37f35af1c66e9aae47a56ffb3ae9a3b738047e0af44b3b53b90e81af6858  ./public/bt-table.css
+5e5a77a76854075149d4721f949efa7c416db6c9bbf536ae339074e2e4598349  ./public/bt-table.css
 889d5792c5556e53cb56fe5afeea118f65b37512012e729f98508ddbc13d98ee  ./public/compatibility.css
 d73b57f7f6cc89482eb6ed82d81a2a8cb2c64490a3756689129045506a7d4c11  ./public/connection-status.js
 9e31ed22cbfd8a1a3c0d3b5eb3d6afe5e6d99bb53b11258882b28fa4f4111565  ./public/customers-ui.js
@@ -261,7 +261,7 @@ dad9e3a7a6a848ec16537af8c3791f7953a7b3930129b4d78b13321897a83901  ./public/style
 1c3c8acb1737d78bfe539fa704a14b3256b4c298a0eebea9f40702fb0ff6e090  ./public/transport-resources.css
 e8e2e4411bb9197e5a1959f21252abf359260fa3ec8d550a6bc0bc39b3b5ad9c  ./public/transport-resources.js
 76d033745f0f2c81f43397aefcbbe49174eee07982df15cfee4ca4d976f3c4d2  ./public/ui-polish.js
-72caa70cb7b6496f102703bc54686e6e1fbec1865c08e04e5670b8fd861da8f1  ./public/ui2.js
+995dfdd7e3cf0613297e954b5043991b17aa35e8b9703856596279c5a1f505e0  ./public/ui2.js
 4e880225ffbbb1902744190fb7d4ff7629ff2ca77ffd8467d631299910cb6246  ./public/warehouse-document.css
 4b269249e5f812b46eddbff935cd736332a3c9b597c0c3380fad2bddb36213ba  ./scripts/arena-release-build.py
 b7e67493ccf5bf21eba5721eea612c4236ee6a7f271d34f5a68818ca1c120ab4  ./scripts/backup-db.js
@@ -318,7 +318,7 @@ c923241dddb1325ec3c53e11610542c2526c6aee479efbc622bfde8cee1569dd  ./tests/docume
 30ca04e72b08ca6d6ff0be2783dde4693c7f996c8f7a6a08606d2cb76a903fdb  ./tests/driver-details-compact.test.js
 20bc3cdd5c6f9e2cd23149a3e0130267e9dbca7174cd0b4f112bfc23a17b49dd  ./tests/driver-inline-record.test.js
 ed943aa8647583e2c308076cdcf7cc21350c77c21ed3930835ea83350f66ec39  ./tests/driver-role-user-creation.test.js
-d322ca87a53e0a18153d98316f6ca86583e0d762de666f422dd291c602005450  ./tests/driver-store-receipt-layout-browser.test.js
+507d55682e806ca1cfbf9e0418b7ab8bf5d06adf4e2e8c132ef8c909fa990cbc  ./tests/driver-store-receipt-layout-browser.test.js
 d59cb10b0ac933a7d52aa2ed06ab8ea37c7ff12b4ceece1890fa47faf84ab40b  ./tests/drivers-warehouse-history.test.js
 7e1cecd588950d1fb35d7dd8e7698fc55e950039fc63c6690ffa2912242a9f9e  ./tests/fixtures/product-catalog-90.json
 d2613da0cd39e4380f33da6c8c140317b242bd6be917d3e6c8b48b52ded7550c  ./tests/fixtures/tls/README.md
@@ -506,10 +506,10 @@ f0b8a7423459d002b677e67ab2b27591be950a56549a93167a4bf2772290e0ca  ./ui-src/app/0
 92a596ca33cf29e7c0b8c36443b3fab55ae1f4390e7028e1bebb33e08a4c8050  ./ui-src/app/06-warehouse-documents.js
 1e837697eeca65fe6226d4183799e1efd47a58e2feacc7c37c06e8e411b97b1e  ./ui-src/app/07-dashboard-history.js
 af549a3e2175282e5c7bb4e29ceb5833f924188f33cfa9791a2023469c0e2109  ./ui-src/app/08-sales-cache-navigation.js
-5c26ccb135df1a81a4b1bdc39af1964b6d86ae6a6e9a0349e85956be7cb2c8bb  ./ui-src/app/09-settlement.js
+8fe2ab5a52ff92e59ca8328e9adb2b09efe89348ea78312e4abcaa66f6e8852e  ./ui-src/app/09-settlement.js
 66cdb4561bd6eb9af44f174d6a6c9fbe9b853a76a66a366c46ea7160b841c48a  ./ui-src/app/10-weighbridge-history.js
 b9afcc489a500be9b963ec217cac475bf09a2a2b86c3b766cad40a426d387dfe  ./ui-src/manifest.json
-016f09c0e2a567b67a02e488701ff80d67a5c1c2f12e4bb79a1f4aff7f9561e2  ./ui-src/ui2/01-sales-orders.js
+ba22bc3b929c09b3168cf3b93dabfe17e914261062f6faa0767c2b49a0556874  ./ui-src/ui2/01-sales-orders.js
 2850b06232e05ef19244d5c585ec65f2d4df37b5e46a36d948f35711a96a106e  ./ui-src/ui2/02-invoice-edits.js
 f4cb538e25d536e66d71cc07aaf3835879e90e64861e09192e1588616b39035d  ./ui-src/ui2/03-delivery.js
 5e3d042c3ead19962b66c07d9ebd261aee526985c55f5365f57af47694029d90  ./ui-src/ui2/04-gate.js
