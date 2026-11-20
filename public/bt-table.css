@@ -52,6 +52,20 @@
 .wh-orders-table th:nth-child(2),.wh-orders-table td:nth-child(2){width:auto;max-width:320px}
 .wh-orders-table td:nth-child(2) .bt-cell-main{overflow:hidden;text-overflow:ellipsis}
 
+/* ستون‌های «سوابق انبار» — همان قاعده: عرض ستون اندازهٔ متن، تنها نام مشتری کشسان */
+.whh-orders-table{table-layout:auto;width:auto;max-width:100%}
+.whh-orders-table th,.whh-orders-table td{width:1%;white-space:nowrap}
+.whh-orders-table th:nth-child(3),.whh-orders-table td:nth-child(3){width:auto;max-width:320px}
+.whh-orders-table td:nth-child(3) .bt-cell-main{overflow:hidden;text-overflow:ellipsis}
+.whh-orders-table th.bt-col-actions,.whh-orders-table td.bt-col-actions{width:1%}
+.whh-orders-table tbody tr[data-order]{height:48px}
+.whh-orders-table td small{font-size:10px;color:var(--muted)}
+
+/* ردیف بازشوندهٔ اقلام در جدول‌ها (سوابق انبار و…) */
+.bt-expand-row[hidden]{display:none}
+.bt-expand-row>td{padding:0;border-top:0;background:#fafbfc}
+.bt-expand-row .whh-details{padding:8px 10px;border:0;border-radius:0;background:transparent}
+
 /* چند دکمه در ستون عملیات */
 .bt-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:nowrap}
 .bt-cell-note{display:inline-block;color:var(--muted);font-size:10.5px;white-space:nowrap}
@@ -100,3 +114,15 @@
   #modal .order-details-modal.v21-detail-modal .order-detail-head{flex-direction:row;align-items:flex-start}
   #modal .order-details-modal.v21-detail-modal .detail-grid.detail-grid-6>div{min-width:96px}
 }
+
+/* ============================================================================
+   صف تسویه — کارت به اندازهٔ متن، نه تمام‌عرض (درخواست کارفرما)
+   اعلان قفل‌شدهٔ width:100%!important در compatibility.css دست‌نخورده است؛
+   اینجا با اولویت انتخابگر بالاتر فقط عرض را به fit-content می‌بریم.
+   ارتفاع ۵۴px، overflow-x:hidden و سه‌نقطه‌شدن نام (قفل‌های همان تست) پابرجاست:
+   نام بلند با max-width:100% و ellipsis کوتاه می‌شود، نه با پهن‌شدن کادر.
+   ========================================================================== */
+#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card{width:fit-content!important;max-width:100%!important}
+#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card{min-width:0}
+#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card .stl-queue-customer{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card .stl-queue-order{white-space:nowrap}

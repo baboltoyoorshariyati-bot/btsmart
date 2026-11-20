@@ -136,7 +136,7 @@ f089836e1878ed22217a25f8cc826d63abe8cc197c80ffcfad9f9bef08b40d53  ./docs/remaini
 469fe2fd46f9227f3c9f947b0c7b4413700607f3f8d25b87c3d2c6ab8ed3d7f1  ./docs/remote-pickup-workflow-plan-fa.md
 5141aeead09a8502fad0d4fabb815bf22605d0471f6b9a63433312798c9a2103  ./docs/reports-backup-update-fa.md
 389bc8793567ed75a8a2477ad19d98073a5ab8db4540227611fd4060ce3d5567  ./docs/sqlite-database-fa.md
-229769067a341457c25af405b4f2bbf15849d2d75666032a8d37963f4339ae1b  ./docs/table-pattern-fa.md
+1bf548868249c3144ba87fa4234e9c70080620373cd1dff37ee30ee4e5d02317  ./docs/table-pattern-fa.md
 b0e223096f7b00b24c57bc04132a9139dd6176f64c7cab1bb22d8e04cd929a1f  ./docs/ui-audit-fa.md
 b331c4f3b873d5a7f09ce1ed6bbb8e745d6295537cb336313fdf2efed155ec26  ./docs/weighbridge-pu850.md
 0eeaef027235513a81abad1ce5903c9869ce9455609c7146286df1924e8528f7  ./lib/auto-backup.js
@@ -223,9 +223,9 @@ aebc418b4d559390680c227a7845f1d4991b171244be6011d4d121ebad02f0df  ./package.json
 a1405a8a27eb1a40cafaf4b2e16b42bab69bac72c31c457cb1e3613b9c79d32f  ./public/admin-ui.js
 2064099995191f01a76ac032a1f70bf14fa4f33ead4b74b44c9a0786f14f4a7e  ./public/android-chrome-192x192.png
 a0bd3b3fd14e7b3ef311543c910bfeb861346022e258f3d65474aec2a5b5b4f3  ./public/android-chrome-512x512.png
-8a57b55cbb42a9346cb23e02e201cf4abfb086dfcae9ff9dd47d07ae10679acd  ./public/app.js
+e2ce1fdd142ec72a5c87c89497dbf592e7eac1a3436ebe38308cd5e288d3dc46  ./public/app.js
 cea98dba58c31f5d95773c711c10b626d0253a7281d7bfa0d9928b9c99650110  ./public/apple-touch-icon.png
-75e4ef685198ca919986be8971ebea944853e52346dcf319c9c0e30f05cfeeb8  ./public/bt-table.css
+de6d2091541286a54afae5920f550bdc3f1755dae61a78c59e94d10492607037  ./public/bt-table.css
 889d5792c5556e53cb56fe5afeea118f65b37512012e729f98508ddbc13d98ee  ./public/compatibility.css
 d73b57f7f6cc89482eb6ed82d81a2a8cb2c64490a3756689129045506a7d4c11  ./public/connection-status.js
 9e31ed22cbfd8a1a3c0d3b5eb3d6afe5e6d99bb53b11258882b28fa4f4111565  ./public/customers-ui.js
@@ -364,7 +364,7 @@ d8d340ff44c3ca75342b7729053de0a05269326c25f0d22f150dbd7225776980  ./tests/order-
 4f96d9a2734956c47c7cfe0fabdf8bab5ab26e63849ac42041a9c30af59a4482  ./tests/order-entry-enter-browser.test.js
 76976b2eb9a79aff62730371eb680d8f60ca986c96ef3a82ff8e00bcbef9395d  ./tests/order-history-ui.test.js
 1e61d99d4a9a8f7160c2aa5317b7bc82a67250c1d64083a27f9de066dc59eb14  ./tests/order-numbers.test.js
-21d87c9831b54f628c93ff82e1874301159d17a764d3dca7af9a4b08f643003c  ./tests/order-unified-layout-browser.test.js
+c9ca0bfa8a4320da491bb0f515a8bcd3c207640770c17ee52831b2d9f8dc836d  ./tests/order-unified-layout-browser.test.js
 5e9a06bb53edf7582b1b56e40bef981a7ff32692424c168436223df3424cb9c0  ./tests/persian-print-digits-browser.test.js
 68447e4b0887a285ad4b28e7dd03f4dd50985866a5cf513db0623672578c4a37  ./tests/persian-text-spacing.test.js
 aff5fb96252f9b5b49ebd67fd1ef3a910042ee0f2cae53f2d11c0c4dafbd5044  ./tests/pickup-activation-race.test.js
@@ -506,7 +506,7 @@ f0b8a7423459d002b677e67ab2b27591be950a56549a93167a4bf2772290e0ca  ./ui-src/app/0
 1e837697eeca65fe6226d4183799e1efd47a58e2feacc7c37c06e8e411b97b1e  ./ui-src/app/07-dashboard-history.js
 8c49fc894141e8205fdc1c7cecf7985767d307ee0239885109620775767e09ae  ./ui-src/app/08-sales-cache-navigation.js
 c657800955ddf921e030e6c7fbcc6c8976147f4995441d351573d1cf1734ca56  ./ui-src/app/09-settlement.js
-0bd99e9776953251de5348f383bfe58df3c8c56dbab53c7d6ae0efc71c3b78da  ./ui-src/app/10-weighbridge-history.js
+66cdb4561bd6eb9af44f174d6a6c9fbe9b853a76a66a366c46ea7160b841c48a  ./ui-src/app/10-weighbridge-history.js
 b9afcc489a500be9b963ec217cac475bf09a2a2b86c3b766cad40a426d387dfe  ./ui-src/manifest.json
 dab20e2389a85f3bca6c0977289bc15119b6c1f2d521da32fafde20c10d3b083  ./ui-src/ui2/01-sales-orders.js
 2850b06232e05ef19244d5c585ec65f2d4df37b5e46a36d948f35711a96a106e  ./ui-src/ui2/02-invoice-edits.js
