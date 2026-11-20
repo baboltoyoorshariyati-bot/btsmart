@@ -8,7 +8,7 @@
 .inv38-compact .inv38-meta {gap:5px;grid-template-columns:repeat(3,minmax(0,1fr))}
 .inv38-compact .inv38-meta > div {padding:4px 8px;border-radius:6px}
 .inv38-compact .inv38-meta span {font-size:9px}
-.inv38-compact .inv38-meta b {font-size:11px;line-height:1.35;margin-top:1px;}
+.inv38-compact .inv38-meta b {font-size:11px;line-height:1.35;margin-top:1px;overflow-wrap:anywhere}
 .inv38-compact .inv38-rule {height:2px;margin:6px 0}
 .inv38-compact .inv38-cust {gap:5px}
 .inv38-compact .inv38-cust > div {padding:4px 8px;border-radius:6px}
@@ -20,7 +20,7 @@
 .inv38-compact .inv38-table td:first-child {width:26px}
 .inv38-compact .inv38-table td small {display:inline;margin:0 5px 0 0;font-size:9px;white-space:nowrap}
 /* RTL grid: amount on the physical right, customer contact on physical left. */
-.inv38-compact .inv38-bottom {display:grid;gap:8px;margin-top:6px;align-items:stretch;grid-auto-rows:1fr;direction:rtl}
+.inv38-compact .inv38-bottom {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:8px;margin-top:6px;align-items:stretch;grid-auto-rows:1fr;direction:rtl}
 .inv38-compact .inv38-total {margin:0;display:flex;min-width:0}
 .inv38-compact .inv38-total-box {box-sizing:border-box;width:100%;padding:5px 8px;border-radius:6px}
 .inv38-compact .inv38-total-box > div {gap:6px;padding:2px 0;font-size:10.5px}

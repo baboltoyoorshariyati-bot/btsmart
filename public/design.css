@@ -9,9 +9,26 @@
 
 /* ---------- 1) توکن‌ها ---------- */
 :root{
+  /* برند */
+  --brand:#b40f23;
+  --brand-dark:#99091c;
+  --brand-deep:#7a0716;
+  --brand-050:#fef1f2;
+  --brand-100:#fde3e6;
+  --brand-200:#f9c9cf;
   --brand-300:#f2a7b0;
+  /* خنثی‌ها */
+  --ink:#151a21;
+  --ink-2:#2a323d;
   --ink-3:#4b5563;
+  --muted:#67707d;
+  --muted-2:#98a0ac;
+  --bg:#f4f5f7;
   --bg-soft:#eceef2;
+  --panel:#ffffff;
+  --panel-2:#fafbfc;
+  --line:#e6e9ee;
+  --line-strong:#d5dae2;
   /* وضعیت‌ها */
   --green:#0f7b4f; --green-bg:#e9f7f0; --green-line:#c4e8d6;
   --orange:#9a6700; --orange-bg:#fff6e0; --orange-line:#f0dfae;
@@ -24,9 +41,15 @@
   --shadow-sm:0 2px 8px rgba(16,24,40,.06);
   --shadow-md:0 8px 24px rgba(16,24,40,.09);
   --shadow-lg:0 24px 64px rgba(16,24,40,.16);
+  --r-sm:10px; --r-md:14px; --r-lg:18px; --r-xl:22px;
+  --rail:252px;
+  --font:"B Yekan","B Yekan+","BYekan","Vazirmatn",Tahoma,Arial,sans-serif;
   --ring:0 0 0 3px rgba(180,15,35,.12);
 }
-body{background:var(--bg);}
+
+/* ---------- 2) پایه ---------- */
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-size:15.5px;line-height:1.8}
 ::selection{background:var(--brand-100);color:var(--brand-deep)}
 button:focus-visible,.btn:focus-visible,[tabindex]:focus-visible{outline:none;box-shadow:var(--ring)}
 .input-shell input:focus-visible,.input-shell select:focus-visible,.input-shell textarea:focus-visible,textarea:focus-visible{outline:none;box-shadow:none}
@@ -50,7 +73,7 @@ svg.svg{stroke-width:1.7}
 .btn-secondary{background:#fff;border-color:var(--line-strong);color:var(--ink-2);box-shadow:var(--shadow-xs)}
 .btn-secondary:hover{background:var(--panel-2);border-color:#c4cbd6}
 .btn-ghost{color:var(--muted)}
-.btn-ghost:hover{background:var(--bt-soft);color:var(--ink-2)}
+.btn-ghost:hover{background:#eef0f3;color:var(--ink-2)}
 .btn-success{background:var(--green)}
 .btn-danger{background:var(--danger)}
 .btn-sm{min-height:34px;padding:0 12px;font-size:13px;border-radius:9px}
@@ -129,9 +152,9 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 
 /* فضای کار و هدر */
 .workspace{margin-right:var(--rail);padding:0 28px 40px}
-.workspace-header{margin-bottom:4px}
-.workspace-header h1{font-weight:1000;}
-.workspace-header p{margin-top:3px}
+.workspace-header{min-height:96px;padding:22px 0 16px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.workspace-header h1{font-size:26px;font-weight:1000;letter-spacing:normal}
+.workspace-header p{font-size:13.5px;margin-top:3px}
 .header-kicker{font-size:11px;letter-spacing:.12em}
 .header-status{background:#fff;border:1px solid var(--line);border-radius:999px;box-shadow:var(--shadow-xs);font-size:12px;font-weight:800;color:var(--ink-3)}
 .header-status .status-dot{background:#22b573;box-shadow:0 0 0 4px rgba(34,181,115,.12)}
@@ -152,7 +175,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .v29-sales-shell{margin-top:18px}
 .v28-sales-pane{animation:sdFade .22s ease}
 @keyframes sdFade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.sd-tabs{display:grid;gap:6px;background:var(--bg-soft);border:1px solid var(--line);border-radius:var(--r-lg);padding:6px}
+.sd-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:var(--bg-soft);border:1px solid var(--line);border-radius:var(--r-lg);padding:6px}
 .sd-tab{position:relative;display:flex;align-items:center;gap:10px;border:1px solid transparent;border-radius:13px;padding:9px 12px;background:transparent;text-align:right;transition:background .14s ease,box-shadow .14s ease,border-color .14s ease;min-width:0}
 .sd-tab:hover{background:rgba(255,255,255,.65)}
 .sd-tab.active{background:#fff;border-color:var(--line);box-shadow:var(--shadow-sm)}
@@ -217,7 +240,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .sd-queue-row .sd-live-dot{width:7px;height:7px;border-radius:50%;background:#22b573;display:inline-block;margin-left:4px;box-shadow:0 0 0 3px rgba(34,181,115,.15)}
 
 /* کارت راهنمای مسیر */
-.sd-flow-card{top:18px}
+.sd-flow-card{position:sticky;top:18px}
 .sd-flow-card .sd-pad{padding:20px}
 .sd-steps{display:grid;gap:0;margin-top:14px}
 .sd-step{display:flex;gap:12px;align-items:flex-start;position:relative;padding:0 0 18px}
@@ -557,7 +580,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .gt-switch input{width:15px;height:15px;accent-color:var(--brand);cursor:pointer}
 .gt-novehicle{display:flex;align-items:center;justify-content:center;gap:8px;height:64px;border:1.5px dashed var(--line-strong);border-radius:14px;color:var(--muted);font-size:13px;font-weight:800;background:#fff}
 /* پلاک ایران — نسخه مدرن */
-.iran-plate{margin-top:12px;display:grid;grid-template-columns:58px 1.05fr .78fr 1.2fr .8fr;height:80px;border:2.5px solid #22303f;border-radius:15px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
+.iran-plate{margin-top:12px;display:grid;grid-template-columns:58px 1.05fr .78fr 1.2fr .8fr;direction:ltr;height:80px;border:2.5px solid #22303f;border-radius:15px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
 .iran-plate .blue-strip{background:linear-gradient(180deg,#1a6fb5,#0d4f8c);display:grid;place-items:center;color:#fff}
 .iran-plate .blue-strip span{font-size:10px;font-weight:900;line-height:1.25;text-align:center}
 .iran-plate .plate-part{border-left:2px solid #eef1f4;display:grid;place-items:center;font-size:24px;font-weight:1000;color:var(--ink)}
@@ -865,7 +888,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .inv38-cust b{display:block;font-size:12px;margin-top:3px}
 .inv38-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:13px;border:1px solid #e3e6ea;border-radius:12px;overflow:hidden}
 .inv38-table th{background:#f6f7f9;font-size:9.5px;color:#67707d;padding:8px 9px;text-align:right;border-bottom:1px solid #e3e6ea}
-.inv38-table td{font-size:10.5px;padding:8px 9px;border-bottom:1px solid var(--bt-soft);text-align:right;vertical-align:top}
+.inv38-table td{font-size:10.5px;padding:8px 9px;border-bottom:1px solid #eef0f3;text-align:right;vertical-align:top}
 .inv38-table tr:last-child td{border-bottom:0}
 .inv38-table td small{display:block;color:#8a919c;margin-top:2px;font-size:8.5px}
 .inv38-total{display:flex;justify-content:flex-end;margin-top:12px}
@@ -880,7 +903,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .inv38-vitem{border:1px solid #e3e6ea;border-radius:10px;background:#fff;padding:8px;min-height:66px}
 .inv38-vitem>span{display:block;font-size:8.5px;color:#8a919c}
 .inv38-vitem>strong{display:block;margin-top:4px;font-size:10px}
-.inv38-vitem .ok{color:#0f7b4f}.inv38-vitem .bad{color:var(--bt-brand)}.inv38-vitem .manual{color:#9a6700}
+.inv38-vitem .ok{color:#0f7b4f}.inv38-vitem .bad{color:#b40f23}.inv38-vitem .manual{color:#9a6700}
 .inv38-vitem small{display:block;color:#8a919c;margin-top:4px;font-size:7.5px}
 .inv38-sign-img{display:block;max-width:150px;max-height:42px;margin:5px auto 0}
 .inv38-cust-under{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:4px 8px;margin-top:9px;align-items:center}
@@ -903,7 +926,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .rpt38-h2{font-size:13px;font-weight:1000;border-right:3px solid var(--brand);padding-right:8px;margin:18px 0 8px}
 .rpt38-table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #e3e6ea;border-radius:11px;overflow:hidden}
 .rpt38-table th{background:#f6f7f9;font-size:9.5px;color:#67707d;padding:7px 10px;text-align:right}
-.rpt38-table td{font-size:10.5px;padding:7px 10px;border-top:1px solid var(--bt-soft);text-align:right}
+.rpt38-table td{font-size:10.5px;padding:7px 10px;border-top:1px solid #eef0f3;text-align:right}
 
 /* ---------- اصلاحات صفحه ورود (دور بازبینی) ---------- */
 /* یکپارچه‌سازی ورودی‌های فرم ورود: حذف کادر داخلی خود input در همه حالت‌ها */
@@ -925,6 +948,8 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
    ================================================================ */
 #loginView.login-page:not(.hidden){
   display:block;min-height:100vh;min-height:100dvh;margin:0;
+  background:radial-gradient(900px 480px at 88% -12%,rgba(255,255,255,.14),transparent 60%),
+    linear-gradient(160deg,#c81429 0%,var(--brand) 48%,var(--brand-deep) 100%)!important;
   color:#fff;
 }
 #loginView .login-stage{
@@ -951,7 +976,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 #loginView label{color:#fff;font-weight:900;font-size:13px}
 #loginView .label-row span{display:none}
 #loginView .input-shell{background:#fff!important;border:0!important;height:50px;border-radius:13px;box-shadow:none}
-#loginView .input-shell:focus-within{background:#fff!important}
+#loginView .input-shell:focus-within{box-shadow:0 0 0 3px rgba(255,255,255,.45)!important;background:#fff!important}
 #loginView .input-shell input{color:#151a21}
 #loginView .field-icon,#loginView .input-action{color:var(--brand)}
 #loginView .btn-primary{
@@ -980,14 +1005,14 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .cust-row{display:grid;grid-template-columns:104px minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) auto;align-items:center;gap:16px;
   padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:#fff;cursor:pointer;min-width:0;box-shadow:var(--shadow-xs)}
 .cust-row:hover,.cust-row:focus-visible{border-color:var(--brand-300);box-shadow:var(--ring);outline:none}
-.cust-code{font-family:var(--font);font-weight:900;color:var(--brand);background:var(--bt-brand-50);border:1px solid #f0cfd3;
+.cust-code{font-family:var(--font);font-weight:900;color:var(--brand);background:#fdf2f3;border:1px solid #f0cfd3;
   border-radius:10px;padding:7px 8px;white-space:nowrap;font-size:15px;letter-spacing:.06em;direction:ltr;unicode-bidi:isolate;
   display:inline-block;width:100%;box-sizing:border-box;text-align:center;font-variant-numeric:tabular-nums}
 .cust-code-lg{font-size:18px;padding:8px 16px;width:auto;min-width:120px}
 .cust-main,.cust-stats{display:grid;gap:4px;min-width:0}
 .cust-main strong{font-size:15.5px;line-height:1.6;overflow-wrap:anywhere}
 .cust-main small,.cust-stats small{color:#4b5563;font-size:13px;line-height:1.6}
-.cust-chips{display:flex;flex-wrap:wrap;min-width:0;align-content:center}
+.cust-chips{display:flex;gap:6px;flex-wrap:wrap;min-width:0;align-content:center}
 .cust-chips .sd-chip{font-size:13px;direction:ltr;unicode-bidi:isolate}
 .cust-open{color:var(--muted)}
 .cust-code-chip{direction:ltr;font-weight:900;letter-spacing:.06em;font-variant-numeric:tabular-nums}
@@ -1014,7 +1039,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .cust-history{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .cust-history h4{margin:0 0 8px;font-size:14px}
 .cust-history ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.cust-history li{display:grid;gap:2px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;min-width:0;}
+.cust-history li{display:grid;gap:2px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;min-width:0;font-size:13px}
 .cust-history li{font-size:14px;line-height:1.7}
 .cust-history li span{color:#4b5563;font-size:12.5px}
 .cust-history li small{color:#4b5563;font-size:13px}
@@ -1094,7 +1119,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .adm-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
 .adm-table{width:100%;border-collapse:collapse;font-size:13px}
 .adm-table th{background:#f8fafc;color:var(--ink-2);font-weight:900;white-space:nowrap;text-align:start;padding:9px 10px;border-bottom:1px solid var(--line)}
-.adm-table td{padding:8px 10px;border-bottom:1px solid var(--bt-soft);text-align:start;overflow-wrap:anywhere;vertical-align:top;line-height:1.7}
+.adm-table td{padding:8px 10px;border-bottom:1px solid #eef0f3;text-align:start;overflow-wrap:anywhere;vertical-align:top;line-height:1.7}
 @media (max-width:900px){
   .adm-report{grid-template-columns:minmax(0,1fr)}
   .adm-row-prod{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
@@ -1125,13 +1150,16 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
    ================================================================ */
 .dsp-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}
 .dsp-list .dsp-card{display:grid;gap:10px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:#fff;min-width:0;box-shadow:var(--shadow-xs)}
-.dsp-card-head b{overflow-wrap:anywhere}
-.dsp-card-head small{overflow-wrap:anywhere}
-.dsp-items{display:grid;gap:4px;min-width:0}
-.dsp-items li{background:#f8fafc;border-radius:10px;min-width:0}
+.dsp-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;min-width:0}
+.dsp-card-head>div{display:grid;gap:3px;min-width:0}
+.dsp-card-head b{font-size:15px;overflow-wrap:anywhere}
+.dsp-card-head small{color:#4b5563;font-size:12.5px;overflow-wrap:anywhere}
+.dsp-card-head .badge{flex:0 0 auto}
+.dsp-items{list-style:none;margin:0;padding:0;display:grid;gap:4px;min-width:0}
+.dsp-items li{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;padding:6px 10px;background:#f8fafc;border-radius:10px;min-width:0}
 .dsp-items li span{overflow-wrap:anywhere;min-width:0}
 .dsp-items li b{white-space:nowrap}
-.dsp-driver{color:var(--ink-2);overflow-wrap:anywhere}
+.dsp-driver{font-size:13.5px;color:var(--ink-2);overflow-wrap:anywhere}
 .dsp-wait{padding:10px 12px;border:1px solid #d7dff3;border-radius:10px;background:#f3f6ff;color:#34446f;font-size:13px;font-weight:700;line-height:1.65}
 .dsp-driver-warning{margin:0 20px 12px;padding:12px 14px;border:1px solid #f0d38a;border-radius:12px;background:#fff9e8;color:#765313;font-size:13px;line-height:1.7}.dsp-driver-warning b{display:block;margin-bottom:2px}
 .dsp-assign{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -1286,6 +1314,10 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
   .gate-dispatch-home .gate-dispatch-home-group{padding:10px 10px 2px}
   .gate-dispatch-home-footer{padding:8px 10px 12px}
 }
+
+/* فروش: تأیید نهایی تحویل راننده و امضای مشتری */
+.sd-sales-tabs{grid-template-columns:repeat(6,minmax(0,1fr))}
+.sales-delivery-pane{display:grid;gap:16px}
 .sales-delivery-list{display:grid;gap:12px;padding:14px 18px 18px}
 .sales-delivery-card{padding:0;overflow:hidden;border-color:var(--line)}
 .sales-delivery-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(120deg,#fff,#fafbfc)}
@@ -1297,7 +1329,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .sales-delivery-meta small{color:var(--muted);font-size:11px}
 .sales-delivery-meta b{font-size:12px;overflow-wrap:anywhere}
 .sales-delivery-lines{display:grid;gap:7px;padding:2px 18px 12px}
-.sales-delivery-line{display:grid;align-items:center;gap:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.sales-delivery-line{display:grid;grid-template-columns:auto minmax(130px,1.2fr) repeat(4,minmax(95px,.7fr));align-items:center;gap:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
 .sales-delivery-line>strong{min-width:0;overflow-wrap:anywhere}
 .sales-delivery-line>span:not(.sd-row-no){color:var(--muted);font-size:11px;white-space:nowrap}
 .sales-delivery-line>span b{color:var(--ink);font-size:12px}
@@ -1313,6 +1345,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .sales-delivery-signature img{display:block;max-width:100%;width:min(560px,100%);min-height:130px;max-height:360px;object-fit:contain;border:1px solid var(--line);border-radius:12px;background:#fff}
 .sales-delivery-signature small{color:var(--muted)}
 @media(max-width:1100px){
+  .sd-sales-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
   .sales-delivery-meta,.sales-delivery-history .sales-delivery-meta{grid-template-columns:repeat(3,minmax(0,1fr))}
   .sales-delivery-line,.sales-delivery-history .sales-delivery-line{grid-template-columns:auto minmax(0,1fr) repeat(2,minmax(90px,.7fr))}
   .sales-delivery-line>small{grid-column:2/-1}
@@ -1346,6 +1379,9 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
   box-shadow:0 2px 5px rgba(35,20,24,.18);
 }
 #bell #bellCount.hidden{display:none!important}
+
+/* هفت تب فروش با شمارندهٔ مستقل فروشگاه */
+.sd-sales-tabs{grid-template-columns:repeat(7,minmax(0,1fr))}
 @media(max-width:1100px){.sd-sales-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 /* فرم غیرحضوری و کادر یادداشت: یک قاب بیرونی، بدون border تکراری */
@@ -1402,22 +1438,29 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 #content .contact-field-v41 .input-shell input{box-sizing:border-box;width:100%;height:auto;min-height:0;padding:0!important;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:0!important;flex:1 1 auto}
 #content .future-note-v40 textarea{box-sizing:border-box;width:100%;min-height:88px;margin-top:2px;border:1px solid var(--line-strong);border-radius:11px;padding:10px 12px;line-height:1.8}
 #content .future-note-v40 textarea:focus{border-color:var(--brand-200);box-shadow:0 0 0 3px rgba(180,15,35,.08)}
-.dsp-roster{min-width:0}
-.dsp-roster-head{flex-wrap:wrap}
-.dsp-roster-head p{line-height:1.7}
+.dsp-roster{display:grid;gap:11px;margin:15px 0 16px;padding:14px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(135deg,#fbfcfe,#fff);min-width:0}
+.dsp-roster-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.dsp-roster-head h3{margin:0;font-size:15px;font-weight:1000}
+.dsp-roster-head p{margin:3px 0 0;color:var(--muted);font-size:11px;line-height:1.7}
 .dsp-roster-head>span{padding:5px 9px;border:1px solid var(--green-line);border-radius:999px;background:var(--green-bg);color:var(--green);font-size:10px;font-weight:900}
-.dsp-roster-grid{min-width:0}
-.dsp-roster-card{min-width:0;}
-.dsp-roster-card>header{justify-content:space-between;}
-.dsp-roster-card>header strong{overflow-wrap:anywhere}
+.dsp-roster-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:9px;min-width:0}
+.dsp-roster-card{display:grid;gap:9px;min-width:0;padding:11px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.dsp-roster-card>header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;min-width:0}
+.dsp-roster-card>header>div{display:grid;gap:2px;min-width:0}
+.dsp-roster-card>header strong{font-size:13px;overflow-wrap:anywhere}
 .dsp-roster-card>header span{color:var(--muted);font-size:10px;overflow-wrap:anywhere}
-.dsp-active-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;background:var(--green-bg);color:var(--green)!important;font-weight:900;}
+.dsp-active-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;background:var(--green-bg);color:var(--green)!important;font-weight:900;white-space:nowrap}
 .dsp-active-pill i,.dsp-live-dot{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#15a56b}
-.dsp-roster-stats small{overflow-wrap:anywhere}
-.dsp-roster-orders{min-width:0}
-.dsp-roster-orders>div b{overflow-wrap:anywhere}
-.dsp-roster-orders>div small{overflow-wrap:anywhere}
-.dsp-roster-orders .badge{min-height:22px;padding:0 6px;font-size:9px;max-width:150px;white-space:normal;}
+.dsp-roster-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.dsp-roster-stats>span{display:grid;gap:1px;padding:6px;border:1px solid #edf0f3;border-radius:8px;background:#fafbfc;min-width:0}
+.dsp-roster-stats small{font-size:9px;color:var(--muted);overflow-wrap:anywhere}
+.dsp-roster-stats b{font-size:13px}
+.dsp-roster-orders{display:grid;gap:5px;min-width:0}
+.dsp-roster-orders>div{display:grid;grid-template-columns:9px minmax(0,1fr) auto;align-items:center;gap:7px;padding:6px 7px;border-radius:8px;background:#f8fafc;min-width:0}
+.dsp-roster-orders>div>span:nth-child(2){display:grid;gap:1px;min-width:0}
+.dsp-roster-orders>div b{font-size:10px;overflow-wrap:anywhere}
+.dsp-roster-orders>div small{font-size:9px;color:var(--muted);overflow-wrap:anywhere}
+.dsp-roster-orders .badge{min-height:22px;padding:0 6px;font-size:9px;max-width:150px;white-space:normal;text-align:center}
 .dsp-live-dot.is-blue{background:#4479d6}.dsp-live-dot.is-purple{background:#9566d0}.dsp-live-dot.is-green{background:#15a56b}
 .dsp-roster-orders>p{margin:0;padding:8px;border-radius:8px;background:#f8fafc;color:var(--muted);font-size:10px;text-align:center}
 .dsp-roster-pos{color:var(--muted);font-size:10px}
@@ -1428,7 +1471,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .dsp-invoice-kicker{color:var(--brand);font-size:8px;font-weight:1000;letter-spacing:.07em}
 .dsp-invoice-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
 .dsp-invoice table{width:100%;min-width:590px;border-collapse:collapse;font-size:11px}
-.dsp-invoice th,.dsp-invoice td{padding:7px 9px;border-bottom:1px solid var(--bt-soft);text-align:right;vertical-align:middle;white-space:nowrap}
+.dsp-invoice th,.dsp-invoice td{padding:7px 9px;border-bottom:1px solid #eef0f3;text-align:right;vertical-align:middle;white-space:nowrap}
 .dsp-invoice th{background:#fff;font-size:10px;color:var(--muted);font-weight:900}
 .dsp-invoice td:first-child{white-space:normal;min-width:160px}
 .dsp-invoice td strong{color:var(--ink);font-size:11px}
@@ -1444,8 +1487,9 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .dsp-delivery-modal-card{width:min(1180px,calc(100vw - 34px))!important;max-width:1180px!important;max-height:94vh!important}
 .dsp-delivery-modal-card .modal-body{padding:16px 19px!important}
 .dsp-delivery-modal-card .cust-form{display:grid;gap:12px}
-.dsp-delivery-customer{border:1px solid var(--line);border-radius:11px;}
-.dsp-delivery-customer span,.dsp-delivery-customer small{color:var(--muted);overflow-wrap:anywhere}
+.dsp-delivery-customer{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fafbfc}
+.dsp-delivery-customer strong{font-size:14px}
+.dsp-delivery-customer span,.dsp-delivery-customer small{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
 .dsp-delivery-modal-card .dsp-deliver{gap:10px}
 .dsp-delivery-modal-card .dsp-block{gap:8px;padding:10px}
 .dsp-payable-preview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:10px 12px;border:1px solid var(--green-line);border-radius:12px;background:var(--green-bg)}
@@ -1584,6 +1628,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .iran-plate.is-compact .plate-part span{display:grid;place-items:center;width:100%;height:100%;font-weight:1000;color:var(--ink);font-size:14px}
 .plate-view-inline{display:inline-flex;vertical-align:middle}
 .jalali-datetime-shell{cursor:pointer}
+.jalali-datetime-shell .datetime-display{flex:1}
 .datetime-popover .jalali-cal-grid{max-height:none}
 .datetime-popover .time-picker-hours{grid-template-columns:repeat(6,1fr)}
 .datetime-popover .time-picker-mins{grid-template-columns:repeat(6,1fr)}
@@ -1591,7 +1636,8 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 /* ================================================================
    v37.2.11-fix — منظم‌سازی کارت راننده + نالین datetime
    ================================================================ */
-.dsp-roster-grid{align-items:stretch}
+.dsp-roster-grid{grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;align-items:stretch}
+.dsp-roster-card{display:flex;flex-direction:column;gap:10px;padding:13px;border-radius:14px;box-shadow:0 1px 6px rgba(16,24,40,.04)}
 .dsp-roster-card>header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-width:0}
 .dsp-roster-card>header>div{display:grid;gap:4px;min-width:0;align-content:start}
 .dsp-roster-card>header strong{font-size:13.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1605,6 +1651,7 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
   .dsp-roster-card>header{grid-template-columns:minmax(0,1fr) auto}
 }
 @media(max-width:700px){
+  .dsp-roster-grid{grid-template-columns:1fr}
   .dsp-roster-card>header{grid-template-columns:minmax(0,1fr) auto;align-items:start}
   .dsp-roster-card>header .iran-plate{max-width:100%}
 }
@@ -1621,7 +1668,15 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .jalali-datetime-field label{font-size:12px;font-weight:800;color:var(--muted)}
 .datetime-popover{min-width:340px}
 .datetime-popover .jalali-cal-grid{grid-template-columns:repeat(7,1fr)}
+
+/* v37.2.11-fix2 — roster 4-column [avatar] 1fr [plate] auto [actions] */
+.dsp-roster-top{display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:10px;min-width:0}
+.dsp-roster-avatar{width:40px;height:40px;border-radius:50%;background:var(--brand-050);color:var(--brand);display:grid;place-items:center;font-weight:900;font-size:13px;border:1px solid var(--line)}
+.dsp-roster-main{display:grid;gap:2px;min-width:0}
+.dsp-roster-main strong{font-size:13.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-main span{font-size:11px;color:var(--muted);line-height:1.4}
 .dsp-roster-plate .iran-plate{max-width:190px}
+.dsp-roster-card{padding:13px}
 @media(max-width:1024px){
   .dsp-roster-top{grid-template-columns:40px 1fr auto;gap:8px}
   .dsp-roster-top .dsp-active-pill{grid-column:1/-1;justify-self:start}
@@ -1661,47 +1716,74 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
   .analog-hand.hour-hand{height:52px}
   .analog-hand.minute-hand{height:72px}
 }
-.dsp-roster-plate .iran-plate .blue-strip span{line-height:1.2!important}
+
+/* ===== 37.2.14 — بازطراحی نهایی کارتابل‌ها: یک‌خطی، منظم، پلاک استاندارد ===== */
+/* پلاک — استاندارد یکسان اما سایز بهینه برای هر کارتابل */
+.dsp-roster-plate .iran-plate{height:32px!important;grid-template-columns:32px 1fr .65fr .95fr .65fr!important;border-radius:7px!important}
+.dsp-roster-plate .iran-plate .blue-strip span{font-size:5.5px!important;line-height:1.2!important}
+.dsp-roster-plate .iran-plate .plate-part span{font-size:11px!important}
+.dsp-card-head .iran-plate,
+.dsp-driver .iran-plate,
+.dsp-delivery-customer .iran-plate,
+.sc-item .iran-plate{height:36px!important;grid-template-columns:34px 1fr .7fr 1fr .7fr!important;border-radius:7px!important}
+.dsp-card-head .iran-plate .plate-part span,
+.dsp-driver .iran-plate .plate-part span,
+.dsp-delivery-customer .iran-plate .plate-part span{font-size:12.5px!important}
 .iran-plate.is-readonly, .iran-plate.is-compact{height:42px;grid-template-columns:38px 1fr .75fr 1.05fr .75fr;border-radius:9px} /* پیش‌فرض برای جاهای دیگر (نگهبانی، فروش، انبار) */
 
 /* کارت راننده — 4 ستون دقیق [آواتار] 1fr [پلاک] auto [وضعیت] — یک خط، وسط‌چین */
-.dsp-roster{display:grid;gap:12px;}
+.dsp-roster{display:grid;gap:12px;margin:16px 0;padding:16px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,#fbfcfe,#fff)}
 .dsp-roster-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .dsp-roster-head h3{margin:0;font-size:15px;font-weight:1000}
 .dsp-roster-head p{margin:2px 0 0;color:var(--muted);font-size:11px}
-.dsp-roster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));}
-.dsp-roster-card{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 1px 6px rgba(16,24,40,.04)}
-.dsp-roster-top{display:grid;}
+.dsp-roster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px}
+.dsp-roster-card{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 1px 6px rgba(16,24,40,.04)}
+.dsp-roster-top{display:grid;grid-template-columns:42px 1fr auto auto;align-items:center;gap:10px;min-width:0}
 .dsp-roster-avatar{width:42px;height:42px;border-radius:50%;background:var(--brand-050);color:var(--brand);display:grid;place-items:center;font-weight:900;font-size:14px;border:1px solid var(--line);flex:0 0 auto}
 .dsp-roster-main{display:grid;gap:2px;min-width:0}
-.dsp-roster-main strong{font-size:13.5px;line-height:1.15;}
-.dsp-roster-main span{font-size:11px;color:var(--muted);line-height:1.3;}
+.dsp-roster-main strong{font-size:13.5px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-main span{font-size:11px;color:var(--muted);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-plate{justify-self:end}
 .dsp-roster-orders{display:grid;gap:6px}
-.dsp-roster-orders>div{display:grid;grid-template-columns:10px 1fr auto;align-items:center;}
+.dsp-roster-orders>div{display:grid;grid-template-columns:10px 1fr auto;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;background:#f8fafc;min-width:0}
 .dsp-roster-orders>div>span:nth-child(2){display:grid;gap:1px;min-width:0}
-.dsp-roster-orders>div b{font-size:11px;}
-.dsp-roster-orders>div small{font-size:10px;color:var(--muted);}
-.dsp-roster-stats{display:grid;grid-template-columns:repeat(4,1fr);}
-.dsp-roster-stats>span{display:grid;gap:2px;}
-.dsp-roster-stats small{font-size:9px;}
-.dsp-roster-stats b{font-size:13px;}
-.dsp-roster-pos{min-width:0}
-.dsp-roster-pos small{white-space:nowrap}
-.dsp-card-head{grid-template-columns:1fr auto;}
-.dsp-card-head>div{flex-wrap:nowrap;}
-.dsp-driver{flex-wrap:nowrap;text-overflow:ellipsis}
-.dsp-delivery-customer{flex-wrap:nowrap;min-width:0;}
+.dsp-roster-orders>div b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-orders>div small{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-roster-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dsp-roster-stats>span{display:grid;gap:2px;padding:8px 6px;border:1px solid #edf0f3;border-radius:10px;background:#fafbfc;text-align:center}
+.dsp-roster-stats small{font-size:9px;color:var(--muted);white-space:nowrap}
+.dsp-roster-stats b{font-size:13px;white-space:nowrap}
+.dsp-roster-pos{display:grid;gap:1px;padding:6px 8px;border:1px dashed #e2e8f0;border-radius:9px;background:#f8fafc;text-align:center;min-width:0}
+.dsp-roster-pos small{font-size:9px;color:var(--muted);white-space:nowrap}
+.dsp-roster-pos b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* کارت پخش — یک خط دقیق، هم‌تراز */
+.dsp-card{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+.dsp-card-head{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:12px 14px;min-width:0;background:#fbfcfe;border-bottom:1px solid var(--line)}
+.dsp-card-head>div{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:0;overflow:hidden}
+.dsp-card-head b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-card-head small{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.dsp-card-head .iran-plate{flex:0 0 auto}
+.dsp-card-head .badge{flex:0 0 auto}
+.dsp-driver{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;padding:10px 14px;font-size:13px;background:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsp-driver .iran-plate{flex:0 0 auto}
+.dsp-delivery-customer{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;padding:10px 14px;background:#fff;min-width:0;overflow:hidden}
+.dsp-delivery-customer strong{font-size:13px;white-space:nowrap}
 .dsp-delivery-customer span{font-size:11.5px;color:var(--muted);white-space:nowrap}
 .dsp-delivery-customer small{font-size:11px;color:var(--muted);white-space:nowrap}
-.dsp-items{margin:0;list-style:none}
-.dsp-items li{display:flex;justify-content:space-between;align-items:center;gap:12px;white-space:nowrap;overflow:hidden}
+.dsp-delivery-customer .iran-plate{flex:0 0 auto}
+.dsp-items{margin:0;padding:0;list-style:none}
+.dsp-items li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 14px;white-space:nowrap;overflow:hidden}
 .dsp-items li span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 @media(max-width:1100px){
+  .dsp-roster-grid{grid-template-columns:1fr 1fr}
   .dsp-card-head{grid-template-columns:1fr auto}
 }
 @media(max-width:700px){
-  .dsp-roster-top{gap:8px}
+  .dsp-roster-grid{grid-template-columns:1fr}
+  .dsp-roster-top{grid-template-columns:42px 1fr auto;gap:8px}
+  .dsp-roster-top .dsp-active-pill{grid-column:1/-1;justify-self:start}
   .dsp-roster-plate{justify-self:start}
   .dsp-card-head{grid-template-columns:1fr;gap:8px}
   .dsp-card-head .badge{justify-self:start}
@@ -1712,12 +1794,28 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
   .dsp-roster-plate{grid-column:1/-1}
   .dsp-roster-stats{grid-template-columns:1fr 1fr}
 }
+
+/* ===== 37.2.15 — بازطراحی کامل پخش و رانندگان + تاریخ داشبورد RTL + تایید نهایی بدون قیمت ===== */
+.dsp-roster-plate .iran-plate{height:34px!important;grid-template-columns:32px 1fr .65fr .95fr .65fr!important;border-radius:7px!important}
+.dsp-roster-plate .iran-plate .blue-strip span{font-size:5.5px!important}
+.dsp-roster-plate .iran-plate .plate-part span{font-size:11px!important}
 .dsp-card-head .iran-plate,
 .dsp-driver .iran-plate,
 .dsp-delivery-customer .iran-plate,
 .sc-item .iran-plate{height:36px!important;grid-template-columns:34px 1fr .7fr 1fr .7fr!important;border-radius:7px!important}
 .dsp-card-head .iran-plate .plate-part span,
 .dsp-driver .iran-plate .plate-part span{font-size:12.5px!important}
+
+/* پخش — کارت یک‌خطی کاملاً تراز */
+.dsp-card-head{padding:12px 14px;background:#fbfcfe}
+.dsp-card-head>div{gap:10px}
+.dsp-card-head b{font-size:14px;font-weight:900}
+.dsp-card-head small{font-size:11px}
+
+/* راننده — کارت مرتب با پایانه دقیق زیر برچسب */
+.dsp-roster-card{gap:12px}
+.dsp-roster-top{gap:12px}
+.dsp-roster-pos{padding:8px 6px}
 /* ===== 37.2.15 — بازطراحی کامل پخش و رانندگان — یک‌خطی، استاندارد ایران، RTL داشبورد ===== */
 /* تاریخ داشبورد RTL */
 .header-date, .header-date *{direction:rtl!important;text-align:right!important}
@@ -1752,13 +1850,19 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 /* کارتابل پخش — بازطراحی مینیمال یک‌خطی */
 .dsp-list{display:grid;gap:12px}
 .dsp-card{display:flex;flex-direction:column;gap:0;border:1px solid #e2e8f0;border-radius:14px;background:#fff;overflow:hidden;box-shadow:0 1px 4px rgba(15,23,42,.04)}
-.dsp-card-head{display:flex;}
-.dsp-card-head>div{display:flex;}
+.dsp-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:linear-gradient(180deg,#fbfdff 0%,#f8fafc 100%);border-bottom:1px solid #eef2f7;min-width:0}
+.dsp-card-head>div{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.dsp-card-head b{font-size:13.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.dsp-card-head small{font-size:11px;color:#64748b;white-space:nowrap}
+.dsp-card-head .iran-plate{flex:0 0 auto}
+.dsp-card-head .badge{flex:0 0 auto;font-size:10px;padding:4px 8px}
 .dsp-items{padding:8px 14px}
 .dsp-items li{padding:6px 0;border-bottom:1px dashed #f1f5f9;font-size:12.5px}
 .dsp-items li:last-child{border:0}
-.dsp-driver{background:#fff;display:flex;}
-.dsp-delivery-customer{display:flex;}
+.dsp-driver{padding:10px 14px;background:#fff;border-top:1px solid #f1f5f9;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden}
+.dsp-driver b{font-size:13px;white-space:nowrap}
+.dsp-delivery-customer{padding:10px 14px;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden;border-top:1px solid #f1f5f9;background:#fff}
+.dsp-delivery-customer strong{font-size:13px;white-space:nowrap}
 .dsp-delivery-customer span, .dsp-delivery-customer small{font-size:11.5px;white-space:nowrap}
 
 /* کارتابل رانندگان — دقیقاً زیرِ هم، بدون فاصله اضافی */
@@ -1766,13 +1870,15 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 .dsp-roster-head{margin-bottom:12px}
 .dsp-roster-grid{gap:12px}
 .dsp-roster-card{padding:14px;gap:10px}
-.dsp-roster-top{grid-template-columns:42px 1fr auto auto;}
+.dsp-roster-top{grid-template-columns:42px 1fr auto auto;gap:10px}
 .dsp-roster-main{line-height:1.2}
+.dsp-roster-plate{justify-self:end}
+.dsp-roster-stats{gap:6px}
 .dsp-roster-stats>span{padding:8px 4px}
 .dsp-roster-orders>div{padding:8px 10px}
-.dsp-roster-pos{margin-top:2px;padding:8px 10px;display:grid;}
+.dsp-roster-pos{margin-top:2px;padding:8px 10px;background:#f8fafc;border:1px dashed #e2e8f0;border-radius:10px;display:grid;gap:2px;text-align:center}
 .dsp-roster-pos small{font-size:9px;color:#64748b}
-.dsp-roster-pos b{font-size:12px;color:#0f172a;}
+.dsp-roster-pos b{font-size:12px;color:#0f172a;direction:ltr}
 
 @media(max-width:1100px){
   .dsp-roster-grid{grid-template-columns:1fr 1fr}
