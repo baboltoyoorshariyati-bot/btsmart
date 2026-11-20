@@ -1,5 +1,5 @@
 'use strict';
-/* v37.43.0 — کارت «سفارش‌های در جریان» کارتابل فروش تک‌خطی و کم‌ارتفاع است؛
+/* فهرست «سفارش‌های در جریان» کارتابل فروش با جدول مشترک ارائه می‌شود؛
    فهرست محصولات روی کارت نمایش داده نمی‌شود و فقط با «جزئیات کامل» دیده می‌شود.
    جلوی هر اطلاعات (شماره سفارش، شماره تماس، محل ارسال، ...) برچسبش نوشته می‌شود. */
 const test=require('node:test');
@@ -11,9 +11,11 @@ const read=(p)=>fs.readFileSync(path.join(root,p),'utf8');
 const app=read('public/app.js'), ui=read('public/ui2.js'), compat=read('public/compatibility.css');
 const slice=(src,from,to)=>src.slice(src.indexOf(from),src.indexOf(to,src.indexOf(from)));
 
-test('flow card is a compact single-line card without the product list',()=>{
+test('flow table retains actions without displaying the product list',()=>{
   const card=slice(ui,'function sdFlowCard','function salesFlowRowsV27');
-  assert.match(card,/sd-flow-card sd-flow-card-1line/);
+  assert.match(card,/<tr class="sd-flow-row/);
+  const table=slice(ui,'function salesFlowRowsV27','function renderSalesFlowV25');
+  assert.match(table,/class="bt-table sd-flow-table"/);
   // فهرست محصولات روی کارت نیست
   assert.doesNotMatch(card,/sd-flow-items/);
   assert.doesNotMatch(card,/it\.product\?\.name/);
@@ -27,11 +29,11 @@ test('flow card is a compact single-line card without the product list',()=>{
   assert.match(card,/sdTypeBadge\(o\)/);
 });
 
-test('flow uses common order row with labeled details and retains operational actions',()=>{
+test('flow table has labeled details and retains operational actions',()=>{
   const card=slice(ui,'function sdFlowCard','function salesFlowRowsV27');
   for(const label of ['شماره تماس','محل ارسال','آخرین اقدام','زمان ارسال'])assert.ok(card.includes(label),label);
-  const shared=slice(app,'function orderSummaryRow','const app =');for(const label of ['شماره سفارش','تاریخ','قلم'])assert.ok(shared.includes(label),label);
-  assert.match(card,/orderSummaryRow\(o/);assert.match(card,/storeAwareOrderPhone\(o\)/);assert.match(card,/o\.dispatchPlace\|\|'ثبت نشده'/);
+  for(const label of ['شماره سفارش','تاریخ','قلم'])assert.ok(card.includes(label),label);
+  assert.match(card,/data-label="عملیات"/);assert.match(card,/storeAwareOrderPhone\(o\)/);assert.match(card,/o\.dispatchPlace\|\|'ثبت نشده'/);
 });
 
 test('compact flow styles and tighter list spacing are in the final stylesheet',()=>{

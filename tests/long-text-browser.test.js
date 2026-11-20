@@ -27,7 +27,7 @@ test('مرورگر: نام‌های طولانی داخل کارت فروش، ا
   for(const width of [1440,1024,768,390,320]){
    await page.setViewportSize({width,height:850});await shopPage.setViewportSize({width,height:850});
    await page.evaluate(()=>go('warehouse','incoming'));await page.locator('.wh-orders-table tbody tr [data-action=wh38-order-details]').first().click();await contained(page,'#modal .v21-detail-table strong',productName,width);await page.locator('#modal .modal-close').click();
-   await page.evaluate(()=>go('sales','flow'));await contained(page,'.sd-flow-card .order-summary-identity strong',customerName,width);
+   await page.evaluate(()=>go('sales','flow'));await contained(page,'.sd-flow-row .bt-cell-main strong',customerName,width);
    await page.evaluate(()=>go('dashboard'));await contained(page,'.dbc-name',productName,width);
    await shopPage.evaluate(()=>go('store','create'));await contained(shopPage,'.st38-hero-badge span',storeName,width);
   }

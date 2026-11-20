@@ -27,16 +27,16 @@ test('مرورگر: چیدمان ردیف‌های انبار، سرویس فر�
    assert.equal(priceRow.length,2);for(const p of priceRow)assert.ok(p&&p.left>=-1&&p.right>=-1&&p.top>=-1&&p.bottom>=-1,`price row ${width}: ${JSON.stringify(p)}`);
    await page.locator('#admList [data-price-for]').first().fill('250000');
    await page.evaluate(()=>go('warehouse','preparing'));await page.waitForSelector('#wh38Body');await page.evaluate(o=>wh38Sheet(o),regular);
-   assert.equal(await page.locator('.wh38-prep-item:not(.sr318-row)').count(),1);
-   const cells=await contained('.wh38-prep-item:not(.sr318-row) .wh38-cell-box, .wh38-prep-item:not(.sr318-row) input, .wh38-prep-item:not(.sr318-row) .wh38-oos','.wh38-prep-item');
+   assert.equal(await page.locator('.wh-prep-table tr[data-wh38-item]').count(),1);
+   const cells=await contained('.wh-prep-table tr[data-wh38-item] .wh38-cell-box, .wh-prep-table tr[data-wh38-item] input, .wh-prep-table tr[data-wh38-item] .wh38-oos','tr[data-wh38-item]');
    assert.ok(cells.length>=6);for(const p of cells)assert.ok(p&&p.left>=-1&&p.right>=-1&&p.top>=-1&&p.bottom>=-1,`warehouse ${width}: ${JSON.stringify(p)}`);
-   const prepList=await page.locator('.wh38-prep-items').evaluate(e=>({scroll:e.scrollWidth,client:e.clientWidth,overflow:getComputedStyle(e).overflowX}));
+   const prepList=await page.locator('.wh-prep-table-wrap').evaluate(e=>({scroll:e.scrollWidth,client:e.clientWidth,overflow:getComputedStyle(e).overflowX}));
    if(width<=1150)assert(prepList.scroll<=prepList.client+1,`warehouse prep does not scroll horizontally ${width}: ${JSON.stringify(prepList)}`);
-   else{const coords=await page.locator('.wh38-prep-cell').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().top));assert.equal(new Set(coords).size,1,'desktop warehouse cells stay on one row');}
+   else{const coords=await page.locator('.wh-prep-table tr[data-wh38-item] > td').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().top));assert.equal(new Set(coords).size,1,'desktop warehouse cells stay on one row');}
    await page.locator('[data-wh38-weight]').fill('5');assert.match(await page.locator('#wh38Total').innerText(),/۵/);
    await page.locator('[data-wh38-oos]').check();assert.equal(await page.locator('[data-wh38-weight]').isDisabled(),true);await page.locator('[data-wh38-oos]').uncheck();
    await page.evaluate(o=>sr38Sheet(o),shop);
-   const controls=await contained('.sr318-row .sr318-ops input,.sr318-row .sr318-ops button','.sr318-row');assert.ok(controls.length>=5);
+   const controls=await contained('.sr318-table-row .sr-table-ops input,.sr318-table-row .sr-table-ops button','.sr318-table-row');assert.ok(controls.length>=5);
    for(const p of controls)assert.ok(p&&p.left>=-1&&p.right>=-1&&p.top>=-1&&p.bottom>=-1,`store ${width}: ${JSON.stringify(p)}`);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`page overflow ${width}`);
    if(width===390){

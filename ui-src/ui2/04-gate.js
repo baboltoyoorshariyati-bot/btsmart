@@ -1,9 +1,9 @@
 function gtQueueRow(v){
-  return `<div class="sd-queue-row" style="grid-template-columns:auto minmax(0,1fr) auto;cursor:default">
-    <span class="sd-avatar">${esc(initials(v.customer?.name||''))}</span>
-    <span class="sd-queue-main"><strong>${esc(v.customer?.name||'—')}</strong><span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px">${v.customer?.code?`<span class="sd-chip cust-code-chip">${esc(v.customer.code)}</span>`:''}${plateViewHtml(v.customer?.plate, 'بدون پلاک', true)}<span class="sd-chip">${esc(v.customer?.phone||'—')}</span></span></span>
-    ${badge(v.status)}
-  </div>`;
+ return `<tr data-visit="${esc(v.id)}"><td data-label="مشتری">${esc(v.customer?.name||'—')}${v.customer?.code?` <span class="sd-chip cust-code-chip">${esc(v.customer.code)}</span>`:''}</td><td data-label="پلاک">${plateViewHtml(v.customer?.plate,'بدون پلاک',true)}</td><td data-label="شماره تماس">${esc(v.customer?.phone||'—')}</td><td data-label="وضعیت">${badge(v.status)}</td></tr>`;
+}
+function gtWaitingTable(rows){
+ if(!rows.length)return '';
+ return `<div class="bt-table-wrap"><table class="bt-table gt-waiting-table"><caption class="bt-caption">مراجعه‌های در انتظار اقدام فروش</caption><thead><tr><th scope="col">مشتری</th><th scope="col">پلاک</th><th scope="col">شماره تماس</th><th scope="col">وضعیت</th></tr></thead><tbody>${rows.map(gtQueueRow).join('')}</tbody></table></div>`;
 }
 
 function gateDispatchTableRow(o){
@@ -105,7 +105,7 @@ function renderGateEntry(){
 function renderGateWaiting(queue){
   return `<section class="sd-panel" id="gateWaitingPanel">
     <div class="sd-head"><div class="sd-head-main"><span class="sd-head-ico" style="background:var(--orange-bg);color:var(--orange)">${icon('bell',19)}</span><div><h2>در انتظار اقدام فروش</h2><p>ورودی‌هایی که نگهبانی ثبت کرده و فروش هنوز برایشان سفارش ثبت نکرده است.</p></div></div><div class="sd-count"><strong>${qty(queue.length)}</strong><span>در صف</span></div></div>
-    <div class="sd-queue gt-waiting-list" id="gateWaitingRows">${queue.map(gtQueueRow).join('')||sdEmpty('user','صف فعالی وجود ندارد','با ثبت ورود مشتری، وضعیت مراجعه در این فهرست دیده می‌شود.')}</div>
+    <div class="sd-queue gt-waiting-list" id="gateWaitingRows">${gtWaitingTable(queue)||sdEmpty('user','صف فعالی وجود ندارد','با ثبت ورود مشتری، وضعیت مراجعه در این فهرست دیده می‌شود.')}</div>
     <div style="padding:0 20px 18px"><div class="sd-live-note"><i></i> پس از ثبت سفارش توسط فروش، مورد از این فهرست خارج می‌شود؛ این نما به‌صورت خودکار به‌روز می‌شود.</div></div>
   </section>`;
 }
@@ -118,23 +118,29 @@ function renderGateHistory(visits,hideHeading=false,detailsAction='gate-order-hi
 }
 
 function gateExitRow(o){
-  const field=(label,text,html)=>`<div class="gt-exit-field" title="${esc(label+': '+text)}"><small>${esc(label)}</small><span>${html??esc(text)}</span></div>`;
-  const phone=storeAwareOrderPhone(o),name=storeAwareOrderName(o),plate=o.customer?.plate||'بدون پلاک';
-  return `<article class="gt-exit-card" data-order="${esc(o.id)}">${field('مشتری',name)}${field('شماره و تاریخ سفارش',fa(o.orderNo||'—')+' • '+dt(o.createdAt))}${field('پلاک',fa(plate),plateViewHtml(o.customer?.plate,'بدون پلاک',true))}${field('شماره تماس',fa(phone))}${field('تعداد اقلام',String(activeItemsOf(o).length),qty(activeItemsOf(o).length)+' قلم')}<div class="gt-exit-actions"><button class="btn btn-success btn-sm" data-action="open-exit" data-id="${esc(o.id)}">${icon('check',14)} کنترل خروج</button></div></article>`;
+ const phone=storeAwareOrderPhone(o),name=storeAwareOrderName(o);
+ return `<tr data-order="${esc(o.id)}"><td data-label="مشتری">${esc(name)}</td><td data-label="شماره و تاریخ سفارش">${esc(fa(o.orderNo||'—'))} • ${esc(dt(o.createdAt))}</td><td data-label="پلاک">${plateViewHtml(o.customer?.plate,'بدون پلاک',true)}</td><td data-label="شماره تماس">${esc(fa(phone))}</td><td data-label="تعداد اقلام">${qty(activeItemsOf(o).length)} قلم</td><td data-label="عملیات" class="bt-col-actions"><button class="btn btn-success btn-sm" data-action="open-exit" data-id="${esc(o.id)}">${icon('check',14)} کنترل خروج</button></td></tr>`;
 }
+function gateExitTable(rows){
+ if(!rows.length)return '';
+ return `<div class="bt-table-wrap"><table class="bt-table gt-exit-table"><caption class="bt-caption">سفارش‌های آماده خروج</caption><thead><tr><th scope="col">مشتری</th><th scope="col">شماره و تاریخ سفارش</th><th scope="col">پلاک</th><th scope="col">شماره تماس</th><th scope="col">تعداد اقلام</th><th scope="col">عملیات</th></tr></thead><tbody>${rows.map(gateExitRow).join('')}</tbody></table></div>`;
+}
+
 function renderGateExit(orders){
   if(app.features?.pickupStaging)orders=orders.filter(o=>!o.pickupHandover);
   return `<section class="sd-panel gt-exit-panel">
     <div class="sd-head"><div class="sd-head-main"><span class="sd-head-ico" style="background:var(--green-bg);color:var(--green)">${icon('check',19)}</span><div><h2>سفارش‌های آماده خروج</h2><p>اقلام و وزن سفارش‌های مجاز به خروج را با بار واقعی تطبیق دهید.</p></div></div><div class="sd-count"><strong>${qty(orders.length)}</strong><span>آماده</span></div></div>
-    <div class="gt-exit-list" id="gateExitRows">${orders.map(gateExitRow).join('')||sdEmpty('check','فاکتور آماده خروج وجود ندارد','پس از تسویه هر سفارش، فاکتور آن برای کنترل خروج اینجا قرار می‌گیرد.')}</div>
+    <div class="gt-exit-list" id="gateExitRows">${gateExitTable(orders)||sdEmpty('check','فاکتور آماده خروج وجود ندارد','پس از تسویه هر سفارش، فاکتور آن برای کنترل خروج اینجا قرار می‌گیرد.')}</div>
     <div id="exitEditor" style="padding:0 20px 20px"></div>
   </section>`;
 }
 
 function renderPickupExits(orders){
  const rows=orders.filter(o=>o.cancellation?.status==='EXIT_APPROVED'||(o.status==='SETTLED'&&o.handover));
- return `<section class="sd-panel"><div class="sd-head"><h2>خروج مراجعهٔ سفارش غیرحضوری</h2><span>${qty(rows.length)} آماده خروج</span></div>${rows.map(o=>`<article class="sd-pad" data-pickup-exit="${esc(o.id)}"><p><b>سفارش ${esc(fa(o.orderNo||'—'))}</b> • صاحب سفارش: ${esc(o.customerName)} • ${esc(fa(o.customerPhone))}</p><p>تحویل‌گیرنده: <b>${esc(o.recipient?.name||'—')}</b> • ${esc(fa(o.recipient?.phone||''))} • ${esc([o.recipient?.vehicleType,o.recipient?.carType,o.recipient?.plate].filter(Boolean).join(' — '))}</p>${o.cancellation?.status==='EXIT_APPROVED'?`<p>خروج بدون کالا؛ انصراف توسط انبار و فروش تأیید شده است.</p><button type="button" class="btn btn-success" data-action="pickup-cancellation-exit" data-id="${esc(o.id)}">ثبت خروج بدون کالا</button>`:`<p>کالا را با اقلام تحویلی زیر تطبیق دهید:</p>${o.items.map(i=>`<label class="gt-check"><input type="checkbox" data-pickup-check="${esc(i.itemId)}"><span>${esc(i.productName)} • ${qty(i.deliveredKg)} کیلوگرم</span></label>`).join('')}<button type="button" class="btn btn-success" data-action="pickup-goods-exit" data-id="${esc(o.id)}">ثبت خروج کالا</button>`}</article>`).join('')||'<p class="sd-pad">خروجی آماده نیست.</p>'}</section>`;
+ const body=rows.map(o=>`<tr data-pickup-exit="${esc(o.id)}"><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="صاحب سفارش">${esc(o.customerName)} • ${esc(fa(o.customerPhone))}</td><td data-label="تحویل‌گیرنده">${esc(o.recipient?.name||'—')} • ${esc(fa(o.recipient?.phone||''))}<br>${esc([o.recipient?.vehicleType,o.recipient?.carType,o.recipient?.plate].filter(Boolean).join(' — '))}</td><td data-label="کنترل کالا">${o.cancellation?.status==='EXIT_APPROVED'?'خروج بدون کالا؛ انصراف توسط انبار و فروش تأیید شده است.':`<p>کالا را با اقلام تحویلی زیر تطبیق دهید:</p>${o.items.map(i=>`<label class="gt-check"><input type="checkbox" data-pickup-check="${esc(i.itemId)}"><span>${esc(i.productName)} • ${qty(i.deliveredKg)} کیلوگرم</span></label>`).join('')}`}</td><td data-label="عملیات" class="bt-col-actions">${o.cancellation?.status==='EXIT_APPROVED'?`<button type="button" class="btn btn-success" data-action="pickup-cancellation-exit" data-id="${esc(o.id)}">ثبت خروج بدون کالا</button>`:`<button type="button" class="btn btn-success" data-action="pickup-goods-exit" data-id="${esc(o.id)}">ثبت خروج کالا</button>`}</td></tr>`).join('');
+ return `<section class="sd-panel"><div class="sd-head"><h2>خروج مراجعهٔ سفارش غیرحضوری</h2><span>${qty(rows.length)} آماده خروج</span></div>${body?`<div class="bt-table-wrap"><table class="bt-table gt-pickup-exit-table"><caption class="bt-caption">خروج مراجعهٔ سفارش غیرحضوری</caption><thead><tr><th scope="col">شماره سفارش</th><th scope="col">صاحب سفارش</th><th scope="col">تحویل‌گیرنده</th><th scope="col">کنترل کالا</th><th scope="col">عملیات</th></tr></thead><tbody>${body}</tbody></table></div>`:'<p class="sd-pad">خروجی آماده نیست.</p>'}</section>`;
 }
+
 async function refreshPickupExit(){
  const host=$('#pickupExitPanel');if(!host||!app.features?.pickupStaging)return;
  try{const rows=(await fetchPagedList('/api/pickup/active','orders')).orders;const sig=JSON.stringify(rows.filter(o=>o.cancellation?.status==='EXIT_APPROVED'||(o.status==='SETTLED'&&o.handover)));if(host.dataset.signature!==sig){host.innerHTML=renderPickupExits(rows);host.dataset.signature=sig;}}catch(e){throw new Error('به‌روزرسانی خروج سفارش غیرحضوری ناموفق بود: '+e.message);}
@@ -178,7 +184,7 @@ function bindPickupGateEntry(){
  if(!input||!results||!selected||!clear)return;
  let timer=0,seq=0,rows=[];app.pickupSelected=null;
  input.addEventListener('input',()=>{clearTimeout(timer);const search=input.value.trim(),id=++seq;if(search.length<2){results.innerHTML='';return;}
-  timer=setTimeout(async()=>{try{const data=await api('/api/pickup/orders?q='+encodeURIComponent(search));if(seq!==id||!input.isConnected)return;rows=data.orders||[];results.innerHTML=rows.map((o,i)=>`<div class="order-compact-row"><span>سفارش ${esc(fa(o.orderNo||'—'))}</span><b>${esc(o.customerName||'—')}</b><span>${esc(fa(o.customerPhone||''))}</span><span>تاریخ تحویل: ${esc(o.deliveryDate?dateLabel(o.deliveryDate):'تعیین نشده')}</span><button type="button" class="btn btn-secondary btn-sm" data-pickup-choose="${i}" ${o.hasOpenVisit?'disabled':''}>${o.hasOpenVisit?'مراجعه باز دارد':'انتخاب سفارش'}</button></div>`).join('')||'<p>سفارشی یافت نشد.</p>';}catch(e){if(seq===id)results.textContent='خطا در جست‌وجو: '+e.message;}},250);
+  timer=setTimeout(async()=>{try{const data=await api('/api/pickup/orders?q='+encodeURIComponent(search));if(seq!==id||!input.isConnected)return;rows=data.orders||[];results.innerHTML=`<div class="bt-table-wrap"><table class="bt-table gt-pickup-search-table"><caption class="bt-caption">نتایج جستجوی سفارش</caption><thead><tr><th scope="col">شماره سفارش</th><th scope="col">مشتری</th><th scope="col">شماره تماس</th><th scope="col">تاریخ تحویل</th><th scope="col">عملیات</th></tr></thead><tbody>${rows.map((o,i)=>`<tr><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="مشتری">${esc(o.customerName||'—')}</td><td data-label="شماره تماس">${esc(fa(o.customerPhone||''))}</td><td data-label="تاریخ تحویل">${esc(o.deliveryDate?dateLabel(o.deliveryDate):'تعیین نشده')}</td><td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-secondary btn-sm" data-pickup-choose="${i}" ${o.hasOpenVisit?'disabled':''}>${o.hasOpenVisit?'مراجعه باز دارد':'انتخاب سفارش'}</button></td></tr>`).join('')||'<tr><td colspan="5">سفارشی یافت نشد.</td></tr>'}</tbody></table></div>`;}catch(e){if(seq===id)results.textContent='خطا در جست‌وجو: '+e.message;}},250);
  });
  const name=$('#gateCustomerName'),phone=$('#gateCustomerPhone');
  let otherDraft={name:'',phone:''};

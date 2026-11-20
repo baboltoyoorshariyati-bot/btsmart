@@ -61,8 +61,8 @@ test('مرورگر: دسکتاپ کوچک و بزرگ، کارت‌ها و پن�
   await post(`/api/orders/${regular.id}/warehouse/accept`,{});await post(`/api/orders/${regular.id}/warehouse/start-preparing`,{});regular=(await get(`/api/orders/${regular.id}`)).order;
   await post(`/api/orders/${shop.id}/warehouse/accept`,{});await post(`/api/orders/${shop.id}/warehouse/start-preparing`,{});shop=(await get(`/api/orders/${shop.id}`)).order;
   for(const [width,height] of sizes){
-   await page.setViewportSize({width,height});await page.evaluate(()=>go('warehouse','preparing'));await page.locator('#wh38Body').waitFor();await page.evaluate(o=>wh38Sheet(o),regular);await check('.wh38-prep-item:not(.sr318-row)',`warehouse form ${width}`);
-   await page.evaluate(o=>sr38Sheet(o),shop);await check('.sr318-row',`store service ${width}`);
+   await page.setViewportSize({width,height});await page.evaluate(()=>go('warehouse','preparing'));await page.locator('#wh38Body').waitFor();await page.evaluate(o=>wh38Sheet(o),regular);await check('.wh-prep-table tr[data-wh38-item]',`warehouse form ${width}`);
+   await page.evaluate(o=>sr38Sheet(o),shop);await check('.sr318-table-row',`store service ${width}`);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`page overflow ${width}`);
    await page.evaluate(()=>go('admin'));await page.evaluate(()=>{clearInterval(app.indicatorTimer);app.indicatorTimer=null;});await page.locator('#settings-tab-audit').click();await page.locator('.audit-table').waitFor();
    assert.equal(await page.locator('.audit-table').evaluate(e=>e.closest('.table-wrap').scrollWidth<=e.closest('.table-wrap').clientWidth+1),true,`audit table ${width}`);
