@@ -223,9 +223,9 @@ aebc418b4d559390680c227a7845f1d4991b171244be6011d4d121ebad02f0df  ./package.json
 a1405a8a27eb1a40cafaf4b2e16b42bab69bac72c31c457cb1e3613b9c79d32f  ./public/admin-ui.js
 2064099995191f01a76ac032a1f70bf14fa4f33ead4b74b44c9a0786f14f4a7e  ./public/android-chrome-192x192.png
 a0bd3b3fd14e7b3ef311543c910bfeb861346022e258f3d65474aec2a5b5b4f3  ./public/android-chrome-512x512.png
-8a57b55cbb42a9346cb23e02e201cf4abfb086dfcae9ff9dd47d07ae10679acd  ./public/app.js
+e2ce1fdd142ec72a5c87c89497dbf592e7eac1a3436ebe38308cd5e288d3dc46  ./public/app.js
 cea98dba58c31f5d95773c711c10b626d0253a7281d7bfa0d9928b9c99650110  ./public/apple-touch-icon.png
-75e4ef685198ca919986be8971ebea944853e52346dcf319c9c0e30f05cfeeb8  ./public/bt-table.css
+f78b3db3718fccd7cfb6711aaee6807bc44f0beb163f58f36fcaf59cff5172df  ./public/bt-table.css
 889d5792c5556e53cb56fe5afeea118f65b37512012e729f98508ddbc13d98ee  ./public/compatibility.css
 d73b57f7f6cc89482eb6ed82d81a2a8cb2c64490a3756689129045506a7d4c11  ./public/connection-status.js
 9e31ed22cbfd8a1a3c0d3b5eb3d6afe5e6d99bb53b11258882b28fa4f4111565  ./public/customers-ui.js
@@ -506,7 +506,7 @@ f0b8a7423459d002b677e67ab2b27591be950a56549a93167a4bf2772290e0ca  ./ui-src/app/0
 1e837697eeca65fe6226d4183799e1efd47a58e2feacc7c37c06e8e411b97b1e  ./ui-src/app/07-dashboard-history.js
 8c49fc894141e8205fdc1c7cecf7985767d307ee0239885109620775767e09ae  ./ui-src/app/08-sales-cache-navigation.js
 c657800955ddf921e030e6c7fbcc6c8976147f4995441d351573d1cf1734ca56  ./ui-src/app/09-settlement.js
-0bd99e9776953251de5348f383bfe58df3c8c56dbab53c7d6ae0efc71c3b78da  ./ui-src/app/10-weighbridge-history.js
+66cdb4561bd6eb9af44f174d6a6c9fbe9b853a76a66a366c46ea7160b841c48a  ./ui-src/app/10-weighbridge-history.js
 b9afcc489a500be9b963ec217cac475bf09a2a2b86c3b766cad40a426d387dfe  ./ui-src/manifest.json
 dab20e2389a85f3bca6c0977289bc15119b6c1f2d521da32fafde20c10d3b083  ./ui-src/ui2/01-sales-orders.js
 2850b06232e05ef19244d5c585ec65f2d4df37b5e46a36d948f35711a96a106e  ./ui-src/ui2/02-invoice-edits.js
