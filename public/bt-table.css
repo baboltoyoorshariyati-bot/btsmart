@@ -123,5 +123,6 @@
    نام بلند با max-width:100% و ellipsis کوتاه می‌شود، نه با پهن‌شدن کادر.
    ========================================================================== */
 #appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card{width:fit-content!important;max-width:100%!important}
-#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card .stl-queue-customer{max-width:none;white-space:nowrap}
+#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card{min-width:0}
+#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card .stl-queue-customer{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card .stl-queue-order{white-space:nowrap}
