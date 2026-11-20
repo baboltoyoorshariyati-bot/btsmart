@@ -62,8 +62,9 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
    }
    if(kind==='warehouse-history'){
     const table=page.locator('#content .whh-orders-table');await waitFor(table,'whh-table');
-    assert.equal(await table.locator('thead th').count(),6,'ستون‌های جدول سوابق انبار');
-    assert.deepEqual(await table.locator('thead th').allInnerTexts(),['تاریخ و ساعت','شماره سفارش','نام مشتری','وزن تحویلی','ثبت‌کننده','عملیات']);
+    // ردیف بازشوندهٔ اقلام خودش یک جدول تو در تو دارد؛ فقط سرستون جدول اصلی شمرده می‌شود
+    assert.equal(await table.locator('> thead th').count(),6,'ستون‌های جدول سوابق انبار');
+    assert.deepEqual(await table.locator('> thead th').allInnerTexts(),['تاریخ و ساعت','شماره سفارش','نام مشتری','وزن تحویلی','ثبت‌کننده','عملیات']);
     for(const width of [1280,768,390,320]){
      await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
      const row=table.locator('tbody tr[data-order]').first();await waitFor(row,`whh-row ${width}`);
@@ -76,8 +77,8 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
    }
    if(kind==='warehouse'){
     const table=page.locator('#content .bt-table');await waitFor(table,'warehouse-table');
-    assert.equal(await table.locator('thead th').count(),5,'ستون‌های جدول انبار');
-    assert.deepEqual(await table.locator('thead th').allInnerTexts(),['شماره سفارش','نام مشتری','تاریخ سفارش','تاریخ تحویل','عملیات']);
+    assert.equal(await table.locator('> thead th').count(),5,'ستون‌های جدول انبار');
+    assert.deepEqual(await table.locator('> thead th').allInnerTexts(),['شماره سفارش','نام مشتری','تاریخ سفارش','تاریخ تحویل','عملیات']);
     for(const width of [1280,768,390,320]){
      await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
      const row=table.locator('tbody tr').first();await waitFor(row,`warehouse-row ${width}`);
