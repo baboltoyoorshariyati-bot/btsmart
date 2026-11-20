@@ -60,6 +60,20 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     }
     continue;
    }
+   if(kind==='warehouse-history'){
+    const table=page.locator('#content .whh-orders-table');await waitFor(table,'whh-table');
+    assert.equal(await table.locator('thead th').count(),6,'ستون‌های جدول سوابق انبار');
+    assert.deepEqual(await table.locator('thead th').allInnerTexts(),['تاریخ و ساعت','شماره سفارش','نام مشتری','وزن تحویلی','ثبت‌کننده','عملیات']);
+    for(const width of [1280,768,390,320]){
+     await page.setViewportSize({width,height:900});
+     const row=table.locator('tbody tr[data-order]').first();await waitFor(row,`whh-row ${width}`);
+     assert.equal(await row.locator('td').count(),6,`whh/${width} cells`);
+     assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row',`whh/${width} row display`);
+     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`whh/${width} page overflow`);
+     const btn=row.locator('[data-whh-order-details], [data-whh-detail]').first();await btn.scrollIntoViewIfNeeded();assert.equal(await btn.isVisible(),true,`whh/${width} action`);
+    }
+    continue;
+   }
    if(kind==='warehouse'){
     const table=page.locator('#content .bt-table');await waitFor(table,'warehouse-table');
     assert.equal(await table.locator('thead th').count(),5,'ستون‌های جدول انبار');
