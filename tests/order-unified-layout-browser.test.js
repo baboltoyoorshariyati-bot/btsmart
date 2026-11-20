@@ -13,6 +13,8 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
   const real=(await post('/api/orders/remote',{name:'مشتری واقعی آزمون',phone:'09121112234',dispatchPlace:'بابل',scheduledDate:day,scheduledAt:day+'T00:00',transportWorkflow:true,deliveryMode:'DELIVERY',items:[{productId:'p01',requestedQty:4,requestedUnit:'کیلوگرم'}]})).order;
   await page.evaluate(()=>go('sales','flow'));const realRow=page.locator(`.sd-flow-list [data-order="${real.id}"]`);await realRow.waitFor();await realRow.locator('[data-action=order-details]').click();await page.locator('#modal.open .v21-detail-modal').waitFor();assert.match(await page.locator('#modal').innerText(),/مشتری واقعی آزمون/);await page.evaluate(()=>closeModal());
   const kinds=['remote','flow','future','settlement','sales-store','warehouse','warehouse-store-incoming','warehouse-store-preparing','delivery','transport','store-registered','store-delivery','store-delivered','gate','gate-dispatch','legacy-dispatch','sales-history','warehouse-document','store-document','warehouse-history','invoice'];
+  let step='start';
+  const waitFor=async(locator,label,opts)=>{ try{ return await locator.waitFor({timeout:20000,...opts}); }catch(e){ throw new Error(`STEP ${label} | ${String(e.message).split('\n')[0]}`); } };
   for(const kind of kinds){
    await page.evaluate(kind=>{
     if(app.timer)clearInterval(app.timer);if(app.wh38?.timer)clearInterval(app.wh38.timer);
@@ -46,7 +48,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
    if(kind==='delivery'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});const row=page.locator('.sales-distribution-table tr');await row.waitFor();assert.equal(await row.locator('td').count(),8);assert.equal(await row.evaluate(e=>getComputedStyle(e).display),'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}continue;}
    if(kind==='invoice'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});const table=page.locator('.settlement-invoice-table');await table.waitFor();assert.equal(await table.locator('th').count(),7);assert(await table.evaluate(e=>e.scrollWidth<=e.clientWidth+1));}continue;}
    if(kind==='warehouse-store-incoming'||kind==='warehouse-store-preparing'){
-    const table=page.locator('#content .wh38-store-table'),row=table.locator('tbody tr[data-store-order]').first();await row.waitFor();
+    const table=page.locator('#content .wh38-store-table'),row=table.locator('tbody tr[data-store-order]').first();await waitFor(row,`store-row ${kind}`);
     for(const width of [1280,768,390,320]){
      await page.setViewportSize({width,height:900});
      const layout=await row.evaluate(el=>{const r=el.getBoundingClientRect();return{display:getComputedStyle(el).display,left:r.left,right:r.right,cells:[...el.children].map(x=>x.getBoundingClientRect().toJSON()),scroll:document.documentElement.scrollWidth,viewport:innerWidth};});
@@ -59,12 +61,12 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     continue;
    }
    if(kind==='warehouse'){
-    const table=page.locator('#content .bt-table');await table.waitFor();
+    const table=page.locator('#content .bt-table');await waitFor(table,'warehouse-table');
     assert.equal(await table.locator('thead th').count(),5,'ستون‌های جدول انبار');
     assert.deepEqual(await table.locator('thead th').allInnerTexts(),['شماره سفارش','نام مشتری','تاریخ سفارش','تاریخ تحویل','عملیات']);
     for(const width of [1280,768,390,320]){
      await page.setViewportSize({width,height:900});
-     const row=table.locator('tbody tr').first();await row.waitFor();
+     const row=table.locator('tbody tr').first();await waitFor(row,`warehouse-row ${width}`);
      assert.equal(await row.locator('td').count(),5,`warehouse/${width} cells`);
      assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row',`warehouse/${width} row display`);
      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`warehouse/${width} page overflow`);
@@ -75,7 +77,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
    }
    for(const width of [1280,768,390,320]){
     await page.setViewportSize({width,height:900});
-    const row=page.locator('#content .order-summary-row:visible,#content .sales-delivery-summary-row:visible,#content .stl-queue-item:visible,#content .gt-exit-card:visible').first();await row.waitFor();
+    const row=page.locator('#content .order-summary-row:visible,#content .sales-delivery-summary-row:visible,#content .stl-queue-item:visible,#content .gt-exit-card:visible').first();await waitFor(row,`generic-row ${kind}/${width}`);
     const g=await row.evaluate(el=>{const r=el.getBoundingClientRect(),cells=[...el.children].filter(x=>x.matches('.order-summary-cell,.sales-distribution-cell')),buttons=[...el.querySelectorAll('.order-summary-actions .btn,.sales-distribution-actions .btn')].filter(x=>x.offsetParent!==null);return {height:r.height,cells:cells.map(x=>({h:x.getBoundingClientRect().height,cy:x.getBoundingClientRect().top+x.getBoundingClientRect().height/2,top:x.getBoundingClientRect().top,bottom:x.getBoundingClientRect().bottom})),buttons:buttons.map(x=>({h:x.getBoundingClientRect().height,top:x.getBoundingClientRect().top,bottom:x.getBoundingClientRect().bottom})),top:r.top,bottom:r.bottom,scroll:document.documentElement.scrollWidth,viewport:innerWidth};});
     if(kind==='settlement'){const q=await row.evaluate(el=>({row:el.getBoundingClientRect().width,content:el.scrollWidth,list:el.parentElement.clientWidth-parseFloat(getComputedStyle(el.parentElement).paddingLeft)-parseFloat(getComputedStyle(el.parentElement).paddingRight),scroll:el.parentElement.scrollWidth,client:el.parentElement.clientWidth,title:el.title,aria:el.getAttribute('aria-label')}));assert(q.scroll<=q.client+1,JSON.stringify(q));assert(q.row<=q.list+1,`کارت از فهرست پهن‌تر است ${JSON.stringify(q)}`);assert(q.row<=q.content+2,`عرض کارت به اندازهٔ متن نیست ${JSON.stringify(q)}`);assert.match(q.title,/مشتری آزمایشی با نام بسیار طولانی/);assert.equal(q.aria,q.title);}
     if(kind==='gate'){const q=await row.evaluate(el=>({row:el.scrollWidth,client:el.clientWidth,list:el.parentElement.scrollWidth,listClient:el.parentElement.clientWidth}));assert(q.row<=q.client+1&&q.list<=q.listClient+1,JSON.stringify(q));continue;}
