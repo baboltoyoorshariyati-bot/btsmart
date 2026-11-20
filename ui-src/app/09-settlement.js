@@ -91,10 +91,18 @@ function renderSalesSettlementV25(orders){
   </section>`;
 }
 function settlementPendingRowsV27(rows){
-  return rows.map(o=>`<button type="button" class="stl-queue-item stl-queue-item-card ${stl.orderId===o.id?'active':''}" data-stl="select" data-action="select-settlement" data-id="${esc(o.id)}">
-    <strong class="stl-queue-customer">${esc(storeAwareOrderName(o))}</strong>
-    <span class="stl-queue-order"><span>شماره سفارش</span><bdi>${esc(fa(o.orderNo||'—'))}</bdi></span>
-  </button>`).join('') || '<div class="stl-q-empty">سفارشی در انتظار تسویه نیست.</div>';
+  const body=rows.map(o=>{
+    const name=storeAwareOrderName(o),number=fa(o.orderNo||'—');
+    const description=`${name}، شماره سفارش ${number}، تاریخ ${formatDateTime24(o.createdAt)}، ${qty(activeItemsOf(o).length)} قلم، آماده تسویه`;
+    return `<tr class="stl-queue-row ${stl.orderId===o.id?'active':''}" data-stl="select" data-action="select-settlement" data-id="${esc(o.id)}" title="${esc(description)}" aria-label="${esc(description)}">
+      <td data-label="نام مشتری"><span class="bt-cell-main">${esc(name)}</span></td>
+      <td data-label="شماره سفارش"><bdi>${esc(number)}</bdi></td>
+      <td data-label="تاریخ">${formatDateTime24(o.createdAt)}</td>
+      <td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td>
+      <td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-primary btn-sm" data-stl="select" data-action="select-settlement" data-id="${esc(o.id)}">تسویه</button></td>
+    </tr>`;
+  }).join('');
+  return `<div class="bt-table-wrap"><table class="bt-table stl-queue-table"><thead><tr><th>نام مشتری</th><th>شماره سفارش</th><th>تاریخ</th><th>اقلام</th><th>عملیات</th></tr></thead><tbody>${body||'<tr><td colspan="5"><div class="stl-q-empty">سفارشی در انتظار تسویه نیست.</div></td></tr>'}</tbody></table></div>`;
 }
 function stlRowHtml(it){
   const priceLocked = !!stl.order?.dispatch?.priceApprovedAt;

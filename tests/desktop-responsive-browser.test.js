@@ -31,13 +31,13 @@ test('مرورگر: دسکتاپ کوچک و بزرگ، کارت‌ها و پن�
    assert.ok(result.scroll<=1,`${tag}: horizontal overflow ${JSON.stringify(result)}`);assert.deepEqual(result.bad,[],`${tag}: controls outside card`);assert.deepEqual(result.overlap,[],`${tag}: overlapping controls`);
   };
   for(const [width,height] of sizes){
-   await page.setViewportSize({width,height});if(width<640)await page.waitForTimeout(350);await page.evaluate(()=>go('sales','stores'));await page.locator('.sd-store-card-v42').waitFor();await page.evaluate(async()=>{clearInterval(app.timer);app.timer=null;if(app.salesFetchPromise)await app.salesFetchPromise;});
-   assert.equal(await page.locator('.sd-store-card-v42').locator('..').evaluate(e=>e.scrollWidth<=e.clientWidth+1||['auto','scroll'].includes(getComputedStyle(e).overflowX)),true,`sales list scroll containment ${width}`);
-   await check('.sd-store-card-v42',`sales ${width}x${height}`);
+   await page.setViewportSize({width,height});if(width<640)await page.waitForTimeout(350);await page.evaluate(()=>go('sales','stores'));await page.locator('.sd-store-table tbody tr[data-store-summary-id]:visible').waitFor();await page.evaluate(async()=>{clearInterval(app.timer);app.timer=null;if(app.salesFetchPromise)await app.salesFetchPromise;});
+   assert.equal(await page.locator('.sd-store-table:visible').locator('..').evaluate(e=>e.scrollWidth<=e.clientWidth+1||['auto','scroll'].includes(getComputedStyle(e).overflowX)),true,`sales list scroll containment ${width}`);
+   await check('.sd-store-table tbody tr[data-store-summary-id]:visible',`sales ${width}x${height}`);
    for(const action of ['store-order-details-v25','sales-edit-store-order','store-approve-v25','store-quick-send-v40']){
-    const button=page.locator(`.sd-store-card-v42 [data-action=${action}]`);await button.scrollIntoViewIfNeeded();assert.equal(await button.isVisible(),true);const r=await button.boundingBox();assert.ok(r.x>=-1&&r.x+r.width<=width+1,`${action} ${width}`);assert.equal(await button.evaluate(e=>{const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!hit&&(hit===e||e.contains(hit));}),true,`click target ${action} ${width}`);
+    const button=page.locator(`.sd-store-table:visible [data-action=${action}]`);await button.scrollIntoViewIfNeeded();assert.equal(await button.isVisible(),true);const r=await button.boundingBox();assert.ok(r.x>=-1&&r.x+r.width<=width+1,`${action} ${width}`);assert.equal(await button.evaluate(e=>{const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!hit&&(hit===e||e.contains(hit));}),true,`click target ${action} ${width}`);
    }
-   await page.locator('.sd-store-card-v42 [data-action=store-order-details-v25]').click();await page.locator('#modal.open .modal-card').waitFor();
+   await page.locator('.sd-store-table:visible [data-action=store-order-details-v25]').click();await page.locator('#modal.open .modal-card').waitFor();
    assert.ok(await page.locator('#modal .modal-card').evaluate(e=>e.scrollWidth<=e.clientWidth+1),`sales modal ${width}`);await page.locator('#modal .modal-close').click();
    await page.evaluate(()=>go('warehouse','incoming'));const row=page.locator('.wh-orders-table tbody tr').first();await row.waitFor();await page.evaluate(()=>{clearInterval(app.wh38.timer);app.wh38.timer=null});
    const rowGeom=await row.evaluate(e=>{const r=e.getBoundingClientRect();return {buttons:[...e.querySelectorAll('button')].map(b=>{const x=b.getBoundingClientRect();return {l:x.left-r.left,r:r.right-x.right,t:x.top-r.top,b:r.bottom-x.bottom};})};});

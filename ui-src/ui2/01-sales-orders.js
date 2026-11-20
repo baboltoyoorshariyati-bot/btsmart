@@ -68,14 +68,14 @@ function renderSalesOnsiteV25(visits){
   </section>`;
 }
 function salesOnsiteRowsV25(visits){
-  return visits.map(v=>`<button type="button" class="sd-queue-row" data-action="open-order" data-id="${v.id}">
-    <span class="sd-avatar">${esc(initials(v.customer?.name||''))}</span>
-    <span class="sd-queue-main"><strong>${esc(v.customer?.name||'—')}</strong>
-      <span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${plateViewHtml(v.customer?.plate, 'بدون پلاک', true)}<span class="sd-chip">${icon('phone',12)} ${esc(v.customer?.phone||'—')}</span>${v.district?`<span class="sd-chip">${esc(v.district)}</span>`:''}</span>
-    </span>
-    <span class="sd-queue-time"><span class="sd-live-dot"></span> ${formatDateTime24(v.createdAt)}</span>
-    <span class="sd-queue-cta">ثبت سفارش ${icon('arrow',14)}</span>
-  </button>`).join('')||sdEmpty('user','صف حضوری خالی است','با ثبت مراجعه جدید در نگهبانی، مشتری در این فهرست قرار می‌گیرد.');
+  const rows=visits.map(v=>`<tr data-onsite-visit="${esc(v.id)}">
+    <td data-label="مشتری"><span class="bt-cell-main">${esc(v.customer?.name||'—')}</span><span class="bt-cell-sub">${esc(v.customer?.phone||'—')}</span></td>
+    <td data-label="پلاک">${plateViewHtml(v.customer?.plate, 'بدون پلاک', true)}</td>
+    <td data-label="منطقه">${v.district?`<span class="sd-chip">${esc(v.district)}</span>`:'—'}</td>
+    <td data-label="زمان ورود">${formatDateTime24(v.createdAt)}</td>
+    <td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-primary btn-sm" data-action="open-order" data-id="${esc(v.id)}">ثبت سفارش ${icon('arrow',14)}</button></td>
+  </tr>`).join('');
+  return `<div class="bt-table-wrap"><table class="bt-table sd-queue-table"><thead><tr><th>مشتری</th><th>پلاک</th><th>منطقه</th><th>زمان ورود</th><th>عملیات</th></tr></thead><tbody>${rows||`<tr><td colspan="5">${sdEmpty('user','صف حضوری خالی است','با ثبت مراجعه جدید در نگهبانی، مشتری در این فهرست قرار می‌گیرد.')}</td></tr>`}</tbody></table></div>`;
 }
 
 /* ---------- صفحه ثبت سفارش حضوری ---------- */
@@ -248,10 +248,23 @@ function renderSalesStoresV41(orders,deliveries={}){ // v37.7.9 — فروشگا
   const approved=all.filter(o=>o.status==='SCHEDULED_REMOTE').sort((a,b)=>String(a.scheduledAt||a.createdAt||'').localeCompare(String(b.scheduledAt||b.createdAt||'')));
   const processing=all.filter(o=>['WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES'].includes(o.status)).sort((a,b)=>String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||'')));
   const history=all.filter(o=>['CLOSED','SETTLED','EXITED','OUT_OF_STOCK'].includes(o.status)||(o.payments||[]).length>0||storeReceiptEntries(o).some(d=>d.confirmed)).sort((a,b)=>String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||'')));
-  const card=(o,kind)=>`<article class="sd-store-card sd-store-card-v40 sd-store-card-compact-v41 sd-store-card-v42 ssin21-card order-summary-row" data-store-summary-id="${esc(o.id)}"><div class="sd-store-identity-v42 ssin21-id order-summary-cell order-summary-identity"><h3>${esc(o.storeName||'فروشگاه')}</h3><small>${o.storeOrderKind==='PARTIAL'?'سفارش جزئی':'سفارش روزانه'}</small>${o.storeOrderKind==='PARTIAL'&&o.storePurpose==='STOCK'?'<small class="ssin21-customer">تأمین تکمیلی فروشگاه</small>':o.customer?.name?`<small class="ssin21-customer">مشتری: ${esc(o.customer?.name||'—')}</small>`:''}</div><span class="order-code order-summary-cell">${kind==='history'?'سفارش':'شماره سفارش'} ${esc(fa(o.orderNo||'—'))}</span><span class="ssin21-meta order-summary-cell">${kind==='history'?'':'تاریخ '}${esc(formatDateTime24(o.createdAt))}</span><span class="order-summary-cell order-summary-status">${badge(o.status)}</span><span class="ssin21-meta order-summary-cell">${qty(activeItemsOf(o).length)} قلم</span><div class="ssin21-actions order-summary-cell order-summary-actions">${kind==='history'?'<div class="ssin21-history-buttons">':''}<button class="btn btn-secondary btn-sm" data-action="store-order-details-v25" data-id="${esc(o.id)}">${icon('eye',14)} ${kind==='history'?'جزئیات':'جزئیات سفارش'}</button>${kind==='incoming'?`<button class="btn btn-secondary btn-sm" data-action="sales-edit-store-order" data-id="${esc(o.id)}">${icon('edit',14)} ویرایش سفارش</button><button class="btn btn-primary btn-sm" data-action="store-approve-v25" data-id="${esc(o.id)}">${icon('calendar',14)} تأیید و تعیین زمان</button><button class="btn btn-secondary btn-sm" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',14)} تأیید و ارسال سریع</button>`:''}${kind==='approved'?`<button class="btn btn-secondary btn-sm" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',14)} ارسال سریع به انبار</button>`:''}${kind==='processing'&&o.status==='RETURNED_TO_SALES'?`<button class="btn btn-secondary btn-sm" data-action="edit-returned-order" data-id="${esc(o.id)}">${icon('edit',14)} اصلاح سفارش</button><button class="btn btn-primary btn-sm" data-action="resubmit-order" data-id="${esc(o.id)}">${icon('send',14)} ارسال مجدد به انبار</button>`:''}${kind==='processing'&&o.dispatch&&o.dispatch.status==='DELIVERED'?`<button class="btn btn-primary btn-sm" data-action="sales-finalize-driver-delivery" data-id="${esc(o.id)}">${icon('check',14)} تأیید نهایی تحویل${o.dispatch.run?` سرویس ${o.dispatch.run===2?'دوم':'اول'}`:''}</button>`:''}${kind==='processing'?storeSalesReviewButtons(o):''}${kind==='processing'||kind==='history'?storeSalesDocumentButtons(o,kind==='history',kind!=='history'):''}${kind==='history'?storeReturnPrintButton(o)+'</div>'+storeReceiptSummary(o):''}</div>${kind==='processing'&&warehouseReturnNoteHtml(o)?`<span class="order-summary-cell order-summary-note">${warehouseReturnNoteHtml(o)}</span>`:''}${kind==='processing'&&storeReceiptSummary(o)?`<span class="order-summary-cell">${storeReceiptSummary(o)}</span>`:''}</article>`;
+  const card=(o,kind)=>{
+    const storeSub=o.storeOrderKind==='PARTIAL'?'سفارش جزئی':'سفارش روزانه';
+    const customerSub=o.storeOrderKind==='PARTIAL'&&o.storePurpose==='STOCK'?'تأمین تکمیلی فروشگاه':o.customer?.name?`مشتری: ${esc(o.customer?.name||'—')}`:'';
+    const actions=`<button class="btn btn-secondary btn-sm" data-action="store-order-details-v25" data-id="${esc(o.id)}">${icon('eye',14)} ${kind==='history'?'جزئیات':'جزئیات سفارش'}</button>${kind==='incoming'?`<button class="btn btn-secondary btn-sm" data-action="sales-edit-store-order" data-id="${esc(o.id)}">${icon('edit',14)} ویرایش سفارش</button><button class="btn btn-primary btn-sm" data-action="store-approve-v25" data-id="${esc(o.id)}">${icon('calendar',14)} تأیید و تعیین زمان</button><button class="btn btn-secondary btn-sm" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',14)} تأیید و ارسال سریع</button>`:''}${kind==='approved'?`<button class="btn btn-secondary btn-sm" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',14)} ارسال سریع به انبار</button>`:''}${kind==='processing'&&o.status==='RETURNED_TO_SALES'?`<button class="btn btn-secondary btn-sm" data-action="edit-returned-order" data-id="${esc(o.id)}">${icon('edit',14)} اصلاح سفارش</button><button class="btn btn-primary btn-sm" data-action="resubmit-order" data-id="${esc(o.id)}">${icon('send',14)} ارسال مجدد به انبار</button>`:''}${kind==='processing'&&o.dispatch&&o.dispatch.status==='DELIVERED'?`<button class="btn btn-primary btn-sm" data-action="sales-finalize-driver-delivery" data-id="${esc(o.id)}">${icon('check',14)} تأیید نهایی تحویل${o.dispatch.run?` سرویس ${o.dispatch.run===2?'دوم':'اول'}`:''}</button>`:''}${kind==='processing'?storeSalesReviewButtons(o):''}${kind==='processing'||kind==='history'?storeSalesDocumentButtons(o,kind==='history',kind!=='history'):''}${kind==='history'?storeReturnPrintButton(o):''}`;
+    const notes=(kind==='processing'&&warehouseReturnNoteHtml(o)?warehouseReturnNoteHtml(o):'')+(kind==='processing'&&storeReceiptSummary(o)?storeReceiptSummary(o):'')+(kind==='history'?storeReceiptSummary(o):'');
+    return `<tr data-store-summary-id="${esc(o.id)}">
+      <td data-label="فروشگاه"><span class="bt-cell-main">${esc(o.storeName||'فروشگاه')}</span><span class="bt-cell-sub">${storeSub}${customerSub?` · ${customerSub}`:''}</span></td>
+      <td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td>
+      <td data-label="تاریخ">${esc(formatDateTime24(o.createdAt))}</td>
+      <td data-label="وضعیت">${badge(o.status)}</td>
+      <td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td>
+      <td data-label="عملیات" class="bt-col-actions">${actions}${notes?`<div class="bt-cell-notes">${notes}</div>`:''}</td>
+    </tr>`;
+  };
   // v37.33.0 — محموله‌های ارسالی انبار (هر دو سرویس) در سربرگ «ورودی» فروشگاه‌های فروش نمایش داده می‌شوند (جای قبلی: «در جریان»؛ فروش آن‌ها را در ورودی پیدا نمی‌کرد)
   const shipmentsPanel=renderStoreRunShipmentsPanel(deliveries.storeRunShipments||[]);
-  const panel=(id,title,rows,kind,emptyTitle,emptyText,extra='')=>`<section class="sales-store-subpanel-v43" data-store-section="${id}"${(app.salesStoreTab||'incoming')===id?'':' hidden'}><header class="sales-store-subhead-v43"><h2>${title}</h2><span>${qty(rows.length)} سفارش</span></header>${extra}<div class="sd-store-list sd-store-list-v40">${rows.map(o=>card(o,kind)).join('')||salesEmptyV25('sales',emptyTitle,emptyText)}</div></section>`;
+  const panel=(id,title,rows,kind,emptyTitle,emptyText,extra='')=>`<section class="sales-store-subpanel-v43" data-store-section="${id}"${(app.salesStoreTab||'incoming')===id?'':' hidden'}><header class="sales-store-subhead-v43"><h2>${title}</h2><span>${qty(rows.length)} سفارش</span></header>${extra}<div class="bt-table-wrap"><table class="bt-table sd-store-table"><thead><tr><th>فروشگاه</th><th>شماره سفارش</th><th>تاریخ</th><th>وضعیت</th><th>اقلام</th><th>عملیات</th></tr></thead><tbody>${rows.map(o=>card(o,kind)).join('')||`<tr><td colspan="6">${salesEmptyV25('sales',emptyTitle,emptyText)}</td></tr>`}</tbody></table></div></section>`;
   const shipCount=(deliveries.storeRunShipments||[]).length;
   const tabs=[['incoming','ورودی',incoming.length+shipCount],['processing','در جریان',processing.length],['approved','تأیید شده',approved.length],['history','سوابق',history.length]];
   const active=(tabs.some(t=>t[0]===app.salesStoreTab)?app.salesStoreTab:'incoming');
@@ -300,8 +313,8 @@ function renderSalesSettlementV25(orders){
   const pending=salesSettlementPendingOrders(orders);
   const finalized=salesSettlementIssuedOrders(orders); // v37.5.0 — فاکتور هر سرویس سفارش فروشگاه هم دیده می‌شود
   return `<section class="sd-pane stl-pane">
-    <div class="stl-layout">
-      <aside class="sd-panel stl-queue-panel">
+    <div class="stl-layout stl-layout-table">
+      <aside class="sd-panel stl-queue-panel stl-queue-panel-table">
         <div class="stl-block-head"><div><span class="stl-eyebrow">۰۴ / تسویه</span><h2>آماده تسویه</h2></div><span class="sd-count" style="min-width:56px"><strong>${qty(pending.length)}</strong><span>سفارش</span></span></div>
         <div class="v26-settlement-list stl-queue-list">${settlementPendingRowsV27(pending)}</div>
       </aside>
@@ -314,11 +327,18 @@ function renderSalesSettlementV25(orders){
   </section>`;
 }
 function settlementPendingRowsV27(rows){
- return rows.map(o=>{
+ const body=rows.map(o=>{
   const name=storeAwareOrderName(o),number=fa(o.orderNo||'—');
   const description=`${name}، شماره سفارش ${number}، تاریخ ${formatDateTime24(o.createdAt)}، ${qty(activeItemsOf(o).length)} قلم، آماده تسویه`;
-  return `<button type="button" class="stl-queue-item stl-queue-item-card ${stl.orderId===o.id?'active':''}" data-stl="select" data-action="select-settlement" data-id="${esc(o.id)}" title="${esc(description)}" aria-label="${esc(description)}"><span class="stl-queue-customer" title="${esc(name)}">${esc(name)}</span><span class="stl-queue-order">سفارش <bdi>${esc(number)}</bdi></span></button>`;
- }).join('')||'<div class="stl-q-empty">سفارشی در انتظار تسویه نیست.</div>';
+  return `<tr class="stl-queue-row ${stl.orderId===o.id?'active':''}" data-stl="select" data-action="select-settlement" data-id="${esc(o.id)}" title="${esc(description)}" aria-label="${esc(description)}">
+    <td data-label="نام مشتری"><span class="bt-cell-main">${esc(name)}</span></td>
+    <td data-label="شماره سفارش"><bdi>${esc(number)}</bdi></td>
+    <td data-label="تاریخ">${formatDateTime24(o.createdAt)}</td>
+    <td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td>
+    <td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-primary btn-sm" data-stl="select" data-action="select-settlement" data-id="${esc(o.id)}">تسویه</button></td>
+  </tr>`;
+ }).join('');
+ return `<div class="bt-table-wrap"><table class="bt-table stl-queue-table"><thead><tr><th>نام مشتری</th><th>شماره سفارش</th><th>تاریخ</th><th>اقلام</th><th>عملیات</th></tr></thead><tbody>${body||'<tr><td colspan="5"><div class="stl-q-empty">سفارشی در انتظار تسویه نیست.</div></td></tr>'}</tbody></table></div>`;
 }
 
 function transportIssuedInvoiceRow(o){

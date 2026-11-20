@@ -53,7 +53,7 @@ test('بورد کامل چرخهٔ حیات در تب فروشگاهِ فروش 
  const fn=ui2.slice(ui2.indexOf('function sdStoreInvoiceChips'),ui2.indexOf('/* ---------- تب ۳: در جریان'));
  assert.match(fn,/renderStoreRunShipmentsPanel/);
  assert.match(fn,/تأیید نهایی تحویل\$/);
- assert.match(fn,/sd-store-card-compact-v41/);
+ assert.match(fn,/class="bt-table sd-store-table"/);
  assert.match(fn,/دریافت فروشگاه تأیید شد/);
 });
 
