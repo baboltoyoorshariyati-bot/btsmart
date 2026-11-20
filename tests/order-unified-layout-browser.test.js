@@ -30,7 +30,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     if(kind==='warehouse')html=wh38List([o],'incoming');
     if(kind==='warehouse-store-incoming')html=`<div class="wh38-store-pane">${wh38StoreList([store],'incoming')}</div>`;
     if(kind==='warehouse-store-preparing')html=`<div class="wh38-store-pane">${wh38StoreList([{...store,status:'WAREHOUSE_PREPARING'}],'preparing')}</div>`;
-    if(kind==='delivery')html='<div class="table-wrap"><table class="table sales-distribution-table"><tbody>'+salesDeliverySummaryRow({...o,transportService:{label:'در مسیر',run:0,driverName:'راننده نمونه',lines:[]}})+'</tbody></table></div>';
+    if(kind==='delivery')html='<div class="bt-table-wrap"><table class="bt-table sales-distribution-table"><tbody>'+salesDeliverySummaryRow({...o,transportService:{label:'در مسیر',run:0,driverName:'راننده نمونه',lines:[]}})+'</tbody></table></div>';
     if(kind==='transport')html=transportPlanTable(transportPlanRows([{...o,customerName:o.customer.name,services:[{run:0,assignment:{driverName:'راننده نمونه',vehicleType:'وانت',vehiclePlate:'12ب34567'},departed:true}]}]));
     if(kind==='store-registered')html=stRegisteredTable([store]);
     if(kind==='store-delivery')html=stDeliveryTable([{...store,dispatch:{run:1,status:'IN_TRANSIT',lines:[]}}]);
@@ -51,7 +51,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${kind}/${width} page overflow`);const button=row.locator('button').first();await button.scrollIntoViewIfNeeded();assert(await button.isVisible());assert(await button.evaluate(e=>{const r=e.getBoundingClientRect();return r.left>=-1&&r.right<=innerWidth+1;}),`${kind}/${width} action outside viewport`);}
     continue;
    }
-   if(kind==='delivery'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;const row=page.locator('.sales-distribution-table tr');await row.waitFor();assert.equal(await row.locator('td').count(),8);assert.equal(await row.evaluate(e=>getComputedStyle(e).display),'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}continue;}
+   if(kind==='delivery'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;const row=page.locator('.sales-distribution-table tr');await row.waitFor();assert.equal(await row.locator('td').count(),8);assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert(await row.locator('[data-action=sales-delivery-details]').isVisible());}continue;}
    if(kind==='invoice'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;const table=page.locator('.settlement-invoice-table');await table.waitFor();assert.equal(await table.locator('th').count(),7);assert(await table.evaluate(e=>e.scrollWidth<=e.clientWidth+1));}continue;}
    if(kind==='warehouse-store-incoming'||kind==='warehouse-store-preparing'){
     const table=page.locator('#content .wh38-store-table'),row=table.locator('tbody tr[data-store-order]').first();await waitFor(row,`store-row ${kind}`);
@@ -149,7 +149,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
   }
   for(const width of [1280,768,390,320])for(const kind of ['phone','future','store','onsite']){
    await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
-   await page.evaluate(kind=>{const root=document.querySelector('#content');const line={productId:'p01',productLabel:'محصول آزمایشی',requestedQty:2,requestedUnit:'کیلوگرم',description:'توضیح'};if(kind==='onsite'){root.innerHTML='<div id="orderLines"></div>';app.orderDraft=[line];renderOrderLines();}else root.innerHTML=`<div id="${kind}-lines">${renderProductPickerLine(line,0,kind)}</div>`;},kind);
+   await page.evaluate(kind=>{const root=document.querySelector('#content');const line={productId:'p01',productLabel:'محصول آزمایشی',requestedQty:2,requestedUnit:'کیلوگرم',description:'توضیح'};if(kind==='onsite'){root.innerHTML='<div id="orderLines"></div>';app.orderDraft=[line];renderOrderLines();}else root.innerHTML=`<div id="${kind}-lines"></div>`;app[kind+'Draft']=[line];renderOrderLineArea(kind,kind+'Draft');},kind);
    const h=await page.locator('.sd-line-cell > .input-shell').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().height));assert.equal(h.length,4,`${kind} controls`);assert.ok(h.every(n=>Math.abs(n-44)<1),`${kind} ${width}: ${h}`);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`${kind} page overflow ${width}`);
   }

@@ -287,3 +287,105 @@
 @media(max-width:900px){#appView #content :is(.gt-waiting-table,.gt-exit-table,.gt-pickup-exit-table) td{flex-wrap:wrap}}
 #appView #content .wh-document-edit-table td{min-width:0;overflow-wrap:anywhere}
 @media(max-width:900px){#appView #content .wh-document-edit-table td{flex-wrap:wrap}}
+/* اقلام قابل ویرایش فاکتور فروش و سند انبار */
+#modal .document-edit-form :is(.document-edit-invoice-table,.document-edit-warehouse-table) td{min-width:0;overflow-wrap:anywhere}
+#modal .document-edit-form :is(.document-edit-invoice-table,.document-edit-warehouse-table) td label{width:100%;min-width:0}
+#modal .document-edit-form :is(.document-edit-invoice-table,.document-edit-warehouse-table) .document-edit-line-name{white-space:normal;overflow-wrap:anywhere}
+@media(max-width:900px){#modal .document-edit-form :is(.document-edit-invoice-table,.document-edit-warehouse-table) td{flex-wrap:wrap}#modal .document-edit-form :is(.document-edit-invoice-table,.document-edit-warehouse-table) td label{width:auto;flex:1 1 140px}}
+/* رانندگان فعال و سفارش‌های زندهٔ هر راننده */
+#appView #content .dsp-roster-table{table-layout:fixed}
+#appView #content .dsp-roster-table>thead>tr>th:last-child{width:32%}
+#appView #content :is(.dsp-roster-table,.dsp-roster-orders-table) td{min-width:0;overflow-wrap:anywhere;white-space:normal}
+#appView #content .dsp-roster-table .dsp-roster-foot{display:flex;gap:5px;flex-wrap:wrap}
+#appView #content .dsp-roster-table .dsp-roster-foot span{min-width:0;overflow-wrap:anywhere}
+#appView #content .dsp-roster-orders-table{font-size:11px}
+@media(max-width:900px){#appView #content :is(.dsp-roster-table,.dsp-roster-orders-table) td{flex-wrap:wrap}#appView #content .dsp-roster-table>tbody>tr>td:last-child>.bt-table-wrap{flex:1 1 100%;min-width:0}}
+/* فهرست محموله‌های پخش فروش؛ بدون اسکرول افقی در موبایل */
+#appView #content .bt-table.sales-distribution-table{min-width:0;width:100%}
+#appView #content .bt-table.sales-distribution-table :is(th,td){overflow-wrap:anywhere;white-space:normal}
+@media(max-width:900px){
+ #appView #content .bt-table.sales-distribution-table tr.sales-delivery-summary-row{display:block!important;height:auto!important;width:auto!important;margin:0 0 8px!important;padding:6px 4px!important}
+ #appView #content .bt-table.sales-distribution-table tr.sales-delivery-summary-row>td{display:flex!important;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;width:auto!important;height:auto!important;text-align:right;border:0!important}
+ #appView #content .bt-table.sales-distribution-table tr.sales-delivery-summary-row>td::before{content:attr(data-label);font-size:10.5px;color:#6b7280;font-weight:900}
+ #appView #content .bt-table.sales-distribution-table tr.sales-delivery-summary-row>td.bt-col-actions::before{display:none}
+}
+#modal :is(.sales-store-delivery-items-table,.sales-delivery-items-table,.sr-ship-items-table) td{min-width:0;overflow-wrap:anywhere}
+@media(max-width:900px){#modal :is(.sales-store-delivery-items-table,.sales-delivery-items-table,.sr-ship-items-table) td{flex-wrap:wrap}}
+#appView #content .gt-exit-items-table td{min-width:0;overflow-wrap:anywhere}
+#appView #content .gt-exit-items-table .gt-check{min-width:0;white-space:normal}
+@media(max-width:900px){#appView #content .gt-exit-items-table td{flex-wrap:wrap}}
+#modal .document-edit-methods-table td{min-width:0;overflow-wrap:anywhere}
+#modal .document-edit-methods-table td label{width:100%;min-width:0}
+#modal .document-edit-methods-table .document-edit-method-extra{flex-wrap:wrap}
+#modal .document-edit-methods-table .document-edit-method-extra>label{flex:1 1 120px}
+@media(max-width:900px){#modal .document-edit-methods-table td{flex-wrap:wrap}#modal .document-edit-methods-table td>label,#modal .document-edit-methods-table td>.document-edit-method-extra{width:auto;flex:1 1 140px}}
+
+/* اقلام قابل ویرایش سفارش؛ پیشنهاد محصول داخل جدول بریده نمی‌شود. */
+.draft-lines-wrap{overflow:visible}
+.draft-lines-table th:nth-child(1){width:7%}
+.draft-lines-table th:nth-child(2){width:30%}
+.draft-lines-table th:nth-child(3){width:13%}
+.draft-lines-table th:nth-child(4){width:15%}
+.draft-lines-table th:nth-child(5){width:27%}
+.draft-lines-table th:nth-child(6){width:8%}
+.draft-lines-table td{padding:6px}
+.draft-lines-table .sd-line-cell{width:100%;min-width:0}
+.draft-lines-table .input-shell{box-sizing:border-box;width:100%;height:44px;min-height:44px}
+.draft-lines-table .input-shell input,.draft-lines-table .input-shell select{min-width:0;width:100%}
+.draft-lines-table .draft-product{position:relative}
+.draft-lines-table .product-suggest:empty{display:none}
+.draft-lines-table .product-suggest{max-height:260px;overflow:auto;z-index:40}
+.draft-lines-table tr:focus-within{position:relative;z-index:2}
+@media(max-width:900px){
+ .draft-lines-table td{align-items:flex-start}
+ .draft-lines-table td::before{width:62px;padding-top:12px}
+ .draft-lines-table .sd-line-cell{flex:1;min-width:0}
+}
+
+/* فهرست‌های مستقل مدیریت */
+#appView .adm-data-table tr.adm-row{display:table-row;padding:0;box-shadow:none;border:0}
+#appView .adm-data-table td{overflow-wrap:anywhere}
+#appView .adm-data-table .adm-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start}
+#appView .adm-data-table .adm-price input{min-width:0;max-width:100%}
+@media(max-width:900px){
+ #appView .adm-data-table tr.adm-row{display:block;padding:6px 4px;border:1px solid var(--line)}
+ #appView .adm-data-table td>div{min-width:0;flex:1}
+}
+
+/* حساب مشتری: فاکتورها و دریافت‌های هر فاکتور، دو جدول مستقل. */
+.cust-debt-table,.cust-receipts-table{overflow-wrap:anywhere}
+.cust-debt-table th:nth-child(1){width:16%}
+.cust-debt-table th:nth-child(2){width:21%}
+.cust-debt-table th:nth-child(3){width:49%}
+.cust-debt-table th:nth-child(4){width:14%}
+.cust-debt-table .cust-debt-invoice,.cust-receipts-table .cust-debt-receipt{border:0;border-radius:0;padding:0;margin:0}
+.cust-receipts-table .cust-debt-receipt{display:table-row}
+.cust-debt-values{display:grid;margin:0}
+@media(max-width:900px){
+ .cust-debt-table td,.cust-receipts-table td{min-width:0;overflow-wrap:anywhere}
+ .cust-debt-table td[data-label="دریافت‌ها"]{display:block}
+ .cust-debt-table td[data-label="دریافت‌ها"]::before{display:block;margin-bottom:6px}
+ .cust-receipts-table .cust-debt-receipt{display:block;padding:6px 4px;border:1px solid var(--line)}
+}
+@media(min-width:901px){#appView .adm-data-table tr.adm-row{display:table-row!important}}
+@media(max-width:900px){#appView .adm-data-table tr.adm-row{display:block!important}}
+#appView #content .drv-lines table{width:100%;min-width:0;max-width:100%;table-layout:fixed}
+#appView .adm-data-table .drv-detail-row td{padding:4px 12px 12px}
+#appView .drv-lines-table td{overflow-wrap:anywhere}
+@media(max-width:900px){#appView .adm-data-table .drv-detail-row td{display:block}#appView .adm-data-table .drv-detail-row td::before{display:none}}
+#appView .cust-list-table tr.cust-row{display:table-row;padding:0;border:0;box-shadow:none}
+#appView .cust-list-table td{overflow-wrap:anywhere}
+@media(max-width:900px){#appView .cust-list-table tr.cust-row{display:block;padding:6px 4px;border:1px solid var(--line)}}
+#appView .trc-scroll table.trc-data-table{min-width:0;table-layout:fixed}
+#appView .trc-data-table td{overflow-wrap:anywhere}
+@media(max-width:900px){#appView .trc-scroll{overflow:visible}#appView .trc-data-table td{width:auto} }
+.settings-users-table td,.audit-table td{overflow-wrap:anywhere}
+@media(max-width:900px){#appView .table-wrap.bt-table-wrap{overflow:visible}}
+.adm-data-table details,.adm-data-table .adm-detail{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.adm-data-table pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%}
+.whh-order-items td{overflow-wrap:anywhere}
+@media(max-width:900px){.whh-order-items td{min-width:0}.whh-order-items td[data-label="وضعیت و ثبت‌کننده"]{display:block}.whh-order-items td[data-label="وضعیت و ثبت‌کننده"]::before{display:block}}
+.adm-report-table td,.adm-backups-table td{overflow-wrap:anywhere}
+.adm-backup-row-actions{display:flex;flex-wrap:wrap;gap:6px}
+@media(max-width:900px){#appView .adm-table-wrap.bt-table-wrap{overflow:visible}}
+.draft-not-picked{color:var(--muted);font-size:10px}

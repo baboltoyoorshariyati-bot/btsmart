@@ -221,7 +221,8 @@ test('دکمهٔ افزودن ردیف دقیقاً پس از ردیف‌های 
 });
 
 test('توضیحات ردیف در فرم غیرحضوری تک‌خطی و عمودی هم‌تراز است و بریده نمی‌شود', () => {
-  assert.match(ui,/cell-desc\"><label>توضیحات ردیف<\/label><div class="input-shell"><input type="text" data-op-desc=/);
+  assert.match(ui,/data-label="توضیحات"><div class="sd-line-cell cell-desc"><div class="input-shell"><input type="text"/);
+  assert.match(ui,/data-op-desc/);
   assert.doesNotMatch(ui,/cell-desc\"><label>توضیحات ردیف<\/label><div class="input-shell"><textarea data-op-desc=/);
   // v37.2.15 — بدون بریدگی: shell flex-center و overflow-visible، input ارتفاع auto با line-height کافی
   assert.match(css,/\.sd-line \.cell-desc>\.input-shell\{[^}]*display:flex[^}]*align-items:center[^}]*overflow:visible/);

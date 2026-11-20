@@ -53,7 +53,7 @@ async function custLoad() {
     const d = await api('/api/customers?limit=300&q=' + encodeURIComponent(custUi.q.trim()));
     custUi.rows = d.customers || [];
     const total = $('#custTotal'); if (total) total.textContent = fa(d.total || 0);
-    list.innerHTML = custUi.rows.length ? custUi.rows.map(custRowHtml).join('')
+    list.innerHTML = custUi.rows.length ? `<div class="bt-table-wrap"><table class="bt-table cust-list-table"><caption class="bt-caption">پرونده مشتریان</caption><thead><tr><th>کد مشتری</th><th>مشتری</th><th>پلاک و محله</th><th>سوابق</th><th>عملیات</th></tr></thead><tbody>${custUi.rows.map(custRowHtml).join('')}</tbody></table></div>`
       : sdEmpty('user', 'مشتری پیدا نشد', custUi.q ? 'عبارت جستجو را تغییر دهید یا مشتری جدید ثبت کنید.' : 'با «مشتری جدید» اولین پرونده را بسازید.');
   } catch (err) { list.innerHTML = `<div class="form-error">${custEsc(err.message)}</div>`; }
 }
@@ -61,13 +61,13 @@ async function custLoad() {
 function custRowHtml(c) {
   const plate = c.plate ? `${plateViewHtml(c.plate, '—', true)}` : '';
   const district = c.district ? `<span class="sd-chip">${custEsc(c.district)}</span>` : '';
-  return `<article class="cust-row" data-action="cust-open" data-id="${custEsc(c.id)}" role="button" tabindex="0">
-    <span class="cust-code">${custEsc(c.code)}</span>
-    <span class="cust-main"><strong>${custEsc(c.name)}</strong><small>${custEsc(c.phone || '—')}</small></span>
-    <span class="cust-chips">${plate}${district}</span>
-    <span class="cust-stats">${c.debtBalance!==undefined?`<small>مانده معوق: <b>${money(c.debtBalance)}</b></small>`:''}<small>${fa(c.visitCount || 0)} مراجعه • ${fa(c.orderCount || 0)} سفارش</small><small>${c.lastActivityAt ? dt(c.lastActivityAt) : 'بدون فعالیت'}</small></span>
-    <span class="cust-open">${icon('arrow', 16)}</span>
-  </article>`;
+  return `<tr class="cust-row" data-action="cust-open" data-id="${custEsc(c.id)}" tabindex="0">
+    <td data-label="کد مشتری"><span class="cust-code">${custEsc(c.code)}</span></td>
+    <td data-label="مشتری"><span class="cust-main"><strong>${custEsc(c.name)}</strong><small>${custEsc(c.phone || '—')}</small></span></td>
+    <td data-label="پلاک و محله"><span class="cust-chips">${plate}${district}</span></td>
+    <td data-label="سوابق"><span class="cust-stats">${c.debtBalance!==undefined?`<small>مانده معوق: <b>${money(c.debtBalance)}</b></small>`:''}<small>${fa(c.visitCount || 0)} مراجعه • ${fa(c.orderCount || 0)} سفارش</small><small>${c.lastActivityAt ? dt(c.lastActivityAt) : 'بدون فعالیت'}</small></span></td>
+    <td data-label="عملیات"><button type="button" class="btn btn-secondary btn-sm" data-action="cust-open" data-id="${custEsc(c.id)}">جزئیات</button></td>
+  </tr>`;
 }
 
 function custClick(e) {
@@ -169,9 +169,10 @@ function custDebtHtml(data){
  const status={PENDING:'در انتظار وصول',CLEARED:'وصول‌شده',RETURNED:'برگشتی',REVERSED:'ابطال‌شده'};
  return `<section class="cust-debt" aria-label="حساب معوق مشتری"><h3>حساب معوق و مانده</h3><p>مانده کل: <b>${money(data.balance)}</b> • چک در انتظار وصول: <b>${money(data.pending)}</b></p>
  <p class="cust-debt-hint">این حساب از سفارش‌های جدید آغاز شده است؛ معوق سفارش‌های قبلی به آن افزوده نشده است.</p>
- ${data.invoices.length?data.invoices.map(inv=>`<article class="cust-debt-invoice"><div class="cust-debt-heading"><div><b>فاکتور ${custEsc(fa(inv.invoiceNumber||'—'))}</b> • سفارش ${custEsc(fa(inv.orderNo||'—'))}<br><small>${custEsc(dt(inv.createdAt))}</small></div><button type="button" class="btn btn-secondary btn-sm" data-debt-receive="${custEsc(inv.paymentId)}" ${inv.available<=0?'disabled':''}>ثبت دریافت</button></div>
- <div class="cust-debt-values"><span>معوق اولیه: <b>${money(inv.initial)}</b></span><span>وصول‌شده: <b>${money(inv.paid)}</b></span><span>مانده: <b>${money(inv.balance)}</b></span><span>چک در انتظار: <b>${money(inv.pending)}</b></span><span>قابل دریافت: <b>${money(inv.available)}</b></span></div>
- <div class="cust-debt-history">${inv.receipts.length?inv.receipts.map(r=>`<div class="cust-debt-receipt"><span><b>${custEsc(labels[r.type]||r.type)}</b> • ${money(r.amount)} • ${custEsc(status[r.status]||r.status)}<br><small>${custEsc(dt(r.createdAt))} • ${custEsc(r.createdByName||'—')}${r.bank?' • '+custEsc(r.bank):''}${r.checkNumber?' • چک '+custEsc(r.checkNumber):''}${r.dueDate?' • سررسید '+custEsc(fa(r.dueDate)):''}${r.reference?' • پیگیری '+custEsc(r.reference):''}${r.deviceSnapshot?.title?' • دستگاه '+custEsc(r.deviceSnapshot.title):''}${r.resolvedAt?' • تعیین وضعیت: '+custEsc(dt(r.resolvedAt))+' '+custEsc(r.resolvedByName||''):''}${r.reversedAt?' • ابطال: '+custEsc(dt(r.reversedAt))+' '+custEsc(r.reversedByName||''):''}</small></span>${r.status==='PENDING'?`<span class="cust-debt-actions"><button type="button" class="btn btn-secondary btn-sm" data-debt-check="${custEsc(r.id)}" data-payment="${custEsc(inv.paymentId)}" data-status="CLEARED">تأیید وصول</button><button type="button" class="btn btn-secondary btn-sm" data-debt-check="${custEsc(r.id)}" data-payment="${custEsc(inv.paymentId)}" data-status="RETURNED">برگشت چک</button></span>`:r.status==='CLEARED'&&normalizeRole(app.user?.roleCode)==='admin'?`<span class="cust-debt-actions"><button type="button" class="btn btn-secondary btn-sm" data-debt-check="${custEsc(r.id)}" data-payment="${custEsc(inv.paymentId)}" data-status="REVERSED">ابطال دریافت</button></span>`:''}</div>`).join(''):'<small>دریافتی ثبت نشده است.</small>'}</div></article>`).join(''):'<p>فاکتور معوق جدیدی ثبت نشده است.</p>'}</section>`;
+ ${data.invoices.length?`<div class="bt-table-wrap"><table class="bt-table cust-debt-table"><caption class="bt-caption">فاکتورهای معوق مشتری</caption><thead><tr><th>فاکتور و سفارش</th><th>مبالغ</th><th>دریافت‌ها</th><th>عملیات</th></tr></thead><tbody>${data.invoices.map(inv=>`<tr class="cust-debt-invoice"><td data-label="فاکتور و سفارش"><b>فاکتور ${custEsc(fa(inv.invoiceNumber||'—'))}</b> • سفارش ${custEsc(fa(inv.orderNo||'—'))}<br><small>${custEsc(dt(inv.createdAt))}</small></td>
+ <td data-label="مبالغ"><div class="cust-debt-values"><span>معوق اولیه: <b>${money(inv.initial)}</b></span><span>وصول‌شده: <b>${money(inv.paid)}</b></span><span>مانده: <b>${money(inv.balance)}</b></span><span>چک در انتظار: <b>${money(inv.pending)}</b></span><span>قابل دریافت: <b>${money(inv.available)}</b></span></div></td>
+ <td data-label="دریافت‌ها">${inv.receipts.length?`<div class="bt-table-wrap"><table class="bt-table cust-receipts-table"><caption class="bt-caption">دریافت‌های فاکتور ${custEsc(fa(inv.invoiceNumber||'—'))}</caption><thead><tr><th>دریافت</th><th>جزئیات</th><th>عملیات</th></tr></thead><tbody>${inv.receipts.map(r=>`<tr class="cust-debt-receipt"><td data-label="دریافت"><b>${custEsc(labels[r.type]||r.type)}</b> • ${money(r.amount)} • ${custEsc(status[r.status]||r.status)}</td><td data-label="جزئیات"><small>${custEsc(dt(r.createdAt))} • ${custEsc(r.createdByName||'—')}${r.bank?' • '+custEsc(r.bank):''}${r.checkNumber?' • چک '+custEsc(r.checkNumber):''}${r.dueDate?' • سررسید '+custEsc(fa(r.dueDate)):''}${r.reference?' • پیگیری '+custEsc(r.reference):''}${r.deviceSnapshot?.title?' • دستگاه '+custEsc(r.deviceSnapshot.title):''}${r.resolvedAt?' • تعیین وضعیت: '+custEsc(dt(r.resolvedAt))+' '+custEsc(r.resolvedByName||''):''}${r.reversedAt?' • ابطال: '+custEsc(dt(r.reversedAt))+' '+custEsc(r.reversedByName||''):''}</small></td><td data-label="عملیات">${r.status==='PENDING'?`<span class="cust-debt-actions"><button type="button" class="btn btn-secondary btn-sm" data-debt-check="${custEsc(r.id)}" data-payment="${custEsc(inv.paymentId)}" data-status="CLEARED">تأیید وصول</button><button type="button" class="btn btn-secondary btn-sm" data-debt-check="${custEsc(r.id)}" data-payment="${custEsc(inv.paymentId)}" data-status="RETURNED">برگشت چک</button></span>`:r.status==='CLEARED'&&normalizeRole(app.user?.roleCode)==='admin'?`<span class="cust-debt-actions"><button type="button" class="btn btn-secondary btn-sm" data-debt-check="${custEsc(r.id)}" data-payment="${custEsc(inv.paymentId)}" data-status="REVERSED">ابطال دریافت</button></span>`:'—'}</td></tr>`).join('')}</tbody></table></div>`:'<small>دریافتی ثبت نشده است.</small>'}</td>
+ <td data-label="عملیات"><button type="button" class="btn btn-secondary btn-sm" data-debt-receive="${custEsc(inv.paymentId)}" ${inv.available<=0?'disabled':''}>ثبت دریافت</button></td></tr>`).join('')}</tbody></table></div>`:'<p>فاکتور معوق جدیدی ثبت نشده است.</p>'}</section>`;
 }
 function custBindDebt(id,data){
  const modal=$('#modal');

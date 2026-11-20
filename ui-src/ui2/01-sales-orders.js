@@ -118,19 +118,7 @@ async function openOrder(visitId){
 }
 function renderOrderLines(){
   const box=$('#orderLines'); if(!box)return;
-  const units=['کیلوگرم','بسته','عدد','کارتن'];
-  box.innerHTML=(app.orderDraft||[]).map((x,i)=>`<article class="sd-line sd-line-compact" data-line="${i}">
-    <span class="sd-line-no">${fa(String(i+1).padStart(2,'0'))}</span>
-    <div class="sd-line-cell cell-product" style="position:relative">
-      <div class="input-shell"><span>${icon('search',14)}</span><input data-product-search="${i}" value="${esc(x.productLabel||'')}" placeholder="محصول (نام/کد سریع)" autocomplete="off" aria-label="محصول ردیف ${fa(String(i+1))}"></div>
-      <div class="product-suggest" data-suggest-for="${i}"></div>
-      ${x.productId?`<span class="sd-picked-inline" title="انتخاب شد">${icon('check',11)}<span class="code-pill">${esc(x.quickCode||'')}</span></span>`:''}
-    </div>
-    <div class="sd-line-cell cell-qty"><div class="input-shell"><input data-qty="${i}" inputmode="decimal" value="${esc(x.requestedQty||'')}" placeholder="مقدار" aria-label="مقدار ردیف ${fa(String(i+1))}"></div></div>
-    <div class="sd-line-cell cell-unit"><div class="input-shell"><select data-unit="${i}" aria-label="واحد ردیف ${fa(String(i+1))}">${units.map(u=>`<option ${x.requestedUnit===u?'selected':''}>${u}</option>`).join('')}</select></div></div>
-    <div class="sd-line-cell cell-desc"><div class="input-shell"><input type="text" data-description="${i}" value="${esc(x.description||'')}" maxlength="500" placeholder="توضیح (اختیاری)" aria-label="توضیح ردیف ${fa(String(i+1))}"></div></div>
-    <button type="button" class="sd-line-del" data-action="remove-line" data-index="${i}" title="حذف ردیف" aria-label="حذف ردیف">${icon('trash',15)}</button>
-  </article>`).join('');
+  box.innerHTML=renderDraftLinesTable((app.orderDraft||[]).map((x,i)=>renderDraftLine(x,i,'onsite')));
   $$('#orderLines [data-product-search]').forEach(inp=>inp.addEventListener('input',()=>productSearch(inp.dataset.productSearch,inp.value)));
   $$('#orderLines [data-qty]').forEach(inp=>inp.addEventListener('input',()=>{app.orderDraft[Number(inp.dataset.qty)].requestedQty=inp.value;updateOrderDraftSummary()}));
   $$('#orderLines [data-unit]').forEach(sel=>sel.addEventListener('change',()=>{app.orderDraft[Number(sel.dataset.unit)].requestedUnit=sel.value;updateOrderDraftSummary()}));
@@ -144,38 +132,29 @@ function updateOrderDraftSummary(){
   <div class="sd-summary-list">${valid.map(x=>`<div><span><span class="code-pill">${esc(x.quickCode||'')}</span>${esc(x.productLabel||'')}</span><b>${qty(x.requestedQty)} ${esc(x.requestedUnit||'')}</b></div>`).join('')||'<div class="empty" style="padding:16px 8px;font-size:12px">هنوز قلم معتبری ثبت نشده است.</div>'}</div></div>`;
 }
 
-/* ---------- ردیف محصول مشترک (تلفنی / آینده) ---------- */
-function renderProductPickerLine(x,i,prefix='sales'){
-  const idx=String(i);
-  const units=['کیلوگرم','بسته','عدد','کارتن'];
-  const draftKey=({remote:'remoteDraft',phone:'phoneDraft',future:'futureDraft',store:'storeDraft',storeedit:'storeEditDraft',sales:'orderDraft',onsite:'orderDraft'})[prefix]||'orderDraft';
-  if(prefix==='store'){ /* v37.5.0 — ردیف تک‌خطی فشرده فرم فروشگاه: کادر محصول باریک‌تر، مقدار/واحد/توضیح در یک خط، کمینه ارتفاع */
-    return `<article class="sd-line sd-line-compact" data-line="${idx}">
-    <span class="sd-line-no">${fa(String(i+1).padStart(2,'0'))}</span>
-    <div class="sd-line-cell cell-product" style="position:relative">
-      <div class="input-shell"><span>${icon('search',14)}</span><input data-op-product-search="store-${idx}" value="${esc(x.productLabel||'')}" placeholder="محصول (نام/کد)" autocomplete="off" aria-label="محصول ردیف ${fa(String(i+1))}"></div>
-      <div class="product-suggest" data-op-suggest="store-${idx}"></div>
-      ${x.productId?`<span class="sd-picked-inline" title="انتخاب شد">${icon('check',11)}<span class="code-pill">${esc(x.quickCode||'')}</span></span>`:''}
-    </div>
-    <div class="sd-line-cell cell-qty"><div class="input-shell"><input data-op-qty="store-${idx}" inputmode="decimal" value="${esc(x.requestedQty||'')}" placeholder="مقدار" aria-label="مقدار ردیف ${fa(String(i+1))}"></div></div>
-    <div class="sd-line-cell cell-unit"><div class="input-shell"><select data-op-unit="store-${idx}" aria-label="واحد ردیف ${fa(String(i+1))}">${units.map(u=>`<option ${x.requestedUnit===u?'selected':''}>${u}</option>`).join('')}</select></div></div>
-    <div class="sd-line-cell cell-desc"><div class="input-shell"><input type="text" data-op-desc="store-${idx}" value="${esc(x.description||'')}" maxlength="500" placeholder="توضیح (اختیاری)" aria-label="توضیح ردیف ${fa(String(i+1))}"></div></div>
-    <button type="button" class="sd-line-del" data-action="op-remove-line" data-prefix="${prefix}" data-draft-key="${draftKey}" data-index="${idx}" title="حذف ردیف" aria-label="حذف ردیف">${icon('trash',15)}</button>
-  </article>`;
-  }
-  return `<article class="sd-line" data-line="${idx}">
-    <span class="sd-line-no">${fa(String(i+1).padStart(2,'0'))}</span>
-    <div class="sd-line-cell cell-product" style="position:relative"><label>محصول (نام یا کد سریع)</label>
-      <div class="input-shell"><span>${icon('search',15)}</span><input data-op-product-search="${prefix}-${idx}" aria-label="محصول ردیف ${fa(String(i+1))}" value="${esc(x.productLabel||'')}" placeholder="مثلاً 01 یا ران مرغ" autocomplete="off"></div>
-      <div class="product-suggest" data-op-suggest="${prefix}-${idx}"></div>
-      <div class="sd-picked ${x.productId?'':'none'}">${x.productId?`${icon('check',13)} انتخاب شد <span class="code-pill">${esc(x.quickCode||'')}</span>`:'هنوز محصولی انتخاب نشده'}</div>
-    </div>
-    <div class="sd-line-cell cell-qty"><label>مقدار</label><div class="input-shell"><input data-op-qty="${prefix}-${idx}" aria-label="مقدار ردیف ${fa(String(i+1))}" inputmode="decimal" value="${esc(x.requestedQty||'')}" placeholder="۰"></div></div>
-    <div class="sd-line-cell cell-unit"><label>واحد</label><div class="input-shell"><select data-op-unit="${prefix}-${idx}" aria-label="واحد ردیف ${fa(String(i+1))}">${units.map(u=>`<option ${x.requestedUnit===u?'selected':''}>${u}</option>`).join('')}</select></div></div>
-    <div class="sd-line-cell cell-desc"><label>توضیحات ردیف</label><div class="input-shell"><input type="text" data-op-desc="${prefix}-${idx}" aria-label="توضیح ردیف ${fa(String(i+1))}" value="${esc(x.description||'')}" maxlength="500" placeholder="توضیح برای انبار..."></div></div>
-    <button type="button" class="sd-line-del" data-action="op-remove-line" data-prefix="${prefix}" data-draft-key="${draftKey}" data-index="${idx}" title="حذف ردیف" aria-label="حذف ردیف">${icon('trash',16)}</button>
-  </article>`;
+/* جدول مستقل اقلام قابل ویرایش در تمام فرم‌های سفارش. */
+function renderDraftLinesTable(rows){
+  return `<div class="bt-table-wrap draft-lines-wrap"><table class="bt-table draft-lines-table"><caption class="bt-caption">اقلام سفارش</caption><thead><tr>${['ردیف','محصول','مقدار','واحد','توضیحات','عملیات'].map(x=>`<th scope="col">${x}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
 }
+function renderDraftLine(x,i,prefix){
+  const idx=String(i), onsite=prefix==='onsite';
+  const key=onsite?idx:`${prefix}-${idx}`;
+  const draftKey=({remote:'remoteDraft',phone:'phoneDraft',future:'futureDraft',store:'storeDraft',storeedit:'storeEditDraft',sales:'orderDraft',onsite:'orderDraft'})[prefix]||'orderDraft';
+  const units=['کیلوگرم','بسته','عدد','کارتن'];
+  return `<tr data-line="${idx}">
+    <td data-label="ردیف"><span class="sd-line-no">${fa(String(i+1).padStart(2,'0'))}</span></td>
+    <td data-label="محصول"><div class="sd-line-cell cell-product draft-product">
+      <div class="input-shell"><span>${icon('search',14)}</span><input ${onsite?'data-product-search':'data-op-product-search'}="${key}" value="${esc(x.productLabel||'')}" placeholder="محصول (نام/کد سریع)" autocomplete="off" aria-label="محصول ردیف ${fa(String(i+1))}"></div>
+      <div class="product-suggest" ${onsite?'data-suggest-for':'data-op-suggest'}="${key}"></div>
+      ${x.productId?`<span class="sd-picked-inline" title="انتخاب شد">${icon('check',11)}<span class="code-pill">${esc(x.quickCode||'')}</span></span>`:(!onsite&&prefix!=='store'?'<span class="draft-not-picked">هنوز محصولی انتخاب نشده</span>':'')}
+    </div></td>
+    <td data-label="مقدار"><div class="sd-line-cell cell-qty"><div class="input-shell"><input ${onsite?'data-qty':'data-op-qty'}="${key}" inputmode="decimal" value="${esc(x.requestedQty||'')}" placeholder="مقدار" aria-label="مقدار ردیف ${fa(String(i+1))}"></div></div></td>
+    <td data-label="واحد"><div class="sd-line-cell cell-unit"><div class="input-shell"><select ${onsite?'data-unit':'data-op-unit'}="${key}" aria-label="واحد ردیف ${fa(String(i+1))}">${units.map(u=>`<option ${x.requestedUnit===u?'selected':''}>${u}</option>`).join('')}</select></div></div></td>
+    <td data-label="توضیحات"><div class="sd-line-cell cell-desc"><div class="input-shell"><input type="text" ${onsite?'data-description':'data-op-desc'}="${key}" value="${esc(x.description||'')}" maxlength="500" placeholder="توضیح (اختیاری)" aria-label="توضیح ردیف ${fa(String(i+1))}"></div></div></td>
+    <td data-label="عملیات"><button type="button" class="sd-line-del" data-action="${onsite?'remove-line':'op-remove-line'}" ${onsite?'':`data-prefix="${prefix}" data-draft-key="${draftKey}"`} data-index="${idx}" title="حذف ردیف" aria-label="حذف ردیف">${icon('trash',15)}</button></td>
+  </tr>`;
+}
+function renderProductPickerLine(x,i,prefix='sales'){return renderDraftLine(x,i,prefix);}
 function renderFutureLineRow(x,i){ return renderProductPickerLine(x,i,'future'); }
 
 /* ---------- تب ۲: غیرحضوری ---------- */

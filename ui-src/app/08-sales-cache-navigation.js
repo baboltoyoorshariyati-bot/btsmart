@@ -201,7 +201,6 @@ function ensureSalesShellV29(){
           <div class="fx41-card">
             <div class="fx41-card-head"><span class="fx41-ico">${icon('receipt',17)}</span><h3>اقلام سفارش</h3></div>
             <div class="fx41-card-body">
-              <div class="fx41-lines-head"><span>ردیف</span><span>نام محصول</span><span>مقدار</span><span>واحد</span><span>توضیحات</span><span></span></div>
               <div id="future-lines" class="fx41-lines op-lines"></div>
               <button type="button" class="btn btn-secondary fx41-add" data-action="future-add-line">${icon('plus',16)} افزودن قلم جدید</button>
             </div>
