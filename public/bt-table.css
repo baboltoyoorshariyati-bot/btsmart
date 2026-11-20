@@ -114,3 +114,14 @@
   #modal .order-details-modal.v21-detail-modal .order-detail-head{flex-direction:row;align-items:flex-start}
   #modal .order-details-modal.v21-detail-modal .detail-grid.detail-grid-6>div{min-width:96px}
 }
+
+/* ============================================================================
+   صف تسویه — کارت به اندازهٔ متن، نه تمام‌عرض (درخواست کارفرما)
+   اعلان قفل‌شدهٔ width:100%!important در compatibility.css دست‌نخورده است؛
+   اینجا با اولویت انتخابگر بالاتر فقط عرض را به fit-content می‌بریم.
+   ارتفاع ۵۴px، overflow-x:hidden و سه‌نقطه‌شدن نام (قفل‌های همان تست) پابرجاست:
+   نام بلند با max-width:100% و ellipsis کوتاه می‌شود، نه با پهن‌شدن کادر.
+   ========================================================================== */
+#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card{width:fit-content!important;max-width:100%!important}
+#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card .stl-queue-customer{max-width:none;white-space:nowrap}
+#appView #content .stl-queue-list .stl-queue-item.stl-queue-item-card .stl-queue-order{white-space:nowrap}
