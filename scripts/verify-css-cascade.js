@@ -8,7 +8,7 @@
  * [ref] پیش‌فرض HEAD است. ابزار نسخهٔ CSS در آن مرجع و نسخهٔ روی دیسک را
  * دوباره تجزیه می‌کند و «نقشهٔ آبشاری» هر دو را می‌سازد: برای هر
  * (media, selector, property, !important) آخرین مقدار برنده در کل زنجیرهٔ
- * فایل‌ها. اگر این نقشه یکی باشد، مرورگر برای هیچ عنصری مقدار دیگری محاسبه
+ * فایل‌ها — شامل متغیرهای سفارشی (--*) که خودشان هم آبشاری‌اند. اگر این نقشه یکی باشد، مرورگر برای هیچ عنصری مقدار دیگری محاسبه
  * نمی‌کند؛ یعنی حذف اعلان‌های تکراری و جایگزینی رنگ‌های خام با توکن،
  * ظاهر را تغییر نداده است.
  *
@@ -69,7 +69,7 @@ function parseDecls(masked, from, to) {
     let value = raw.slice(colon + 1).trim();
     const important = /!important\s*$/i.test(value);
     if (important) value = value.replace(/!important\s*$/i, '').trim();
-    if (!prop || prop.startsWith('--') || /[{}]/.test(prop)) return;
+    if (!prop || /[{}]/.test(prop)) return;
     out.push({ prop, value, important });
   };
   for (let i = from; i < to; i++) {
@@ -104,7 +104,7 @@ function collect(read) {
   let decls = 0, important = 0;
   for (const f of FILES) {
     let text; try { text = read(f); } catch { continue; }
-    for (const r of parseCss(norm(text))) {
+    for (const r of parseCss(text)) {
       if (r.skip) continue;
       order.push(`${r.media}||${r.selector}`);
       for (const d of r.decls) {

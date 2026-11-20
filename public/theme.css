@@ -44,10 +44,6 @@
   --bt-amber:#975f00;  --bt-amber-bg:#fff4dc;
   --bt-purple:#6b3fbf; --bt-purple-bg:#f3eefc;
   --bt-red:#b4232d;    --bt-red-bg:#fdeef0;
-
-  --bt-rail-bg:#171a21;
-  --bt-rail-bg-2:#1e222b;
-  --bt-rail-text:#a9b0bc;
   --bt-rail-w:240px;
 
   --bt-r-sm:8px;
@@ -76,7 +72,6 @@
   --line:var(--bt-line); --line-strong:var(--bt-line-2);
   --r-sm:var(--bt-r-sm); --r:var(--bt-r); --r-md:var(--bt-r); --r-lg:var(--bt-r-lg); --r-xl:var(--bt-r-lg);
   --rail:var(--bt-rail-w);
-  --font:"B Yekan","B Yekan+","BYekan","Vazirmatn",Tahoma,Arial,sans-serif;
 }
 
 /* ---------- ۱) پایه ---------- */

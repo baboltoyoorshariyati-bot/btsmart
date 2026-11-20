@@ -9,26 +9,9 @@
 
 /* ---------- 1) توکن‌ها ---------- */
 :root{
-  /* برند */
-  --brand:#b40f23;
-  --brand-dark:#99091c;
-  --brand-deep:#7a0716;
-  --brand-050:#fef1f2;
-  --brand-100:#fde3e6;
-  --brand-200:#f9c9cf;
   --brand-300:#f2a7b0;
-  /* خنثی‌ها */
-  --ink:#151a21;
-  --ink-2:#2a323d;
   --ink-3:#4b5563;
-  --muted:#67707d;
-  --muted-2:#98a0ac;
-  --bg:#f4f5f7;
   --bg-soft:#eceef2;
-  --panel:#ffffff;
-  --panel-2:#fafbfc;
-  --line:#e6e9ee;
-  --line-strong:#d5dae2;
   /* وضعیت‌ها */
   --green:#0f7b4f; --green-bg:#e9f7f0; --green-line:#c4e8d6;
   --orange:#9a6700; --orange-bg:#fff6e0; --orange-line:#f0dfae;
@@ -41,9 +24,6 @@
   --shadow-sm:0 2px 8px rgba(16,24,40,.06);
   --shadow-md:0 8px 24px rgba(16,24,40,.09);
   --shadow-lg:0 24px 64px rgba(16,24,40,.16);
-  --r-sm:10px; --r-md:14px; --r-lg:18px; --r-xl:22px;
-  --rail:252px;
-  --font:"B Yekan","B Yekan+","BYekan","Vazirmatn",Tahoma,Arial,sans-serif;
   --ring:0 0 0 3px rgba(180,15,35,.12);
 }
 body{background:var(--bg);}
