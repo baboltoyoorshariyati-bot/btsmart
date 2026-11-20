@@ -304,11 +304,11 @@ c4642ec0fe9ad443f691d576697813908abecd4a3f2b6f9e2880653b2e907f54  ./tests/custom
 593ef3a55aff251c342317b97d6ae26c071b2cb734c99769b268cf74b08b7127  ./tests/dashboard-modern-logo.test.js
 50fc4a5bdeeacc6e83749ee0438327228321bdc1ad21df3940d88ee40dbd5936  ./tests/dashboard-product-charts.test.js
 34b998260080f0f51df2a48d3c13710ead0cf53d8717633b3feac51d2dcccd78  ./tests/datepicker-sales-products.test.js
-d5205ab832e97005aad1204419f74083b665fb0e7c5d2964e197f9b62451a570  ./tests/delivery-date-browser.test.js
+a589cf0e85ee60d039218e6693097b9e6d15f6badede0054e2378f1d375b9ce4  ./tests/delivery-date-browser.test.js
 4c67909fc2b079258ea1d8b1ffcad14f3c770a13be5263526efda5c7efa38f04  ./tests/delivery-date.test.js
 4e74ce04e852c1875db7fb0444f2376541a9e702622eb1f77439da6e50268e54  ./tests/deposits-api.test.js
 7e9b0ff529b8bfaa1a7a1cef901d23eb6214a8b659cca596de5d9e5d9a1a2a47  ./tests/deposits-browser.test.js
-ffbb7cbb0a275cea91f65cf25db6b40ec6cf027e814732da55f4092e9dbf6c3b  ./tests/desktop-responsive-browser.test.js
+99c9c3695c5b7f2e0a25c7e658543c208082b3aa3e1bde40c646c5ef3168fbfd  ./tests/desktop-responsive-browser.test.js
 2114f9132463eb09133ddef7bad9870a40ef58bc4b31850975aa9e9d028fe3eb  ./tests/dispatch-invoice.test.js
 11ce527dfb777f12657671d737322206e9fbaa3bc818c84337ddf173f320c45b  ./tests/dispatch-ui.test.js
 1de9cd09e5b1a8906a265a30d5d32a3305cbbdf084564e688c0fe2b2b22f062c  ./tests/dispatch.test.js
@@ -349,7 +349,7 @@ ee7cfc9e7d3e3e86211567ee5a142892bea34acde237cf7397ac6c6c766b5a7f  ./tests/invoic
 0be7030f2a21828afbbb6912fa0bdb7e8fe1b0f5866690c7f8d8d00d2eb0af33  ./tests/legacy-driver-retirement.test.js
 2eaf80551c3da668fb2192b9df3e7b70ca775fa93595b248e8d50b876ba96945  ./tests/live-sales-cache.test.js
 9fb57be1840c1984732867e022ea02f56012353a04c7c8f25c576b6e658e0f99  ./tests/login-branding.test.js
-b344c95fbed334cfa0de74007085299ebcf5c70b51e73d531e8b89baa75f5b6f  ./tests/long-text-browser.test.js
+b19437d1f743512d6be4d55e7f1506786cdee1b9d8630af4b9146e9f04413420  ./tests/long-text-browser.test.js
 08079dc682d635e54f913a040547a22fb42e89b99196c64f3a8731c05e68c513  ./tests/mobile-layout.test.js
 2be56980d44c212d7c1ff5ac496094d10b96a8115acb4a5eb592a9d823b8c3e6  ./tests/notification-api.test.js
 4a6da8ad9ad717dc44d056a347918487d26008c5cfa8bdb8ae9053dec0830ed0  ./tests/notification-browser.test.js
