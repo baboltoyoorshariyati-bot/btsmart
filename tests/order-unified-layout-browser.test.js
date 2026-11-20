@@ -45,12 +45,12 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     if(kind==='invoice')html=`<div class="sd-invoice-list">${invoiceRowsV27([{...o,status:'SETTLED'}])}</div>`;
     el.innerHTML=html;
    },kind);
-   if(kind==='delivery'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});const row=page.locator('.sales-distribution-table tr');await row.waitFor();assert.equal(await row.locator('td').count(),8);assert.equal(await row.evaluate(e=>getComputedStyle(e).display),'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}continue;}
-   if(kind==='invoice'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});const table=page.locator('.settlement-invoice-table');await table.waitFor();assert.equal(await table.locator('th').count(),7);assert(await table.evaluate(e=>e.scrollWidth<=e.clientWidth+1));}continue;}
+   if(kind==='delivery'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;const row=page.locator('.sales-distribution-table tr');await row.waitFor();assert.equal(await row.locator('td').count(),8);assert.equal(await row.evaluate(e=>getComputedStyle(e).display),'table-row');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}continue;}
+   if(kind==='invoice'){for(const width of [1280,768,390,320]){await page.setViewportSize({width,height:900});step=`${kind}/${width}`;const table=page.locator('.settlement-invoice-table');await table.waitFor();assert.equal(await table.locator('th').count(),7);assert(await table.evaluate(e=>e.scrollWidth<=e.clientWidth+1));}continue;}
    if(kind==='warehouse-store-incoming'||kind==='warehouse-store-preparing'){
     const table=page.locator('#content .wh38-store-table'),row=table.locator('tbody tr[data-store-order]').first();await waitFor(row,`store-row ${kind}`);
     for(const width of [1280,768,390,320]){
-     await page.setViewportSize({width,height:900});
+     await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
      const layout=await row.evaluate(el=>{const r=el.getBoundingClientRect();return{display:getComputedStyle(el).display,left:r.left,right:r.right,cells:[...el.children].map(x=>x.getBoundingClientRect().toJSON()),scroll:document.documentElement.scrollWidth,viewport:innerWidth};});
      assert.equal(layout.cells.length,8,`${kind}/${width} cells`);assert.equal(layout.display,width<=900?'grid':'table-row',`${kind}/${width} row display`);
      assert(layout.cells.every(c=>c.left>=layout.left-1&&c.right<=layout.right+1),`${kind}/${width} cells outside row ${JSON.stringify(layout)}`);
@@ -65,7 +65,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     assert.equal(await table.locator('thead th').count(),6,'ستون‌های جدول سوابق انبار');
     assert.deepEqual(await table.locator('thead th').allInnerTexts(),['تاریخ و ساعت','شماره سفارش','نام مشتری','وزن تحویلی','ثبت‌کننده','عملیات']);
     for(const width of [1280,768,390,320]){
-     await page.setViewportSize({width,height:900});
+     await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
      const row=table.locator('tbody tr[data-order]').first();await waitFor(row,`whh-row ${width}`);
      assert.equal(await row.locator('td').count(),6,`whh/${width} cells`);
      assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row',`whh/${width} row display`);
@@ -79,7 +79,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     assert.equal(await table.locator('thead th').count(),5,'ستون‌های جدول انبار');
     assert.deepEqual(await table.locator('thead th').allInnerTexts(),['شماره سفارش','نام مشتری','تاریخ سفارش','تاریخ تحویل','عملیات']);
     for(const width of [1280,768,390,320]){
-     await page.setViewportSize({width,height:900});
+     await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
      const row=table.locator('tbody tr').first();await waitFor(row,`warehouse-row ${width}`);
      assert.equal(await row.locator('td').count(),5,`warehouse/${width} cells`);
      assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row',`warehouse/${width} row display`);
@@ -90,7 +90,7 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     continue;
    }
    for(const width of [1280,768,390,320]){
-    await page.setViewportSize({width,height:900});
+    await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
     const row=page.locator('#content .order-summary-row:visible,#content .sales-delivery-summary-row:visible,#content .stl-queue-item:visible,#content .gt-exit-card:visible').first();await waitFor(row,`generic-row ${kind}/${width}`);
     const g=await row.evaluate(el=>{const r=el.getBoundingClientRect(),cells=[...el.children].filter(x=>x.matches('.order-summary-cell,.sales-distribution-cell')),buttons=[...el.querySelectorAll('.order-summary-actions .btn,.sales-distribution-actions .btn')].filter(x=>x.offsetParent!==null);return {height:r.height,cells:cells.map(x=>({h:x.getBoundingClientRect().height,cy:x.getBoundingClientRect().top+x.getBoundingClientRect().height/2,top:x.getBoundingClientRect().top,bottom:x.getBoundingClientRect().bottom})),buttons:buttons.map(x=>({h:x.getBoundingClientRect().height,top:x.getBoundingClientRect().top,bottom:x.getBoundingClientRect().bottom})),top:r.top,bottom:r.bottom,scroll:document.documentElement.scrollWidth,viewport:innerWidth};});
     if(kind==='settlement'){const q=await row.evaluate(el=>({row:el.getBoundingClientRect().width,content:el.scrollWidth,list:el.parentElement.clientWidth-parseFloat(getComputedStyle(el.parentElement).paddingLeft)-parseFloat(getComputedStyle(el.parentElement).paddingRight),scroll:el.parentElement.scrollWidth,client:el.parentElement.clientWidth,title:el.title,aria:el.getAttribute('aria-label')}));assert(q.scroll<=q.client+1,JSON.stringify(q));assert(q.row<=q.list+1,`کارت از فهرست پهن‌تر است ${JSON.stringify(q)}`);assert(q.row<=q.content+2,`عرض کارت به اندازهٔ متن نیست ${JSON.stringify(q)}`);assert.match(q.title,/مشتری آزمایشی با نام بسیار طولانی/);assert.equal(q.aria,q.title);}
@@ -99,11 +99,11 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
    }
   }
   for(const width of [1280,768,390,320])for(const kind of ['phone','future','store','onsite']){
-   await page.setViewportSize({width,height:900});
+   await page.setViewportSize({width,height:900});step=`${kind}/${width}`;
    await page.evaluate(kind=>{const root=document.querySelector('#content');const line={productId:'p01',productLabel:'محصول آزمایشی',requestedQty:2,requestedUnit:'کیلوگرم',description:'توضیح'};if(kind==='onsite'){root.innerHTML='<div id="orderLines"></div>';app.orderDraft=[line];renderOrderLines();}else root.innerHTML=`<div id="${kind}-lines">${renderProductPickerLine(line,0,kind)}</div>`;},kind);
    const h=await page.locator('.sd-line-cell > .input-shell').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().height));assert.equal(h.length,4,`${kind} controls`);assert.ok(h.every(n=>Math.abs(n-44)<1),`${kind} ${width}: ${h}`);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`${kind} page overflow ${width}`);
   }
   assert.deepEqual(errors,[]);
- }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true})}
+ }catch(e){throw new Error(`FAIL ${step} :: ${String(e.message).split('\n').filter(Boolean).slice(0,3).join(' | ')}`);}finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true})}
 });
