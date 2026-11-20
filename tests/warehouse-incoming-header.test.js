@@ -3,7 +3,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
-const ui=read('public/ui2.js'),css=read('public/form-layout.css');
+const ui=read('public/ui2.js'),app=read('public/app.js'),css=read('public/form-layout.css');
 const helper=ui.slice(ui.indexOf('function wh38IncomingHeader(o)'),ui.indexOf('function wh38List(orders,kind)'));
 test('incoming header has four equal cells with customer and metadata in one row',()=>{
  assert.equal((helper.match(/class="wh38-incoming-cell/g)||[]).length,4);
@@ -13,13 +13,20 @@ test('incoming header has four equal cells with customer and metadata in one row
  assert.match(css,/\.wh38-incoming-cell \{[\s\S]*?height:44px!important/);
  assert.match(css,/\.wh38-incoming-summary-scroll \{[\s\S]*?overflow-x:auto!important/);
 });
-test('compact order header is shared by incoming and preparing, preserving both actions',()=>{
+test('incoming and preparing lists are one shared bt-table with the fixed column order',()=>{
  const list=ui.slice(ui.indexOf('function wh38List(orders,kind)'),ui.indexOf('async function wh38Paint(phase)'));
- assert.match(list,/order-compact-row/);assert.match(list,/data-action="wh38-order-details"/);
- assert.doesNotMatch(list,/class="wh38-meta"/);
- assert.doesNotMatch(list,/data-action="wh38-accept"/);assert.match(list,/data-action="wh38-start"/);
+ const table=ui.slice(ui.indexOf('function wh38OrdersTable(orders,kind)'),ui.indexOf('function wh38Tabs(active)'));
+ assert.match(list,/return wh38OrdersTable\(orders,kind\)/);   // یک سازندهٔ مشترک برای هر دو تب
+ assert.match(table,/class="bt-table wh-orders-table"/);
+ assert.match(table,/<th scope="col">شماره سفارش<\/th><th scope="col">نام مشتری<\/th><th scope="col">تاریخ سفارش<\/th><th scope="col">تاریخ تحویل<\/th><th scope="col" class="bt-col-actions">عملیات<\/th>/, 'ترتیب ستون‌ها');
+ for(const label of ['شماره سفارش','نام مشتری','تاریخ سفارش','تاریخ تحویل','عملیات'])assert.match(table,new RegExp('data-label="'+label+'"'));
+ assert.match(table,/data-action="wh38-order-details"/);
+ assert.doesNotMatch(table,/data-action="wh38-start"/);          // جدول تک‌دکمه‌ای است
+ assert.doesNotMatch(table,/class="wh38-meta"/);
+ assert.doesNotMatch(list,/data-action="wh38-accept"/);
+ // عملیات ثانویه از جدول به صفحهٔ جزئیات منتقل شده و از دست نرفته است
+ assert.match(app,/data-wh-start-order/);assert.match(app,/data-wh-pickup-cancel/);
  assert.match(css,/\.wh38-incoming-card \{[\s\S]*?padding:10px 12px!important/);
-
 });
 test('customer strings are escaped, cancelled items excluded, updated time falls back to created time',()=>{
  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');

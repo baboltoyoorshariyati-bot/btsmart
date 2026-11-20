@@ -1,0 +1,93 @@
+/* ============================================================================
+   bt-table — سیستم جدول مشترک کارتابل‌ها
+   نسخهٔ پایه: ۱.۱.۱۰ (شاخهٔ arena/8913e7e8)
+   آخرین لایهٔ استایل‌ها؛ بعد از responsive.css بارگذاری می‌شود.
+
+   قرارداد (برای همهٔ بخش‌ها یکسان است):
+   <div class="bt-table-wrap">
+     <table class="bt-table <کلاس-اختصاصی>">
+       <thead><tr><th scope="col">…</th></tr></thead>
+       <tbody>
+         <tr data-order="…">
+           <td data-label="برچسب ستون">
+             <span class="bt-cell-main">مقدار اصلی</span>
+             <span class="bt-cell-sub">مشخصات زیرین</span>
+           </td>
+         </tr>
+       </tbody>
+     </table>
+   </div>
+
+   - ستون‌ها در دسکتاپ با table-layout:fixed و عرض درصدی تعیین می‌شوند.
+   - در عرض ≤۹۰۰px هر ردیف به کارت عمودی تبدیل می‌شود و برچسب ستون از
+     data-label با ::before ساخته می‌شود (بدون تغییر در HTML).
+   - ارتفاع ردیف واحدها ۵۲px، هدر چسبان ۳۶px، دکمهٔ عملیات btn-sm.
+   ========================================================================== */
+
+.bt-table-wrap{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px;background:#fff}
+.bt-table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:12.5px}
+.bt-caption{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+.bt-table thead th{height:36px;padding:0 12px;background:#f6f7f9;border-bottom:1px solid var(--line);color:#5b6470;font-size:11px;font-weight:900;text-align:right;white-space:nowrap;vertical-align:middle}
+.bt-table tbody tr{height:52px}
+.bt-table tbody tr+tr td{border-top:1px solid #eef0f3}
+.bt-table tbody tr:hover td{background:#fffafb}
+.bt-table td{padding:6px 12px;vertical-align:middle;min-width:0;text-align:right}
+
+.bt-cell-main{display:block;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.6}
+.bt-cell-sub{display:block;margin-top:1px;color:var(--muted);font-size:10.5px;line-height:1.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt-cell-sub .badge,.bt-cell-sub .status-badge{font-size:9.5px;padding:1px 6px;vertical-align:middle}
+
+.bt-table th.bt-col-actions,.bt-table td.bt-col-actions{width:18%;text-align:center}
+.bt-table td.bt-col-actions .btn{white-space:nowrap}
+
+/* ستون‌های «سفارش‌های ورودی / در حال آماده‌سازی» انبار */
+.wh-orders-table th:nth-child(1),.wh-orders-table td:nth-child(1){width:16%}
+.wh-orders-table th:nth-child(2),.wh-orders-table td:nth-child(2){width:30%}
+.wh-orders-table th:nth-child(3),.wh-orders-table td:nth-child(3){width:18%}
+.wh-orders-table th:nth-child(4),.wh-orders-table td:nth-child(4){width:18%}
+.wh-orders-table th:nth-child(5),.wh-orders-table td:nth-child(5){width:18%}
+
+/* -------- ≤۹۰۰px: هر ردیف یک کارت با برچسب ستون -------- */
+@media (max-width:900px){
+  .bt-table-wrap{border:0;border-radius:0;background:transparent;overflow:visible}
+  .bt-table,.bt-table tbody,.bt-table tr,.bt-table td{display:block;width:auto}
+  .bt-table thead{display:none}
+  .bt-table tbody tr{height:auto;margin:0 0 8px;padding:6px 4px;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 4px 14px rgba(28,34,42,.04)}
+  .bt-table tbody tr+tr td{border-top:0}
+  .bt-table tbody tr:hover td{background:transparent}
+  .bt-table td{display:flex;align-items:center;justify-content:space-between;gap:10px;width:auto !important;padding:4px 10px;text-align:right}
+  .bt-table td::before{content:attr(data-label);flex:0 0 auto;color:#6b7280;font-size:10.5px;font-weight:900}
+  .bt-cell-main,.bt-cell-sub{text-align:left;white-space:normal;overflow:visible;text-overflow:clip}
+  .bt-table td.bt-col-actions{width:auto;padding-top:6px;justify-content:flex-start}
+  .bt-table td.bt-col-actions::before{display:none}
+  .bt-table td.bt-col-actions .btn{width:100%}
+}
+
+/* ============================================================================
+   نوار مشخصات صفحهٔ «جزئیات سفارش» — همهٔ اطلاعات در یک خط افقی، ارتفاع کم
+   ========================================================================== */
+#modal .order-details-modal.v21-detail-modal .order-detail-head{align-items:center;padding-bottom:8px;gap:12px}
+#modal .order-details-modal.v21-detail-modal .order-detail-head h2{margin:0 0 2px;font-size:19px;line-height:1.5}
+#modal .order-details-modal.v21-detail-modal .order-detail-head p{font-size:11.5px;line-height:1.6}
+#modal .order-details-modal.v21-detail-modal .order-detail-head .eyebrow{display:none}
+#modal .order-details-modal.v21-detail-modal .detail-status-stack{flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px}
+#modal .order-details-modal.v21-detail-modal .detail-status-stack>*{white-space:nowrap}
+
+#modal .order-details-modal.v21-detail-modal .detail-grid.detail-grid-6{
+  display:flex;flex-wrap:nowrap;gap:0;margin-top:8px;overflow-x:auto;overflow-y:hidden;
+  border:1px solid var(--line);border-radius:10px;background:#fafbfc;scrollbar-width:thin;
+  grid-template-columns:none;grid-auto-rows:auto}
+#modal .order-details-modal.v21-detail-modal .detail-grid.detail-grid-6>div{
+  flex:1 0 auto;min-width:108px;min-height:40px !important;height:auto;padding:3px 10px;
+  display:flex;flex-direction:column;justify-content:center;gap:0;
+  border:0;border-inline-end:1px solid var(--line);border-radius:0;background:transparent;
+  box-sizing:border-box}
+#modal .order-details-modal.v21-detail-modal .detail-grid.detail-grid-6>div:last-child{border-inline-end:0}
+#modal .order-details-modal.v21-detail-modal .detail-grid span{font-size:9.5px;line-height:1.5;white-space:nowrap}
+#modal .order-details-modal.v21-detail-modal .detail-grid b{margin:0;font-size:11.5px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+@media (max-width:760px){
+  #modal .order-details-modal.v21-detail-modal .order-detail-head{flex-direction:row;align-items:flex-start}
+  #modal .order-details-modal.v21-detail-modal .detail-grid.detail-grid-6>div{min-width:96px}
+}

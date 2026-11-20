@@ -1166,6 +1166,31 @@ async function warehouseVisitOrderHistory(id){
   openVisitOrderDetailsModal(result.order,result.records||[]);
  }catch(e){toast(e.message);}
 }
+/* ── bt-table: سیستم جدول مشترک کارتابل‌ها ─────────────────────────────────
+   همهٔ فهرست‌های کارتابلی با همین الگو ساخته می‌شوند: هدر ثابت، ستون‌های
+   مشخص، «مشخصات» هر آیتم در خط دوم همان سلول، و ستون عملیات در انتها.
+   در عرض ≤۹۰۰px هر ردیف با CSS (نه با HTML) به کارت برچسب‌دار تبدیل می‌شود. */
+function btDate(v){ const s=String(v||''); return /^\d{4}-\d{2}-\d{2}/.test(s)?dateLabel(s.slice(0,10)):'—'; }
+function btTime(v){ const m=String(v||'').match(/[T ](\d{2}):(\d{2})/); return m?fa(m[1]+':'+m[2]):''; }
+function wh38OrdersTable(orders,kind){
+  const rows=orders.map(o=>{
+    const name=storeAwareOrderName(o), phone=storeAwareOrderPhone(o), count=activeItemsOf(o).length;
+    const delivery=o.deliveryDate||o.scheduledDate||'';
+    const deliverySub=delivery?(btTime(o.scheduledAt)||'زمان‌بندی‌شده'):'ثبت نشده';
+    return `<tr data-order="${esc(o.id)}">
+      <td data-label="شماره سفارش"><span class="bt-cell-main order-code">${esc(fa(o.orderNo||'—'))}</span><span class="bt-cell-sub">${badge(o.status)}</span></td>
+      <td data-label="نام مشتری"><span class="bt-cell-main" title="${esc(name||'—')}">${esc(name||'—')}</span><span class="bt-cell-sub">${qty(count)} قلم • ${esc(o.orderType==='STORE'?'فروشگاه':'تلفنی')}${phone&&phone!=='—'?` • ${esc(fa(phone))}`:''}</span></td>
+      <td data-label="تاریخ سفارش"><span class="bt-cell-main">${btDate(o.createdAt)}</span><span class="bt-cell-sub">${btTime(o.createdAt)||'—'}</span></td>
+      <td data-label="تاریخ تحویل"><span class="bt-cell-main">${btDate(delivery)}</span><span class="bt-cell-sub">${deliverySub}</span></td>
+      <td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-secondary btn-sm" data-action="wh38-order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button></td>
+    </tr>`;
+  }).join('');
+  return `<div class="bt-table-wrap"><table class="bt-table wh-orders-table">
+    <caption class="bt-caption">${kind==='incoming'?'سفارش‌های ورودی انبار':'سفارش‌های در حال آماده‌سازی انبار'}</caption>
+    <thead><tr><th scope="col">شماره سفارش</th><th scope="col">نام مشتری</th><th scope="col">تاریخ سفارش</th><th scope="col">تاریخ تحویل</th><th scope="col" class="bt-col-actions">عملیات</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
 function wh38Tabs(active){
   const inc=badgeCount('warehouseIncomingRegular')||badgeCount('warehouseIncoming'), prep=badgeCount('warehousePreparingRegular')||badgeCount('warehousePreparing'), st=badgeCount('warehouseStores');
   return `<div class="wh38-tabs">
@@ -1251,7 +1276,10 @@ async function wh38AcceptFromDetails(id,btn){
 }
 function wh38List(orders,kind){
  if(!orders.length)return sdEmpty(kind==='incoming'?'truck':'scale',kind==='incoming'?'سفارش ورودی جدیدی نیست':'سفارشی در مرحله آماده‌سازی نیست','');
- return `<div class="wh38-list wh38-incoming-list order-compact-scroll">${orders.map(o=>orderSummaryRow(o,{className:'wh38-card wh38-incoming-card order-compact-row',statusHtml:badge(o.status),itemCount:activeItemsOf(o).length,extras:o.deliveryDate?[{html:`تاریخ تحویل: ${esc(dateLabel(o.deliveryDate))}`}]:[],actionsHtml:`<button type="button" class="btn btn-secondary btn-sm" data-action="wh38-order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>${app.features?.pickupStaging&&o.visit?.status==='PICKUP_PRESENT'&&!o.pickupCancellation?`<button type="button" class="btn btn-secondary btn-sm" data-action="pickup-cancel" data-id="${esc(o.id)}">ثبت انصراف بدون تحویل</button>`:''}${o.pickupCancellation?.status==='PENDING_SALES'?'در انتظار تأیید انصراف فروش':kind==='incoming'?'':`<button type="button" class="btn btn-primary btn-sm" data-action="wh38-start" data-id="${esc(o.id)}">شروع آماده‌سازی</button>`}`})).join('')}</div>`;
+ // v1.1.11 — فهرست‌های ورودی/آماده‌سازی انبار به جدول واحد bt-table منتقل شدند؛
+ // عملیات هر ردیف فقط «جزئیات سفارش» است و «شروع آماده‌سازی»/«ثبت انصراف»
+ // از داخل همان صفحهٔ جزئیات انجام می‌شود تا جدول تک‌دکمه‌ای و یکدست بماند.
+ return wh38OrdersTable(orders,kind);
 }
 async function wh38Paint(phase){
   if(phase==='history') return; // سوابق با فیلترهای کاربر؛ نوسازی خودکار ۷ ثانیه‌ای فیلترها را به‌هم نمی‌زند
