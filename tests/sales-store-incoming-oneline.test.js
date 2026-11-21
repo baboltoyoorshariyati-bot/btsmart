@@ -19,8 +19,10 @@ const view = (() => {
 test('جدول فشرده است و همهٔ دکمه‌ها در ستون عملیات قابل چیدمان‌اند', () => {
   assert.match(view, /class="bt-table sd-store-table"/);
   assert.match(view, /data-label="عملیات" class="bt-col-actions"/);
-  for (const a of ['store-order-details-v25', 'sales-edit-store-order', 'store-approve-v25', 'store-quick-send-v40'])
-    assert.ok(view.includes(`data-action="${a}"`), `دکمهٔ ${a} در جدول نیست`);
+  assert.ok(view.includes('data-action="store-order-details-v25"'));
+  const actions = view.slice(view.indexOf('const actions='), view.indexOf('const notes='));
+  assert.doesNotMatch(actions, /kind==='incoming'\?/);
+  assert.doesNotMatch(actions, /data-action="sales-edit-store-order"|data-action="store-approve-v25"/);
   // جدول از الگوی bt-table پیروی می‌کند: thead هرگز حذف نمی‌شود و هر td دارای data-label است
   assert.match(view, /<thead><tr><th>فروشگاه<\/th><th>شماره سفارش<\/th><th>تاریخ<\/th><th>وضعیت<\/th><th>اقلام<\/th><th>عملیات<\/th><\/tr><\/thead>/);
   assert.match(view, /data-label="فروشگاه"/);

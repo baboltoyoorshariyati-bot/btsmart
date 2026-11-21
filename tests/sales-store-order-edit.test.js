@@ -12,11 +12,11 @@ const path = require('node:path');
 const root = path.join(__dirname, '..');
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
-test('کارت سفارش ورودی فروشگاه در کارتابل فروش دکمهٔ ویرایش دارد', () => {
+test('عملیات سفارش ورودی فروشگاه در جزئیات قرار دارد', () => {
   const ui2 = read('public/ui2.js');
   const card = ui2.slice(ui2.indexOf('function renderSalesStoresV41'), ui2.indexOf('/* ---------- تب ۳'));
-  assert.match(card, /data-action="sales-edit-store-order"/, 'دکمهٔ ویرایش روی کارت ورودی نیست');
-  assert.ok(card.indexOf('sales-edit-store-order') < card.indexOf('store-approve-v25'), 'ویرایش باید کنار عملیات ورودی باشد');
+  assert.match(card, /data-action="store-order-details-v25"/);
+  assert.doesNotMatch(card, /data-action="sales-edit-store-order"|data-action="store-approve-v25"/);
 });
 
 test('ویرایشگر فروش: بازکردن، افزودن/حذف ردیف، جست‌وجوی محصول و ذخیره با مسیر sales-edit', () => {
@@ -30,7 +30,8 @@ test('ویرایشگر فروش: بازکردن، افزودن/حذف ردیف،
   assert.match(app, /SALES_EDIT_STORE_ORDER:'ویرایش سفارش فروشگاه توسط فروش'/, 'برچسب سوابق فعالیت نیست');
   // دکمهٔ ویرایش داخل مودال جزئیات هم برای سفارش ورودی فروشگاه هست
   const details = app.slice(app.indexOf('async function openOrderDetails'), app.indexOf('function renderRemoteOrdersV21'));
-  assert.match(details, /o\.orderType==='STORE'&&o\.status==='STORE_PENDING_SALES'\?`<button class="btn btn-primary" data-action="sales-edit-store-order"/);
+  assert.match(details, /app\.page==='sales'&&can\('sales'\)&&o\.orderType==='STORE'&&o\.status==='STORE_PENDING_SALES'/);
+  for (const action of ['sales-edit-store-order','store-approve-v25','store-quick-send-v40']) assert.ok(details.includes(`data-action="${action}"`));
 });
 
 test('مسیر سمت سرور sales-edit فقط برای فروش و فقط در وضعیت در انتظار بررسی فروش است', () => {

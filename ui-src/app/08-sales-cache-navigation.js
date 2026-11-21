@@ -266,6 +266,18 @@ function bindSalesRootV29(){
   root.addEventListener('submit',salesV29SubmitHandler);
 }
 
+async function quickSendStoreOrder(button,fromDetails=false){
+  if(button.disabled)return;
+  if(!confirm(app.features?.experimentalTransport?'سفارش فروشگاهی اکنون به انبار و ترابری ارسال شود؟ سفارش زمان‌دار تا موعد مقرر ارسال نمی‌شود.':'این سفارش فروشگاهی بدون انتظار برای زمان‌بندی، همین حالا به صف انبار ارسال شود؟'))return;
+  button.disabled=true;
+  try{
+    const result=await api('/api/store/orders/'+encodeURIComponent(button.dataset.id)+'/quick-send',{method:'POST',body:JSON.stringify(app.features?.experimentalTransport?{transportWorkflow:true}:{})});
+    if(fromDetails)closeModal();
+    toast(result.order?.status==='WAREHOUSE_PENDING'?(result.order.transportWorkflow===1?'سفارش به انبار و ترابری ارسال شد.':'سفارش با موفقیت به صف انبار ارسال شد.'):'ارسال سریع ثبت شد.');
+    await fetchSalesCache(true);await renderSales('stores');await refreshIndicators();
+  }catch(err){button.disabled=false;toast(err.message||'ارسال سریع انجام نشد.');}
+}
+
 async function salesV29ClickHandler(e){
   const content=$('#content');
   if(!content || !content.contains(e.target))return;
@@ -359,13 +371,7 @@ async function salesV29ClickHandler(e){
     }
     if(a==='sales-edit-store-order')return openSalesStoreOrderEdit(el.dataset.id);
     if(a==='store-approve-v25')return openStoreApprovalV25(el.dataset.id);
-    if(a==='store-quick-send-v40'){
-      if(!confirm(app.features?.experimentalTransport?'سفارش فروشگاهی اکنون به انبار و ترابری ارسال شود؟ سفارش زمان‌دار تا موعد مقرر ارسال نمی‌شود.':'این سفارش فروشگاهی بدون انتظار برای زمان‌بندی، همین حالا به صف انبار ارسال شود؟'))return;
-      el.disabled=true;
-      try{const result=await api('/api/store/orders/'+encodeURIComponent(el.dataset.id)+'/quick-send',{method:'POST',body:JSON.stringify(app.features?.experimentalTransport?{transportWorkflow:true}:{})});toast(result.order?.status==='WAREHOUSE_PENDING'?(result.order.transportWorkflow===1?'سفارش به انبار و ترابری ارسال شد.':'سفارش با موفقیت به صف انبار ارسال شد.'):'ارسال سریع ثبت شد.');await fetchSalesCache(true);await renderSales('stores');await refreshIndicators();}
-      catch(err){el.disabled=false;toast(err.message||'ارسال سریع انجام نشد.');}
-      return;
-    }
+    if(a==='store-quick-send-v40')return quickSendStoreOrder(el);
     if(a==='store-order-details-v25')return openOrderDetails(el.dataset.id);
     if(a==='future-edit')return editFutureV25(el.dataset.id);
     if(a==='future-cancel')return cancelFutureV25(el.dataset.id);

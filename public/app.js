@@ -1476,6 +1476,8 @@ async function bootstrap(){
     if(a==='pick-return-product')return pickReturnedProduct(Number(el.dataset.index),el.dataset.productId,el.dataset.label);
     if(a==='save-returned-order')return saveReturnedOrder(el.dataset.id);
     if(a==='sales-edit-store-order')return openSalesStoreOrderEdit(el.dataset.id);
+    if(a==='store-approve-v25')return openStoreApprovalV25(el.dataset.id);
+    if(a==='store-quick-send-v40')return quickSendStoreOrder(el,true);
     if(a==='sales-store-add-line')return addSalesStoreLine();
     if(a==='sales-store-delete-line')return deleteSalesStoreLine(Number(el.dataset.index));
     if(a==='pick-sales-store-product')return pickSalesStoreProduct(Number(el.dataset.index),el.dataset.productId,el.dataset.label);
@@ -2392,7 +2394,7 @@ async function openOrderDetails(id){
       ${warehouseReturnNoteHtml(o)}
       ${o.notes?`<div class="detail-note"><span>${icon('info',16)}</span><div><b>یادداشت سفارش</b><p>${esc(o.notes)}</p></div></div>`:''}
       <div class="table-wrap section-space"><table class="table v21-detail-table"><thead><tr><th>#</th><th>محصول</th><th>مقدار درخواستی</th><th>واحد</th><th>توضیحات</th>${showRunCols?'<th>وزن سرویس اول</th><th>وزن سرویس دوم</th>':''}<th>وزن تحویلی</th><th>وضعیت</th></tr></thead><tbody>${items.map((i,k)=>`<tr class="${i.itemStatus==='CANCELLED'?'row-cancelled':''}"><td>${fa(String(k+1))}</td><td><strong>${esc(i.product?.name||'—')}</strong></td><td>${qty(i.requestedQty)}</td><td>${esc(i.requestedUnit||'—')}</td><td>${esc(i.description||'—')}</td>${showRunCols?`<td>${runView[i.id]&&n(runView[i.id].r1Kg)>0?qty(runView[i.id].r1Kg)+' کیلوگرم':'—'}</td><td>${runView[i.id]&&n(runView[i.id].r2Kg)>0?qty(runView[i.id].r2Kg)+' کیلوگرم':'—'}</td>`:''}<td>${i.deliveredKg==null?'—':qty(i.deliveredKg)+' کیلوگرم'}</td><td>${badge(i.itemStatus)}</td></tr>`).join('')}</tbody></table></div>
-      <div class="sticky-actions"><span class="subtle">تمام تغییرات و ارجاع‌ها در سوابق مدیریتی ثبت می‌شوند.</span><div class="toolbar"><button class="btn btn-secondary" data-action="close-modal">بستن</button>${app.page==='warehouse'&&o.status==='WAREHOUSE_PENDING'?`<button class="btn btn-primary" data-wh-accept-order>تأیید دریافت و ورود به آماده‌سازی</button>`:''}${app.page==='warehouse'&&o.status==='WAREHOUSE_PREPARING'?`<button class="btn btn-primary" data-wh-start-order>شروع آماده‌سازی</button>`:''}${app.page==='warehouse'&&app.features?.pickupStaging&&o.visit?.status==='PICKUP_PRESENT'&&!o.pickupCancellation?`<button class="btn btn-secondary" data-wh-pickup-cancel>ثبت انصراف بدون تحویل</button>`:''}${o.status==='RETURNED_TO_SALES'?`<button class="btn btn-secondary" data-action="edit-returned-order" data-id="${o.id}">${icon('edit',16)} اصلاح سفارش</button><button class="btn btn-primary" data-action="resubmit-order" data-id="${o.id}">${icon('send',16)} ارسال مجدد به انبار</button>`:''}${o.orderType==='STORE'&&o.status==='STORE_PENDING_SALES'?`<button class="btn btn-primary" data-action="sales-edit-store-order" data-id="${o.id}">${icon('edit',16)} ویرایش سفارش</button>`:''}</div></div>
+      <div class="sticky-actions"><span class="subtle">تمام تغییرات و ارجاع‌ها در سوابق مدیریتی ثبت می‌شوند.</span><div class="toolbar"><button class="btn btn-secondary" data-action="close-modal">بستن</button>${app.page==='warehouse'&&o.status==='WAREHOUSE_PENDING'?`<button class="btn btn-primary" data-wh-accept-order>تأیید دریافت و ورود به آماده‌سازی</button>`:''}${app.page==='warehouse'&&o.status==='WAREHOUSE_PREPARING'?`<button class="btn btn-primary" data-wh-start-order>شروع آماده‌سازی</button>`:''}${app.page==='warehouse'&&app.features?.pickupStaging&&o.visit?.status==='PICKUP_PRESENT'&&!o.pickupCancellation?`<button class="btn btn-secondary" data-wh-pickup-cancel>ثبت انصراف بدون تحویل</button>`:''}${o.status==='RETURNED_TO_SALES'?`<button class="btn btn-secondary" data-action="edit-returned-order" data-id="${o.id}">${icon('edit',16)} اصلاح سفارش</button><button class="btn btn-primary" data-action="resubmit-order" data-id="${o.id}">${icon('send',16)} ارسال مجدد به انبار</button>`:''}${app.page==='sales'&&can('sales')&&o.orderType==='STORE'&&o.status==='STORE_PENDING_SALES'?`<button class="btn btn-secondary" data-action="sales-edit-store-order" data-id="${esc(o.id)}">${icon('edit',16)} ویرایش سفارش</button><button class="btn btn-secondary" data-action="store-approve-v25" data-id="${esc(o.id)}">${icon('calendar',16)} ارسال با زمان‌بندی</button><button class="btn btn-primary" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',16)} ارسال سریع</button>`:''}</div></div>
     </div>`)
     const accept=$('#modal [data-wh-accept-order]');if(accept)accept.onclick=async()=>{accept.disabled=true;try{await api('/api/orders/'+encodeURIComponent(o.id)+'/warehouse/accept',{method:'POST'});await wh38Shell('incoming');closeModal();await refreshIndicators();}catch(e){accept.disabled=false;toast(e.message);}};
     // v1.1.11 — عملیات ثانویهٔ انبار از جدول به صفحهٔ جزئیات منتقل شد (جدول تک‌دکمه‌ای: فقط «جزئیات سفارش»)
@@ -3407,6 +3409,18 @@ function bindSalesRootV29(){
   root.addEventListener('submit',salesV29SubmitHandler);
 }
 
+async function quickSendStoreOrder(button,fromDetails=false){
+  if(button.disabled)return;
+  if(!confirm(app.features?.experimentalTransport?'سفارش فروشگاهی اکنون به انبار و ترابری ارسال شود؟ سفارش زمان‌دار تا موعد مقرر ارسال نمی‌شود.':'این سفارش فروشگاهی بدون انتظار برای زمان‌بندی، همین حالا به صف انبار ارسال شود؟'))return;
+  button.disabled=true;
+  try{
+    const result=await api('/api/store/orders/'+encodeURIComponent(button.dataset.id)+'/quick-send',{method:'POST',body:JSON.stringify(app.features?.experimentalTransport?{transportWorkflow:true}:{})});
+    if(fromDetails)closeModal();
+    toast(result.order?.status==='WAREHOUSE_PENDING'?(result.order.transportWorkflow===1?'سفارش به انبار و ترابری ارسال شد.':'سفارش با موفقیت به صف انبار ارسال شد.'):'ارسال سریع ثبت شد.');
+    await fetchSalesCache(true);await renderSales('stores');await refreshIndicators();
+  }catch(err){button.disabled=false;toast(err.message||'ارسال سریع انجام نشد.');}
+}
+
 async function salesV29ClickHandler(e){
   const content=$('#content');
   if(!content || !content.contains(e.target))return;
@@ -3500,13 +3514,7 @@ async function salesV29ClickHandler(e){
     }
     if(a==='sales-edit-store-order')return openSalesStoreOrderEdit(el.dataset.id);
     if(a==='store-approve-v25')return openStoreApprovalV25(el.dataset.id);
-    if(a==='store-quick-send-v40'){
-      if(!confirm(app.features?.experimentalTransport?'سفارش فروشگاهی اکنون به انبار و ترابری ارسال شود؟ سفارش زمان‌دار تا موعد مقرر ارسال نمی‌شود.':'این سفارش فروشگاهی بدون انتظار برای زمان‌بندی، همین حالا به صف انبار ارسال شود؟'))return;
-      el.disabled=true;
-      try{const result=await api('/api/store/orders/'+encodeURIComponent(el.dataset.id)+'/quick-send',{method:'POST',body:JSON.stringify(app.features?.experimentalTransport?{transportWorkflow:true}:{})});toast(result.order?.status==='WAREHOUSE_PENDING'?(result.order.transportWorkflow===1?'سفارش به انبار و ترابری ارسال شد.':'سفارش با موفقیت به صف انبار ارسال شد.'):'ارسال سریع ثبت شد.');await fetchSalesCache(true);await renderSales('stores');await refreshIndicators();}
-      catch(err){el.disabled=false;toast(err.message||'ارسال سریع انجام نشد.');}
-      return;
-    }
+    if(a==='store-quick-send-v40')return quickSendStoreOrder(el);
     if(a==='store-order-details-v25')return openOrderDetails(el.dataset.id);
     if(a==='future-edit')return editFutureV25(el.dataset.id);
     if(a==='future-cancel')return cancelFutureV25(el.dataset.id);

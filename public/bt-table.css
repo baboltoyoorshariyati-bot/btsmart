@@ -41,15 +41,15 @@
 .bt-table th.bt-col-actions,.bt-table td.bt-col-actions{width:18%;text-align:center}
 .bt-table td.bt-col-actions .btn{white-space:nowrap}
 
-/* ستون‌های ورودی و آماده‌سازی انبار متناسب با محتوا هستند. */
-.wh-orders-table{table-layout:auto;width:max-content;max-width:100%}
+/* جدول سفارش‌های ورودی و آماده‌سازی عرض کادر را پر می‌کند؛ ستون‌ها با محتوا تنظیم می‌شوند. */
+.wh-orders-table{table-layout:auto;width:100%;max-width:100%}
 .wh-orders-table th,.wh-orders-table td{width:1%;white-space:nowrap}
 .wh-orders-table th.bt-col-actions,.wh-orders-table td.bt-col-actions{width:1%}
 .wh-orders-table th:nth-child(2),.wh-orders-table td:nth-child(2){width:1%;max-width:320px}
 .wh-orders-table td:nth-child(2) .bt-cell-main{overflow:hidden;text-overflow:ellipsis}
 
-/* ستون‌های «سوابق انبار» — همان قاعده: عرض ستون اندازهٔ متن، تنها نام مشتری کشسان */
-.whh-orders-table{table-layout:auto;width:auto;max-width:100%}
+/* جدول سوابق انبار نیز عرض کادر خود را پر می‌کند. */
+.whh-orders-table{table-layout:auto;width:100%;max-width:100%}
 .whh-orders-table th,.whh-orders-table td{width:1%;white-space:nowrap}
 .whh-orders-table th:nth-child(3),.whh-orders-table td:nth-child(3){width:auto;max-width:320px}
 .whh-orders-table td:nth-child(3) .bt-cell-main{overflow:hidden;text-overflow:ellipsis}
@@ -212,9 +212,14 @@
 #appView #content .sr318-table .sr318-product{display:block;white-space:normal;overflow-wrap:anywhere}
 #appView #content .sr318-table .sr318-weights{display:flex;flex-wrap:wrap;gap:4px;min-width:0;max-width:100%;white-space:normal}
 #appView #content .sr318-table .sr318-wts{white-space:normal;overflow-wrap:anywhere}
-#appView #content .sr318-table .sr-table-ops{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0;max-width:100%}
-#appView #content .sr318-table .sr-table-weight{display:flex;align-items:center;gap:4px;min-width:0;max-width:100%}
-#appView #content .sr318-table .sr-table-weight input{width:90px;min-width:0;max-width:100%;height:38px}
+#appView #content .sr318-table .sr-table-ops{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:6px;width:100%;min-width:0;max-width:100%}
+#appView #content .sr318-table .sr-table-ops .btn{box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:4px;width:100%;min-width:0;max-width:100%;height:auto;min-height:38px;padding:5px 6px;line-height:1.4;white-space:normal;text-align:center}
+#appView #content .sr318-table .sr-table-ops .btn .svg{flex:0 0 auto}
+#appView #content .sr318-table .sr-table-weight{box-sizing:border-box;display:flex;align-items:center;gap:4px;width:100%;min-width:0;max-width:100%}
+#appView #content .sr318-table .sr-table-weight input{box-sizing:border-box;flex:1 1 0;width:100%;min-width:0;max-width:100%;height:38px;padding-inline:5px}
+#appView #content .sr318-table .sr-table-weight b{flex:0 0 auto;font-size:11px;white-space:nowrap}
+@media (min-width:901px) and (max-width:1200px){#appView #content .sr318-table .sr-table-ops{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:540px){#appView #content .sr318-table .sr-table-ops{grid-template-columns:repeat(2,minmax(0,1fr))}}
 #appView #content .sr318-table .sr318-final{white-space:normal;overflow-wrap:anywhere}
 @media(max-width:900px){
   #appView #content .sr318-table td{flex-wrap:wrap}
@@ -420,7 +425,7 @@
  #appView #content .phone-queue-table{table-layout:auto}
  #appView #content .phone-queue-table :is(th,td):nth-child(2),
  #appView #content .phone-queue-table :is(th,td):nth-child(5){width:1%;white-space:nowrap}
- #appView #content .sd-flow-table{table-layout:auto;width:max-content;max-width:100%}
+ #appView #content .sd-flow-table{table-layout:auto;width:100%;max-width:100%}
  #appView #content .sd-flow-table :is(th,td){width:1%;white-space:nowrap}
  #appView #content .sd-flow-table :is(th,td):first-child{max-width:320px}
  #appView #content .sd-flow-table td.bt-col-actions{width:1%}
