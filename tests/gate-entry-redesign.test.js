@@ -12,7 +12,7 @@ const html=read('public/index.html'),css=read('public/theme.css'),
 const entrySrc=()=>ui.slice(ui.indexOf('function renderGateEntry()'),ui.indexOf('function renderGateWaiting'));
 
 test('waiting-for-sales is an independent rail menu with the queue badge',()=>{
-  assert.match(app,/\['entry','ثبت ورود','entry',null\],\['waiting','در انتظار اقدام فروش','bell','gateEntry'\]/);
+  assert.match(app,/\['entry','ورود','entry',null\],\['waiting','در انتظار','bell','gateEntry'\]/);
   // کارت داشبورد نگهبانی هم به منوی تازه می‌رود، نه فرم ثبت ورود
   assert.match(app,/\['در انتظار فروش',w\.gateEntry\|\|0,'waiting','user','red'\]/);
   // renderGate شاخهٔ waiting دارد و صف کامل را می‌سازد

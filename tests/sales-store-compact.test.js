@@ -17,7 +17,7 @@ test('تب فروشگاه فروش، جدول فروشگاه دارد و جزئ�
   assert.match(view, /data-label="فروشگاه"[\s\S]*?o\.storeName[\s\S]*?data-label="شماره سفارش"[\s\S]*?o\.orderNo[\s\S]*?data-label="تاریخ"[\s\S]*?o\.createdAt/);
   assert.match(view, /data-action="store-order-details-v25"/);
   assert.doesNotMatch(view, /sd-store-summary-v41|sdStoreTotalsLine\(o\)|sdStoreInvoiceChips\(o\)/);
-  assert.match(app, /if\(a==='store-order-details-v25'\)return openOrderDetails\(el\.dataset\.id\)/);
+  assert.match(app, /if\(a==='store-order-details-v25'\)return openOrderDetails\(el\.dataset\.id,\{storeProcessing:/);
   assert.match(css, /sales-store-pane-v42 \.sd-store-identity-v42\{display:flex;flex-direction:column/);
 });
 

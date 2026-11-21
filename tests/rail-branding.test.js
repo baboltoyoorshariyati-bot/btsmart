@@ -31,7 +31,7 @@ test('clock and menu items turn glassy while nav contract stays intact',()=>{
   assert.match(css,/#appView #railNav \.cartable-nav-home\{[^}]*border:1px solid rgba\(255,255,255,\.24\)!important/);
   // قرارداد ناوبری: همان رندرر یکتا با آیکن موضوعی و شمارنده
   assert.match(app,/function renderNav\(\)/);
-  assert.match(app,/\['incoming','سفارش‌های ورودی','inbox','warehouseIncomingRegular'\]/);
+  assert.match(app,/\['incoming','ورودی','inbox','warehouseIncomingRegular'\]/);
   assert.match(css,/prefers-reduced-motion:reduce\)\{[^}]*rail-logo\.logo-frame\{animation:none/);
   assert.match(html,/app\.js\?v=37\.50\.0/);
   assert.match(html,/theme\.css\?v=37\.48\.0/);

@@ -52,7 +52,7 @@ test('تب مستقل فروشگاه در انبار و حذف فروشگاه ا
 test('بورد کامل چرخهٔ حیات در تب فروشگاهِ فروش (تأیید تا نهایی‌سازی سند)',()=>{
  const fn=ui2.slice(ui2.indexOf('function sdStoreInvoiceChips'),ui2.indexOf('/* ---------- تب ۳: در جریان'));
  assert.match(fn,/renderStoreRunShipmentsPanel/);
- assert.match(fn,/تأیید نهایی تحویل\$/);
+ assert.match(require('node:fs').readFileSync(require('node:path').join(__dirname,'../public/app.js'),'utf8'),/تأیید نهایی تحویل\$/);
  assert.match(fn,/class="bt-table sd-store-table"/);
  assert.match(fn,/دریافت فروشگاه تأیید شد/);
 });

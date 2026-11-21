@@ -1669,3 +1669,10 @@
 @media(max-width:640px){
   #appView #content .wh38-prep-item.wh38-prep-item:not(.sr318-row)>.wh38-note-cell>.wh38-note-box{padding:0 8px!important}
 }
+
+/* زیرمنوهای تسویه و تحویل، بدون افزودن گزینه به نوار اصلی. */
+#appView .cartable-section-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;padding:6px;background:#f4f5f7;border:1px solid #e6e8ec;border-radius:12px}
+#appView .cartable-section-tabs[hidden]{display:none}
+#appView .cartable-section-tabs button{min-height:42px;min-width:120px;padding:7px 18px;border:1px solid transparent;border-radius:9px;background:transparent;color:#343c48;font:inherit;font-weight:800;cursor:pointer}
+#appView .cartable-section-tabs button.active{background:#fff;color:#a20c20;border-color:#eed1d5;box-shadow:0 2px 8px rgba(20,30,40,.08)}
+@media(max-width:480px){#appView .cartable-section-tabs button{min-width:0;flex:1 1 100px}}

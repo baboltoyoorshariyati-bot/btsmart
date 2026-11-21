@@ -8,7 +8,7 @@ test('سوابق فروشگاه دکمهٔ چاپ مرجوعی را فقط با 
  const start=ui.indexOf('function renderSalesStoresV41'),end=ui.indexOf('/* ---------- تب ۳:',start),view=ui.slice(start,end);
  assert(start>=0&&end>start);
  assert.match(view,/kind==='history'\?storeReturnPrintButton\(o\)/);
- assert.match(view,/storeSalesDocumentButtons\(o,kind==='history',kind!=='history'\)/);
+ assert.match(view,/storeSalesDocumentButtons\(o,true,false\)/);
  assert.doesNotMatch(view,/storeServicePrintButtons\(o\.id,[^)]*,[^)]*,true\)/);
  const fnStart=ui.indexOf('function storeReturnPrintButton('),fnEnd=ui.indexOf('\nfunction renderSalesStoresV41',fnStart);
  assert(fnStart>=0&&fnEnd>fnStart);
