@@ -78,12 +78,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 
-/* ================================================================
-   v37.43.0 — منوی کشویی موبایل
-   در موبایل (عرض حداکثر ۶۴۰px) ستون سمت راست مخفی است تا فضای محتوا
-   کامل شود؛ با دکمهٔ منو در هدر باز می‌شود و با پس‌زمینه، دکمهٔ بستن،
-   کلید Esc یا انتخاب هر گزینه بسته می‌شود. در تبلت/دسکتاپ تغییری نیست.
-   ================================================================ */
+/* منوی کشویی موبایل، تبلت و دسکتاپ کوچک. */
 (function () {
   'use strict';
   function start() {
@@ -93,21 +88,35 @@
     const closeBtn = document.getElementById('railCloseBtn');
     const backdrop = document.getElementById('railBackdrop');
     const rail = appView.querySelector('.rail');
+    const compact = window.matchMedia('(max-width: 1024px)');
+    let previousOverflow = '';
     const setOpen = (open) => {
+      open = open && compact.matches;
+      const wasOpen = appView.classList.contains('rail-open');
+      const focusWasInRail = rail && rail.contains(document.activeElement);
       appView.classList.toggle('rail-open', open);
       toggle.setAttribute('aria-expanded', String(open));
       toggle.setAttribute('aria-label', open ? 'بستن منوی ناوبری' : 'باز کردن منوی ناوبری');
       if (backdrop) backdrop.hidden = !open;
-      document.documentElement.style.overflow = open ? 'hidden' : '';
-      if (open && rail) rail.scrollTop = 0;
+      if (rail) rail.inert = compact.matches && !open;
+      if (open && !wasOpen) {
+        previousOverflow = document.documentElement.style.overflow;
+        document.documentElement.style.overflow = 'hidden';
+        if (rail) rail.scrollTop = 0;
+        closeBtn?.focus();
+      } else if (!open && wasOpen) {
+        document.documentElement.style.overflow = previousOverflow;
+        if (focusWasInRail && compact.matches) toggle.focus();
+      }
     };
     toggle.addEventListener('click', () => setOpen(!appView.classList.contains('rail-open')));
     if (closeBtn) closeBtn.addEventListener('click', () => setOpen(false));
     if (backdrop) backdrop.addEventListener('click', () => setOpen(false));
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && appView.classList.contains('rail-open')) setOpen(false); });
     const nav = document.getElementById('railNav');
     if (nav) nav.addEventListener('click', (e) => { if (e.target.closest('button')) setOpen(false); });
-    window.addEventListener('resize', () => { if (window.innerWidth > 640) setOpen(false); });
+    compact.addEventListener('change', () => setOpen(false));
+    setOpen(false);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

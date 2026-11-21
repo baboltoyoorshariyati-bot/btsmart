@@ -91,6 +91,8 @@ async function bootstrap(){
     if(a==='pick-return-product')return pickReturnedProduct(Number(el.dataset.index),el.dataset.productId,el.dataset.label);
     if(a==='save-returned-order')return saveReturnedOrder(el.dataset.id);
     if(a==='sales-edit-store-order')return openSalesStoreOrderEdit(el.dataset.id);
+    if(a==='store-approve-v25')return openStoreApprovalV25(el.dataset.id);
+    if(a==='store-quick-send-v40')return quickSendStoreOrder(el,true);
     if(a==='sales-store-add-line')return addSalesStoreLine();
     if(a==='sales-store-delete-line')return deleteSalesStoreLine(Number(el.dataset.index));
     if(a==='pick-sales-store-product')return pickSalesStoreProduct(Number(el.dataset.index),el.dataset.productId,el.dataset.label);

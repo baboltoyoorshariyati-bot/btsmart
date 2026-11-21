@@ -45,6 +45,12 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
     if(kind==='invoice')html=`<div class="sd-invoice-list">${invoiceRowsV27([{...o,status:'SETTLED'}])}</div>`;
     el.innerHTML=html;
    },kind);
+   // جدول هر فهرست باید کادر خودش را پر کند؛ محتوای بلند می‌تواند در قاب قابل پیمایش بماند.
+   for(const width of [1920,1280,900,390,320]){
+    await page.setViewportSize({width,height:900});step=`frame ${kind}/${width}`;
+    const frames=await page.locator('#content .bt-table-wrap > table:visible').evaluateAll(tables=>tables.map(t=>({name:t.className,table:t.getBoundingClientRect().width,frame:t.parentElement.clientWidth,overflow:getComputedStyle(t.parentElement).overflowX,page:document.documentElement.scrollWidth,viewport:innerWidth})));
+    for(const f of frames){assert(f.table>=f.frame-2,`${kind}/${width} table is narrower than frame ${JSON.stringify(f)}`);assert(f.page<=f.viewport+1,`${kind}/${width} page overflow ${JSON.stringify(f)}`);}
+   }
    if(['store-registered','store-delivery','store-delivered','warehouse-document','store-document','future','sales-history','gate-dispatch','gate'].includes(kind)){
     const selectors={'store-registered':'.st-registered-table','store-delivery':'.st-delivery-table','store-delivered':'.st-delivery-table','warehouse-document':'.wh-delivered-table','store-document':'.wh-store-document-table','future':'.future-order-table','sales-history':'.sales-history-table','gate-dispatch':'.gate-legacy-table','gate':'.gt-exit-table'};
     const table=page.locator(selectors[kind]),row=table.locator('tbody tr').first();await waitFor(row,`${kind}-table`);
