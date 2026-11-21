@@ -11,7 +11,7 @@ const html=fs.readFileSync(path.join(root,'public/index.html'),'utf8');
 test('right rail is the single role-specific navigation renderer and its cache is busted',()=>{
  assert.equal((app.match(/function renderNav\(/g)||[]).length,1);
  assert.doesNotMatch(ui,/function renderNav\(/);
- assert.match(app,/gate:\[\['entry','ثبت ورود'/);assert.match(app,/\['exit','کنترل خروج'/);assert.match(app,/\['dispatch','پخش'/);assert.match(app,/\['history','سوابق مراجعه'/);
+ assert.match(app,/gate:\[\['entry','ورود'/);assert.match(app,/\['exit','خروج'/);assert.match(app,/\['dispatch','پخش'/);assert.match(app,/\['history','سوابق'/);
  assert.match(html,/ui2\.js\?v=37\.50\.0/);assert.match(html,/theme\.css\?v=37\.48\.0/);
 });
 test('admin enters role-specific cartables and store delivery never retains order registration',()=>{

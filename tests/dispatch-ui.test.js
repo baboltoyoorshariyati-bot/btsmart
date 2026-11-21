@@ -17,7 +17,7 @@ const adminUi = fs.readFileSync(path.join(root, 'admin-ui.js'), 'utf8');
 const core = fs.readFileSync(path.join(__dirname, '..', 'lib', 'routes', 'core.js'), 'utf8');
 
 test('خروج‌های منتظر تأیید در تب اصلی نگهبانی دیده می‌شوند و فقط پیش از حرکت به نگهبان ارجاع دارند', () => {
-  assert.match(app,/gate:\[\['entry','ثبت ورود','entry',null\],\['waiting','در انتظار اقدام فروش','bell','gateEntry'\],\['exit','کنترل خروج','exitDoor','gateExit'\],\['dispatch','پخش','truck','gateDispatchPending'\],\['history','سوابق مراجعه','history',null\],\['reports','گزارش‌ها','reports',null\]\]/);
+  assert.match(app,/gate:\[\['entry','ورود','entry',null\],\['waiting','در انتظار','bell','gateEntry'\],\['exit','خروج','exitDoor','gateExit'\],\['dispatch','پخش','truck','gateDispatchPending'\],\['history','سوابق','history',null\],\['reports','گزارش','reports',null\]\]/);
   const guard=ui.slice(ui.indexOf('function gateDispatchFocusMarkup'),ui.indexOf('async function renderGate(tab)'));assert(guard.includes('در انتظار تأیید خروج'));assert(!guard.includes('در انتظار ثبت خروج راننده'));assert(!guard.includes('در حال ارسال به مشتری'));
   assert.match(ui, /try\{dispatchData=await api\('\/api\/gate\/dispatch'\);?\}/);
   const gateStart=ui.indexOf('async function renderGate(tab){'),gateEnd=ui.indexOf('\nfunction renderGateEntry',gateStart);

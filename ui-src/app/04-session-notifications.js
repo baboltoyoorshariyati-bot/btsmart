@@ -84,7 +84,7 @@ async function bootstrap(){
     if(a==='close-modal')return closeModal();
     if(a==='transport-sales-work'){try{return await goTransportSalesWork(el.dataset.id);}catch(err){toast(err.message||'دریافت اطلاعات سفارش ناموفق بود.');return;}}
     if(a==='print-invoice'){e.stopPropagation();return printInvoice(el.dataset.id,Number(el.dataset.run)||null);}
-    if(a==='resubmit-order')return resubmitOrder(el.dataset.id);
+    if(a==='resubmit-order'){e.stopPropagation();return resubmitOrder(el.dataset.id);}
     if(a==='edit-returned-order')return openReturnedOrderEditor(el.dataset.id);
     if(a==='returned-add-line')return addReturnedLine();
     if(a==='returned-delete-line')return deleteReturnedLine(Number(el.dataset.index));
@@ -93,6 +93,9 @@ async function bootstrap(){
     if(a==='sales-edit-store-order')return openSalesStoreOrderEdit(el.dataset.id);
     if(a==='store-approve-v25')return openStoreApprovalV25(el.dataset.id);
     if(a==='store-quick-send-v40')return quickSendStoreOrder(el,true);
+    if(a==='sales-warehouse-edit-request')return salesWarehouseEditRequestOpen(el.dataset.id,el.dataset.paymentId);
+    if(a==='sales-store-document-print')return printSalesStoreDocument(el.dataset.id,Number(el.dataset.run));
+    if(a==='sales-store-review')return salesStoreReview(el.dataset.id,Number(el.dataset.run));
     if(a==='sales-store-add-line')return addSalesStoreLine();
     if(a==='sales-store-delete-line')return deleteSalesStoreLine(Number(el.dataset.index));
     if(a==='pick-sales-store-product')return pickSalesStoreProduct(Number(el.dataset.index),el.dataset.productId,el.dataset.label);

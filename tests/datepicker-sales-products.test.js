@@ -37,7 +37,7 @@ test('فلش‌های ماه در راست‌به‌چپ: دکمهٔ اول «م
 test('فروش، منوی کناری را طبق ترتیب درخواستی نمایش می‌دهد و مسیر محصولات همچنان مجاز است', () => {
   const ui = read('public/ui2.js');
   const app = read('public/app.js');
-  assert.match(app, /sales:\[\['dashboard','داشبورد','dashboard',null\],\['onsite','حضوری','user','salesIntake'\],\['remote','غیرحضوری','phone','salesRemote'\],\['flow','درجریان'/);
+  assert.match(app, /sales:\[\['dashboard','داشبورد','dashboard',null\],\['onsite','حضوری','user','salesIntake'\],\['remote','غیرحضوری','phone','salesRemote'\],\['stores','فروشگاه','store','store'\],\['settlement','تسویه','receipt','salesSettlement'\],\['flow','درجریان'/);
   assert.doesNotMatch(ui,/function renderNav\(/);
   assert.match(app, /const productsOk=page==='products'&&r==='sales';/);
   assert.match(app, /!customersOk&&!productsOk&&/);

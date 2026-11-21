@@ -237,7 +237,7 @@ function renderSalesStoresV41(orders,deliveries={}){ // v37.7.9 — فروشگا
   const card=(o,kind)=>{
     const storeSub=o.storeOrderKind==='PARTIAL'?'سفارش جزئی':'سفارش روزانه';
     const customerSub=o.storeOrderKind==='PARTIAL'&&o.storePurpose==='STOCK'?'تأمین تکمیلی فروشگاه':o.customer?.name?`مشتری: ${esc(o.customer?.name||'—')}`:'';
-    const actions=`<button class="btn btn-secondary btn-sm" data-action="store-order-details-v25" data-id="${esc(o.id)}">${icon('eye',14)} ${kind==='history'?'جزئیات':'جزئیات سفارش'}</button>${kind==='approved'?`<button class="btn btn-secondary btn-sm" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',14)} ارسال سریع به انبار</button>`:''}${kind==='processing'&&o.status==='RETURNED_TO_SALES'?`<button class="btn btn-secondary btn-sm" data-action="edit-returned-order" data-id="${esc(o.id)}">${icon('edit',14)} اصلاح سفارش</button><button class="btn btn-primary btn-sm" data-action="resubmit-order" data-id="${esc(o.id)}">${icon('send',14)} ارسال مجدد به انبار</button>`:''}${kind==='processing'&&o.dispatch&&o.dispatch.status==='DELIVERED'?`<button class="btn btn-primary btn-sm" data-action="sales-finalize-driver-delivery" data-id="${esc(o.id)}">${icon('check',14)} تأیید نهایی تحویل${o.dispatch.run?` سرویس ${o.dispatch.run===2?'دوم':'اول'}`:''}</button>`:''}${kind==='processing'?storeSalesReviewButtons(o):''}${kind==='processing'||kind==='history'?storeSalesDocumentButtons(o,kind==='history',kind!=='history'):''}${kind==='history'?storeReturnPrintButton(o):''}`;
+    const actions=`<button class="btn btn-secondary btn-sm" data-action="store-order-details-v25" data-id="${esc(o.id)}">${icon('eye',14)} ${kind==='history'?'جزئیات':'جزئیات سفارش'}</button>${kind==='approved'?`<button class="btn btn-secondary btn-sm" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',14)} ارسال سریع به انبار</button>`:''}${kind==='history'?storeSalesDocumentButtons(o,true,false):''}${kind==='history'?storeReturnPrintButton(o):''}`;
     const notes=(kind==='processing'&&warehouseReturnNoteHtml(o)?warehouseReturnNoteHtml(o):'')+(kind==='processing'&&storeReceiptSummary(o)?storeReceiptSummary(o):'')+(kind==='history'?storeReceiptSummary(o):'');
     return `<tr data-store-summary-id="${esc(o.id)}">
       <td data-label="فروشگاه"><span class="bt-cell-main">${esc(o.storeName||'فروشگاه')}</span><span class="bt-cell-sub">${storeSub}${customerSub?` · ${customerSub}`:''}</span></td>
@@ -1572,13 +1572,14 @@ async function whStoreDocumentPrint(id,run){
 function wh38Shell(phase){
   const c=$('#content'); if(!c)return;
   app.wh38.phase=phase;
-  // Warehouse phases are selected from the role rail; do not render the legacy in-page tab strip too.
-  c.innerHTML=`<section class="wh38-shell"><div id="wh38Body"></div></section>`;
+  // The delivery rail entry groups preparation and completed deliveries without removing either workflow.
+  const deliveryTabs=['preparing','delivered'].includes(phase)?`<nav class="cartable-section-tabs" aria-label="بخش‌های تحویل">${[['preparing','تحویل و آماده‌سازی'],['delivered','تحویل‌شده']].map(([key,label])=>`<button type="button" data-wh38-tab="${key}" class="${phase===key?'active':''}" aria-current="${phase===key?'page':'false'}">${label}</button>`).join('')}</nav>`:'';
+  c.innerHTML=`<section class="wh38-shell">${deliveryTabs}<div id="wh38Body"></div></section>`;
   c.onclick=async e=>{
     const st=e.target.closest('[data-wh38-store-tab]');
     if(st){ app.wh38.storeTab=['incoming','preparing','history'].includes(st.dataset.wh38StoreTab)?st.dataset.wh38StoreTab:'incoming'; wh38Paint('stores'); return; }
     const t=e.target.closest('[data-wh38-tab]');
-    if(t){ app.wh38.phase=t.dataset.wh38Tab; wh38Shell(app.wh38.phase); return; }
+    if(t){ app.wh38.phase=t.dataset.wh38Tab; app.sub.warehouse=app.wh38.phase; renderNav(); wh38Shell(app.wh38.phase); return; }
     if(e.target.closest('[data-wh-document-edits-refresh]')){void whDocumentEditsPaint($('#wh38Body'));return;}
     const el=e.target.closest('[data-action]'); if(!el)return;
     const a=el.dataset.action, id=el.dataset.id;

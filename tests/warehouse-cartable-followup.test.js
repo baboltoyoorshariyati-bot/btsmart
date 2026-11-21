@@ -26,7 +26,7 @@ test('سوابق انبار از ردیف سفارش به جزئیات سند م
 });
 
 test('صف ویرایش کنترل‌شدهٔ انبار از منوی خودش به endpoint موجود وصل است',()=>{
- assert.match(app,/\['document-edits','درخواست‌های اصلاح سند'/);
+ assert.match(app,/\['document-edits','اصلاح'/);
  assert.match(ui,/data-wh-document-edits-refresh/);
  assert.match(ui,/api\('\/api\/warehouse\/document-edits'\)/);
  assert.match(ui,/data-action="warehouse-document-edit"/);

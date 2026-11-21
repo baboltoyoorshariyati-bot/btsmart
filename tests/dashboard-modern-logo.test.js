@@ -35,20 +35,20 @@ test('every rail section carries a thematic icon separate from its badge key',()
   for(const name of ['entry','exitDoor','history','inbox','package','pos','shield','driver','route','flow','activity','clipboard'])
     assert.match(app,new RegExp(`\\n  ${name}:'<`),`ICONS.${name} must be defined`);
   // نگهبانی
-  assert.match(app,/\['waiting','در انتظار اقدام فروش','bell','gateEntry'\]/);
-  assert.match(app,/\['exit','کنترل خروج','exitDoor','gateExit'\]/);
+  assert.match(app,/\['waiting','در انتظار','bell','gateEntry'\]/);
+  assert.match(app,/\['exit','خروج','exitDoor','gateExit'\]/);
   assert.match(app,/\['dispatch','پخش','truck','gateDispatchPending'\]/);
-  assert.match(app,/\['history','سوابق مراجعه','history',null\]/);
+  assert.match(app,/\['history','سوابق','history',null\]/);
   // فروش
   assert.match(app,/\['onsite','حضوری','user','salesIntake'\]/);
   assert.match(app,/\['remote','غیرحضوری','phone','salesRemote'\]/);
   assert.match(app,/\['flow','درجریان','flow','salesFlow'\]/);
   assert.match(app,/\['settlement','تسویه','receipt','salesSettlement'\]/);
-  assert.match(app,/\['future','سفارش‌های روزهای آتی','calendar','salesFuture'\]/);
+  assert.match(app,/\['future','سفارش آتی','calendar','salesFuture'\]/);
   // انبار
-  assert.match(app,/\['incoming','سفارش‌های ورودی','inbox','warehouseIncomingRegular'\]/);
-  assert.match(app,/\['preparing','تحویل و آماده‌سازی','scale','warehousePreparingRegular'\]/);
-  assert.match(app,/\['stores','فروشگاه‌ها','store','warehouseStores'\]/);
+  assert.match(app,/\['incoming','ورودی','inbox','warehouseIncomingRegular'\]/);
+  assert.match(app,/\['preparing','تحویل','scale','warehousePreparingRegular'\]/);
+  assert.match(app,/\['stores','فروشگاه','store','warehouseStores'\]/);
   // ترابری و فروشگاه
   assert.match(app,/\['transport-resources','رانندگان و خودروها','driver',null\]/);assert.doesNotMatch(app,/\['drivers','رانندگان','driver',null\]/);
   assert.match(app,/\['orders','سفارشات','route','dispatchPending'\]/);
@@ -64,7 +64,7 @@ test('every rail section carries a thematic icon separate from its badge key',()
   assert.match(app,/\['payment-devices','دستگاه‌های پوز','pos',0\]/);
   assert.match(app,/\['activity','سوابق فعالیت','activity',0\]/);
   // ورودی‌های قدیمی که آیکن و شمارنده را قاطی می‌کردند نباید برگردند
-  assert.doesNotMatch(app,/\['incoming','سفارش‌های ورودی','warehouse'\]/);
+  assert.doesNotMatch(app,/\['incoming','ورودی','warehouse'\]/);
   assert.doesNotMatch(app,/\['delivery','تحویل','storeDelivery'\]/);
 });
 

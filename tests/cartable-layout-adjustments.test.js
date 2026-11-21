@@ -11,7 +11,7 @@ test('store register and delivery are separate; delivery has exactly two request
 test('gate driver-exit confirmation is only mounted in driver-delivery tab, not the incoming entry header',()=>{
  const start=ui.indexOf('async function renderGate(tab)'),end=ui.indexOf('\nfunction renderGateEntry',start),src=ui.slice(start,end);
  assert.doesNotMatch(src,/gateHomeDispatchMarkup\(dispatchData\)/);
- assert.match(app,/gate:\[\['entry','ثبت ورود','entry',null\],\['waiting','در انتظار اقدام فروش','bell','gateEntry'\],\['exit','کنترل خروج','exitDoor','gateExit'\],\['dispatch','پخش','truck','gateDispatchPending'\],\['history','سوابق مراجعه','history',null\],\['reports','گزارش‌ها','reports',null\]\]/);
+ assert.match(app,/gate:\[\['entry','ورود','entry',null\],\['waiting','در انتظار','bell','gateEntry'\],\['exit','خروج','exitDoor','gateExit'\],\['dispatch','پخش','truck','gateDispatchPending'\],\['history','سوابق','history',null\],\['reports','گزارش','reports',null\]\]/);
  assert.match(src,/gateDispatchTabsHtml\(dispatchData,app\.gateDispatchTab,dispatchError\)/);
  assert.doesNotMatch(src,/<nav class="sd-tabs"/,'legacy in-content gate navigation must not be rendered');
  const panel=driver.slice(driver.indexOf('function gateDispatchMarkup(data)'),driver.indexOf('function updateGateDispatchInCartable'));

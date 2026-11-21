@@ -371,13 +371,14 @@ async function whStoreDocumentPrint(id,run){
 function wh38Shell(phase){
   const c=$('#content'); if(!c)return;
   app.wh38.phase=phase;
-  // Warehouse phases are selected from the role rail; do not render the legacy in-page tab strip too.
-  c.innerHTML=`<section class="wh38-shell"><div id="wh38Body"></div></section>`;
+  // The delivery rail entry groups preparation and completed deliveries without removing either workflow.
+  const deliveryTabs=['preparing','delivered'].includes(phase)?`<nav class="cartable-section-tabs" aria-label="بخش‌های تحویل">${[['preparing','تحویل و آماده‌سازی'],['delivered','تحویل‌شده']].map(([key,label])=>`<button type="button" data-wh38-tab="${key}" class="${phase===key?'active':''}" aria-current="${phase===key?'page':'false'}">${label}</button>`).join('')}</nav>`:'';
+  c.innerHTML=`<section class="wh38-shell">${deliveryTabs}<div id="wh38Body"></div></section>`;
   c.onclick=async e=>{
     const st=e.target.closest('[data-wh38-store-tab]');
     if(st){ app.wh38.storeTab=['incoming','preparing','history'].includes(st.dataset.wh38StoreTab)?st.dataset.wh38StoreTab:'incoming'; wh38Paint('stores'); return; }
     const t=e.target.closest('[data-wh38-tab]');
-    if(t){ app.wh38.phase=t.dataset.wh38Tab; wh38Shell(app.wh38.phase); return; }
+    if(t){ app.wh38.phase=t.dataset.wh38Tab; app.sub.warehouse=app.wh38.phase; renderNav(); wh38Shell(app.wh38.phase); return; }
     if(e.target.closest('[data-wh-document-edits-refresh]')){void whDocumentEditsPaint($('#wh38Body'));return;}
     const el=e.target.closest('[data-action]'); if(!el)return;
     const a=el.dataset.action, id=el.dataset.id;
