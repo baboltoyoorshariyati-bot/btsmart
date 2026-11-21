@@ -55,15 +55,20 @@ jobs:
             # Include the assertion message and stack, not just the test name.
             # The full Actions log can be inaccessible when diagnosing a failed run.
             in_failure=0
+            diagnostic=''
             while IFS= read -r line; do
               case "$line" in
-                "not ok "*) in_failure=1 ;;
-                "  ...") in_failure=0 ;;
+                "not ok "*) in_failure=1; diagnostic='' ;;
+                "  ...")
+                  if [ "$in_failure" -eq 1 ]; then
+                    printf '::error title=Browser regression diagnostic::%s\n' "$diagnostic"
+                  fi
+                  in_failure=0 ;;
               esac
               if [ "$in_failure" -eq 1 ]; then
                 line=${line//%/%25}
                 line=${line//$'\r'/%0D}
-                printf '::error title=Browser regression diagnostic::%s\n' "$line"
+                diagnostic="${diagnostic}${line}%0A"
               fi
             done < /tmp/browser-tests.tap
           fi
