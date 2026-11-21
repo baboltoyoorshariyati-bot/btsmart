@@ -492,10 +492,10 @@ function startGateDispatchLive() {
     busy=true;const tab=app.sub.gate;
     try{
       const historyQ=tab==='history'?(app.gateHistoryQ||''):'';
-      const [dispatch,rows]=await Promise.all([api('/api/gate/dispatch'),tab==='exit'?api('/api/orders?status=SETTLED'):api('/api/visits'+(historyQ?'?q='+encodeURIComponent(historyQ):''))]);
+      const [dispatch,rows,pickup]=await Promise.all([api('/api/gate/dispatch'),tab==='exit'?fetchPagedList('/api/orders?status=SETTLED','orders'):api('/api/visits'+(historyQ?'?q='+encodeURIComponent(historyQ):'')),tab==='exit'&&app.features?.pickupStaging?fetchPagedList('/api/pickup/active','orders'):Promise.resolve({orders:[]})]);
       if(app.page!=='gate'||app.gateRenderSeq!==seq||app.sub.gate!==tab||(tab==='history'&&historyQ!==(app.gateHistoryQ||'')))return;
       const sig=JSON.stringify(dispatch);if(sig!==dsp.sigs.gate){dsp.sigs.gate=sig;updateGateDispatchInCartable(dispatch);}
-      const rowSig=JSON.stringify(rows);
+      const rowSig=JSON.stringify(tab==='exit'?[rows,pickup]:rows);
       if(rowSig!==lastRows){
         if(tab==='waiting'){
           const queue=(rows.visits||[]).filter(v=>v.status==='WAITING_SALES');
@@ -504,13 +504,12 @@ function startGateDispatchLive() {
         }else if(tab==='history'){
           const host=$('#gateHistoryLive');if(host)host.innerHTML=renderGateHistory(rows.visits||[],true);
         }else if(tab==='exit'){
-          const temp=document.createElement('div');temp.innerHTML=renderGateExit(rows.orders||[]);
+          app.gateExitPickups=pickup.orders||[];const temp=document.createElement('div');temp.innerHTML=renderGateExit(rows.orders||[],app.gateExitPickups);
           const list=$('#gateExitRows');if(list)list.innerHTML=temp.querySelector('#gateExitRows').innerHTML;
           const count=$('#content .sd-count strong'),fresh=temp.querySelector('.sd-count strong');if(count&&fresh)count.textContent=fresh.textContent;
         }
         lastRows=rowSig;
       }
-      if(tab==='exit'&&app.features?.pickupStaging)await refreshPickupExit();
       const state=$('#gateSyncState');if(state)state.textContent='آخرین به‌روزرسانی: '+(typeof serverNow==='function'?serverNow():new Date()).toLocaleTimeString('fa-IR');
     }catch(_){const state=$('#gateSyncState');if(state&&app.gateRenderSeq===seq)state.textContent='به‌روزرسانی ناموفق؛ اطلاعات نمایش‌داده‌شده ممکن است قدیمی باشد.';}
     finally{busy=false;}

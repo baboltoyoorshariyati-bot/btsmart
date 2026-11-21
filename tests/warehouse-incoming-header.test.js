@@ -30,7 +30,7 @@ test('incoming and preparing lists are one shared bt-table with the fixed column
  // «تاریخ تحویل» فقط تاریخ است و ساعت ندارد
  assert.match(table,/data-label="تاریخ تحویل"><span class="bt-cell-main">\$\{btDate\(delivery\)\}<\/span><\/td>/);
  // عرض ستون‌ها اندازهٔ متن است، نه درصد ثابت
- assert.match(btcss,/\.wh-orders-table\{table-layout:auto;width:auto;max-width:100%\}/);
+ assert.match(btcss,/\.wh-orders-table\{table-layout:auto;width:max-content;max-width:100%\}/);
  assert.match(btcss,/\.wh-orders-table th,\.wh-orders-table td\{width:1%;white-space:nowrap\}/);
  assert.doesNotMatch(btcss,/\.wh-orders-table td:nth-child\(1\)\{width:16%\}/);
  assert.match(css,/\.wh38-incoming-card \{[\s\S]*?padding:10px 12px!important/);

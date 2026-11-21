@@ -250,7 +250,7 @@ function futureOrderRowsV25(orders){
 // A selected record stays linked while its name or phone is edited.
 function salesCustomerPickerHtml(prefix){
  const id=prefix+'CustomerSearch';
- return `<div class="sales-customer-picker"><label for="${id}">جستجوی مشتری ثبت‌شده</label><input id="${id}" type="search" autocomplete="off" maxlength="80" placeholder="نام، شماره تماس یا کد مشتری" aria-controls="${id}Results" aria-expanded="false"><input type="hidden" name="customerId"><div id="${id}Results" class="sales-customer-results" aria-live="polite"></div><small data-sales-customer-selection>برای مشتری جدید، نام و شماره تماس را وارد کنید.</small><button type="button" class="btn btn-secondary btn-sm" data-sales-customer-clear hidden>انتخاب مشتری دیگر / مشتری جدید</button></div>`;
+ return `<div class="sales-customer-picker"><label for="${id}">جستجوی مشتری ثبت‌شده</label><div class="sales-customer-search-row"><div class="sales-customer-search-field"><input id="${id}" type="search" autocomplete="off" maxlength="80" placeholder="نام، شماره تماس یا کد مشتری" aria-controls="${id}Results" aria-expanded="false"><div id="${id}Results" class="sales-customer-results" aria-live="polite"></div></div><button type="button" class="btn btn-secondary btn-sm" data-sales-customer-clear hidden>انتخاب مشتری دیگر</button></div><input type="hidden" name="customerId"><small data-sales-customer-selection>برای مشتری جدید، نام و شماره تماس را وارد کنید.</small></div>`;
 }
 function syncSalesDispatchPlace(form){
  const mode=form.querySelector('[data-delivery-mode]'),field=form.querySelector('[data-sales-dispatch-place]');if(!field)return;

@@ -49,8 +49,9 @@ function orderCustomerFields(o){
   }
   return fields;
 }
-function orderCustomerStripHtml(o,settlement=false){
-  const fields=orderCustomerFields(o).map(([label,value])=>[label,label==='شماره سفارش'?fa(value):value]).filter(([label])=>!settlement||!['نوع وسیله','پلاک','محل ارسال'].includes(label));
+function orderCustomerStripHtml(o,settlement=false,labels=null){
+  let fields=orderCustomerFields(o).map(([label,value])=>[label,label==='شماره سفارش'?fa(value):value]).filter(([label])=>!settlement||!['نوع وسیله','پلاک','محل ارسال'].includes(label));
+  if(labels)fields=labels.flatMap(label=>fields.filter(field=>field[0]===label));
   return `<div class="bt-customer-strip-scroll" role="region" aria-label="مشخصات مشتری" tabindex="0"><div class="bt-customer-strip" style="--customer-fields:${fields.length}">${fields.map(([label,value])=>`<div class="bt-customer-field" tabindex="0" title="${esc(label)}: ${esc(value)}" aria-label="${esc(label)}: ${esc(value)}"><b>${esc(label)}</b><span>${label==='پلاک'?plateViewHtml(o.customer?.plate,'بدون پلاک',true):esc(value)}</span></div>`).join('')}</div></div>`;
 }
 function stlDispatchControls(o,returnControl=''){

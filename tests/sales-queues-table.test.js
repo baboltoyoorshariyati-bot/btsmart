@@ -15,6 +15,6 @@ test('صف تلفنی فقط سفارش‌های فعال غیرحضوری را 
 });
 test('جدول در جریان جزئیات و کنش‌های ارجاع و وضعیت خالی را حفظ می‌کند',()=>{
  const c=setup(),order={id:'4',orderNo:'321',status:'RETURNED_TO_SALES',customer:{name:'آزمایش',phone:'0922'},dispatchPlace:'<مقصد>',warehouseReturn:{reason:'<اصلاح>'},scheduledAt:'فردا',items:[{}]};
- const html=c.salesFlowRowsV27([order]);assert.match(html,/<table class="bt-table sd-flow-table"/);assert.match(html,/data-order="4"/);assert.match(html,/&lt;مقصد&gt;/);assert.match(html,/&lt;اصلاح&gt;/);for(const action of ['order-details','pickup','edit-returned-order','resubmit-order'])assert.ok(html.includes(`data-action="${action}"`));assert.match(html,/زمان ارسال: فردا/);
- assert.match(c.salesFlowRowsV27([]),/<td colspan="6">سفارشی در جریان نیست/);
+ const html=c.salesFlowRowsV27([order]);assert.match(html,/<table class="bt-table sd-flow-table"/);assert.match(html,/data-order="4"/);assert.doesNotMatch(html,/data-label="مشخصات"|&lt;مقصد&gt;|&lt;اصلاح&gt;/);for(const action of ['order-details','pickup','edit-returned-order','resubmit-order'])assert.ok(html.includes(`data-action="${action}"`));assert.doesNotMatch(html,/زمان ارسال: فردا/);
+ assert.match(c.salesFlowRowsV27([]),/<td colspan="5">سفارشی در جریان نیست/);
 });

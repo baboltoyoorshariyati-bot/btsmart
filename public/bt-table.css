@@ -41,15 +41,11 @@
 .bt-table th.bt-col-actions,.bt-table td.bt-col-actions{width:18%;text-align:center}
 .bt-table td.bt-col-actions .btn{white-space:nowrap}
 
-/* ستون‌های «سفارش‌های ورودی / در حال آماده‌سازی» انبار
-   قاعدهٔ کارفرما: عرض هر ستون دقیقاً اندازهٔ متن همان ستون باشد، نه بیشتر.
-   پس چیدمان ثابت درصدی کنار گذاشته شد: table-layout:auto + nowrap + width:1%
-   هر ستون را به اندازهٔ محتوایش جمع می‌کند؛ فقط ستون نام مشتری کشسان است
-   تا نام‌های بلند جدول را از عرض صفحه بیرون نبرند. */
-.wh-orders-table{table-layout:auto;width:auto;max-width:100%}
+/* ستون‌های ورودی و آماده‌سازی انبار متناسب با محتوا هستند. */
+.wh-orders-table{table-layout:auto;width:max-content;max-width:100%}
 .wh-orders-table th,.wh-orders-table td{width:1%;white-space:nowrap}
 .wh-orders-table th.bt-col-actions,.wh-orders-table td.bt-col-actions{width:1%}
-.wh-orders-table th:nth-child(2),.wh-orders-table td:nth-child(2){width:auto;max-width:320px}
+.wh-orders-table th:nth-child(2),.wh-orders-table td:nth-child(2){width:1%;max-width:320px}
 .wh-orders-table td:nth-child(2) .bt-cell-main{overflow:hidden;text-overflow:ellipsis}
 
 /* ستون‌های «سوابق انبار» — همان قاعده: عرض ستون اندازهٔ متن، تنها نام مشتری کشسان */
@@ -389,3 +385,60 @@
 .adm-backup-row-actions{display:flex;flex-wrap:wrap;gap:6px}
 @media(max-width:900px){#appView .adm-table-wrap.bt-table-wrap{overflow:visible}}
 .draft-not-picked{color:var(--muted);font-size:10px}
+
+/* جلوگیری از شکستن دکمه‌های انبار در نمای رومیزی و تبلت پهن. */
+@media(min-width:901px){
+ #appView #content .wh-orders-table .bt-actions .btn{white-space:nowrap!important;flex:0 0 auto;max-width:none}
+}
+@media(max-width:900px){
+ #appView #content .wh-orders-table td:nth-child(2){max-width:none;white-space:normal}
+ #appView #content .wh-orders-table td:nth-child(2) .bt-cell-main{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;min-width:0}
+}
+
+/* برگهٔ وزن مشتری عادی: کادرهای هر محصول هم‌ارتفاع و یادداشت‌ها هم‌اندازه‌اند. */
+#appView #content .wh-prep-table .wh38-note-box{
+ height:44px!important;min-height:44px!important;max-height:44px!important;
+ align-items:center!important;padding:0 8px!important;
+}
+#appView #content .wh-prep-table .wh38-note-box textarea{
+ height:32px!important;min-height:0!important;max-height:32px!important;
+ overflow-y:auto!important;resize:none!important;line-height:1.4!important;
+}
+#appView #content .wh-prep-table .wh38-note-count{padding-top:0!important}
+#appView #content .wh-prep-table .wh-weight-main{
+ height:44px!important;min-height:44px!important;flex-wrap:nowrap!important;align-items:center!important;padding:0 6px!important;
+}
+#appView #content .wh-prep-table .wh-weight-main input{
+ flex:1 1 0!important;width:0!important;min-width:0!important;height:40px!important;
+}
+#appView #content .wh-prep-table .wh-weight-main .wh-weight-open{
+ flex:0 0 auto!important;white-space:nowrap!important;
+}
+
+/* فهرست‌های فروش: ستون‌ها بر اساس محتوا و بدون باز شدن اضافی دکمه‌ها. */
+@media(min-width:901px){
+ #appView #content .phone-queue-table{table-layout:auto}
+ #appView #content .phone-queue-table :is(th,td):nth-child(2),
+ #appView #content .phone-queue-table :is(th,td):nth-child(5){width:1%;white-space:nowrap}
+ #appView #content .sd-flow-table{table-layout:auto;width:max-content;max-width:100%}
+ #appView #content .sd-flow-table :is(th,td){width:1%;white-space:nowrap}
+ #appView #content .sd-flow-table :is(th,td):first-child{max-width:320px}
+ #appView #content .sd-flow-table td.bt-col-actions{width:1%}
+ #appView #content .sd-flow-table .bt-actions .btn{white-space:nowrap!important;flex:0 0 auto;max-width:none}
+}
+/* تراز دکمهٔ حذف و کادرها در جدول اقلام سه فرم فروش. */
+#appView #content :is(#orderLines,#phone-lines,#future-lines) .draft-lines-table .sd-line-del{margin:0!important;vertical-align:middle}
+@media(max-width:900px){
+ #appView #content :is(#orderLines,#phone-lines,#future-lines) .draft-lines-table td[data-label="عملیات"]{align-items:center}
+}
+/* جستجوی مشتری کوتاه و دکمهٔ تغییر کنار آن، بدون کش آمدن دکمه. */
+#appView #content .sales-customer-search-row{display:flex;align-items:center;gap:8px;min-width:0}
+#appView #content .sales-customer-search-field{position:relative;flex:0 1 320px;min-width:0}
+#appView #content .sales-customer-search-row [data-sales-customer-clear]{flex:0 0 auto;width:auto;max-width:100%;white-space:nowrap}
+#appView #content .sales-customer-search-row [data-sales-customer-clear][hidden]{display:none!important}
+
+/* نگهبانی: ردیف شبکه‌ای پخش باید با محتوای چندخطی رشد کند، نه ارتفاع ثابت جدول. */
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table tbody .gate-dispatch-table-row{height:auto!important;max-height:none!important;min-height:52px}
+#appView[data-cartable-page="gate"] #content .gate-dispatch-table tbody .gate-dispatch-table-row>td{height:auto;max-height:none}
+#appView[data-cartable-page="gate"] #content .gt-pickup-recipient{display:block;font-size:11px;overflow-wrap:anywhere}
+#appView[data-cartable-page="gate"] #content .gt-pickup-search-table .bt-actions{flex-wrap:wrap}

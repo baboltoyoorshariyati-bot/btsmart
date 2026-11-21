@@ -29,11 +29,10 @@ test('flow table retains actions without displaying the product list',()=>{
   assert.match(card,/sdTypeBadge\(o\)/);
 });
 
-test('flow table has labeled details and retains operational actions',()=>{
+test('flow table omits the details column but retains operational actions',()=>{
   const card=slice(ui,'function sdFlowCard','function salesFlowRowsV27');
-  for(const label of ['شماره تماس','محل ارسال','آخرین اقدام','زمان ارسال'])assert.ok(card.includes(label),label);
   for(const label of ['شماره سفارش','تاریخ','قلم'])assert.ok(card.includes(label),label);
-  assert.match(card,/data-label="عملیات"/);assert.match(card,/storeAwareOrderPhone\(o\)/);assert.match(card,/o\.dispatchPlace\|\|'ثبت نشده'/);
+  assert.match(card,/data-label="عملیات"/);assert.doesNotMatch(card,/data-label="مشخصات"/);
 });
 
 test('compact flow styles and tighter list spacing are in the final stylesheet',()=>{

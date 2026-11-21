@@ -69,13 +69,12 @@ function renderSalesOnsiteV25(visits){
 }
 function salesOnsiteRowsV25(visits){
   const rows=visits.map(v=>`<tr data-onsite-visit="${esc(v.id)}">
-    <td data-label="مشتری"><span class="bt-cell-main">${esc(v.customer?.name||'—')}</span><span class="bt-cell-sub">${esc(v.customer?.phone||'—')}</span></td>
-    <td data-label="پلاک">${plateViewHtml(v.customer?.plate, 'بدون پلاک', true)}</td>
-    <td data-label="منطقه">${v.district?`<span class="sd-chip">${esc(v.district)}</span>`:'—'}</td>
+    <td data-label="نام مشتری"><span class="bt-cell-main">${esc(v.customer?.name||'—')}</span></td>
+    <td data-label="نوع خودرو">${esc(v.vehicleType||v.customer?.vehicleType||'—')}</td>
     <td data-label="زمان ورود">${formatDateTime24(v.createdAt)}</td>
     <td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-primary btn-sm" data-action="open-order" data-id="${esc(v.id)}">ثبت سفارش ${icon('arrow',14)}</button></td>
   </tr>`).join('');
-  return `<div class="bt-table-wrap"><table class="bt-table sd-queue-table"><thead><tr><th>مشتری</th><th>پلاک</th><th>منطقه</th><th>زمان ورود</th><th>عملیات</th></tr></thead><tbody>${rows||`<tr><td colspan="5">${sdEmpty('user','صف حضوری خالی است','با ثبت مراجعه جدید در نگهبانی، مشتری در این فهرست قرار می‌گیرد.')}</td></tr>`}</tbody></table></div>`;
+  return `<div class="bt-table-wrap"><table class="bt-table sd-queue-table"><thead><tr><th>نام مشتری</th><th>نوع خودرو</th><th>زمان ورود</th><th>عملیات</th></tr></thead><tbody>${rows||`<tr><td colspan="4">${sdEmpty('user','صف حضوری خالی است','با ثبت مراجعه جدید در نگهبانی، مشتری در این فهرست قرار می‌گیرد.')}</td></tr>`}</tbody></table></div>`;
 }
 
 /* ---------- صفحه ثبت سفارش حضوری ---------- */
@@ -146,7 +145,7 @@ function renderDraftLine(x,i,prefix){
     <td data-label="محصول"><div class="sd-line-cell cell-product draft-product">
       <div class="input-shell"><span>${icon('search',14)}</span><input ${onsite?'data-product-search':'data-op-product-search'}="${key}" value="${esc(x.productLabel||'')}" placeholder="محصول (نام/کد سریع)" autocomplete="off" aria-label="محصول ردیف ${fa(String(i+1))}"></div>
       <div class="product-suggest" ${onsite?'data-suggest-for':'data-op-suggest'}="${key}"></div>
-      ${x.productId?`<span class="sd-picked-inline" title="انتخاب شد">${icon('check',11)}<span class="code-pill">${esc(x.quickCode||'')}</span></span>`:(!onsite&&prefix!=='store'?'<span class="draft-not-picked">هنوز محصولی انتخاب نشده</span>':'')}
+      ${!['onsite','phone','remote','future'].includes(prefix)?(x.productId?`<span class="sd-picked-inline" title="انتخاب شد">${icon('check',11)}<span class="code-pill">${esc(x.quickCode||'')}</span></span>`:(prefix!=='store'?'<span class="draft-not-picked">هنوز محصولی انتخاب نشده</span>':'')):''}
     </div></td>
     <td data-label="مقدار"><div class="sd-line-cell cell-qty"><div class="input-shell"><input ${onsite?'data-qty':'data-op-qty'}="${key}" inputmode="decimal" value="${esc(x.requestedQty||'')}" placeholder="مقدار" aria-label="مقدار ردیف ${fa(String(i+1))}"></div></div></td>
     <td data-label="واحد"><div class="sd-line-cell cell-unit"><div class="input-shell"><select ${onsite?'data-unit':'data-op-unit'}="${key}" aria-label="واحد ردیف ${fa(String(i+1))}">${units.map(u=>`<option ${x.requestedUnit===u?'selected':''}>${u}</option>`).join('')}</select></div></div></td>
@@ -273,23 +272,18 @@ async function pickupApprove(id,button){
 }
 function sdFlowCard(o,idx){
  const items=activeItemsOf(o);
- const notes=[`<span>شماره تماس: ${esc(storeAwareOrderPhone(o)||'—')}</span>`,`<span>محل ارسال: ${esc(o.dispatchPlace||'ثبت نشده')}</span>`,`<span>آخرین اقدام: ${esc(formatDateTime24(o.updatedAt||o.createdAt))}</span>`];
- if(o.scheduledAt)notes.push(`<span>زمان ارسال: ${esc(salesOrderDateTime(o))}</span>`);
- if(o.storeRun&&o.storeRun.enabled)notes.push(sr38Chips(o));
- if(o.status==='RETURNED_TO_SALES'&&o.warehouseReturn?.reason)notes.push(warehouseReturnNoteHtml(o));
  const actions=`<button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>${pickupSalesActions(o)}${o.status==='RETURNED_TO_SALES'&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button class="btn btn-secondary btn-sm" data-action="edit-returned-order" data-id="${esc(o.id)}">${icon('edit',14)} اصلاح سفارش</button><button class="btn btn-primary btn-sm" data-action="resubmit-order" data-id="${esc(o.id)}">${icon('send',14)} ارسال مجدد به انبار</button>`:''}`;
  return `<tr class="sd-flow-row ${sdStatusAccent(o.status)}" data-order="${esc(o.id)}">
    <td data-label="نام مشتری"><span class="bt-cell-main"><strong>${esc(storeAwareOrderName(o)||'—')}</strong></span></td>
    <td data-label="شماره سفارش"><bdi>${esc(fa(o.orderNo||'—'))}</bdi></td>
    <td data-label="تاریخ">${esc(formatDateTime24(o.createdAt))}</td>
    <td data-label="وضعیت">${badge(o.status)} ${sdTypeBadge(o)} <span>${qty(items.length)} قلم</span></td>
-   <td data-label="مشخصات"><div class="bt-flow-notes">${notes.join('')}</div></td>
    <td data-label="عملیات" class="bt-col-actions"><div class="bt-actions">${actions}</div></td>
  </tr>`;
 }
 function salesFlowRowsV27(orders){
  const rows=(orders||[]).map(sdFlowCard).join('');
- return `<div class="bt-table-wrap"><table class="bt-table sd-flow-table"><caption class="bt-caption">سفارش‌های در جریان</caption><thead><tr><th scope="col">نام مشتری</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ</th><th scope="col">وضعیت</th><th scope="col">مشخصات</th><th scope="col">عملیات</th></tr></thead><tbody>${rows||`<tr><td colspan="6">${sdEmpty('truck','سفارشی در جریان نیست','هر سفارشی که به انبار ارسال شود در این فهرست قرار می‌گیرد.')}</td></tr>`}</tbody></table></div>`;
+ return `<div class="bt-table-wrap"><table class="bt-table sd-flow-table"><caption class="bt-caption">سفارش‌های در جریان</caption><thead><tr><th scope="col">نام مشتری</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ</th><th scope="col">وضعیت</th><th scope="col">عملیات</th></tr></thead><tbody>${rows||`<tr><td colspan="5">${sdEmpty('truck','سفارشی در جریان نیست','هر سفارشی که به انبار ارسال شود در این فهرست قرار می‌گیرد.')}</td></tr>`}</tbody></table></div>`;
 }
 function renderSalesFlowV25(orders){
   return `<section class="sd-pane"><section class="sd-panel">

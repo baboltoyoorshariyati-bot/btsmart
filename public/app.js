@@ -2559,7 +2559,7 @@ function futureOrderRowsV25(orders){
 // A selected record stays linked while its name or phone is edited.
 function salesCustomerPickerHtml(prefix){
  const id=prefix+'CustomerSearch';
- return `<div class="sales-customer-picker"><label for="${id}">جستجوی مشتری ثبت‌شده</label><input id="${id}" type="search" autocomplete="off" maxlength="80" placeholder="نام، شماره تماس یا کد مشتری" aria-controls="${id}Results" aria-expanded="false"><input type="hidden" name="customerId"><div id="${id}Results" class="sales-customer-results" aria-live="polite"></div><small data-sales-customer-selection>برای مشتری جدید، نام و شماره تماس را وارد کنید.</small><button type="button" class="btn btn-secondary btn-sm" data-sales-customer-clear hidden>انتخاب مشتری دیگر / مشتری جدید</button></div>`;
+ return `<div class="sales-customer-picker"><label for="${id}">جستجوی مشتری ثبت‌شده</label><div class="sales-customer-search-row"><div class="sales-customer-search-field"><input id="${id}" type="search" autocomplete="off" maxlength="80" placeholder="نام، شماره تماس یا کد مشتری" aria-controls="${id}Results" aria-expanded="false"><div id="${id}Results" class="sales-customer-results" aria-live="polite"></div></div><button type="button" class="btn btn-secondary btn-sm" data-sales-customer-clear hidden>انتخاب مشتری دیگر</button></div><input type="hidden" name="customerId"><small data-sales-customer-selection>برای مشتری جدید، نام و شماره تماس را وارد کنید.</small></div>`;
 }
 function syncSalesDispatchPlace(form){
  const mode=form.querySelector('[data-delivery-mode]'),field=form.querySelector('[data-sales-dispatch-place]');if(!field)return;
@@ -3759,8 +3759,9 @@ function orderCustomerFields(o){
   }
   return fields;
 }
-function orderCustomerStripHtml(o,settlement=false){
-  const fields=orderCustomerFields(o).map(([label,value])=>[label,label==='شماره سفارش'?fa(value):value]).filter(([label])=>!settlement||!['نوع وسیله','پلاک','محل ارسال'].includes(label));
+function orderCustomerStripHtml(o,settlement=false,labels=null){
+  let fields=orderCustomerFields(o).map(([label,value])=>[label,label==='شماره سفارش'?fa(value):value]).filter(([label])=>!settlement||!['نوع وسیله','پلاک','محل ارسال'].includes(label));
+  if(labels)fields=labels.flatMap(label=>fields.filter(field=>field[0]===label));
   return `<div class="bt-customer-strip-scroll" role="region" aria-label="مشخصات مشتری" tabindex="0"><div class="bt-customer-strip" style="--customer-fields:${fields.length}">${fields.map(([label,value])=>`<div class="bt-customer-field" tabindex="0" title="${esc(label)}: ${esc(value)}" aria-label="${esc(label)}: ${esc(value)}"><b>${esc(label)}</b><span>${label==='پلاک'?plateViewHtml(o.customer?.plate,'بدون پلاک',true):esc(value)}</span></div>`).join('')}</div></div>`;
 }
 function stlDispatchControls(o,returnControl=''){

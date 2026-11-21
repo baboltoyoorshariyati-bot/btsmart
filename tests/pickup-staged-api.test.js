@@ -30,7 +30,7 @@ test('staged pickup API: roles, recipient, physical delivery, cancellation and l
    assert.equal(legacyResult.status===200?newResult.status:legacyResult.status,409);
   }finally{if(worker.exitCode===null)worker.kill();}
   assert.equal((await call('GET','/api/pickup/orders?q=مالک',null,wh)).status,403);
-  const found=(await ok('GET','/api/pickup/orders?q=مالک',null,gate)).orders;assert(found.some(x=>x.id===order.id));assert(!JSON.stringify(found).includes('deposit'));assert(!JSON.stringify(found).includes('payment'));
+  const found=(await ok('GET','/api/pickup/orders?q=مالک',null,gate)).orders;assert(found.some(x=>x.id===order.id));assert(!JSON.stringify(found).includes('deposit'));assert(!JSON.stringify(found).includes('payment'));const searched=found.find(x=>x.id===order.id);assert.equal(searched.items.length,1);assert.equal(searched.items[0].requestedQty,5);assert.equal(searched.items[0].requestedUnit,'کیلوگرم');assert(searched.items[0].productName);assert(!JSON.stringify(searched).includes('unitPrice'));assert(!JSON.stringify(searched).includes('finalAmount'));
   assert.equal((await call('PUT',`/api/pickup/${order.id}/delivery-date`,{deliveryDate:day},gate)).status,403);
   const tomorrow=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1),next=[tomorrow.getFullYear(),String(tomorrow.getMonth()+1).padStart(2,'0'),String(tomorrow.getDate()).padStart(2,'0')].join('-');
   await ok('PUT',`/api/pickup/${order.id}/delivery-date`,{deliveryDate:next},sales);assert.equal((await ok('GET',`/api/orders/${order.id}`,null,sales)).order.scheduledAt,order.scheduledAt);

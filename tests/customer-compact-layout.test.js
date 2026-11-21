@@ -4,8 +4,8 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 const app=read('public/app.js'),ui=read('public/ui2.js'),css=read('public/form-layout.css');
 const source=app.slice(app.indexOf('function orderCustomerFields(o){'),app.indexOf("function stlDispatchControls(o,returnControl='')"));
-test('warehouse keeps full customer strip and settlement uses the filtered strip',()=>{
- assert.match(ui,/wh38-sheet-head-compact[\s\S]*?\$\{orderCustomerStripHtml\(o\)\}/);
+test('warehouse uses four selected customer fields and settlement uses its own filtered strip',()=>{
+ assert.match(ui,/wh38-sheet-head-compact[\s\S]*?\$\{orderCustomerStripHtml\(o,false,\['نام مشتری','شماره تماس','شماره سفارش','محل ارسال'\]\)\}/);
  assert.match(ui,/return window\.BTSettlementRenderers\.form\(o\)/);
  for(const code of [app]){
   const form=code.slice(code.indexOf('function stlFormHtml(o){'),code.indexOf('function stlFormHtml(o){')+6500);
@@ -24,6 +24,7 @@ test('all available customer details are retained with escaped text and visit fa
  const values=fields.map(f=>f[1]);for(const value of ['000123','09123456789','09350000000','1234567890','شرکت','نشانی','یادداشت','وانت','مقصد'])assert(values.includes(value));assert(!values.includes('بابل'));
  const html=c.orderCustomerStripHtml(order);assert(!html.includes('<script>'));assert(html.includes('&lt;script&gt;'));assert(html.includes('iran-plate'));
  assert.equal((html.match(/class="bt-customer-field"/g)||[]).length,12);
+ const compact=c.orderCustomerStripHtml(order,false,['نام مشتری','شماره تماس','شماره سفارش','محل ارسال']);assert.equal((compact.match(/class="bt-customer-field"/g)||[]).length,4);assert(!compact.includes('iran-plate'));assert(!compact.includes('شرکت'));assert(compact.includes('&lt;script&gt;'));assert(compact.indexOf('شماره سفارش')<compact.indexOf('محل ارسال'));
  assert.equal(c.orderCustomerFields({customer:{},orderNo:'000001'}).length,7);
 });
 test('return is beside driver, in the same visual and keyboard order, preserving dispatch guard',()=>{

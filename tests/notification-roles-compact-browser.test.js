@@ -39,6 +39,7 @@ for(const width of [1440,390]){
   assert.equal(await gateRow.evaluate(e=>getComputedStyle(e).display),width<=1100?'grid':'table-row');
   const gateLayout=await pages.gate.evaluate(()=>{const table=document.querySelector('.gate-dispatch-table');return{tableScroll:table.scrollWidth,tableClient:table.clientWidth,pageScroll:document.documentElement.scrollWidth,viewport:innerWidth};});
   assert.ok(gateLayout.tableScroll<=gateLayout.tableClient+1,`gate table horizontal overflow ${width}: ${JSON.stringify(gateLayout)}`);assert.ok(gateLayout.pageScroll<=gateLayout.viewport+1,`gate page horizontal overflow ${width}: ${JSON.stringify(gateLayout)}`);
+  const boxLayout=await gateRow.evaluate(row=>{const clone=row.cloneNode(true);row.parentElement.appendChild(clone);const r=row.getBoundingClientRect(),next=clone.getBoundingClientRect(),panel=row.closest('.gate-dispatch-focus').getBoundingClientRect(),cells=[...row.children].map(x=>x.getBoundingClientRect().toJSON());clone.remove();return{row:r.toJSON(),next:next.toJSON(),panel:panel.toJSON(),cells};});assert(boxLayout.cells.every(c=>c.top>=boxLayout.row.top-1&&c.bottom<=boxLayout.row.bottom+1),`gate cells outside row ${width}: ${JSON.stringify(boxLayout)}`);assert(boxLayout.next.top>=boxLayout.row.bottom-1&&boxLayout.next.bottom<=boxLayout.panel.bottom+1,`gate rows overlap ${width}: ${JSON.stringify(boxLayout)}`);
   assert.equal(await gateRow.locator('[data-gate=details]').count(),1);assert.equal(await gateRow.locator('[data-gate=exit]').count(),1);
   await gateRow.locator('[data-gate=details]').click();
   await pages.gate.locator('#modal.open .dsp-order-details').waitFor();assert.ok((await pages.gate.locator('#modal').innerText()).includes('فروشگاه شعبه 1 اول'));
@@ -58,6 +59,8 @@ for(const width of [1024,768,320]){
  const layout=await pages.gate.evaluate(()=>{const table=document.querySelector('.gate-dispatch-table'),row=table.querySelector('[data-order]');return{rowDisplay:getComputedStyle(row).display,tableScroll:table.scrollWidth,tableClient:table.clientWidth,pageScroll:document.documentElement.scrollWidth,viewport:innerWidth,labels:[...row.cells].map(cell=>cell.dataset.label)};});
  assert.equal(layout.rowDisplay,'grid',`gate card-table layout ${width}`);assert.ok(layout.tableScroll<=layout.tableClient+1,`gate table horizontal overflow ${width}: ${JSON.stringify(layout)}`);assert.ok(layout.pageScroll<=layout.viewport+1,`gate page horizontal overflow ${width}: ${JSON.stringify(layout)}`);
  assert.equal(layout.labels.length,10,`gate table retains all columns ${width}`);
+ const height=await pages.gate.locator('.gate-dispatch-table tbody tr[data-order]').first().evaluate(row=>{const copy=row.cloneNode(true);row.parentElement.appendChild(copy);const a=row.getBoundingClientRect(),b=copy.getBoundingClientRect(),cells=[...row.children].map(c=>c.getBoundingClientRect().toJSON());copy.remove();return{a:a.toJSON(),b:b.toJSON(),cells};});assert(height.cells.every(c=>c.top>=height.a.top-1&&c.bottom<=height.a.bottom+1)&&height.b.top>=height.a.bottom-1,`gate row height ${width}: ${JSON.stringify(height)}`);
+
 }
 await pages.gate.setViewportSize({width:1440,height:850});
 // Confirm both separate deliveries in a real store browser; archived run 1
