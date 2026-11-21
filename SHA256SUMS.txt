@@ -1,5 +1,5 @@
 5667d990883d7d6a0e5dcfefcc96a0488b461d39d361316bd8e67e86a92b96ce  ./.gitattributes
-9a011b494122d2717740da986d159affee1ea6ee7c44db6770fb249e3e453fec  ./.github/workflows/ci.yml
+53b7b9e09879d0319f815a44f15991becbe5a19df6556b17c1bb649627dfafaa  ./.github/workflows/ci.yml
 1bd57d4d8e439aca6eb9d360b9e3ef036c1494ad8f936fbd5e10b919fedf8778  ./.github/workflows/release.yml
 45a4a240ad89728268c09abcd811ed7e16ef5a4feb3103d89a445ce82e9d5e9b  ./.gitignore
 bb995d6991ca888be66eeab15d3199cd1f898a9bd18be97675c817dff865042d  ./CHANGELOG.md
