@@ -17,7 +17,8 @@ test('warehouse preparation has four peer cells and a separate simple out-of-sto
  assert.match(sheet,/class="wh38-stock-cell"[\s\S]*?<label class="wh38-oos"[^>]*><input type="checkbox"/);
  assert.doesNotMatch(sheet,/این قلم موجود نیست/);
  assert.match(sheet,/aria-label="عدم موجودی/);
- assert.match(sheet,/for="wh38-weight-/);
+ assert.match(sheet,/aria-label="وزن خالص \$\{esc\(it\.product/);
+ assert.doesNotMatch(sheet,/<label class="wh38-cell-label"/);
  assert.match(sheet,/title="\$\{esc\(it\.description/);
 });
 test('warehouse rows keep the desktop grid but wrap for phones and tablets without horizontal scroll',()=>{

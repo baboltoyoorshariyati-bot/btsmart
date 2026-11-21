@@ -95,12 +95,12 @@ test('مرورگر: ردیف سفارش در کارتابل‌ها و همه ع�
    }
    if(kind==='remote'||kind==='flow'){
     const table=page.locator(kind==='remote'?'#content .phone-queue-table':'#content .sd-flow-table');await waitFor(table,`${kind}-table`);
-    const headers=kind==='remote'?['نام مشتری','شماره سفارش','تاریخ','وضعیت','اقلام','عملیات']:['نام مشتری','شماره سفارش','تاریخ','وضعیت','مشخصات','عملیات'];
+    const headers=kind==='remote'?['نام مشتری','شماره سفارش','تاریخ','وضعیت','اقلام','عملیات']:['نام مشتری','شماره سفارش','تاریخ','وضعیت','عملیات'];
     assert.deepEqual(await table.locator('> thead th').allInnerTexts(),headers);
     for(const width of [1280,768,390,320]){
      await page.setViewportSize({width,height:900});if(width<640)await page.waitForTimeout(350);step=`${kind}/${width}`;
      const row=table.locator('tbody tr[data-order]').first();await waitFor(row,`${kind}-row`);
-     assert.equal(await row.locator('td').count(),6);
+     assert.equal(await row.locator('td').count(),headers.length);
      assert.equal(await row.evaluate(e=>getComputedStyle(e).display),width<=900?'block':'table-row');
      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${kind}/${width} page overflow`);
      const btn=row.locator('[data-action=order-details]');await btn.scrollIntoViewIfNeeded();assert(await btn.isVisible());
