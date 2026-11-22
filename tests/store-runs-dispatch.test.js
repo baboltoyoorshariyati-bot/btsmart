@@ -9,7 +9,7 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { PRODUCTS_SEED } = require('../lib/catalog');
+const { PRODUCTS_SEED } = require('./helpers/catalog-fixture');
 
 const ADMIN_PASS = 'Ta1!' + require('crypto').randomBytes(8).toString('hex');
 const PASS = 'Ts7!' + require('crypto').randomBytes(8).toString('hex');

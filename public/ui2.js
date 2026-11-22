@@ -580,12 +580,13 @@ function futureOrderRowsV25(orders){
   const actions=`<button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',13)} جزئیات سفارش</button>`+(canSalesEditRemote(o)&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button class="btn btn-ghost btn-sm" data-action="future-edit" data-id="${esc(o.id)}">${icon('edit',13)} ویرایش سفارش</button>${o.visit?.status!=='PICKUP_PRESENT'?`<button class="btn btn-ghost btn-sm danger-text" data-action="future-cancel" data-id="${esc(o.id)}">${icon('trash',13)} لغو</button>`:''}`:'');
   return `<tr class="fx-table-row" data-order="${esc(o.id)}"><td data-label="مشتری">${esc(storeAwareOrderName(o))}<small>${esc(storeAwareOrderPhone(o)||'—')}</small></td><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="تاریخ ثبت">${esc(formatDateTime24(o.createdAt))}</td><td data-label="وضعیت">${badge(o.status)} ${sdTypeBadge(o)}</td><td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td><td data-label="زمان‌بندی"><span>ورود به انبار: ${esc(dateLabel(o.scheduledDate))} ${esc(fa(time24(o.scheduledAt)))}</span><br><span>تاریخ تحویل: ${o.deliveryDate?esc(dateLabel(o.deliveryDate)):'ثبت نشده'}</span></td><td data-label="مقصد و بیعانه"><span>${esc(o.dispatchPlace||'ثبت نشده')}</span>${o.deposit?depositSummaryHtml(o.deposit):''}</td><td data-label="عملیات" class="bt-col-actions"><div class="fx-table-actions">${actions+pickupSalesActions(o)}</div></td></tr>`;
  }).join('');
- return rows?`<div class="bt-table-wrap"><table class="bt-table future-order-table"><caption class="bt-caption">سفارش‌های آینده</caption><thead><tr><th scope="col">مشتری</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ ثبت</th><th scope="col">وضعیت</th><th scope="col">اقلام</th><th scope="col">زمان‌بندی</th><th scope="col">مقصد و بیعانه</th><th scope="col">عملیات</th></tr></thead><tbody>${rows}</tbody></table></div>`:sdEmpty('calendar','سفارشی برای روزهای آینده برنامه‌ریزی نشده است','سفارش‌های آینده پس از ثبت در این تقویم قرار می‌گیرند.');
+ const empty=`<tr class="future-empty-row"><td colspan="8" class="future-empty-cell">${sdEmpty('calendar','سفارشی برای روزهای آینده برنامه‌ریزی نشده است','سفارش‌های آینده پس از ثبت در این تقویم قرار می‌گیرند.')}</td></tr>`;
+ return `<div class="bt-table-wrap"><table class="bt-table future-order-table"><caption class="bt-caption">سفارش‌های آینده</caption><thead><tr><th scope="col">مشتری</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ ثبت</th><th scope="col">وضعیت</th><th scope="col">اقلام</th><th scope="col">زمان‌بندی</th><th scope="col">مقصد و بیعانه</th><th scope="col">عملیات</th></tr></thead><tbody>${rows||empty}</tbody></table></div>`;
 }
 
 function futureFormV38(orders){
   const future=salesFutureOrders(orders||[]);
-  return `<div class="fx-grid"><section class="fx-form">
+  return `<div class="fx-grid fx-future-layout"><section class="fx-form fx-future-form">
     <div class="fx-card">
       <div class="fx-card-head"><span class="fx-ico">${icon('calendar',16)}</span><h3>ثبت سفارش برنامه‌ریزی‌شده</h3><span class="fx-list-count">${qty(future.length)} برنامه فعال</span></div>
       <div class="fx-card-body fx-body-compact"><p class="fx-intro">مشتری، <b>زمان ورود به کارتابل انبار</b> و اقلام را وارد کنید؛ سفارش در زمان سررسید خودکار وارد صف انبار می‌شود.</p>
@@ -615,7 +616,7 @@ function futureFormV38(orders){
       </div>
     </div>
   </section>
-  <section class="fx-card" style="align-self:start"><div class="fx-card-head"><span class="fx-ico" style="background:var(--purple-bg);color:var(--purple)">${icon('calendar',16)}</span><h3>سفارش‌های ثبت‌شده</h3><span class="fx-list-count">${qty(future.length)} مورد</span></div>
+  <section class="fx-card fx-future-registered"><div class="fx-card-head"><span class="fx-ico" style="background:var(--purple-bg);color:var(--purple)">${icon('calendar',16)}</span><h3>سفارش‌های ثبت‌شده</h3><span class="fx-list-count">${qty(future.length)} مورد</span></div>
     <div class="fx-card-body"><div id="futureOrderListV25" class="fx-list-grid">${futureOrderRowsV25(future)}</div></div>
   </section><section class="fx-card deposit-refund-panel"><div class="fx-card-head"><h3>استرداد بیعانه سفارش‌های لغوشده</h3></div><div class="fx-card-body" id="depositRefundList">در حال دریافت…</div></section></div>`;
 }

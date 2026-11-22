@@ -266,6 +266,8 @@
 /* سفارش‌های آینده و سوابق فروش */
 #appView #content :is(.future-order-table,.sales-history-table) td{min-width:0;overflow-wrap:anywhere}
 #appView #content .future-order-table td small{display:block}
+#appView #content .future-order-table .future-empty-cell::before{display:none}
+#appView #content .future-order-table .future-empty-cell>.sd-empty{box-sizing:border-box;width:100%;min-width:0}
 #appView #content .fx-table-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 @media(max-width:900px){#appView #content :is(.future-order-table,.sales-history-table) td{flex-wrap:wrap}}
 #appView #content .dsp-returns-table td{min-width:0;overflow-wrap:anywhere}

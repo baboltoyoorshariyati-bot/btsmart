@@ -47,7 +47,7 @@ jobs:
           test -x "$CHROME"
           set +e
           LD_LIBRARY_PATH="/tmp/al2023/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
-            BT_CHROMIUM_PATH="$CHROME" node --test --test-concurrency=1 tests/*browser*.test.js > /tmp/browser-tests.tap 2>&1
+            BT_CHROMIUM_PATH="$CHROME" node --require ./tests/helpers/install-catalog-fixture.js --test --test-concurrency=1 tests/*browser*.test.js > /tmp/browser-tests.tap 2>&1
           test_status=$?
           set -e
           cat /tmp/browser-tests.tap
