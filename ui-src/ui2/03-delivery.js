@@ -245,6 +245,7 @@ function paintSalesPaneV29(tab,data){
   }else if(tab==='settlement'){
     const all=salesAllInSettlement(data.orders||[]);
     const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
+    const noGoods=pane.querySelector('.sales-no-goods-list'); if(noGoods)noGoods.innerHTML=salesNoGoodsRows(all);
     const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(salesSettlementIssuedOrders(all)); // v37.5.0 // v37.6.1
   }else if(tab==='delivery'){
     pane.innerHTML=renderSalesDeliveryV38(data.dispatchDeliveries||{});

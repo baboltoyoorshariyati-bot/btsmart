@@ -20,7 +20,6 @@ assert.throws(()=>api.finalizeHandover('o',payload,sales),/دسترسی/);
 assert.throws(()=>api.finalizeHandover('o',{items:weights},wh),/واقعی/);
 assert.throws(()=>api.finalizeHandover('o',{physicalHandoverConfirmed:true,items:[weights[0]]},wh),/همه/);
 assert.throws(()=>api.finalizeHandover('o',{physicalHandoverConfirmed:true,items:[weights[0],weights[0]]},wh),/تکراری/);
-assert.throws(()=>api.finalizeHandover('o',{physicalHandoverConfirmed:true,items:[{itemId:'i1',outOfStock:true},weights[1]]},wh),/بدون کالای/);
 s.sql.run("CREATE TRIGGER fail_finalize BEFORE INSERT ON notifications WHEN NEW.type='WAREHOUSE_DONE' BEGIN SELECT RAISE(ABORT,'test rollback'); END");
 assert.throws(()=>api.finalizeHandover('o',payload,wh),/test rollback/);s.sql.run('DROP TRIGGER fail_finalize');
 assert.equal(s.get().orders.find(x=>x.id==='o').status,'WAREHOUSE_PREPARING');assert.equal(s.get().orders.find(x=>x.id==='o').pickupHandover,undefined);
@@ -29,7 +28,7 @@ const out=api.finalizeHandover('o',payload,wh);assert.equal(out.handover.documen
 assert.equal(out.handover.document.customerName,'مالک سفارش');assert.equal(out.handover.document.recipient.name,'راننده مشتری');
 assert.equal(out.handover.document.items[0].deliveredKg,6);assert.equal(out.handover.document.items[0].weighings[0].cartKg,1);
 assert.equal(s.get().orders.find(x=>x.id==='o').status,'SETTLEMENT_PENDING');
-assert.throws(()=>api.finalizeHandover('o',payload,wh),/وضعیت/);assert.throws(()=>api.requestCancellation('o',{reason:'انصراف',confirmedNoGoods:true},wh),/وزن نهایی/);
+assert.throws(()=>api.finalizeHandover('o',payload,wh),/وضعیت|وزن نهایی/);assert.throws(()=>api.requestCancellation('o',{reason:'انصراف',confirmedNoGoods:true},wh),/وزن نهایی/);
 s.get().customers.find(c=>c.id==='buyer').name='نام تغییر یافته';s.get().visits.find(v=>v.id===entry.visit.id).recipient.name='نام جدید راننده';s.reloadFromSql();
 assert.equal(s.get().orders.find(x=>x.id==='o').pickupHandover.document.customerName,'مالک سفارش');assert.equal(s.get().orders.find(x=>x.id==='o').pickupHandover.document.recipient.name,'راننده مشتری');
 assert.throws(()=>api.goodsExit('o',{checkedItems:['i1']},gate),/تسویه/);

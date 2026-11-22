@@ -567,10 +567,13 @@ async function wh38Finalize(id){
   }
   const pickup=app.features?.pickupStaging&&selected?.id===id&&selected.orderType==='REMOTE'&&selected.deliveryMode==='PICKUP'&&(selected.pickupWorkflow===1||selected.visit?.status==='PICKUP_PRESENT'||!selected.warehouseCompletedAt);
   if(pickup&&selected.visit?.status!=='PICKUP_PRESENT')return toast('ابتدا نگهبانی ورود تحویل‌گیرنده را برای این سفارش ثبت کند.');
-  if(pickup&&!confirm(`آیا کالا را واقعاً به ${selected.visit.recipient?.name||'تحویل‌گیرنده ثبت‌شده'} (${selected.visit.recipient?.phone||'—'}) داده‌اید؟ پس از ثبت، سند برای امضای دستی چاپ می‌شود.`))return;
-  if(!pickup&&!confirm(selected?.deliveryMode==='DELIVERY'?'ارسال به معنی تحویل فیزیکی به راننده پخش است. کالا را تحویل داده‌اید؟ سند برای امضای راننده چاپ می‌شود.':'ارسال به معنی تحویل فیزیکی کالا به مشتری یا تحویل‌گیرنده است. تأیید می‌کنید؟ سند برای امضا چاپ می‌شود.'))return;
-  try{if(pickup)result=await api('/api/pickup/'+encodeURIComponent(id)+'/handover',{method:'POST',body:JSON.stringify({items,draftRevision,physicalHandoverConfirmed:true})});else result=await api('/api/orders/'+id+'/warehouse',{method:'POST',body:JSON.stringify({items,draftRevision,physicalHandoverConfirmed:true})});}
+  const hasGoods=items.some(i=>!i.outOfStock&&i.deliveredKg>0);
+  if(!hasGoods&&!confirm('همه اقلام ناموجودند. سفارش بدون ثبت تحویل یا تسویه برای تعیین تکلیف به فروش برگردد؟'))return;
+  if(hasGoods&&pickup&&!confirm(`آیا کالا را واقعاً به ${selected.visit.recipient?.name||'تحویل‌گیرنده ثبت‌شده'} (${selected.visit.recipient?.phone||'—'}) داده‌اید؟ پس از ثبت، سند برای امضای دستی چاپ می‌شود.`))return;
+  if(hasGoods&&!pickup&&!confirm(selected?.deliveryMode==='DELIVERY'?'ارسال به معنی تحویل فیزیکی به راننده پخش است. کالا را تحویل داده‌اید؟ سند برای امضای راننده چاپ می‌شود.':'ارسال به معنی تحویل فیزیکی کالا به مشتری یا تحویل‌گیرنده است. تأیید می‌کنید؟ سند برای امضا چاپ می‌شود.'))return;
+  try{if(pickup)result=await api('/api/pickup/'+encodeURIComponent(id)+'/handover',{method:'POST',body:JSON.stringify({items,draftRevision,physicalHandoverConfirmed:hasGoods})});else result=await api('/api/orders/'+id+'/warehouse',{method:'POST',body:JSON.stringify({items,draftRevision,physicalHandoverConfirmed:hasGoods})});}
   catch(e){toast(e.message);return;}
+  if(result.allUnavailable){toast('همه اقلام ناموجود است؛ سفارش بدون تحویل برای تعیین تکلیف به فروش برگشت.');if(app.page==='warehouse')wh38Shell('preparing');void refreshIndicators();return;}
   if(pickup){try{whPrintDocument(result.handover.document,0);}catch(e){toast('تحویل ثبت شد؛ چاپ را از بخش تحویل‌شده تکرار کنید.');}if(app.page==='warehouse'){toast('تحویل واقعی ثبت شد؛ سند را چاپ و امضای دستی تحویل‌گیرنده را دریافت کنید.');wh38Shell('preparing');void refreshIndicators();}return;}
   if(app.page!=='warehouse')return;
   void refreshIndicators();

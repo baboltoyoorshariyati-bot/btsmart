@@ -317,6 +317,13 @@ async function salesV29ClickHandler(e){
     if(a==='edit-returned-order')return openReturnedOrderEditor(el.dataset.id);
     if(a==='resubmit-order')return resubmitOrder(el.dataset.id);
     if(a==='transport-sales-work')return goTransportSalesWork(el.dataset.id);
+    if(a==='recover-no-goods'){
+      if(!confirm('آیا اسناد و وضعیت سفارش را بررسی کرده‌اید و تأیید می‌کنید هیچ کالایی تحویل نشده است؟ سفارش برای تعیین تکلیف به فروش برمی‌گردد؛ بیعانه خودکار مسترد نمی‌شود.'))return;
+      el.disabled=true;
+      try{await api('/api/orders/'+encodeURIComponent(el.dataset.id)+'/recover-no-goods',{method:'POST',body:JSON.stringify({confirmedNoGoods:true})});toast('سفارش برای تعیین تکلیف به جریان فروش برگشت.');await fetchSalesCache(true);await renderSales('settlement');await refreshIndicators();}
+      catch(err){el.disabled=false;toast(err.message);}
+      return;
+    }
     if(a==='select-settlement')return selectSettlement(el.dataset.id);
     if(a==='back-settlement')return renderSales('settlement');
     if(a==='settlement-reopen-prep')return reopenSettlementToWarehouse(el.dataset.id);
@@ -464,6 +471,7 @@ function paintSalesPaneV29(tab,data){
   }else if(tab==='settlement'){
     const all=salesAllInSettlement(data.orders||[]);
     const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
+    const noGoods=pane.querySelector('.sales-no-goods-list'); if(noGoods)noGoods.innerHTML=salesNoGoodsRows(all);
     const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(salesSettlementIssuedOrders(all));
   }else if(tab==='delivery'){
     pane.innerHTML=renderSalesDeliveryV38(data.dispatchDeliveries||{});

@@ -47,3 +47,12 @@ test('SQLite migrates old store services once and retains their numbers on resta
   const first=run(code),again=run(code);assert.deepEqual(first,again);assert.deepEqual(first.numbers,{1:'W-000008',2:'W-000009'});assert.equal(first.normal,'W-000007');assert.equal(first.counter,9);assert.deepEqual(first.audit,audit);
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
+
+test('recovered no-goods legacy document remains reserved without creating a replacement on restart',()=>{
+ const docs=require('../lib/warehouse-document-numbers');
+ const audit={id:'final1',action:'WAREHOUSE_FINALIZE',entityId:'o',details:{warehouseDocumentNo:'W-000099',items:[{itemId:'i',status:'OUT_OF_STOCK',deliveredKg:0}]}};
+ const data={orders:[{id:'o',orderType:'ONSITE',status:'RETURNED_TO_SALES',noGoodsRecovery:{warehouseDocumentNo:'W-000099',finalizeAuditId:'final1'}}],audit:[audit],counters:{warehouseDocumentNumber:99},payments:[]};
+ docs.ensureWarehouseDocumentNumbers(data);assert.equal(data.orders[0].warehouseDocumentNo,undefined);assert.equal(data.counters.warehouseDocumentNumber,99);
+ const next={id:'next',orderType:'ONSITE'};data.orders.push(next);assert.equal(docs.assignWarehouseDocumentNumber(data,next),'W-000100');
+ docs.ensureWarehouseDocumentNumbers(data);assert.equal(data.orders[0].warehouseDocumentNo,undefined);
+});

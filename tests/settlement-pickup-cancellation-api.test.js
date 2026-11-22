@@ -27,5 +27,17 @@ test('settlement pickup return preserves physical handover and deposit',{timeout
   assert.equal((await call('POST',`/api/pickup/${order.id}/cancellation-exit`,{},gate)).status,400);
   await ok('POST',`/api/pickup/${order.id}/cancellation-exit`,{confirmedNoGoods:true},gate);
   assert.equal((await ok('GET',`/api/orders/${order.id}`,null,sales)).order.visit.exitReason,'CANCELLATION');
+  const unavailable=await create('09121112234',true);
+  await ok('POST',`/api/pickup/${unavailable.id}/entry`,{recipientIsBuyer:true,name:'مالک سفارش',phone:'09121112234',noVehicle:true},gate);
+  await ok('POST',`/api/orders/${unavailable.id}/warehouse/accept`,{},wh);
+  const noGoods=await ok('POST',`/api/pickup/${unavailable.id}/handover`,{physicalHandoverConfirmed:false,items:[{itemId:unavailable.items[0].id,outOfStock:true}]},wh);
+  assert.equal(noGoods.allUnavailable,true);assert.equal(noGoods.handover,null);
+  const pending=(await ok('GET',`/api/orders/${unavailable.id}`,null,sales)).order;
+  assert.equal(pending.status,'RETURNED_TO_SALES');assert.equal(pending.deposit.status,'RECEIVED');assert.equal(pending.pickupHandover,undefined);assert.equal(pending.warehouseDocumentNo,undefined);
+  assert.equal((await call('POST',`/api/orders/${unavailable.id}/cancel-remote`,{reason:'ناموجود'},sales)).status,409,'open pickup requires gate-safe cancellation');
+  await ok('POST',`/api/pickup/${unavailable.id}/cancellation`,{reason:'عدم موجودی',confirmedNoGoods:true},wh);
+  await ok('POST',`/api/pickup/${unavailable.id}/cancellation-approval`,{},sales);
+  assert.equal((await ok('GET',`/api/orders/${unavailable.id}`,null,sales)).order.deposit.status,'REFUND_REQUIRED');
+  await ok('POST',`/api/pickup/${unavailable.id}/cancellation-exit`,{},gate);
  }finally{if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });
