@@ -3519,6 +3519,13 @@ async function salesV29ClickHandler(e){
     if(a==='edit-returned-order')return openReturnedOrderEditor(el.dataset.id);
     if(a==='resubmit-order')return resubmitOrder(el.dataset.id);
     if(a==='transport-sales-work')return goTransportSalesWork(el.dataset.id);
+    if(a==='recover-no-goods'){
+      if(!confirm('آیا اسناد و وضعیت سفارش را بررسی کرده‌اید و تأیید می‌کنید هیچ کالایی تحویل نشده است؟ سفارش برای تعیین تکلیف به فروش برمی‌گردد؛ بیعانه خودکار مسترد نمی‌شود.'))return;
+      el.disabled=true;
+      try{await api('/api/orders/'+encodeURIComponent(el.dataset.id)+'/recover-no-goods',{method:'POST',body:JSON.stringify({confirmedNoGoods:true})});toast('سفارش برای تعیین تکلیف به جریان فروش برگشت.');await fetchSalesCache(true);await renderSales('settlement');await refreshIndicators();}
+      catch(err){el.disabled=false;toast(err.message);}
+      return;
+    }
     if(a==='select-settlement')return selectSettlement(el.dataset.id);
     if(a==='back-settlement')return renderSales('settlement');
     if(a==='settlement-reopen-prep')return reopenSettlementToWarehouse(el.dataset.id);
@@ -3666,6 +3673,7 @@ function paintSalesPaneV29(tab,data){
   }else if(tab==='settlement'){
     const all=salesAllInSettlement(data.orders||[]);
     const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
+    const noGoods=pane.querySelector('.sales-no-goods-list'); if(noGoods)noGoods.innerHTML=salesNoGoodsRows(all);
     const i=pane.querySelector('.v26-invoice-list'); if(i)i.innerHTML=invoiceRowsV27(salesSettlementIssuedOrders(all));
   }else if(tab==='delivery'){
     pane.innerHTML=renderSalesDeliveryV38(data.dispatchDeliveries||{});
@@ -3874,7 +3882,9 @@ function stlEmptyHtml(){ return `<div class="stl-empty"><div class="stl-empty-ic
 // v37.6.1 — همان مرزِ لایهٔ زنده (ui2) در رندر پشتیبان هم رعایت می‌شود: با چاپ برگهٔ ارسال،
 // فاکتور صادرشده است و سفارش از صف تسویه به فهرست فاکتورهای صادرشده می‌رود.
 function salesTransportInvoiceIssued(o){const inv=o&&o.transportInvoice;return !!inv&&(inv.status==='CLOSED'||!!inv.printedAt);}
-function salesSettlementPendingOrders(orders){return (orders||[]).filter(o=>o.status==='SETTLEMENT_PENDING'&&!salesTransportInvoiceIssued(o));}
+function salesNoGoodsLegacy(o){const items=(o?.items||[]).filter(i=>i.itemStatus!=='CANCELLED');return o?.status==='SETTLEMENT_PENDING'&&!o.transportInvoice&&items.length>0&&items.every(i=>i.itemStatus==='OUT_OF_STOCK'&&i.warehouseStatus==='OUT_OF_STOCK'&&i.deliveredKg!=null&&Number(i.deliveredKg)===0);}
+function salesSettlementPendingOrders(orders){return (orders||[]).filter(o=>o.status==='SETTLEMENT_PENDING'&&!salesTransportInvoiceIssued(o)&&!salesNoGoodsLegacy(o));}
+function salesNoGoodsRows(orders){const rows=(orders||[]).filter(salesNoGoodsLegacy);return rows.length?`<section class="sd-panel"><h3>سفارش‌های قدیمی بدون کالای تحویلی — نیازمند بررسی</h3><p>این سفارش‌ها قابل تسویه نیستند. پس از بررسی کالا و اسناد، آنها را برای تعیین تکلیف به فروش برگردانید.</p><div class="bt-table-wrap"><table class="bt-table"><thead><tr><th>مشتری</th><th>شماره سفارش</th><th>عملیات</th></tr></thead><tbody>${rows.map(o=>`<tr><td>${esc(storeAwareOrderName(o))}</td><td>${esc(fa(o.orderNo||'—'))}</td><td><button type="button" class="btn btn-secondary btn-sm" data-action="recover-no-goods" data-id="${esc(o.id)}">بررسی و بازگشت به فروش</button></td></tr>`).join('')}</tbody></table></div></section>`:'';}
 function salesSettlementIssuedOrders(orders){return (orders||[]).filter(o=>['SETTLED','EXITED'].includes(o.status)||((o.payments||[]).length&&!['SETTLEMENT_PENDING','CANCELLED'].includes(o.status)&&!o.payment?.archived)||salesTransportInvoiceIssued(o));}
 function renderSalesSettlementV25(orders){
   const pending = salesSettlementPendingOrders(orders);
@@ -3884,6 +3894,7 @@ function renderSalesSettlementV25(orders){
       <aside class="stl-queue"><div class="stl-block-head"><span class="stl-eyebrow">04 / SETTLEMENT</span><h2>سفارش‌های آماده تسویه</h2></div><div class="v26-settlement-list stl-queue-list">${settlementPendingRowsV27(pending)}</div></aside>
       <section class="stl-main" id="stlMain">${stl.orderId ? '' : stlEmptyHtml()}</section>
     </div>
+    <div class="sales-no-goods-list">${salesNoGoodsRows(orders)}</div>
     <section class="stl-done"><div class="stl-block-head"><span class="stl-eyebrow">INVOICE & EXIT</span><h2>فاکتورهای صادرشده</h2></div><div class="v26-invoice-list">${invoiceRowsV27(finalized)}</div></section>
   </section>`;
 }
