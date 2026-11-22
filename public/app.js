@@ -100,7 +100,7 @@ const ICONS = {
   clipboard:'<rect x="6" y="4.8" width="12" height="16.2" rx="2"/><path d="M9.2 4.8A2.8 2.8 0 0 1 12 3a2.8 2.8 0 0 1 2.8 1.8"/><path d="M9.5 12h5M9.5 15.8h5"/>'
 };
 const ROLE={admin:'مدیر سیستم',gate:'نگهبانی',sales:'فروش',warehouse:'انبار',store:'فروشگاه',dispatch:'واحد پخش',driver:'راننده'};
-const STATUS={STORE_PENDING_SALES:['در انتظار تایید فروش','orange'],SCHEDULED_REMOTE:['برنامه‌ریزی‌شده','purple'],WAITING_SALES:['در انتظار فروش','orange'],PICKUP_PRESENT:['حاضر برای تحویل','purple'],ORDERED:['ثبت سفارش شد','blue'],WAREHOUSE_PENDING:['در صف انبار','orange'],WAREHOUSE_PREPARING:['در حال آماده‌سازی','purple'],SETTLEMENT_PENDING:['آماده تسویه','blue'],SETTLED:['آماده خروج','green'],EXITED:['خروج ثبت شد','green'],OUT_OF_STOCK:['عدم موجودی','red'],RETURNED_TO_SALES:['برگشت به فروش','orange'],CANCELLED:['انصراف','gray'],DELIVERED:['تحویل کامل','green'],PENDING:['در انتظار','gray']};
+const STATUS={STORE_PENDING_SALES:['در انتظار تایید فروش','orange'],SCHEDULED_REMOTE:['برنامه‌ریزی‌شده','purple'],WAITING_SALES:['در انتظار فروش','orange'],PICKUP_PRESENT:['حاضر برای تحویل','purple'],ORDERED:['ثبت سفارش شد','blue'],CANCELLED_EXIT_PENDING:['لغو؛ در انتظار خروج بدون کالا','orange'],WAREHOUSE_PENDING:['در صف انبار','orange'],WAREHOUSE_PREPARING:['در حال آماده‌سازی','purple'],SETTLEMENT_PENDING:['آماده تسویه','blue'],SETTLED:['آماده خروج','green'],EXITED:['خروج ثبت شد','green'],OUT_OF_STOCK:['عدم موجودی','red'],RETURNED_TO_SALES:['برگشت به فروش','orange'],CANCELLED:['انصراف','gray'],DELIVERED:['تحویل کامل','green'],PENDING:['در انتظار','gray']};
 
 function icon(name,size=20){return `<svg class="svg" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]||ICONS.info}</svg>`}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -1393,7 +1393,7 @@ function showAppView(){
   $('#loginView')?.classList.add('hidden');
   $('#appView')?.classList.remove('hidden');
 }
-// A page has a fresh tab id even after reload; pagehide is best effort, lease is the fallback.
+// Each page has a fresh tab id; pagehide is best effort and reloads receive a short grace.
 const browserTabId = newIdempotencyKey();
 let browserPresenceTimer = null;
 function browserPresence(){
@@ -1572,6 +1572,8 @@ document.addEventListener('click',e=>{ if(e.target.closest?.('#changePasswordBtn
 /* ---------- اعلان‌ها: پنل زیر زنگوله، ناوبری به کارتابل مربوط، صدا و هشدار ---------- */
 const NOTIF_ROUTES={
   NEW_VISIT:{page:'sales',sub:'onsite'},
+  ONSITE_CANCELLATION_EXIT:{page:'gate',sub:'exit'},
+  ONSITE_ORDER_CANCELLED:{page:'warehouse',sub:'incoming'},
   PICKUP_ENTRY:{page:'warehouse',sub:'incoming'},
   PICKUP_CANCELLATION_REQUESTED:{page:'sales',sub:'flow'},
   PICKUP_CANCELLATION_APPROVED:{page:'gate',sub:'exit'},
@@ -1804,6 +1806,11 @@ async function openNotificationTarget(id,type,role,entityType,entityId){
   if(!entityId||!entityType){await go(route.page,route.sub);toast('شناسهٔ مورد در این اعلان قدیمی موجود نیست.');return;}
   app.notifNavigationDepth=(app.notifNavigationDepth||0)+1;
   try{
+    if(type==='ONSITE_ORDER_CANCELLED'&&route.page==='warehouse'){await go('warehouse','incoming');toast('سفارش لغوشده از صف انبار حذف شده است.');return finish(true);}
+    if(type==='ONSITE_CANCELLATION_EXIT'&&entityType==='visit'){
+      await go('gate','exit');const el=document.querySelector(`[data-cancelled-visit="${CSS.escape(entityId)}"]`);
+      if(focusNotificationElement(el))return finish(true);return toast('این خروج دیگر در صف نگهبانی نیست.');
+    }
     if(entityType==='visit'){
       const visits=(await api('/api/visits?id='+encodeURIComponent(entityId))).visits||[];
       const visit=visits.find(v=>v.id===entityId);
@@ -3461,6 +3468,7 @@ async function salesV29ClickHandler(e){
   if(!el || !content.contains(el))return;
   const a=el.dataset.action;
   try{
+    if(a==='cancel-onsite')return cancelOnsiteVisit(el.dataset.id,el);
     if(a==='open-order')return openOrder(el.dataset.id);
     if(a==='back-order-intake'){app.orderDraft=[];return renderSales('onsite');}
     if(a==='submit-order')return submitOrder(el.dataset.id);
@@ -3732,6 +3740,16 @@ document.addEventListener('click',e=>{
    ================================================================ */
 app.stl = app.stl || {orderId:null, order:null, items:[], drivers:[], devices:[], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false, dispatchBusy:false, paymentRows:[{type:'CASH',amount:''}]};
 const stl = app.stl;
+
+async function cancelOnsiteVisit(id,button){
+ const reason=prompt('دلیل لغو مراجعه یا سفارش را وارد کنید:');
+ if(reason===null)return;
+ if(!reason.trim())return toast('دلیل لغو الزامی است.');
+ if(!confirm('آیا مطمئن هستید هیچ کالایی به مشتری تحویل نشده است؟ مراجعه برای ثبت خروج بدون کالا به نگهبانی ارجاع می‌شود.'))return;
+ if(button.disabled)return;button.disabled=true;
+ try{await api('/api/visits/'+encodeURIComponent(id)+'/cancel-onsite',{method:'POST',body:JSON.stringify({reason:reason.trim(),confirmedNoGoods:true})});toast('لغو ثبت شد؛ مشتری برای خروج بدون کالا به نگهبانی مراجعه کند.');app.orderDraft=[];await fetchSalesCache(true);await renderSales(app.sub.sales);}
+ catch(e){toast(e.message);}finally{button.disabled=false;}
+}
 function stlReset(){ app.stl = {orderId:null, order:null, items:[], prices:[], priceMap:Object.create(null), drivers:[], devices:[], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false, dispatchBusy:false, paymentRows:[{type:'CASH',amount:''}]}; Object.assign(stl, app.stl); app.selectedSettlement=null; }
 function stlPrice(v){ return Number(en(String(v ?? '')).replace(/[^0-9]/g,'')) || 0; }
 function stlFmtPrice(v){ return v ? new Intl.NumberFormat('fa-IR').format(v) : ''; }

@@ -30,15 +30,13 @@ test('environment loader preserves process values, supports quotes/comments and 
   fs.writeFileSync(file,'BAD="not closed');assert.throws(()=>require('../lib/load-env').loadEnv(file,{}));
  }finally{fs.rmSync(dir,{recursive:true,force:true})}
 });
-test('cookie renewal is bounded by absolute session lifetime; server rejects idle/absolute expiry',()=>{
- const sec=require('../lib/security'),config=require('../lib/config');const now=Date.now,base=now();let clock=base;Date.now=()=>clock;
+test('session cookie remains protected, sessions persist without time limit and explicit logout revokes',()=>{
+ const sec=require('../lib/security');const now=Date.now,base=now();let clock=base;Date.now=()=>clock;
  try{
-  const sid=sec.createSession('test','127.0.0.1');clock+=1000;const s=sec.getSession(sid);assert(s);
-  assert.match(sec.sessionCookie(sid,s),/HttpOnly; SameSite=Strict/);
-  clock=base+config.SESSION_MAX_MS-1500;assert.doesNotMatch(sec.sessionCookie(sid,s),/Max-Age|Expires/);
-  clock=base+config.SESSION_MAX_MS+1;assert.equal(sec.getSession(sid),null);
-  clock=base;const idle=sec.createSession('test','127.0.0.1');clock+=config.SESSION_IDLE_MS+1;assert.equal(sec.getSession(idle),null);
- }finally{Date.now=now}
+  const sid=sec.createSession('test','127.0.0.1');const s=sec.getSession(sid);assert(s);
+  assert.match(sec.sessionCookie(sid,s),/HttpOnly; SameSite=Strict/);assert.doesNotMatch(sec.sessionCookie(sid,s),/Max-Age|Expires/);
+  clock=base+90*24*60*60*1000;assert(sec.getSession(sid));sec.destroySession(sid);assert.equal(sec.getSession(sid),null);
+ }finally{Date.now=now;sec.destroyAllSessions()}
 });
 test('print documents load CSP-compliant external script, licensed font and one shared signature pad',()=>{
  const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
