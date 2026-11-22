@@ -21,7 +21,7 @@ test('ensureCodes به مشتری‌های قدیمی بدون کد، کد یک�
   assert.equal(JSON.stringify(db.customers), snapshot);
 });
 
-test('findExisting: اولویت کد مشتری، سپس شماره تماس، سپس پلاک', () => {
+test('findExisting: کد یا شماره تماس، نه پلاک', () => {
   const db = { customers: [
     { id: '1', code: '00001', phone: '09120000001', plate: '12ب345-67' },
     { id: '2', code: '00002', phone: '09120000002', plate: '' },
@@ -29,7 +29,7 @@ test('findExisting: اولویت کد مشتری، سپس شماره تماس، 
   assert.equal(core.findExisting(db, { code: 'c-00002' }).id, '2');
   assert.equal(core.findExisting(db, { code: 'C 00002' }).id, '2');
   assert.equal(core.findExisting(db, { phone: '09120000001' }).id, '1');
-  assert.equal(core.findExisting(db, { plate: '12ب345-67' }).id, '1');
+  assert.equal(core.findExisting(db, { plate: '12ب345-67' }), null);
   assert.equal(core.findExisting(db, { code: '00002', phone: '09120000001' }).id, '2');
   assert.equal(core.findExisting(db, { code: '99999', phone: '000' }), null);
 });
@@ -51,7 +51,7 @@ test('upsertCustomer: همان شماره تماس به پرونده‌ی قبل
   const again = upsertCustomer(db, { name: 'محمد احمدی', phone: '09123334444', plate: '12ب345-67' });
   assert.equal(again.id, first.id);
   assert.equal(db.customers.length, 1);
-  assert.equal(again.name, 'محمد احمدی');
+  assert.equal(again.name, 'محمد');
   assert.equal(again.plate, '12ب345-67');
 });
 

@@ -907,7 +907,7 @@ async function renderGate(tab){
 
 function renderGateEntry(){
   return `<section class="sd-panel gt-entry-panel">
-    <div class="sd-head"><div class="sd-head-main"><span class="sd-head-ico">${icon('gate',20)}</span><div><h2 data-gate-entry-title>ثبت ورود مشتری</h2><p data-gate-entry-help>اطلاعات مشتری و وسیله یک‌بار ثبت می‌شود؛ دفعه‌ی بعد سوابق پلاک قابل انتخاب است.</p></div></div><span class="badge blue" data-gate-entry-badge>ورود مستقیم به صف فروش</span></div>
+    <div class="sd-head"><div class="sd-head-main"><span class="sd-head-ico">${icon('gate',20)}</span><div><h2 data-gate-entry-title>ثبت ورود مشتری</h2><p data-gate-entry-help>مشتری را با شماره تماس جستجو و اطلاعات وسیله را جداگانه ثبت کنید.</p></div></div><span class="badge blue" data-gate-entry-badge>ورود مستقیم به صف فروش</span></div>
 
     <form id="gateForm" autocomplete="on">
       <section class="gt-search-panel" aria-labelledby="gateSearchTitle">
@@ -1091,7 +1091,7 @@ function bindPickupGateEntry(){
   name.readOnly=false;phone.readOnly=false;name.value='';phone.value='';resetPickupVehicle();
   document.querySelector('label[for=gateCustomerName]').textContent='نام و نام خانوادگی';document.querySelector('label[for=gateCustomerPhone]').textContent='شماره تماس';
   $('#gateCustCode').disabled=false;document.querySelector('.cust-code-entry').style.display='';
-  document.querySelector('[data-gate-entry-title]').textContent='ثبت ورود مشتری';document.querySelector('[data-gate-entry-help]').textContent='اطلاعات مشتری و وسیله یک‌بار ثبت می‌شود؛ دفعه‌ی بعد سوابق پلاک قابل انتخاب است.';
+  document.querySelector('[data-gate-entry-title]').textContent='ثبت ورود مشتری';document.querySelector('[data-gate-entry-help]').textContent='مشتری را با شماره تماس جستجو و اطلاعات وسیله را جداگانه ثبت کنید.';
   document.querySelector('[data-gate-entry-badge]').textContent='ورود مستقیم به صف فروش';document.querySelector('[data-gate-person-title]').textContent='مشخصات مشتری';
   document.querySelector('[data-gate-entry-submit-help]').textContent='پس از ثبت، اعلان فوری برای کارتابل فروش ارسال می‌شود.';$('#gateForm button[type=submit]').textContent='ثبت ورود و ارسال به فروش';
  });

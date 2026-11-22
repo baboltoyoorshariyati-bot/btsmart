@@ -41,13 +41,13 @@ test('فروش، منوی کناری را طبق ترتیب درخواستی ن�
   assert.doesNotMatch(ui,/function renderNav\(/);
   assert.match(app, /const productsOk=page==='products'&&r==='sales';/);
   assert.match(app, /!customersOk&&!productsOk&&/);
-  assert.match(app, /if\(r==='sales'\)\{setHeader\('فروش','کارتابل محصولات','تعیین قیمت روز و ویرایش محصولات'\);await renderProductsPage\(\);\}/);
+  assert.match(app, /if\(r==='sales'\)\{setHeader\('فروش','کارتابل محصولات','ثبت و ویرایش محصولات و تعیین قیمت روز'\);await renderProductsPage\(\);\}/);
 });
 
-test('فروش: تعیین قیمت و ویرایش دارد؛ دکمه‌های «محصول جدید» و «حذف» فقط برای مدیر رندر می‌شوند', () => {
+test('فروش: ثبت، تعیین قیمت و ویرایش دارد؛ حذف فقط برای مدیر است', () => {
   const adm = read('public/admin-ui.js');
   assert.match(adm, /function admIsCatalogAdmin\(\)/);
-  assert.match(adm, /\$\{isAdmin \? `<button class="btn btn-primary" type="button" data-adm="prod-new">/);
+  assert.match(adm, /<button class="btn btn-primary" type="button" data-adm="prod-new">/);
   assert.match(adm, /\$\{admIsCatalogAdmin\(\) \? `<button class="btn btn-secondary btn-sm" type="button" data-adm="prod-delete"/);
   // قیمت و ویرایش برای هر دو نقش
   assert.match(adm, /data-adm="prod-price"/);
@@ -55,7 +55,7 @@ test('فروش: تعیین قیمت و ویرایش دارد؛ دکمه‌های
   assert.match(adm, /if \(e\.key === 'Enter'\) \{ e\.preventDefault\(\); saveProductPrice/);
 });
 
-test('سرور: فروش محصولات را می‌بیند/ویرایش می‌کند و قیمت ثبت می‌کند، اما ایجاد و حذف محصول فقط با مدیر است', () => {
+test('سرور: فروش محصول ثبت و ویرایش می‌کند؛ حذف محصول فقط با مدیر است', () => {
   const core = read('lib/routes/core.js');
   const admin = read('lib/routes/admin.js');
   const ext = read('lib/routes/admin-ext.js');
@@ -63,8 +63,8 @@ test('سرور: فروش محصولات را می‌بیند/ویرایش می�
   assert.match(admin, /route\('GET', '\/api\/admin\/products', CATALOG_EDIT,/);
   assert.match(admin, /route\('PUT', '\/api\/admin\/products\/:id', CATALOG_EDIT,/);
   assert.match(core, /route\('POST', '\/api\/admin\/prices', \{ roles: \['admin', 'sales'\], idempotent: true \}/);
-  // ایجاد و حذف همچنان فقط مدیر
-  assert.match(admin, /route\('POST', '\/api\/admin\/products', \{ \.\.\.ADMIN, idempotent: true \}/);
+  // ثبت برای فروش هم مجاز است؛ حذف فقط مدیر
+  assert.match(admin, /route\('POST', '\/api\/admin\/products', \{ \.\.\.CATALOG_EDIT, idempotent: true \}/);
   assert.match(ext, /route\('DELETE', '\/api\/admin\/products\/:id', ADMIN,/);
   // سایر مسیرهای مدیریتی دست نخورده
   assert.match(admin, /route\('GET', '\/api\/admin\/audit', ADMIN,/);
