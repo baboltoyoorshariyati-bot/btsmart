@@ -1432,7 +1432,11 @@ async function handleLoginSubmit(e){
   }
 }
 async function handleLogout(){
-  try{await api('/api/logout',{method:'POST',body:'{}'});}catch{}
+  // Do not tell the user they have logged out when the server did not confirm
+  // revocation. They can retry; closing a disconnected browser falls back to
+  // the server-side heartbeat timeout.
+  try{await api('/api/logout',{method:'POST',body:'{}'});}
+  catch{toast('خروج در سرور تأیید نشد؛ اتصال را بررسی کنید و دوباره تلاش کنید.');return;}
   resetClientState();
   closeModal();
   showLoginView('');
