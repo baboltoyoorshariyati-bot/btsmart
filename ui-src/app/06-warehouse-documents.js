@@ -387,17 +387,32 @@ async function editFutureV25(id){
   const o=(await api('/api/orders/'+encodeURIComponent(id))).order;
   if(!canSalesEditRemote(o))return toast('ویرایش مستقیم فقط پیش از تأیید انبار مجاز است.');
   const products=(await api('/api/products')).products.filter(p=>p.isActive!==false);
+  const showMode=app.features?.experimentalTransport&&o.transportWorkflow===1&&['PICKUP','DELIVERY'].includes(o.deliveryMode);
+  const modeLocked=!!(o.dispatch||o.visitId||o.pickupRecipient||o.pickupCancellation||o.transportInvoice||o.transportDeparture||Object.keys(o.transportAssignments||{}).length||Object.keys(o.transportHandovers||{}).length);
+  const modeField=showMode?`<label>روش تحویل سفارش<select name="deliveryMode" data-re-delivery-mode ${modeLocked?'disabled':''}><option value="DELIVERY" ${o.deliveryMode==='DELIVERY'?'selected':''} ${o.deposit?'disabled':''}>ارسال توسط پخش</option><option value="PICKUP" ${o.deliveryMode==='PICKUP'?'selected':''} ${!app.features?.pickupStaging&&o.deliveryMode!=='PICKUP'?'disabled':''}>تحویل در انبار</option></select><small>${modeLocked?'تغییر روش پس از تخصیص پخش یا ثبت مراجعه مجاز نیست.':o.deposit?'سفارش بیعانه‌دار فقط تحویل در انبار است.':'تغییر روش پیش از تأیید انبار و تخصیص پخش امکان‌پذیر است.'}</small></label>`:'';
   const line=x=>`<tr data-remote-edit-line><td><select data-re-product required aria-label="محصول">${products.map(p=>`<option value="${esc(p.id)}" ${p.id===x.productId?'selected':''}>${esc(p.name)}</option>`).join('')}</select></td><td><input data-re-qty aria-label="مقدار" required inputmode="decimal" value="${esc(x.requestedQty??'')}"></td><td><select data-re-unit aria-label="واحد">${['کیلوگرم','بسته','عدد','کارتن'].map(u=>`<option ${u===x.requestedUnit?'selected':''}>${u}</option>`).join('')}</select></td><td><input data-re-desc aria-label="توضیح" maxlength="300" value="${esc(x.description||'')}"></td><td><button type="button" data-re-remove class="btn btn-secondary">حذف</button></td></tr>`;
-  openModal('ویرایش سفارش پیش از تأیید انبار',`<form id="remoteFullEdit"><p>${esc(storeAwareOrderName(o))} — ${esc(fa(o.orderNo))}</p><div class="form-grid">${o.status==='SCHEDULED_REMOTE'?jalaliDateTimeInput('ورود به انبار','scheduledDate','scheduledTime',o.scheduledDate,time24(o.scheduledAt)||'08:00',true):''}${jalaliInput('تاریخ تحویل','deliveryDate',o.deliveryDate||'',o.deliveryMode==='PICKUP')}<label>محل ارسال<input name="dispatchPlace" value="${esc(o.dispatchPlace||'')}" ${o.deliveryMode==='PICKUP'?'readonly':''}></label><label>یادداشت<input name="notes" maxlength="1000" value="${esc(o.notes||'')}"></label></div><div class="table-wrap"><table class="table remote-edit-table"><thead><tr><th>محصول</th><th>مقدار</th><th>واحد</th><th>توضیح</th><th>عملیات</th></tr></thead><tbody>${(o.items||[]).filter(x=>x.itemStatus!=='CANCELLED').map(line).join('')}</tbody></table></div><button type="button" class="btn btn-secondary" data-re-add>افزودن قلم</button><p data-re-error role="alert"></p><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button type="submit" class="btn btn-primary">ذخیره سفارش</button></div></form>`);
+  openModal('ویرایش سفارش پیش از تأیید انبار',`<form id="remoteFullEdit"><p>${esc(storeAwareOrderName(o))} — ${esc(fa(o.orderNo))}</p><div class="form-grid">${o.status==='SCHEDULED_REMOTE'?jalaliDateTimeInput('ورود به انبار','scheduledDate','scheduledTime',o.scheduledDate,time24(o.scheduledAt)||'08:00',true):''}${modeField}${jalaliInput('تاریخ تحویل','deliveryDate',o.deliveryDate||'',o.deliveryMode==='PICKUP')}<label>محل ارسال<input name="dispatchPlace" value="${esc(o.dispatchPlace||'')}" ${o.deliveryMode==='PICKUP'?'readonly':''}></label><label>یادداشت<input name="notes" maxlength="1000" value="${esc(o.notes||'')}"></label></div><div class="table-wrap"><table class="table remote-edit-table"><thead><tr><th>محصول</th><th>مقدار</th><th>واحد</th><th>توضیح</th><th>عملیات</th></tr></thead><tbody>${(o.items||[]).filter(x=>x.itemStatus!=='CANCELLED').map(line).join('')}</tbody></table></div><button type="button" class="btn btn-secondary" data-re-add>افزودن قلم</button><p data-re-error role="alert"></p><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button type="submit" class="btn btn-primary">ذخیره سفارش</button></div></form>`);
   const form=$('#remoteFullEdit');bindJalaliDates(form);bindTime24(form);
+  const modeInput=form.querySelector('[data-re-delivery-mode]'),place=form.elements.dispatchPlace,dateInput=form.querySelector('.jalali-date-input[data-target="deliveryDate"]');
+  let placeDraft=place.value, lastMode=o.deliveryMode;
+  function syncRemoteDelivery(){
+   const mode=modeInput?.value||o.deliveryMode, pickup=mode==='PICKUP';
+   if(pickup && lastMode!=='PICKUP'){placeDraft=place.value;place.value='';}
+   else if(!pickup && lastMode==='PICKUP') place.value=placeDraft;
+   place.readOnly=pickup;place.required=mode==='DELIVERY'&&mode!==o.deliveryMode;
+   if(dateInput)dateInput.required=pickup;
+   lastMode=mode;
+  }
+  modeInput?.addEventListener('change',syncRemoteDelivery);syncRemoteDelivery();
   form.querySelector('[data-re-add]').onclick=()=>form.querySelector('tbody').insertAdjacentHTML('beforeend',line({requestedUnit:'کیلوگرم'}));
   form.addEventListener('click',e=>{if(e.target.closest('[data-re-remove]'))e.target.closest('tr').remove();});
   form.onsubmit=async e=>{e.preventDefault();const error=form.querySelector('[data-re-error]'),button=form.querySelector('[type=submit]');error.textContent='';try{
    const body=Object.fromEntries(new FormData(form));
+   if(modeInput)body.expectedDeliveryMode=o.deliveryMode;
    body.items=[...form.querySelectorAll('[data-remote-edit-line]')].map(r=>({productId:r.querySelector('[data-re-product]').value,requestedQty:toAsciiDigits(r.querySelector('[data-re-qty]').value).replace('٫','.'),requestedUnit:r.querySelector('[data-re-unit]').value,description:r.querySelector('[data-re-desc]').value}));
    if(!body.items.length)throw Error('حداقل یک قلم لازم است.');
    if(body.scheduledTime){body.scheduledTime=normalizeTime24(body.scheduledTime);body.scheduledAt=body.scheduledDate+'T'+body.scheduledTime;}
-   button.disabled=true;await api('/api/orders/'+encodeURIComponent(id)+'/remote',{method:'PUT',body:JSON.stringify(body)});closeModal();await fetchSalesCache(true);await renderSales(app.sub.sales);toast('سفارش بدون ارجاع به انبار ویرایش شد.');
+   button.disabled=true;await api('/api/orders/'+encodeURIComponent(id)+'/remote',{method:'PUT',body:JSON.stringify(body)});closeModal();await fetchSalesCache(true);await renderSales(app.sub.sales);await refreshIndicators();toast('سفارش بدون ارجاع به انبار ویرایش شد.');
   }catch(err){error.textContent=err.message;button.disabled=false;}};
  }catch(e){toast(e.message);}
 }

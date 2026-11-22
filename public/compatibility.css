@@ -1676,3 +1676,12 @@
 #appView .cartable-section-tabs button{min-height:42px;min-width:120px;padding:7px 18px;border:1px solid transparent;border-radius:9px;background:transparent;color:#343c48;font:inherit;font-weight:800;cursor:pointer}
 #appView .cartable-section-tabs button.active{background:#fff;color:#a20c20;border-color:#eed1d5;box-shadow:0 2px 8px rgba(20,30,40,.08)}
 @media(max-width:480px){#appView .cartable-section-tabs button{min-width:0;flex:1 1 100px}}
+
+/* Stock-order preview is informational, not a warehouse handover form. */
+.wh-stock-preview-links{display:flex;flex-wrap:wrap;gap:8px}
+.wh-stock-preview-links .btn{min-height:40px}
+#modal .wh-stock-preview .bt-table-wrap{max-width:100%;overflow-x:auto}
+#modal .wh-stock-preview .bt-table{width:100%;min-width:520px}
+#modal .wh-stock-preview td{vertical-align:top;overflow-wrap:anywhere}
+#modal .wh-stock-preview details summary{cursor:pointer}
+#modal .wh-stock-preview details ul{padding-inline-start:1.4em;min-width:12em}

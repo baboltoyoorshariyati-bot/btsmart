@@ -42,6 +42,15 @@ test('staged pickup API: roles, recipient, physical delivery, cancellation and l
   assert.equal((await call('POST',`/api/orders/${order.id}/warehouse`,{items:[{itemId:order.items[0].id,deliveredKg:5}]},wh)).status,409);
   const result=await ok('POST',`/api/pickup/${order.id}/handover`,{physicalHandoverConfirmed:true,items:[{itemId:order.items[0].id,deliveredKg:5}]},wh);
   assert.equal(result.handover.document.customerName,'مالک سفارش');assert.equal(result.handover.document.recipient.name,person.name);
+  // A recipient is not the buyer; later the recipient can order under their own phone.
+  const own=await ok('POST','/api/orders/remote',{name:person.name,phone:person.phone,deliveryMode:'PICKUP',scheduledTime:'00:00',deliveryDate:day,items:[{productId:'p01',requestedQty:1,requestedUnit:'کیلوگرم'}]},sales);
+  assert.notEqual(own.order.customerId,order.customerId);
+  assert.equal(own.order.customer.name,person.name);
+  const recipientProfile=await ok('GET',`/api/customers/${own.order.customerId}`,null,sales);
+  assert(!recipientProfile.orders.some(o=>o.id===order.id));
+  assert.equal((await ok('GET',`/api/customers/${order.customerId}`,null,sales)).customer.name,'مالک سفارش');
+  assert.equal((await call('POST','/api/orders/remote',{name:person.name,phone:'09121112233',deliveryMode:'PICKUP',scheduledTime:'00:00',deliveryDate:day,items:[{productId:'p01',requestedQty:1,requestedUnit:'کیلوگرم'}]},sales)).status,409);
+
   const active=(await ok('GET','/api/pickup/active',null,gate)).orders;assert(active.some(x=>x.id===order.id));assert(!JSON.stringify(active).includes('deposit'));
   const doc=(await ok('GET',`/api/warehouse/delivered/${order.id}`,null,wh)).order;assert.equal(doc.recipient.name,person.name);assert.equal(doc.customerName,'مالک سفارش');
   await ok('PUT',`/api/customers/${order.customerId}`,{name:'نام ویرایش‌شده'},sales);

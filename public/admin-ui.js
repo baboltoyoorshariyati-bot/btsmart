@@ -324,7 +324,7 @@ async function deleteDriver(id) {
 /* ---------- محصولات و قیمت ---------- */
 /* v37.3.1 — صفحهٔ مشترک محصولات و قیمت‌ها
    مدیر: ثبت، ویرایش، حذف محصول و تعیین قیمت روز.
-   فروش: ویرایش محصول و تعیین قیمت روز (ایجاد و حذف محصول فقط با مدیر؛ سرور هم همین را کنترل می‌کند). */
+   فروش: ثبت و ویرایش محصول و تعیین قیمت روز؛ حذف فقط با مدیر است. */
 function admIsCatalogAdmin() { return (typeof normalizeRole === 'function' ? normalizeRole(app.user?.roleCode) : app.user?.roleCode) === 'admin'; }
 async function renderProductsPage() {
   const page = app.page, sub = app.sub?.sales;
@@ -339,12 +339,12 @@ async function renderProductsPage() {
   const priced = active.filter((x) => Number(adm.todayPrices[x.id]) > 0).length;
   const desc = isAdmin
     ? `هر محصول را ثبت، ویرایش یا حذف کنید و قیمت امروز (${admTodayLabel()}) را جلوی آن تعیین کنید.`
-    : `قیمت امروز (${admTodayLabel()}) را جلوی هر محصول وارد و ثبت کنید (Enter هم ثبت می‌کند). نام، کد سریع، واحد و وضعیت محصول با «ویرایش» قابل تغییر است.`;
+    : `محصول جدید ثبت کنید و قیمت امروز (${admTodayLabel()}) را وارد کنید (Enter هم ثبت می‌کند). نام، کد سریع، واحد و وضعیت محصول با «ویرایش» قابل تغییر است.`;
   host.innerHTML = admHead('receipt', isAdmin ? 'محصولات و قیمت‌ها' : 'کارتابل محصولات و قیمت‌ها', desc, adm.products.length,
     `${admSearchBox('admProdSearch', 'جستجوی نام یا کد سریع', adm.q)}
      <span class="adm-count">${fa(priced)} از ${fa(active.length)} محصول فعال قیمت امروز دارند</span>
      <button class="btn btn-secondary" type="button" data-adm="prod-print">${icon('receipt',16)} چاپ لیست قیمت</button>
-     ${isAdmin ? `<button class="btn btn-primary" type="button" data-adm="prod-new">${icon('plus', 16)} محصول جدید</button>` : ''}`)
+     <button class="btn btn-primary" type="button" data-adm="prod-new">${icon('plus', 16)} محصول جدید</button>`)
     + `<div id="admList" class="adm-list"></div></section>`;
   $('#admProdSearch').addEventListener('input', (e) => { adm.q = e.target.value; paintProducts(); });
   bindAdm('products', host);
@@ -420,6 +420,7 @@ function openProductForm(p) {
     try {
       if (p) await api('/api/admin/products/' + p.id, { method: 'PUT', body: JSON.stringify(b) });
       else await api('/api/admin/products', { method: 'POST', body: JSON.stringify(b) });
+      if (!p) adm.q = ''; // Show the newly created product even after a filtered search.
       toast(p ? 'محصول به‌روز شد.' : 'محصول ثبت شد.'); closeModal(); renderProductsPage();
     } catch (err) { $('#admFormMsg').textContent = err.message; }
   });

@@ -16,7 +16,7 @@ test('مرورگر: چیدمان ردیف‌های انبار، سرویس فر�
   let regular=(await post('/api/orders/remote',{name:'مشتری با نام طولانی آزمایشی',phone:'09121112233',dispatchPlace:'نشانی ارسال آزمایشی با چند کلمه',scheduledTime:'00:00',items:[{productId:'p01',requestedQty:18,requestedUnit:'کیلوگرم',description:'توضیحات طولانی ردیف برای بررسی چیدمان در صفحه کوچک'}]})).order;
   await post(`/api/orders/${regular.id}/warehouse/accept`,{});await post(`/api/orders/${regular.id}/warehouse/start-preparing`,{});regular=(await get(`/api/orders/${regular.id}`)).order;
   const shopCtx=await browser.newContext();await post('/api/login',{username:'layout-shop',password:'Changed!2345'},shopCtx);
-  let shop=(await post('/api/store/orders',{name:'مشتری فروشگاه',phone:'09121112233',items:[{productId:'p01',requestedQty:12,requestedUnit:'کیلوگرم'}]},shopCtx)).order;await shopCtx.close();
+  let shop=(await post('/api/store/orders',{name:'مشتری فروشگاه',phone:'09121112234',items:[{productId:'p01',requestedQty:12,requestedUnit:'کیلوگرم'}]},shopCtx)).order;await shopCtx.close();
   await post(`/api/store/orders/${shop.id}/quick-send`,{});await post(`/api/orders/${shop.id}/warehouse/accept`,{});await post(`/api/orders/${shop.id}/warehouse/start-preparing`,{});shop=(await get(`/api/orders/${shop.id}`)).order;
   const page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(base+'/',{waitUntil:'networkidle'});
   const contained=async(selector,parent)=>page.locator(selector).evaluateAll((nodes,parentSelector)=>nodes.map(n=>{const r=n.getBoundingClientRect(),p=n.closest(parentSelector)?.getBoundingClientRect();return p&&{left:r.left-p.left,right:p.right-r.right,top:r.top-p.top,bottom:p.bottom-r.bottom};}),parent);

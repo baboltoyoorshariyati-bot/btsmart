@@ -52,7 +52,7 @@ test('every rail section carries a thematic icon separate from its badge key',()
   // ترابری و فروشگاه
   assert.match(app,/\['transport-resources','رانندگان و خودروها','driver',null\]/);assert.doesNotMatch(app,/\['drivers','رانندگان','driver',null\]/);
   assert.match(app,/\['orders','سفارشات','route','dispatchPending'\]/);
-  assert.match(app,/\['create','سفارشات روزانه','clipboard',null\]/);
+  assert.match(app,/\['create','سفارش کلی','clipboard',null\]/);
   assert.match(app,/\['partial','سفارشات جزئی','clipboard',null\]/);
   assert.match(app,/\['delivery','تحویل','truck',null\]/);
   // ریشهٔ مدیریت

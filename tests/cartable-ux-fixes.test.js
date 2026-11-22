@@ -2,7 +2,7 @@
 // v1.1.9 — اصلاح‌های کارتابل انبار/ترابری:
 //  ۱) فقط «محل ارسال» (تعیین‌شدهٔ فروش) نمایش داده می‌شود، نه «محله».
 //  ۲) قلم «عدم موجودی» از سند انبار و فاکتور تسویه حذف می‌شود.
-//  ۴) تحویل‌گیرنده‌ای که با شمارهٔ صاحب سفارش قبلی ثبت شده، می‌تواند پروندهٔ مشتری مستقل بگیرد.
+//  ۴) هر شماره فقط برای یک پروندهٔ مشتری است؛ تحویل‌گیرنده نقش جداگانه دارد.
 //  ۵) کادر «توضیحات برای فروش» چندخطی است. ۶) دو تب کارتابل ترابری افقی و مستقل‌اند.
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
@@ -15,7 +15,7 @@ const os=require('node:os');
 const root=path.join(__dirname,'..');
 const read=(p)=>fs.readFileSync(path.join(root,p),'utf8');
 
-test('تحویل‌گیرنده با شمارهٔ تکراری پروندهٔ مشتری مستقل می‌گیرد و سفارش‌های صاحب قبلی را نمی‌بیند',{timeout:90000},async()=>{
+test('شمارهٔ تکراری پروندهٔ مستقل نمی‌سازد و سوابق مشتریان جدا می‌ماند',{timeout:90000},async()=>{
  const port=await new Promise(resolve=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>resolve(p));});});
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-cartable-')),base=`http://127.0.0.1:${port}`,password='Changed!2345';
  const proc=spawn(process.execPath,['server.js'],{cwd:root,env:{...process.env,HOST:'127.0.0.1',PORT:String(port),DATA_DIR:dir,ADMIN_INITIAL_PASSWORD:'Initial!2345',BT_PICKUP_STAGING:'false',BT_EXPERIMENTAL_TRANSPORT_WORKFLOW:'0'},stdio:['ignore','pipe','pipe']});
@@ -39,25 +39,17 @@ test('تحویل‌گیرنده با شمارهٔ تکراری پروندهٔ م
   const before=(await ok('GET','/api/customers?q=09121110001',null,gate)).customers;
   assert.equal(before.length,1,'یک پرونده برای شمارهٔ صاحب سفارش');
 
-  // تحویل‌گیرندهٔ دیگری با همان شماره ثبت می‌شود و نباید مسدود یا با پروندهٔ صاحب قبلی ادغام شود.
-  const recipient=(await ok('POST','/api/customers',{name:'حسن رضایی',phone:'09121110001',vehicleType:'وانت'},gate,201)).customer;
-  assert.notEqual(recipient.id,buyerId,'تحویل‌گیرنده پروندهٔ مستقل می‌گیرد');
-  assert.equal(recipient.name,'حسن رضایی');
-  const recipientProfile=(await ok('GET',`/api/customers/${recipient.id}`,null,gate));
-  assert.equal(recipientProfile.orders.length,0,'سوابق صاحب سفارش قبلی به تحویل‌گیرنده نسبت داده نمی‌شود');
-  const buyerProfile=(await ok('GET',`/api/customers/${buyerId}`,null,gate));
-  assert.equal(buyerProfile.customer.name,'علی رضایی','نام صاحب سفارش با ثبت تحویل‌گیرنده بازنویسی نمی‌شود');
-  assert.equal(buyerProfile.orders.length,1);
-
-  // همان شخص با همان نام و شماره دوباره ثبت نمی‌شود.
-  const duplicate=await call('POST','/api/customers',{name:'علی رضایی',phone:'09121110001'},gate);
+  // یک شماره نمی‌تواند برای دو پرونده به کار رود؛ حتی با نام متفاوت.
+  const duplicate=await call('POST','/api/customers',{name:'حسن رضایی',phone:'09121110001',vehicleType:'وانت'},gate);
   assert.equal(duplicate.status,409);assert.equal(duplicate.body.code,'DUPLICATE_PHONE');
-
-  // سفارش تازه با شمارهٔ مشترک به پروندهٔ درست وصل می‌شود.
-  const recipientOrder=(await orderFor('حسن رضایی','09121110001')).order;
-  assert.equal(recipientOrder.customerId,recipient.id,'سفارش تحویل‌گیرنده به پروندهٔ صاحب قبلی وصل نمی‌شود');
+  const recipient=(await ok('POST','/api/customers',{name:'حسن رضایی',phone:'09121110003',vehicleType:'وانت'},gate,201)).customer;
+  assert.notEqual(recipient.id,buyerId);
+  assert.equal((await ok('GET',`/api/customers/${recipient.id}`,null,gate)).orders.length,0);
+  assert.equal((await ok('GET',`/api/customers/${buyerId}`,null,gate)).customer.name,'علی رضایی');
+  const recipientOrder=(await orderFor('حسن رضایی','09121110003')).order;
+  assert.equal(recipientOrder.customerId,recipient.id);
   const secondBuyerOrder=(await orderFor('علی رضایی','09121110001')).order;
-  assert.equal(secondBuyerOrder.customerId,buyerId,'سفارش صاحب قبلی به پروندهٔ خودش وصل می‌شود');
+  assert.equal(secondBuyerOrder.customerId,buyerId);
 
   // قلم «عدم موجودی» در سند انبار و فاکتور تسویه نمی‌آید.
   const docOrder=(await ok('POST','/api/orders/remote',{name:'مشتری ناموجود',phone:'09121110002',dispatchPlace:'خیابان مدرس',scheduledDate:day,scheduledAt:`${day}T00:00`,deliveryMode:'PICKUP',items:[{productId:'p01',requestedQty:5,requestedUnit:'کیلوگرم'},{productId:'p02',requestedQty:2,requestedUnit:'کیلوگرم'}]},sales,201)).order;
@@ -120,7 +112,7 @@ test('کارتابل‌ها فقط «محل ارسال» را نشان می‌د
  assert.equal(core.namesCompatible('محمد','محمد احمدی'),true);
  assert.equal(core.namesCompatible('حسن','حسین'),false);
  const db={customers:[{id:'1',code:'00001',name:'علی رضایی',phone:'09121110001',plate:'12ب345-67'}]};
- assert.equal(core.findExisting(db,{phone:'09121110001',name:'حسن رضایی'}),null,'شمارهٔ شخص دیگر، پروندهٔ صاحب قبلی را برنمی‌گرداند');
+ assert.equal(core.findExisting(db,{phone:'09121110001',name:'حسن رضایی'}).id,'1');
  assert.equal(core.findExisting(db,{phone:'09121110001',name:'علی رضایی'}).id,'1');
  assert.equal(core.findExisting(db,{plate:'12ب345-67',name:'حسن رضایی'}),null);
 });
