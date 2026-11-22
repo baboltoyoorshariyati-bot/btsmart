@@ -1297,7 +1297,7 @@ function wh38StoreList(orders,kind){
       :`<button type="button" class="btn btn-primary btn-sm" data-action="wh38-start" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات آماده‌سازی</button>`;
     return `<tr data-store-order="${esc(o.id)}"><td data-label="فروشگاه / مشتری"><div class="wh38-store-table-identity"><strong title="${esc(store)}">${esc(store)}</strong><small>${esc(identity)}</small></div></td><td data-label="شماره سفارش"><span class="order-code">${esc(fa(o.orderNo||'—'))}</span></td><td data-label="نوع سفارش">${orderKind}</td><td data-label="تاریخ ثبت"><time title="${esc(created)}">${esc(created)}</time>${scheduled?`<small class="wh38-store-table-scheduled">ارسال: ${esc(scheduled)}</small>`:''}</td><td data-label="وضعیت">${badge(o.status)}</td><td data-label="محل ارسال">${esc(String(o.dispatchPlace||'').trim()||'—')}</td><td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td><td data-label="اقدامات"><div class="wh38-store-table-actions">${action}</div></td></tr>`;
   }).join('');
-  return `<div class="wh38-store-list wh38-store-table-wrap"><table class="wh38-store-table wh38-store-${incoming?'incoming':'preparing'}"><thead><tr><th>فروشگاه / مشتری</th><th>شماره سفارش</th><th>نوع سفارش</th><th>تاریخ ثبت</th><th>وضعیت</th><th>محل ارسال</th><th>اقلام</th><th>اقدامات</th></tr></thead><tbody>${rows||'<tr><td colspan="8">سفارشی برای نمایش وجود ندارد.</td></tr>'}</tbody></table></div>`;
+  return wh38StockPreviewLinks(orders)+`<div class="wh38-store-list wh38-store-table-wrap"><table class="wh38-store-table wh38-store-${incoming?'incoming':'preparing'}"><thead><tr><th>فروشگاه / مشتری</th><th>شماره سفارش</th><th>نوع سفارش</th><th>تاریخ ثبت</th><th>وضعیت</th><th>محل ارسال</th><th>اقلام</th><th>اقدامات</th></tr></thead><tbody>${rows||'<tr><td colspan="8">سفارشی برای نمایش وجود ندارد.</td></tr>'}</tbody></table></div>`;
 }
 /* v37.22.0 — جزئیات کامل سفارش ورودی فروشگاه در انبار؛ تأیید در پایان فهرست اقلام و ورود به آماده‌سازی */
 /* v37.35.0 — همان فرم، فشرده: سربرگ و مشخصات در دو خط، برچسب ستون‌ها فقط در سطر عنوان،
@@ -1324,6 +1324,26 @@ async function wh38AcceptFromDetails(id,btn){
     await refreshIndicators();
     if(app.wh38.phase==='stores') wh38Paint('stores');
   }catch(e){ toast(e.message); if(btn)btn.disabled=false; }
+}
+// Informational only: this is not an operational service, a document, or a
+// weight-entry form. The server recomputes the complete branch view on click.
+function wh38StockPreviewLinks(orders){
+ const branches=[...new Set(orders.filter(o=>o.orderType==='STORE'&&o.storeOrderKind==='PARTIAL'&&o.storePurpose==='STOCK'&&!o.customerId).map(o=>Number(o.branchNo)).filter(n=>Number.isInteger(n)&&n>=1&&n<=59))].sort((a,b)=>a-b);
+ if(!branches.length)return '';
+ return `<section class="sd-panel" aria-label="پیش‌نمایش فقط خواندنی درخواست‌ها"><h3>پیش‌نمایش درخواست‌های تکمیل فروشگاه</h3><p>فقط محاسبهٔ اطلاعات است؛ سفارش‌ها هنوز جداگانه پردازش می‌شوند و سند یا سرویس مشترک صادر نشده است.</p><div class="wh-stock-preview-links">${branches.map(branch=>`<button type="button" class="btn btn-secondary btn-sm" data-action="wh-stock-preview" data-branch="${branch}">پیش‌نمایش شعبه ${esc(fa(branch))}</button>`).join('')}</div></section>`;
+}
+function wh38StockPreviewHtml(preview){
+ const lines=(preview.products||[]).map(line=>{
+  const quantities=(line.amounts||[]).map(a=>`${esc(fa(String(a.quantity)))} ${esc(a.unit)}`).join('، ');
+  const sources=(line.sources||[]).map(s=>`<li>سفارش ${esc(fa(s.orderNo||'—'))}: ${esc(fa(String(s.requestedQty)))} ${esc(s.requestedUnit||'')}${s.description?' — '+esc(s.description):''}</li>`).join('');
+  return `<tr><td data-label="محصول">${esc(line.productName||'—')}</td><td data-label="درخواست">${quantities||'—'}</td><td data-label="وزن ثبت‌شده">${esc(fa(String(line.weightKg||0)))} کیلوگرم</td><td data-label="منشأ"><details><summary>درخواست‌های اصلی (${esc(fa((line.sources||[]).length))})</summary><ul>${sources}</ul></details></td></tr>`;
+ }).join('');
+ return `<section class="sd-panel wh-stock-preview" aria-label="پیش‌نمایش فقط خواندنی"><p><b>فقط پیش‌نمایش:</b> این محاسبه سرویس یا سند مشترک نیست و وزن‌کشی و تحویل را ثبت نمی‌کند. سفارش‌ها در گردش فعلی جداگانه پردازش می‌شوند.</p><p>شعبه ${esc(fa(preview.branchNo))} — ${esc(fa((preview.orderIds||[]).length))} سفارش تأییدشده و آمادهٔ انبار؛ سفارش‌های در انتظار تأیید یا زمان‌بندی‌شده در این نما نیستند.</p>${lines?`<div class="bt-table-wrap"><table class="bt-table"><thead><tr><th>محصول</th><th>درخواست به تفکیک واحد</th><th>وزن ثبت‌شدهٔ فعلی</th><th>منشأ درخواست</th></tr></thead><tbody>${lines}</tbody></table></div>`:'<p>در حال حاضر سفارش واجد شرایطی برای نمایش وجود ندارد.</p>'}<div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button></div></section>`;
+}
+async function wh38StockPreview(branch){
+ const n=Number(branch);if(!Number.isInteger(n)||n<1||n>59)return toast('شماره شعبه معتبر نیست.');
+ try{const data=await api('/api/store-stock-consolidation/branches/'+n+'/preview');if(data.readOnly!==true||!data.preview)throw new Error('پیش‌نمایش معتبر نیست.');openModal('پیش‌نمایش فقط خواندنی شعبه '+fa(n),wh38StockPreviewHtml(data.preview));}
+ catch(e){toast(e.message||'پیش‌نمایش در دسترس نیست.');}
 }
 function wh38List(orders,kind){
  if(!orders.length)return sdEmpty(kind==='incoming'?'truck':'scale',kind==='incoming'?'سفارش ورودی جدیدی نیست':'سفارشی در مرحله آماده‌سازی نیست','');
@@ -1597,6 +1617,7 @@ function wh38Shell(phase){
     const a=el.dataset.action, id=el.dataset.id;
     try{
       if(a==='pickup-cancel'){ const reason=prompt('دلیل انصراف را وارد کنید:');if(!reason?.trim())return;if(!confirm('آیا انبار تأیید می‌کند هیچ کالایی به این مراجعه تحویل نشده است؟'))return;el.disabled=true;await api('/api/pickup/'+encodeURIComponent(id)+'/cancellation',{method:'POST',body:JSON.stringify({reason,confirmedNoGoods:true})});toast('عدم تحویل ثبت شد و در انتظار تأیید فروش است.');await refreshIndicators();wh38Shell(app.wh38.phase);return;}
+      if(a==='wh-stock-preview')return wh38StockPreview(el.dataset.branch);
       if(a==='wh-history-document')return whDeliveredDetails(id);
       if(a==='wh-history-store-document')return whStoreDocumentDetails(id,Number(el.dataset.run)||1);
       if(a==='wh-delivered-details'){ return whDeliveredDetails(id); }
