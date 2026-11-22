@@ -492,10 +492,10 @@ function startGateDispatchLive() {
     busy=true;const tab=app.sub.gate;
     try{
       const historyQ=tab==='history'?(app.gateHistoryQ||''):'';
-      const [dispatch,rows,pickup]=await Promise.all([api('/api/gate/dispatch'),tab==='exit'?fetchPagedList('/api/orders?status=SETTLED','orders'):api('/api/visits'+(historyQ?'?q='+encodeURIComponent(historyQ):'')),tab==='exit'&&app.features?.pickupStaging?fetchPagedList('/api/pickup/active','orders'):Promise.resolve({orders:[]})]);
+      const [dispatch,rows,pickup,cancelled]=await Promise.all([api('/api/gate/dispatch'),tab==='exit'?fetchPagedList('/api/orders?status=SETTLED','orders'):api('/api/visits'+(historyQ?'?q='+encodeURIComponent(historyQ):'')),tab==='exit'&&app.features?.pickupStaging?fetchPagedList('/api/pickup/active','orders'):Promise.resolve({orders:[]}),tab==='exit'?fetchPagedList('/api/visits?status=CANCELLED_EXIT_PENDING','visits'):Promise.resolve({visits:[]})]);
       if(app.page!=='gate'||app.gateRenderSeq!==seq||app.sub.gate!==tab||(tab==='history'&&historyQ!==(app.gateHistoryQ||'')))return;
       const sig=JSON.stringify(dispatch);if(sig!==dsp.sigs.gate){dsp.sigs.gate=sig;updateGateDispatchInCartable(dispatch);}
-      const rowSig=JSON.stringify(tab==='exit'?[rows,pickup]:rows);
+      const rowSig=JSON.stringify(tab==='exit'?[rows,pickup,cancelled]:rows);
       if(rowSig!==lastRows){
         if(tab==='waiting'){
           const queue=(rows.visits||[]).filter(v=>v.status==='WAITING_SALES');
@@ -504,7 +504,7 @@ function startGateDispatchLive() {
         }else if(tab==='history'){
           const host=$('#gateHistoryLive');if(host)host.innerHTML=renderGateHistory(rows.visits||[],true);
         }else if(tab==='exit'){
-          app.gateExitPickups=pickup.orders||[];const temp=document.createElement('div');temp.innerHTML=renderGateExit(rows.orders||[],app.gateExitPickups);
+          app.gateExitPickups=pickup.orders||[];const temp=document.createElement('div');temp.innerHTML=renderGateExit(rows.orders||[],app.gateExitPickups,cancelled.visits||[]);
           const list=$('#gateExitRows');if(list)list.innerHTML=temp.querySelector('#gateExitRows').innerHTML;
           const count=$('#content .sd-count strong'),fresh=temp.querySelector('.sd-count strong');if(count&&fresh)count.textContent=fresh.textContent;
         }

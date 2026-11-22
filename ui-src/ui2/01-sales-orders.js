@@ -72,7 +72,7 @@ function salesOnsiteRowsV25(visits){
     <td data-label="نام مشتری"><span class="bt-cell-main">${esc(v.customer?.name||'—')}</span></td>
     <td data-label="نوع خودرو">${esc(v.vehicleType||v.customer?.vehicleType||'—')}</td>
     <td data-label="زمان ورود">${formatDateTime24(v.createdAt)}</td>
-    <td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-primary btn-sm" data-action="open-order" data-id="${esc(v.id)}">ثبت سفارش ${icon('arrow',14)}</button></td>
+    <td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-primary btn-sm" data-action="open-order" data-id="${esc(v.id)}">ثبت سفارش ${icon('arrow',14)}</button> <button type="button" class="btn btn-secondary btn-sm" data-action="cancel-onsite" data-id="${esc(v.id)}">لغو مراجعه</button></td>
   </tr>`).join('');
   return `<div class="bt-table-wrap"><table class="bt-table sd-queue-table"><thead><tr><th>نام مشتری</th><th>نوع خودرو</th><th>زمان ورود</th><th>عملیات</th></tr></thead><tbody>${rows||`<tr><td colspan="4">${sdEmpty('user','صف حضوری خالی است','با ثبت مراجعه جدید در نگهبانی، مشتری در این فهرست قرار می‌گیرد.')}</td></tr>`}</tbody></table></div>`;
 }
@@ -272,7 +272,7 @@ async function pickupApprove(id,button){
 }
 function sdFlowCard(o,idx){
  const items=activeItemsOf(o);
- const actions=`<button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>${pickupSalesActions(o)}${o.status==='RETURNED_TO_SALES'&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button class="btn btn-secondary btn-sm" data-action="edit-returned-order" data-id="${esc(o.id)}">${icon('edit',14)} اصلاح سفارش</button><button class="btn btn-primary btn-sm" data-action="resubmit-order" data-id="${esc(o.id)}">${icon('send',14)} ارسال مجدد به انبار</button>`:''}`;
+ const actions=`<button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>${pickupSalesActions(o)}${o.orderType==='ONSITE'&&o.visitId?`<button type="button" class="btn btn-secondary btn-sm" data-action="cancel-onsite" data-id="${esc(o.visitId)}">لغو سفارش حضوری</button>`:''}${o.status==='RETURNED_TO_SALES'&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button class="btn btn-secondary btn-sm" data-action="edit-returned-order" data-id="${esc(o.id)}">${icon('edit',14)} اصلاح سفارش</button><button class="btn btn-primary btn-sm" data-action="resubmit-order" data-id="${esc(o.id)}">${icon('send',14)} ارسال مجدد به انبار</button>`:''}`;
  return `<tr class="sd-flow-row ${sdStatusAccent(o.status)}" data-order="${esc(o.id)}">
    <td data-label="نام مشتری"><span class="bt-cell-main"><strong>${esc(storeAwareOrderName(o)||'—')}</strong></span></td>
    <td data-label="شماره سفارش"><bdi>${esc(fa(o.orderNo||'—'))}</bdi></td>

@@ -1,0 +1,32 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const {spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),net=require('node:net');
+test('onsite cancellation at both stages requires sales, then a gate no-goods exit', {timeout:60000},async()=>{
+ const port=await new Promise(r=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>r(p));});});
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-onsite-cancel-')),base=`http://127.0.0.1:${port}`;
+ const proc=spawn(process.execPath,['server.js'],{cwd:path.join(__dirname,'..'),env:{...process.env,PORT:String(port),HOST:'127.0.0.1',DATA_DIR:dir,ADMIN_INITIAL_PASSWORD:'Initial!2345',BT_EXPERIMENTAL_TRANSPORT_WORKFLOW:'0'},stdio:['ignore','pipe','pipe']});
+ try{
+  await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(Error('startup timeout')),15000);proc.stdout.on('data',d=>{if(String(d).includes('"listening"')){clearTimeout(t);resolve();}});proc.once('exit',c=>reject(Error('exit '+c)));});
+  async function call(method,url,body,cookie=''){const r=await fetch(base+url,{method,headers:{...(cookie?{cookie}:{}),...(body?{'content-type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});return {status:r.status,data:await r.json(),cookie:(r.headers.get('set-cookie')||'').split(';')[0]};}
+  async function ok(method,url,body,cookie){const r=await call(method,url,body,cookie);assert(r.status>=200&&r.status<300,`${method} ${url}: ${r.status} ${JSON.stringify(r.data)}`);return r.data;}
+  const admin=(await call('POST','/api/login',{username:'admin',password:'Initial!2345'})).cookie;await ok('POST','/api/account/password',{currentPassword:'Initial!2345',newPassword:'Changed!2345'},admin);
+  for(const role of ['gate','warehouse','sales'])await ok('POST','/api/admin/users',{username:'cancel-'+role,roleCode:role,fullName:role,position:'تست',password:'Changed!2345',mustChangePassword:false},admin);
+  const cookies={};for(const role of ['gate','warehouse','sales'])cookies[role]=(await call('POST','/api/login',{username:'cancel-'+role,password:'Changed!2345'})).cookie;
+  const {gate,warehouse:wh,sales}=cookies;
+  const visit=async n=>(await ok('POST','/api/visits',{name:'مشتری تست',phone:'091211122'+String(n).padStart(2,'0'),noVehicle:true},gate)).visit;
+  const order=async v=>(await ok('POST','/api/orders',{visitId:v.id,items:[{productId:'p01',requestedQty:5,requestedUnit:'کیلوگرم'}]},sales)).order;
+  const cancel=v=>`/api/visits/${v.id}/cancel-onsite`, exit=v=>`/api/visits/${v.id}/cancelled-exit`, payload={reason:'انصراف مشتری',confirmedNoGoods:true};
+  const v=await visit(1);assert.equal((await call('POST',cancel(v),payload,gate)).status,403);assert.equal((await call('POST',cancel(v),{...payload,reason:' '},sales)).status,400);assert.equal((await call('POST',cancel(v),{reason:'انصراف'},sales)).status,400);
+  const countBefore=(await ok('GET','/api/workload',null,gate)).counts.gateExit;await ok('POST',cancel(v),payload,sales);assert.equal((await ok('GET','/api/workload',null,gate)).counts.gateExit,countBefore+1);assert.equal((await call('POST','/api/orders',{visitId:v.id,items:[{productId:'p01',requestedQty:1,requestedUnit:'کیلوگرم'}]},sales)).status,409);
+  assert((await ok('GET','/api/visits?status=CANCELLED_EXIT_PENDING',null,gate)).visits.some(x=>x.id===v.id));assert((await ok('GET','/api/notifications',null,gate)).notifications.some(n=>n.entityId===v.id&&n.navSection==='exit'));
+  assert.equal((await call('POST',exit(v),{confirmedNoGoods:true},sales)).status,403);assert.equal((await call('POST',exit(v),{},gate)).status,400);await ok('POST',exit(v),{confirmedNoGoods:true},gate);assert.equal((await call('POST',exit(v),{confirmedNoGoods:true},gate)).status,409);
+  assert.equal((await ok('GET','/api/workload',null,gate)).counts.gateExit,countBefore);
+  let saved=(await ok('GET','/api/visits?id='+v.id,null,gate)).visits[0];assert.equal(saved.status,'EXITED');assert.equal(saved.exitReason,'CANCELLATION');
+  const v2=await visit(2),o2=await order(v2);await ok('POST',`/api/orders/${o2.id}/warehouse/accept`,{},wh);await ok('POST',cancel(v2),payload,sales);
+  const cancelled=(await ok('GET',`/api/orders/${o2.id}`,null,sales)).order;assert.equal(cancelled.status,'CANCELLED');assert.equal(cancelled.items[0].requestedQty,5);assert.equal((await call('POST',`/api/orders/${o2.id}/warehouse`,{items:[{itemId:o2.items[0].id,deliveredKg:5}]},wh)).status,409);await ok('POST',exit(v2),{confirmedNoGoods:true},gate);assert.equal((await ok('GET',`/api/orders/${o2.id}`,null,sales)).order.status,'CANCELLED');
+  const events=(await ok('GET',`/api/admin/audit?entityId=${v2.id}&limit=200`,null,admin)).audit;assert(events.some(e=>e.action==='CANCEL_ONSITE_VISIT'&&e.details.reason===payload.reason));assert(events.some(e=>e.action==='CANCEL_ONSITE_EXIT'&&e.details.confirmedNoGoods===true));const orderEvents=(await ok('GET',`/api/admin/audit?entityId=${o2.id}&limit=200`,null,admin)).audit;assert(orderEvents.some(e=>e.action==='CANCEL_ONSITE_ORDER'));assert.equal((await ok('GET','/api/admin/audit/verify',null,admin)).ok,true);
+  const v3=await visit(3),o3=await order(v3);await ok('POST',`/api/orders/${o3.id}/warehouse/accept`,{},wh);await ok('POST',`/api/orders/${o3.id}/warehouse/start-preparing`,{},wh);await ok('POST',`/api/orders/${o3.id}/warehouse`,{items:[{itemId:o3.items[0].id,deliveredKg:5}]},wh);assert.equal((await call('POST',cancel(v3),payload,sales)).status,409);
+  const vr=await visit(5),or=await order(vr);await ok('POST',`/api/orders/${or.id}/warehouse/accept`,{},wh);await ok('POST',`/api/orders/${or.id}/warehouse/start-preparing`,{},wh);const [cr,fr]=await Promise.all([call('POST',cancel(vr),payload,sales),call('POST',`/api/orders/${or.id}/warehouse`,{items:[{itemId:or.items[0].id,deliveredKg:5}]},wh)]);assert.equal(Number(cr.status===200)+Number(fr.status===200),1,JSON.stringify([cr,fr]));assert.equal(cr.status===200?fr.status:cr.status,409);
+  const v4=await visit(4);const [a,b]=await Promise.all([call('POST',cancel(v4),payload,sales),call('POST','/api/orders',{visitId:v4.id,items:[{productId:'p01',requestedQty:1,requestedUnit:'کیلوگرم'}]},sales)]);assert.equal(Number(a.status===200)+Number(b.status===201),1,JSON.stringify([a,b]));
+ }finally{if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
+});

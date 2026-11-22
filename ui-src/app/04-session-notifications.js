@@ -8,7 +8,7 @@ function showAppView(){
   $('#loginView')?.classList.add('hidden');
   $('#appView')?.classList.remove('hidden');
 }
-// A page has a fresh tab id even after reload; pagehide is best effort, lease is the fallback.
+// Each page has a fresh tab id; pagehide is best effort and reloads receive a short grace.
 const browserTabId = newIdempotencyKey();
 let browserPresenceTimer = null;
 function browserPresence(){
@@ -187,6 +187,8 @@ document.addEventListener('click',e=>{ if(e.target.closest?.('#changePasswordBtn
 /* ---------- اعلان‌ها: پنل زیر زنگوله، ناوبری به کارتابل مربوط، صدا و هشدار ---------- */
 const NOTIF_ROUTES={
   NEW_VISIT:{page:'sales',sub:'onsite'},
+  ONSITE_CANCELLATION_EXIT:{page:'gate',sub:'exit'},
+  ONSITE_ORDER_CANCELLED:{page:'warehouse',sub:'incoming'},
   PICKUP_ENTRY:{page:'warehouse',sub:'incoming'},
   PICKUP_CANCELLATION_REQUESTED:{page:'sales',sub:'flow'},
   PICKUP_CANCELLATION_APPROVED:{page:'gate',sub:'exit'},
@@ -419,6 +421,11 @@ async function openNotificationTarget(id,type,role,entityType,entityId){
   if(!entityId||!entityType){await go(route.page,route.sub);toast('شناسهٔ مورد در این اعلان قدیمی موجود نیست.');return;}
   app.notifNavigationDepth=(app.notifNavigationDepth||0)+1;
   try{
+    if(type==='ONSITE_ORDER_CANCELLED'&&route.page==='warehouse'){await go('warehouse','incoming');toast('سفارش لغوشده از صف انبار حذف شده است.');return finish(true);}
+    if(type==='ONSITE_CANCELLATION_EXIT'&&entityType==='visit'){
+      await go('gate','exit');const el=document.querySelector(`[data-cancelled-visit="${CSS.escape(entityId)}"]`);
+      if(focusNotificationElement(el))return finish(true);return toast('این خروج دیگر در صف نگهبانی نیست.');
+    }
     if(entityType==='visit'){
       const visits=(await api('/api/visits?id='+encodeURIComponent(entityId))).visits||[];
       const visit=visits.find(v=>v.id===entityId);

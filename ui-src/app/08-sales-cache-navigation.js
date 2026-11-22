@@ -307,6 +307,7 @@ async function salesV29ClickHandler(e){
   if(!el || !content.contains(el))return;
   const a=el.dataset.action;
   try{
+    if(a==='cancel-onsite')return cancelOnsiteVisit(el.dataset.id,el);
     if(a==='open-order')return openOrder(el.dataset.id);
     if(a==='back-order-intake'){app.orderDraft=[];return renderSales('onsite');}
     if(a==='submit-order')return submitOrder(el.dataset.id);
@@ -578,3 +579,13 @@ document.addEventListener('click',e=>{
    ================================================================ */
 app.stl = app.stl || {orderId:null, order:null, items:[], drivers:[], devices:[], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false, dispatchBusy:false, paymentRows:[{type:'CASH',amount:''}]};
 const stl = app.stl;
+
+async function cancelOnsiteVisit(id,button){
+ const reason=prompt('دلیل لغو مراجعه یا سفارش را وارد کنید:');
+ if(reason===null)return;
+ if(!reason.trim())return toast('دلیل لغو الزامی است.');
+ if(!confirm('آیا مطمئن هستید هیچ کالایی به مشتری تحویل نشده است؟ مراجعه برای ثبت خروج بدون کالا به نگهبانی ارجاع می‌شود.'))return;
+ if(button.disabled)return;button.disabled=true;
+ try{await api('/api/visits/'+encodeURIComponent(id)+'/cancel-onsite',{method:'POST',body:JSON.stringify({reason:reason.trim(),confirmedNoGoods:true})});toast('لغو ثبت شد؛ مشتری برای خروج بدون کالا به نگهبانی مراجعه کند.');app.orderDraft=[];await fetchSalesCache(true);await renderSales(app.sub.sales);}
+ catch(e){toast(e.message);}finally{button.disabled=false;}
+}

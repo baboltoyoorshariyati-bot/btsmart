@@ -46,13 +46,14 @@ async function renderGate(tab){
   try{dispatchData=await api('/api/gate/dispatch');}
   catch(err){dispatchError=err.message||'صف خروج ارسالی بارگذاری نشد.';}
   const exitOrders=tab==='exit'?(await fetchPagedList('/api/orders?status=SETTLED','orders')).orders:[];
+  const cancelledVisits=tab==='exit'?(await fetchPagedList('/api/visits?status=CANCELLED_EXIT_PENDING','visits')).visits:[];
   const pickupExits=tab==='exit'&&app.features?.pickupStaging?(await fetchPagedList('/api/pickup/active','orders')).orders:[];
   if(app.page!=='gate'||app.sub.gate!==tab||app.gateRenderSeq!==renderSeq)return;
   let html='<span class="gate-ui-build" data-ui-build="37.3.18" hidden></span><div class="gate-workspace-content">';
   if(tab==='entry')html+=renderGateEntry();
   else if(tab==='waiting')html+=renderGateWaiting(visits.filter(v=>v.status==='WAITING_SALES'));
   else if(tab==='history')html+=`<div class="gate-history-search"><label for="gateHistorySearch">جستجوی سوابق مراجعه</label><input id="gateHistorySearch" type="search" maxlength="80" value="${esc(app.gateHistoryQ||'')}" placeholder="نام، شماره تماس، پلاک، کد یا شماره سفارش" autocomplete="off"><small>آخرین ۱۰۰ نتیجه نمایش داده می‌شود.</small></div><div id="gateHistoryLive" aria-live="polite">${renderGateHistory(visits,true)}</div>`;
-  else if(tab==='exit'){app.gateExitPickups=pickupExits;html+=renderGateExit(exitOrders,pickupExits);}
+  else if(tab==='exit'){app.gateExitPickups=pickupExits;html+=renderGateExit(exitOrders,pickupExits,cancelledVisits);}
   else if(tab==='dispatch'){app.gateDispatchTab='leaving';html+=gateDispatchTabsHtml(dispatchData,app.gateDispatchTab,dispatchError);}
   html+='</div>';
   $('#content').innerHTML=html; bindGate(tab); if(tab==='entry')bindPlate();
@@ -124,15 +125,18 @@ function gatePickupExitRow(o){
  const recipient=o.recipient||{},cancelled=o.cancellation?.status==='EXIT_APPROVED';
  return `<tr data-order="${esc(o.id)}" data-pickup-exit="${esc(o.id)}"><td data-label="مشتری">${esc(o.customerName||'—')}<small class="gt-pickup-recipient">تحویل‌گیرنده: ${esc(recipient.name||'—')}</small></td><td data-label="شماره و تاریخ سفارش">${esc(fa(o.orderNo||'—'))} • ${esc(dt(o.enteredAt))}</td><td data-label="پلاک">${plateViewHtml(recipient.plate,'بدون پلاک',true)}</td><td data-label="شماره تماس">${esc(fa(recipient.phone||o.customerPhone||'—'))}</td><td data-label="تعداد اقلام">${cancelled?'خروج بدون کالا':qty((o.items||[]).length)+' قلم'}</td><td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-success btn-sm" data-action="open-pickup-exit" data-id="${esc(o.id)}">${icon('check',14)} ثبت خروج</button></td></tr>`;
 }
-function gateExitTable(rows,pickups=[]){
- if(!rows.length&&!pickups.length)return '';
- return `<div class="bt-table-wrap"><table class="bt-table gt-exit-table"><caption class="bt-caption">سفارش‌های آماده خروج</caption><thead><tr><th scope="col">مشتری</th><th scope="col">شماره و تاریخ سفارش</th><th scope="col">پلاک</th><th scope="col">شماره تماس</th><th scope="col">تعداد اقلام</th><th scope="col">عملیات</th></tr></thead><tbody>${rows.map(gateExitRow).join('')}${pickups.map(gatePickupExitRow).join('')}</tbody></table></div>`;
+function gateCancelledVisitRow(v){
+ return `<tr data-cancelled-visit="${esc(v.id)}"><td data-label="مشتری">${esc(v.customer?.name||'—')}</td><td data-label="شماره و تاریخ سفارش">${esc(fa(v.order?.orderNo||'بدون سفارش'))} • ${esc(dt(v.createdAt))}</td><td data-label="پلاک">${plateViewHtml(v.plate||v.customer?.plate,'بدون پلاک',true)}</td><td data-label="شماره تماس">${esc(fa(v.customer?.phone||'—'))}</td><td data-label="تعداد اقلام">لغو؛ خروج بدون کالا</td><td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-success btn-sm" data-action="cancelled-onsite-exit" data-id="${esc(v.id)}">کنترل و ثبت خروج</button></td></tr>`;
 }
-function renderGateExit(orders,pickups=[]){
+function gateExitTable(rows,pickups=[],cancelled=[]){
+ if(!rows.length&&!pickups.length&&!cancelled.length)return '';
+ return `<div class="bt-table-wrap"><table class="bt-table gt-exit-table"><caption class="bt-caption">سفارش‌های آماده خروج</caption><thead><tr><th scope="col">مشتری</th><th scope="col">شماره و تاریخ سفارش</th><th scope="col">پلاک</th><th scope="col">شماره تماس</th><th scope="col">تعداد اقلام</th><th scope="col">عملیات</th></tr></thead><tbody>${rows.map(gateExitRow).join('')}${pickups.map(gatePickupExitRow).join('')}${cancelled.map(gateCancelledVisitRow).join('')}</tbody></table></div>`;
+}
+function renderGateExit(orders,pickups=[],cancelled=[]){
  const activeIds=new Set(pickups.map(o=>o.id));
  const regular=orders.filter(o=>!activeIds.has(o.id));
  const ready=pickups.filter(o=>o.cancellation?.status==='EXIT_APPROVED'||(o.status==='SETTLED'&&o.handover));
- return `<section class="sd-panel gt-exit-panel"><div class="sd-head"><div class="sd-head-main"><span class="sd-head-ico" style="background:var(--green-bg);color:var(--green)">${icon('check',19)}</span><div><h2>سفارش‌های آماده خروج</h2><p>اقلام و وزن سفارش‌های مجاز به خروج را با بار واقعی تطبیق دهید.</p></div></div><div class="sd-count"><strong>${qty(regular.length+ready.length)}</strong><span>آماده</span></div></div><div class="gt-exit-list" id="gateExitRows">${gateExitTable(regular,ready)||sdEmpty('check','سفارشی آماده خروج نیست','پس از تسویه یا تأیید انصراف، سفارش برای کنترل خروج اینجا قرار می‌گیرد.')}</div><div id="exitEditor" style="padding:0 20px 20px"></div></section>`;
+ return `<section class="sd-panel gt-exit-panel"><div class="sd-head"><div class="sd-head-main"><span class="sd-head-ico" style="background:var(--green-bg);color:var(--green)">${icon('check',19)}</span><div><h2>سفارش‌های آماده خروج</h2><p>اقلام و وزن سفارش‌های مجاز به خروج را با بار واقعی تطبیق دهید.</p></div></div><div class="sd-count"><strong>${qty(regular.length+ready.length+cancelled.length)}</strong><span>آماده</span></div></div><div class="gt-exit-list" id="gateExitRows">${gateExitTable(regular,ready,cancelled)||sdEmpty('check','سفارشی آماده خروج نیست','پس از تسویه یا تأیید انصراف، سفارش برای کنترل خروج اینجا قرار می‌گیرد.')}</div><div id="exitEditor" style="padding:0 20px 20px"></div></section>`;
 }
 async function openPickupExit(id,btn){
  const host=$('#exitEditor');if(!host)return;const seq=app.gateExitEditorSeq=(Number(app.gateExitEditorSeq)||0)+1;
@@ -173,6 +177,7 @@ function bindGate(tab){
     if(a==='pickup-goods-exit'||a==='pickup-cancellation-exit')return confirmPickupExit(el);
     if(a==='open-pickup-exit')return openPickupExit(el.dataset.id,el);
     if(a==='gate-order-history')return gateOrderHistory(el.dataset.id);
+    if(a==='cancelled-onsite-exit')return confirmCancelledOnsiteExit(el);
     if(a==='open-exit')return openExit(el.dataset.id,el);
     if(a==='confirm-exit')return confirmExit(el.dataset.id);
     if(a==='pick-customer')return pickCustomer(Number(el.dataset.index));
@@ -355,4 +360,11 @@ async function warehouseVisitOrderHistory(id){
   if(!result.order)throw Error('جزئیات سفارش در دسترس نیست.');
   openVisitOrderDetailsModal(result.order,result.records||[]);
  }catch(e){toast(e.message);}
+}
+
+async function confirmCancelledOnsiteExit(button){
+ if(!confirm('آیا مشتری و وسیله را کنترل کرده‌اید و خروج بدون کالا را تأیید می‌کنید؟'))return;
+ if(button.disabled)return;button.disabled=true;
+ try{await api('/api/visits/'+encodeURIComponent(button.dataset.id)+'/cancelled-exit',{method:'POST',body:JSON.stringify({confirmedNoGoods:true})});toast('خروج بدون کالا ثبت شد.');await renderGate('exit');}
+ catch(e){toast(e.message);}finally{button.disabled=false;}
 }

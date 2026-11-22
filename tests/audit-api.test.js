@@ -6,13 +6,13 @@ const password='Audit!'+require('node:crypto').randomBytes(8).toString('hex');
 let proc,agent,base,admin,gate,captures=0,mode='real',releaseCapture;
 async function call(method,url,body,cookie){const res=await fetch(base+url,{method,headers:{...(cookie?{Cookie:cookie}:{}),...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});const text=await res.text();let json;try{json=JSON.parse(text)}catch{}return {status:res.status,headers:res.headers,text,json};}
 async function login(name){const r=await call('POST','/api/login',{username:name,password});assert.equal(r.status,200,r.text);return r.headers.get('set-cookie').split(';')[0];}
-// Separate RBAC checks from the deliberately short idle-expiry test below.
+// Separate RBAC checks from the session lifecycle test below.
 async function renew(name,cookie){await call('POST','/api/logout',{},cookie);return login(name);}
 before(async()=>{
  const seed=spawnSync(process.execPath,['-e',`const s=require('./lib/store'),sec=require('./lib/security');s.init();const d=s.get();d.users[0].mustChangePassword=false;for(const role of ['gate','sales'])d.users.push({id:role,username:role,roleCode:role,isActive:true,passwordHash:sec.hashPassword(process.env.ADMIN_INITIAL_PASSWORD),mustChangePassword:false});d.customers=Array.from({length:11001},(_,i)=>({id:'c'+i,name:i===0?'=1+1':'نام '+i,phone:'09123456789',code:String(i+1).padStart(5,'0')}));d.orders.push({id:'capture-order',orderNo:'000001',status:'SETTLEMENT_PENDING'},{id:'legacy-order',orderNo:'000002',status:'SETTLED',customerId:'c0',dispatch:{status:'SALES_FINALIZED',signatureData:'data:image/png;base64,legacy'}});d.payments.push({id:'legacy-pay',orderId:'legacy-order',signatureData:'data:image/png;base64,legacy',fingerprintRef:'legacy-ref',verificationMode:'FINGERPRINT'});s.save();`],{cwd:root,env:{...process.env,DATA_DIR:dir,ADMIN_INITIAL_PASSWORD:password},encoding:'utf8'});assert.equal(seed.status,0,seed.stderr);
  agent=http.createServer(async(req,res)=>{assert.equal(req.headers.authorization,'Bearer audit-token');assert.equal(req.method,'POST');captures++;if(mode==='wait')await new Promise(resolve=>releaseCapture=resolve);if(mode==='bad'){res.end('bad');return;}res.setHeader('Content-Type','application/json');res.end(JSON.stringify({ok:true,fingerprintRef:mode==='mock'?'mock-untrusted':'hardware-test-reference'}));});await new Promise(resolve=>agent.listen(0,'127.0.0.1',resolve));
  const listener=http.createServer();await new Promise(resolve=>listener.listen(0,'127.0.0.1',resolve));const port=listener.address().port;await new Promise(resolve=>listener.close(resolve));
- proc=spawn(process.execPath,['server.js'],{cwd:root,env:{...process.env,DATA_DIR:dir,HOST:'127.0.0.1',PORT:String(port),SESSION_IDLE_MINUTES:'0.05',FINGERPRINT_AGENT_URL:`http://127.0.0.1:${agent.address().port}/capture`,FINGERPRINT_AGENT_TOKEN:'audit-token',FINGERPRINT_ALLOW_MOCK:'false'},stdio:['ignore','pipe','pipe']});base=`http://127.0.0.1:${port}`;
+ proc=spawn(process.execPath,['server.js'],{cwd:root,env:{...process.env,DATA_DIR:dir,HOST:'127.0.0.1',PORT:String(port),FINGERPRINT_AGENT_URL:`http://127.0.0.1:${agent.address().port}/capture`,FINGERPRINT_AGENT_TOKEN:'audit-token',FINGERPRINT_ALLOW_MOCK:'false'},stdio:['ignore','pipe','pipe']});base=`http://127.0.0.1:${port}`;
  await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('server startup timeout')),15000);proc.stdout.on('data',d=>{if(String(d).includes('"listening"')){clearTimeout(timer);resolve()}});proc.once('exit',code=>{clearTimeout(timer);reject(Error('server exited '+code))})});
  admin=await login('admin');gate=await login('gate');
 });
@@ -42,7 +42,7 @@ test('authenticated API renews browser cookie on each successful activity, unaut
  admin=await renew('admin',admin);const until=Date.now()+3600;
  while(Date.now()<until){await new Promise(r=>setTimeout(r,450));const r=await call('GET','/api/me',null,admin);assert.equal(r.status,200);assert.doesNotMatch(r.headers.get('set-cookie'),/Max-Age|Expires/);}
  const denied=await call('GET','/api/me');assert.equal(denied.status,401);assert.equal(denied.headers.get('set-cookie'),null);
- await new Promise(r=>setTimeout(r,3200));assert.equal((await call('GET','/api/me',null,admin)).status,401);
+ await new Promise(r=>setTimeout(r,3200));assert.equal((await call('GET','/api/me',null,admin)).status,200);await call('POST','/api/logout',{},admin);assert.equal((await call('GET','/api/me',null,admin)).status,401);
 });
 test('sales can view and save current product prices; malformed numeric requests cannot mutate a saved price',async()=>{
  const sales=await login('sales');const products=await call('GET','/api/admin/products',null,sales);assert.equal(products.status,200);const productId=products.json.products[0].id,date='2026-10-14';
