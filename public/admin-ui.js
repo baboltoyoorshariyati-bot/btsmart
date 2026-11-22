@@ -24,25 +24,26 @@ if(typeof plateViewHtml === 'undefined'){
   }
 }
 
-function admFormatPrice(v){ if(v==null||v==='') return ''; const s=en(String(v)).replace(/[^0-9]/g,''); const n=Number(s||0); if(!n) return '۰'; return new Intl.NumberFormat('fa-IR').format(n); }
-function admParsePrice(v){ const s=en(String(v||'')).replace(/[^0-9]/g,''); return Number(s||0); }
+function admParsePrice(v){
+ const s=en(String(v??'')).trim().replace(/٫/g,'.');
+ if(!/^(?:\d+|\d{1,3}(?:[,٬]\d{3})+)(?:\.\d+)?$/.test(s))return NaN;
+ return Number(s.replace(/[,٬]/g,''));
+}
+function admFormatPrice(v){
+ if(v==null||v==='')return '';const n=typeof v==='number'?v:admParsePrice(v);
+ return Number.isFinite(n)?new Intl.NumberFormat('fa-IR',{maximumFractionDigits:15}).format(n):String(v);
+}
 function admBindPriceInputs(root=document){
   $$('[data-price-for]', root).forEach(inp=>{
-    // initial format if value is plain number
-    if(inp.value && !/[٬,]/u.test(inp.value)) inp.value=admFormatPrice(inp.value);
     inp.addEventListener('input',()=>{
-      const start=inp.selectionStart, end=inp.selectionEnd, beforeLen=inp.value.length;
-      const num=admParsePrice(inp.value);
-      inp.value = num ? admFormatPrice(num) : '';
-      // try to keep cursor near end (simple)
-      const afterLen=inp.value.length;
-      const delta=afterLen-beforeLen;
-      try{ inp.setSelectionRange((start||0)+delta, (end||0)+delta); }catch{}
+      // Format only complete whole numbers; leave decimal and invalid text intact
+      // rather than silently changing the value the operator typed.
+      const raw=en(inp.value);if(!/^[\d,٬]+$/.test(raw))return;
+      const start=inp.selectionStart,end=inp.selectionEnd,beforeLen=inp.value.length;
+      inp.value=admFormatPrice(Number(raw.replace(/[,٬]/g,'')));const delta=inp.value.length-beforeLen;
+      try{inp.setSelectionRange((start||0)+delta,(end||0)+delta);}catch{}
     });
-    inp.addEventListener('blur',()=>{
-      const num=admParsePrice(inp.value);
-      inp.value = num ? admFormatPrice(num) : '';
-    });
+    inp.addEventListener('blur',()=>{const num=admParsePrice(inp.value);if(Number.isFinite(num))inp.value=admFormatPrice(num);});
   });
 }
 /* v37.3.1 — تاریخ محلی (مثل سرور lib/domain.js). toISOString تاریخ UTC می‌داد و در ایران بین ۰۰:۰۰ تا ۰۳:۳۰
@@ -330,34 +331,71 @@ async function renderProductsPage() {
   const page = app.page, sub = app.sub?.sales;
   const host = page === 'admin' ? $('#settings-products-content') : $('#content');
   if (!host || !(page === 'admin' || page === 'products' || (page === 'sales' && sub === 'products'))) return;
-  const [p, pr] = await Promise.all([api('/api/admin/products'), api('/api/prices?date=' + admToday())]);
+  const [p, pr, groupData] = await Promise.all([api('/api/admin/products'), api('/api/prices?date=' + admToday()), api('/api/admin/price-groups')]);
   if (app.page !== page || (page === 'sales' && app.sub?.sales !== sub) || !host.isConnected) return;
   const isAdmin = admIsCatalogAdmin();
   adm.products = p.products || [];
+  adm.priceGroups = groupData.groups || [];
   adm.todayPrices = Object.fromEntries((pr.prices || []).map((x) => [x.productId, x.price]));
   const active = adm.products.filter((x) => x.isActive);
   const priced = active.filter((x) => Number(adm.todayPrices[x.id]) > 0).length;
   const desc = isAdmin
-    ? `هر محصول را ثبت، ویرایش یا حذف کنید و قیمت امروز (${admTodayLabel()}) را جلوی آن تعیین کنید.`
-    : `محصول جدید ثبت کنید و قیمت امروز (${admTodayLabel()}) را وارد کنید (Enter هم ثبت می‌کند). نام، کد سریع، واحد و وضعیت محصول با «ویرایش» قابل تغییر است.`;
+    ? 'قیمت هر محصول تا ثبت قیمت جدید معتبر می‌ماند؛ دسته‌ها و تغییرات گروهی را از همین صفحه مدیریت کنید.'
+    : 'قیمت هر محصول تا ثبت قیمت جدید معتبر می‌ماند؛ گروه محصول را در ویرایش محصول انتخاب کنید.';
   host.innerHTML = admHead('receipt', isAdmin ? 'محصولات و قیمت‌ها' : 'کارتابل محصولات و قیمت‌ها', desc, adm.products.length,
     `${admSearchBox('admProdSearch', 'جستجوی نام یا کد سریع', adm.q)}
-     <span class="adm-count">${fa(priced)} از ${fa(active.length)} محصول فعال قیمت امروز دارند</span>
+     <span class="adm-count">${fa(priced)} از ${fa(active.length)} محصول فعال قیمت مثبت دارند</span>
      <button class="btn btn-secondary" type="button" data-adm="prod-print">${icon('receipt',16)} چاپ لیست قیمت</button>
      <button class="btn btn-primary" type="button" data-adm="prod-new">${icon('plus', 16)} محصول جدید</button>`)
-    + `<div id="admList" class="adm-list"></div></section>`;
+    + `${priceGroupsHtml()}<div class="price-group-filter"><label for="priceGroupFilter">فیلتر گروه محصول</label><select id="priceGroupFilter"><option value="all">همهٔ محصولات</option><option value="none">بدون گروه</option>${adm.priceGroups.map(g=>`<option value="${admE(g.id)}">${admE(g.name)}</option>`).join('')}</select></div><div id="admList" class="adm-list"></div></section>`;
+  $('#priceGroupFilter').addEventListener('change',()=>paintProducts());
   $('#admProdSearch').addEventListener('input', (e) => { adm.q = e.target.value; paintProducts(); });
   bindAdm('products', host);
   paintProducts();
 }
+function priceGroupsHtml(){
+ const groups=adm.priceGroups||[];
+ return `<section class="price-groups" aria-label="گروه‌بندی و تغییر گروهی قیمت"><div class="price-groups-head"><div><h3>گروه‌بندی و تغییر گروهی قیمت</h3><p>فقط محصولات فعال عضو هر گروه تغییر می‌کنند. محصولات بدون گروه در تغییر گروهی شرکت نمی‌کنند. ابتدا قیمت همهٔ اعضا را ثبت کنید.</p></div><button type="button" class="btn btn-secondary" data-adm="price-group-new">افزودن گروه</button></div><div class="price-group-cards">${groups.map(g=>{
+  const count=adm.products.filter(p=>p.isActive&&p.priceGroupId===g.id).length;
+  return `<article class="price-group-card" data-price-group="${admE(g.id)}"><div class="price-group-title"><b>${admE(g.name)}</b><span>${fa(count)} محصول فعال</span><button type="button" class="btn btn-secondary btn-sm" data-adm="price-group-rename" data-id="${admE(g.id)}">تغییر نام</button><button type="button" class="btn btn-secondary btn-sm" data-adm="price-group-delete" data-id="${admE(g.id)}">حذف</button></div><div class="price-group-controls"><label>جهت تغییر<select data-group-direction aria-label="جهت تغییر ${admE(g.name)}"><option value="increase">افزایش</option><option value="decrease">کاهش</option></select></label><label>نوع تغییر<select data-group-mode aria-label="نوع تغییر ${admE(g.name)}"><option value="percent">درصد</option><option value="fixed">مبلغ ریالی</option></select></label><label>مقدار<input data-group-amount type="text" inputmode="decimal" placeholder="مثلاً ۱۰" aria-label="مقدار تغییر ${admE(g.name)}"></label><button type="button" class="btn btn-primary" data-adm="price-group-preview" data-id="${admE(g.id)}">پیش‌نمایش تغییر</button></div></article>`;
+ }).join('')||'<p>هنوز گروهی ساخته نشده است؛ محصولات فعلی بدون گروه هستند.</p>'}</div></section>`;
+}
+async function priceGroupManage(action,id){
+ const group=(adm.priceGroups||[]).find(g=>g.id===id);
+ try{
+  if(action==='price-group-delete'){
+   if(!group||!confirm(`گروه «${group.name}» حذف شود؟ فقط گروه خالی قابل حذف است.`))return;
+   await api('/api/admin/price-groups/'+encodeURIComponent(id),{method:'DELETE'});
+  }else{
+   const name=prompt(action==='price-group-new'?'نام گروه جدید:':'نام جدید گروه:',group?.name||'');if(!name?.trim())return;
+   await api('/api/admin/price-groups'+(id?'/'+encodeURIComponent(id):''),{method:id?'PUT':'POST',body:JSON.stringify({name:name.trim()})});
+  }
+  toast('گروه‌ها به‌روزرسانی شدند.');await renderProductsPage();
+ }catch(e){toast(e.message);}
+}
+async function previewPriceGroup(id,button){
+ const card=button.closest('[data-price-group]');if(!card||button.disabled)return;
+ const body={direction:card.querySelector('[data-group-direction]').value,mode:card.querySelector('[data-group-mode]').value,amount:en(card.querySelector('[data-group-amount]').value).replace(/٫/g,'.')};
+ button.disabled=true;
+ try{
+  const preview=await api('/api/admin/price-groups/'+encodeURIComponent(id)+'/preview',{method:'POST',body:JSON.stringify(body)});
+  const rows=preview.rows.map(r=>`<tr><td>${admE(r.quickCode)}</td><td>${admE(r.name)}</td><td>${r.before==null?'ثبت نشده':admE(admFormatPrice(r.before))}</td><td>${r.error?admE(r.error):admE(admFormatPrice(r.after))}</td></tr>`).join('');
+  openModal('پیش‌نمایش تغییر قیمت گروه '+preview.group.name,`<div class="price-group-preview"><p>${preview.direction==='increase'?'افزایش':'کاهش'} ${admE(fa(preview.amount))} ${preview.mode==='percent'?'درصد':'ریال'} برای ${fa(preview.rows.length)} محصول فعال. اعداد به نزدیک‌ترین ریال گرد می‌شوند؛ فاکتورهای قبلی تغییر نمی‌کنند.</p><div class="bt-table-wrap"><table class="bt-table"><thead><tr><th>کد</th><th>محصول</th><th>قیمت فعلی (ریال)</th><th>قیمت جدید / خطا</th></tr></thead><tbody>${rows}</tbody></table></div>${preview.canApply?'':'<p class="form-error">ابتدا خطاهای همهٔ اقلام را برطرف کنید؛ هیچ تغییری اعمال نشده است.</p>'}<p data-price-group-error class="form-error" role="alert"></p><div class="modal-actions"><button type="button" class="btn btn-secondary" data-adm-close>انصراف</button><button type="button" class="btn btn-primary" data-apply-price-group ${preview.canApply?'':'disabled'}>تأیید و ثبت قیمت‌های جدید</button></div></div>`);
+  admBindClose();const host=$('#modal .price-group-preview'),apply=host.querySelector('[data-apply-price-group]');
+  apply.onclick=async()=>{if(apply.disabled||!confirm('قیمت همهٔ محصولات نمایش‌داده‌شده تغییر کند؟'))return;apply.disabled=true;
+   try{await api('/api/admin/price-groups/'+encodeURIComponent(id)+'/apply',{method:'POST',body:JSON.stringify({...body,token:preview.token})});closeModal();toast('قیمت‌های جدید ثبت شدند.');await renderProductsPage();}
+   catch(e){if(host.isConnected){host.querySelector('[data-price-group-error]').textContent=e.message;apply.disabled=true;}}
+  };
+ }catch(e){toast(e.message);}finally{if(button.isConnected)button.disabled=false;}
+}
 function paintProducts() {
-  const q = admNorm(adm.q);
-  const rows = adm.products.filter((x) => !q || admNorm(`${x.name} ${x.quickCode}`).includes(q));
-  $('#admList').innerHTML = admTable(['کد سریع', 'محصول', 'قیمت امروز (ریال)', 'عملیات'], rows.map((x) => `<tr class="adm-row adm-row-prod${x.isActive ? '' : ' is-inactive'}">
+  const q = admNorm(adm.q), selected=$('#priceGroupFilter')?.value||'all';
+  const rows = adm.products.filter((x) => (!q || admNorm(`${x.name} ${x.quickCode}`).includes(q))&&(selected==='all'||(selected==='none'?!x.priceGroupId:x.priceGroupId===selected)));
+  $('#admList').innerHTML = admTable(['کد سریع', 'محصول', 'قیمت جاری (ریال)', 'عملیات'], rows.map((x) => `<tr class="adm-row adm-row-prod${x.isActive ? '' : ' is-inactive'}">
       <td data-label="کد سریع"><div class="adm-cell"><b class="cust-code">${admE(x.quickCode)}</b></div></td>
-      <td data-label="محصول"><div class="adm-cell"><b>${admE(fa(x.name))}</b><span>واحد: ${admE(x.defaultUnit)}</span></div></td>
-      <td data-label="قیمت امروز (ریال)"><div class="adm-cell">
-        <div class="adm-price"><input type="text" inputmode="numeric" data-price-for="${admE(x.id)}" aria-label="قیمت امروز ${admE(x.name)} (ریال)" value="${admE(admFormatPrice(adm.todayPrices[x.id] ?? ''))}" placeholder="مثلاً ۲۵۰٬۰۰۰" autocomplete="off">
+      <td data-label="محصول"><div class="adm-cell"><b>${admE(fa(x.name))}</b><span>واحد: ${admE(x.defaultUnit)} · گروه: ${admE(adm.priceGroups.find(g=>g.id===x.priceGroupId)?.name||'بدون گروه')}</span></div></td>
+      <td data-label="قیمت جاری (ریال)"><div class="adm-cell">
+        <div class="adm-price"><input type="text" inputmode="numeric" data-price-for="${admE(x.id)}" aria-label="قیمت جاری ${admE(x.name)} (ریال)" value="${admE(admFormatPrice(adm.todayPrices[x.id] ?? ''))}" placeholder="مثلاً ۲۵۰٬۰۰۰" autocomplete="off">
         <button class="btn btn-primary btn-sm" type="button" data-adm="prod-price" data-id="${admE(x.id)}">ثبت قیمت</button></div></div></td>
       <td data-label="عملیات"><div class="adm-cell adm-actions">${admActiveBadge(x.isActive)}
         <button class="btn btn-secondary btn-sm" type="button" data-adm="prod-edit" data-id="${admE(x.id)}">${icon('edit', 14)} ویرایش</button>
@@ -373,7 +411,7 @@ function paintProducts() {
 function openPriceListSelection(){
  const products=adm.products.filter(p=>p.isActive);
  if(!products.length)return toast('محصول فعالی برای چاپ وجود ندارد.');
- openModal('انتخاب اقلام لیست قیمت',`<div class="price-pick"><p>اقلام مورد نظر را انتخاب کنید. فقط قیمت ثبت‌شدهٔ امروز چاپ می‌شود؛ با اقلام زیاد اندازهٔ نوشته کوچک‌تر خواهد شد.</p><div class="price-pick-controls"><input type="search" data-price-search placeholder="جستجوی نام یا کد" aria-label="جستجوی محصول"><button type="button" class="btn btn-secondary btn-sm" data-price-all>انتخاب همه</button><button type="button" class="btn btn-secondary btn-sm" data-price-none>حذف انتخاب‌ها</button><span data-price-count aria-live="polite"></span></div><div class="price-pick-list">${products.map(p=>`<label class="price-pick-item" data-price-row data-search="${admE(admNorm(p.name+' '+p.quickCode))}"><input type="checkbox" data-price-id="${admE(p.id)}" checked><span>${admE(fa(p.quickCode))} — ${admE(p.name)}</span><small>${admE(adm.todayPrices[p.id]==null?'قیمت ثبت نشده':admFormatPrice(adm.todayPrices[p.id])+' ریال')}</small></label>`).join('')}</div><p data-price-error role="alert" class="form-error"></p><div class="modal-actions"><button type="button" class="btn btn-secondary" data-price-close>انصراف</button><button type="button" class="btn btn-primary" data-price-print>چاپ اقلام انتخاب‌شده</button></div></div>`);
+ openModal('انتخاب اقلام لیست قیمت',`<div class="price-pick"><p>اقلام مورد نظر را انتخاب کنید. آخرین قیمت ثبت‌شده تا امروز چاپ می‌شود؛ با اقلام زیاد اندازهٔ نوشته کوچک‌تر خواهد شد.</p><div class="price-pick-controls"><input type="search" data-price-search placeholder="جستجوی نام یا کد" aria-label="جستجوی محصول"><button type="button" class="btn btn-secondary btn-sm" data-price-all>انتخاب همه</button><button type="button" class="btn btn-secondary btn-sm" data-price-none>حذف انتخاب‌ها</button><span data-price-count aria-live="polite"></span></div><div class="price-pick-list">${products.map(p=>`<label class="price-pick-item" data-price-row data-search="${admE(admNorm(p.name+' '+p.quickCode))}"><input type="checkbox" data-price-id="${admE(p.id)}" checked><span>${admE(fa(p.quickCode))} — ${admE(p.name)}</span><small>${admE(adm.todayPrices[p.id]==null?'قیمت ثبت نشده':admFormatPrice(adm.todayPrices[p.id])+' ریال')}</small></label>`).join('')}</div><p data-price-error role="alert" class="form-error"></p><div class="modal-actions"><button type="button" class="btn btn-secondary" data-price-close>انصراف</button><button type="button" class="btn btn-primary" data-price-print>چاپ اقلام انتخاب‌شده</button></div></div>`);
  const box=$('#modal .price-pick'),checks=()=>[...box.querySelectorAll('[data-price-id]')];
  const update=()=>{box.querySelector('[data-price-count]').textContent=fa(checks().filter(x=>x.checked).length)+' قلم انتخاب شده';};
  box.querySelector('[data-price-search]').addEventListener('input',e=>{const q=admNorm(e.target.value);box.querySelectorAll('[data-price-row]').forEach(row=>row.hidden=!!q&&!row.dataset.search.includes(q));});
@@ -410,6 +448,7 @@ function openProductForm(p) {
     <label class="cust-field"><span>کد سریع (دو رقمی) *</span><input name="quickCode" required inputmode="numeric" maxlength="2" pattern="\\d{2}" value="${admE(p?.quickCode)}"></label>
     <label class="cust-field"><span>واحد پیش‌فرض *</span><select name="defaultUnit">${ADM_UNITS.map((u) => `<option ${u === (p?.defaultUnit || 'کیلوگرم') ? 'selected' : ''}>${u}</option>`).join('')}</select></label>
     <label class="cust-field cust-span2"><span>نام محصول *</span><input name="name" required maxlength="160" value="${admE(p?.name)}"></label>
+    <label class="cust-field"><span>گروه تغییر قیمت</span><select name="priceGroupId"><option value="">بدون گروه</option>${(adm.priceGroups||[]).map(g=>`<option value="${admE(g.id)}" ${p?.priceGroupId===g.id?'selected':''}>${admE(g.name)}</option>`).join('')}</select></label>
     ${p ? `<label class="cust-field"><span>وضعیت</span><select name="isActive"><option value="true" ${p.isActive ? 'selected' : ''}>فعال</option><option value="false" ${!p.isActive ? 'selected' : ''}>غیرفعال</option></select></label>` : ''}
   </div>`, p ? 'ذخیره تغییرات' : 'ثبت محصول'));
   admBindClose();
@@ -431,9 +470,9 @@ async function saveProductPrice(id) {
   if (!input || input.value === '' || !Number.isFinite(price) || price < 0) return toast('قیمت معتبر وارد کنید.');
   try {
     await api('/api/admin/prices', { method: 'POST', body: JSON.stringify({ productId: id, price, date: admToday() }) });
-    adm.todayPrices[id] = price; input.value = admFormatPrice(price); toast('قیمت امروز ثبت شد.');
+    adm.todayPrices[id] = price; input.value = admFormatPrice(price); toast('قیمت ثبت شد و تا تغییر بعدی معتبر است.');
     const act = adm.products.filter((x) => x.isActive); const cnt = $('#content .adm-count');
-    if (cnt) cnt.textContent = `${fa(act.filter((x) => Number(adm.todayPrices[x.id]) > 0).length)} از ${fa(act.length)} محصول فعال قیمت امروز دارند`;
+    if (cnt) cnt.textContent = `${fa(act.filter((x) => Number(adm.todayPrices[x.id]) > 0).length)} از ${fa(act.length)} محصول فعال قیمت مثبت دارند`;
     const row = input.closest('.adm-row'); if (row) { row.classList.add('is-saved'); setTimeout(() => row.classList.remove('is-saved'), 1600); }
   } catch (err) { toast(err.message); }
 }
@@ -671,6 +710,8 @@ function bindAdm(page, root = $('#content')) {
     if (a === 'drv-records') { adm.recDriver = id; adm.recFrom = ''; adm.recTo = ''; adm.tab = 'records'; return renderDriversPage(); }
     if (a === 'rec-today') { adm.recFrom = drvTodayKey(); adm.recTo = adm.recFrom; return renderDriverRecords(); }
     if (a === 'drv-sign') return showDriverSignature(id);
+    if (a === 'price-group-new' || a === 'price-group-rename' || a === 'price-group-delete') return priceGroupManage(a,id);
+    if (a === 'price-group-preview') return previewPriceGroup(id,el);
     if (a === 'prod-print') return openPriceListSelection();
     if (a === 'prod-new') return openProductForm(null);
     if (a === 'prod-edit') return openProductForm(find(adm.products));

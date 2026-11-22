@@ -19,6 +19,7 @@ test('قیمت فاکتور پیش‌ازخروج از فهرست امروز ب�
  const order={items:[{id:'i1',productId:'p01',unitPrice:45000},{id:'i2',productId:'p02',unitPrice:45000}]};
  assert.equal(ctx.transportInvoicePriceDefault(order,{itemId:'i1'}),'۱۲۳٬۴۵۶');
  assert.equal(ctx.transportInvoicePriceDefault(order,{itemId:'i2'}),'۴۵٬۰۰۰');
+ ctx.stl.priceMap.p01=0;assert.equal(ctx.transportInvoicePriceDefault(order,{itemId:'i1'}),'','zero current price must not revive an older item price');
 });
 test('تحویل با تأیید فیزیکی ثبت و سند بلافاصله برای چاپ ارسال می‌شود',async()=>{
  const calls=[];let confirmed=false,fail=false;const ctx=vm.createContext({confirm:()=>confirmed,api:async(...args)=>{calls.push(args);if(fail)throw Error('network');return {handover:{document:{warehouseDocumentNo:'W-1'}}};},closeModal:()=>calls.push('close'),toast:x=>calls.push(x),whPrintDocument:(doc,run)=>calls.push(['print',doc,run]),whDeliveredLoad:async()=>calls.push('regular'),loadWhStoreDocuments:async()=>calls.push('store'),encodeURIComponent,JSON});

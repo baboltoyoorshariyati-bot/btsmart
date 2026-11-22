@@ -31,11 +31,12 @@ function stlItemsOf(o, prices){
     const status = i.itemStatus || 'PENDING';
     const voided = status === 'CANCELLED';
     const delivered = Number(i.deliveredKg || 0);
-    const listedPrice = Number(map[i.productId] || 0);
+    const hasListedPrice=Object.hasOwn(map,i.productId);
+    const listedPrice = Number(map[i.productId] ?? 0);
     const savedPrice = Number(i.unitPrice || 0);
-    // Pending settlement should start from today's product-list price; stale or
-    // zero item snapshots must not force sales staff to re-enter that price.
-    const price = listedPrice > 0 ? listedPrice : (savedPrice > 0 ? savedPrice : 0);
+    // An explicitly registered zero is not a missing price: do not silently
+    // revive a stale item price. Sales must enter a positive settlement price.
+    const price = hasListedPrice ? listedPrice : (savedPrice > 0 ? savedPrice : 0);
     return { id:i.id, productId:i.productId, name:i.product?.name || i.productId || 'کالا', status, voided, skip:false, delivered, outOfStock: !voided && (status === 'OUT_OF_STOCK' || delivered <= 0), price, warehouseNote: String(i.warehouseNote||''), warehouseNoteByName: String(i.warehouseNoteByName||'') };
   });
 }
@@ -69,8 +70,10 @@ function stlDispatchControls(o,returnControl=''){
 function stlFooterHtml(o){
   const dispatched=!!o.dispatch;
   const returnControl=dispatched?'':`<button type="button" class="btn btn-secondary" data-stl="reopen">${icon('scale',15)} برگشت به انبار</button>`;
+  const canCancel=!dispatched&&o.deliveryMode!=='DELIVERY'&&!!o.visitId&&(o.orderType==='ONSITE'||(o.orderType==='REMOTE'&&o.deliveryMode==='PICKUP'));
   return `<footer class="stl-actions stl-actions-bottom"><div class="stl-footer-scroll"><div class="stl-primary-actions">
     ${stlDispatchControls(o,returnControl)}
+    ${canCancel?'<button type="button" class="btn btn-secondary" data-stl="cancel-purchase">انصراف از خرید و ارجاع به انبار</button>':''}
     ${dispatched?'':`<button type="button" class="stl-submit" id="stlSubmitBtn" data-stl="submit">${icon('receipt',18)} تأیید و صدور فاکتور</button>`}
   </div></div>${dispatched?`<div class="stl-dispatch-lock"><b>مرحلهٔ بعد</b><span>تأیید خروج راننده توسط نگهبان؛ سپس ثبت تحویل و بازبینی نهایی فروش در تب پخش.</span></div>`:''}</footer>`;
 }
@@ -343,6 +346,14 @@ async function stlCapture(){
 }
 // Overrides for the older names (last definition wins). None of these recurse.
 function renderSettlementForm(o){ if(!o || stl.orderId!==o.id) return; stlPaintForm(); }
+async function stlRequestCancellation(button){
+ const id=stl.orderId;if(!id||button.disabled)return;
+ const reason=prompt('دلیل انصراف مشتری را وارد کنید:');if(!reason?.trim())return;
+ if(!confirm('درخواست به انبار ارجاع شود؟ لغو و خروج بدون کالا فقط پس از بررسی و تأیید انبار انجام می‌شود.'))return;
+ button.disabled=true;
+ try{await api('/api/orders/'+encodeURIComponent(id)+'/settlement-cancellation',{method:'POST',body:JSON.stringify({reason:reason.trim()})});stlClose();toast('درخواست انصراف به انبار ارجاع شد؛ تأیید بازگشت کالا لازم است.');if(app.salesCache)app.salesCache.fetchedAt=0;await fetchSalesCache(true);await renderSales('settlement');await refreshIndicators();}
+ catch(e){button.disabled=false;toast(e.message);}
+}
 function selectSettlement(id){ return stlOpen(id); }
 function finalSettle(id){ if(id && stl.orderId!==id) return stlOpen(id); return stlSubmit(); }
 if(!window.__stlBoundV374){
@@ -357,6 +368,7 @@ if(!window.__stlBoundV374){
     if(a==='sig-clear') return stlClearSig();
     if(a==='fp') return stlCapture();
     if(a==='reopen'){ if(stl.orderId) return reopenSettlementToWarehouse(stl.orderId); return; }
+    if(a==='cancel-purchase') return stlRequestCancellation(t);
     if(a==='refund-deposit-excess') return stlRefundExcess();
     if(a==='submit') return stlSubmit();
   });

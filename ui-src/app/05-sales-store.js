@@ -175,10 +175,18 @@ async function openStoreOrderDetails(id){
     ${o.notes?`<div class="store-detail-note"><b>یادداشت سفارش</b><p>${esc(o.notes)}</p></div>`:''}
     ${o.status==='RETURNED_TO_SALES'&&o.warehouseReturn?.reason?`<div class="store-detail-note"><b>علت ارجاع به فروش</b><p>${esc(o.warehouseReturn.reason)}</p></div>`:''}
     ${o.status==='CANCELLED'&&o.cancelReason?`<div class="store-detail-note"><b>علت لغو</b><p>${esc(o.cancelReason)}</p></div>`:''}
+    ${(o.storeCancellationRequests||[]).map(r=>`<div class="store-detail-note"><b>درخواست لغو: ${r.status==='PENDING'?'در انتظار بررسی فروش':'بررسی‌شده'}</b><p>${esc(r.reason)}</p>${r.resolution?`<p>نتیجه بررسی: ${esc(r.resolution)}</p>`:''}</div>`).join('')}
     ${o.storeOrderKind!=='PARTIAL'&&o.storeRun?.enabled&&!['STORE_PENDING_SALES','CANCELLED'].includes(o.status)?`<div class="st-run-letterhead"><div class="st-run-chips"><span class="st-run-chip st-run-r1">سرویس اول: ${esc(o.storeRun.r1StageLabel||'هنوز به فروش ارسال نشده')}</span><span class="st-run-chip st-run-r2">سرویس دوم: ${esc(o.storeRun.r2StageLabel||'هنوز به فروش ارسال نشده')}</span></div></div>`:''}
     ${st38RunSummaryHtml(o)}
     <h3 class="store-detail-items-title">اقلام سفارش</h3><div class="detail-item-list">${active.map(it=>{const v=progress.get(it.id),show=v&&!['STORE_PENDING_SALES','CANCELLED'].includes(o.status);return `<div class="detail-item-row"><div><strong>${esc(it.product?.name||'—')}</strong><small>${esc(it.description||'بدون توضیح')}</small>${show?`<small>${o.storeOrderKind==='PARTIAL'?`وزن ثبت‌شده: ${qty(v.totalKg||0)} کیلوگرم${v.shortageClosed?' · کسری / عدم موجودی':''}`:`${esc(v.runStatus==='IN_SHIPPING'?'وزن‌کشی ثبت شده':(v.runStatusLabel||SR38_STATUS_LABEL[v.runStatus]||'در انتظار'))} · وزن ثبت‌شده: سرویس اول ${qty(v.r1Kg||0)} و سرویس دوم ${qty(v.r2Kg||0)} کیلوگرم · جمع ${qty(v.totalKg||0)} کیلوگرم${v.shortageKg?` · کسری ${qty(v.shortageKg)} کیلوگرم`:''}`}</small>`:''}</div><b>${qty(it.requestedQty)} ${esc(it.requestedUnit||'')}</b></div>`;}).join('')||'<div class="empty">قلم فعالی برای این سفارش وجود ندارد.</div>'}</div>
-    <div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button></div></div>`);
+    <div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button>${o.status!=='CANCELLED'&&!(o.storeCancellationRequests||[]).some(r=>r.status==='PENDING')?`<button type="button" class="btn btn-secondary" data-store-cancel-request>${o.status==='STORE_PENDING_SALES'?'لغو سفارش':'درخواست لغو برای بررسی فروش'}</button>`:''}</div></div>`);
+  const cancelButton=$('#modal [data-store-cancel-request]');
+  if(cancelButton)cancelButton.onclick=async()=>{
+   const reason=prompt('دلیل لغو یا درخواست لغو را وارد کنید:');if(!reason?.trim())return;
+   const direct=o.status==='STORE_PENDING_SALES';
+   if(!confirm(direct?'سفارش مستقیماً لغو شود؟':'درخواست برای بررسی فروش ثبت شود؟ این کار سفارش را خودکار لغو یا عملیات تحویل را متوقف نمی‌کند.'))return;
+   cancelButton.disabled=true;try{await api('/api/store/orders/'+encodeURIComponent(id)+(direct?'/cancel':'/cancellation-request'),{method:'POST',body:JSON.stringify({reason:reason.trim()})});toast(direct?'سفارش لغو شد.':'درخواست به فروش ارجاع شد.');await renderStorePortal();await openStoreOrderDetails(id);}catch(e){cancelButton.disabled=false;toast(e.message);}
+  };
   finishEntityNotices(notices);return true;
  }catch(e){toast(e.message);return false;}
 }

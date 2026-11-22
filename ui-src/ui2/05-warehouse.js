@@ -141,7 +141,7 @@ function wh38List(orders,kind){
 }
 async function wh38Paint(phase){
   if(phase==='history') return; // سوابق با فیلترهای کاربر؛ نوسازی خودکار ۷ ثانیه‌ای فیلترها را به‌هم نمی‌زند
-  const host=$('#wh38Body'); if(!host||host.dataset.sheet==='1')return;
+  const host=$('#wh38Body'); if(!host||host.dataset.sheet==='1'||host.querySelector('[data-return-order] input:checked'))return;
   try{
     if(phase==='delivered'){ await whDeliveredPaint(host); return; }
     if(phase==='document-edits'){ await whDocumentEditsPaint(host); return; }
@@ -173,7 +173,12 @@ async function wh38Paint(phase){
       const early=active.filter(o=>['SCHEDULED_REMOTE','RETURNED_TO_SALES'].includes(o.status)&&!o.cancellation);
       if(early.length)waiting=`<section class="sd-panel"><h3>مراجعهٔ سفارش‌های هنوز فعال‌نشده در انبار</h3><div class="bt-table-wrap"><table class="bt-table wh-early-pickup-table"><caption class="bt-caption">مراجعه‌های زودهنگام انبار</caption><thead><tr><th scope="col">شماره سفارش</th><th scope="col">صاحب سفارش</th><th scope="col">تحویل‌گیرنده</th><th scope="col">عملیات</th></tr></thead><tbody>${early.map(o=>`<tr><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="صاحب سفارش">${esc(o.customerName)}</td><td data-label="تحویل‌گیرنده">${esc(o.recipient?.name||'—')}</td><td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-secondary btn-sm" data-action="pickup-cancel" data-id="${esc(o.id)}">ثبت انصراف بدون تحویل</button></td></tr>`).join('')}</tbody></table></div></section>`;
     }
-    host.innerHTML=waiting+wh38List(orders,phase);
+    let returns='';
+    if(phase==='incoming'){
+      const requests=(await fetchPagedList('/api/warehouse/settlement-cancellations','orders')).orders;
+      if(requests.length)returns=`<section class="sd-panel"><h3>انصراف از تسویه — بررسی بازگشت کالا</h3><p>برای هر قلم وزن‌دار بازگشت کامل و نداشتن کالا نزد مراجعه‌کننده را کنترل کنید.</p>${requests.map(o=>`<article class="sd-panel" data-return-order="${esc(o.id)}"><h4>سفارش ${esc(fa(o.orderNo||'—'))} — ${esc(o.customerName||'—')}</h4><p>سند انبار: ${esc(fa(o.warehouseDocumentNo||'—'))} · دلیل: ${esc(o.reason)}</p>${o.items.filter(i=>Number(i.deliveredKg)>0).map(i=>`<label><input type="checkbox" data-return-item="${esc(i.itemId)}"> بازگشت کامل ${esc(i.productName)} — ${qty(i.deliveredKg)} کیلوگرم</label><br>`).join('')}<label><input type="checkbox" data-return-no-goods> تأیید می‌کنم مراجعه‌کننده هیچ کالایی همراه ندارد.</label><br><button type="button" class="btn btn-primary" data-action="confirm-settlement-return" data-id="${esc(o.id)}">تأیید بازگشت و لغو سفارش</button></article>`).join('')}</section>`;
+    }
+    host.innerHTML=returns+waiting+wh38List(orders,phase);
   }
   catch{ host.innerHTML='<div class="empty">خطا در دریافت صف انبار.</div>'; }
 }
@@ -403,6 +408,12 @@ function wh38Shell(phase){
     const el=e.target.closest('[data-action]'); if(!el)return;
     const a=el.dataset.action, id=el.dataset.id;
     try{
+      if(a==='confirm-settlement-return'){
+        const box=el.closest('[data-return-order]'),checks=[...box.querySelectorAll('[data-return-item]')];
+        if(checks.some(x=>!x.checked)||!box.querySelector('[data-return-no-goods]')?.checked)return toast('ابتدا بازگشت همه اقلام و نبود کالا نزد مراجعه‌کننده را تأیید کنید.');
+        if(!confirm('بازگشت کامل کالا و خروج بدون کالا تأیید و سفارش لغو شود؟'))return;
+        el.disabled=true;await api('/api/warehouse/settlement-cancellations/'+encodeURIComponent(id)+'/confirm',{method:'POST',body:JSON.stringify({returnedItems:checks.map(x=>x.dataset.returnItem),confirmedNoGoods:true})});toast('انصراف ثبت شد؛ خروج بدون کالا به نگهبانی ارجاع شد.');await refreshIndicators();wh38Shell(app.wh38.phase);return;
+      }
       if(a==='pickup-cancel'){ const reason=prompt('دلیل انصراف را وارد کنید:');if(!reason?.trim())return;if(!confirm('آیا انبار تأیید می‌کند هیچ کالایی به این مراجعه تحویل نشده است؟'))return;el.disabled=true;await api('/api/pickup/'+encodeURIComponent(id)+'/cancellation',{method:'POST',body:JSON.stringify({reason,confirmedNoGoods:true})});toast('عدم تحویل ثبت شد و در انتظار تأیید فروش است.');await refreshIndicators();wh38Shell(app.wh38.phase);return;}
       if(a==='wh-stock-preview')return wh38StockPreview(el.dataset.branch);
       if(a==='wh-history-document')return whDeliveredDetails(id);
