@@ -1,4 +1,4 @@
-# نصب و استقرار روی Windows Server 2025 (نسخهٔ انتشار عمومی 1.1.18)
+# نصب و استقرار روی Windows Server 2025 (نسخهٔ انتشار عمومی 1.1.19)
 
 ## خلاصه
 
@@ -10,14 +10,14 @@
 >
 > راهنمای کامل و فارسی نصبکننده: `windows-installer/README-fa.md`
 
-> ❓ **سؤال پرتکرار — آیا SQLite باید نصب شود؟ خیر.** SQLite داخل **Node.js 22.5+** کامپایل شده است؛ نصبکننده Node را خودکار نصب میکند و فایل `data\baboltoyoor.db` را میسازد. هیچ نسخهٔ جداگانهای از sqlite.org لازم نیست (ابزارهای اختیاری فقط برای دیدن محتویات دیتابیساند). حداقل نسخهٔ Node در `package.json`: `>=22.5.0`؛ تستها روی Node 22 LTS اجرا شدهاند.
+> ❓ **سؤال پرتکرار — آیا SQLite باید نصب شود؟ خیر.** SQLite داخل **Node.js 22.13+** کامپایل شده است؛ نصبکننده Node را خودکار نصب میکند و فایل `data\baboltoyoor.db` را میسازد. هیچ نسخهٔ جداگانهای از sqlite.org لازم نیست (ابزارهای اختیاری فقط برای دیدن محتویات دیتابیساند). حداقل نسخهٔ Node در `package.json`: `>=22.13.0`؛ تستها روی Node 22 LTS اجرا شدهاند.
 
 ## نصبکننده چه میکند
 
-1. **Node.js ۲۲٫۵+**: اگر نباشد، بهترتیب از (الف) فایل پورتابل `node-v*-win-x64.zip` کنار نصبکننده، (ب) `winget` و (ج) دانلود رسمی `nodejs.org` **همراه بررسی SHA256** نصب میکند.
-2. **کپی فایلهای برنامه** در `C:\BabolToyor`: اگر `app.zip` کنار نصبکننده باشد از همان استفاده میکند (نصب آفلاین)، وگرنه نصب‌کننده از `AppZipUrl` پیش‌فرض، [بستهٔ پایهٔ `BabolToyor-App-1.1.18-bootstrap.zip`](https://drive.google.com/uc?export=download&id=1cfLpSZ3aTNcKOX4cVvIyYJq5tT8Nmd5O) را دریافت می‌کند؛ دیگر دارایی‌ها در [پوشهٔ انتشار نسخهٔ 1.1.18 در Google Drive](https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky) هستند.
+1. **Node.js ۲۲٫۱۳+**: اگر نباشد، بهترتیب از (الف) فایل پورتابل `node-v*-win-x64.zip` کنار نصبکننده، (ب) `winget` و (ج) دانلود رسمی `nodejs.org` **همراه بررسی SHA256** نصب میکند.
+2. **کپی فایلهای برنامه** در `C:\BabolToyor`: اگر `app.zip` کنار نصبکننده باشد از همان استفاده میکند (نصب آفلاین)، وگرنه نصب‌کننده از `AppZipUrl` پیش‌فرض، [بستهٔ پایهٔ `BabolToyor-App-1.1.19-bootstrap.zip`](https://drive.google.com/uc?export=download&id=1Bo5IOqJxB1WJhBfr-GsyhvVWxtuLxSSn) را دریافت می‌کند؛ دیگر دارایی‌ها در [پوشهٔ انتشار نسخهٔ 1.1.19 در Google Drive](https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A) هستند.
 3. **ساخت `.env`** با `PORT=80`، `HOST=0.0.0.0`، `DATA_DIR=C:\BabolToyor\data` و یک رمز تصادفی قوی برای `admin`. دسترسی فایل فقط برای `SYSTEM` و `Administrators` است.
-4. **پورت ۸۰**: اگر IIS/HTTP.sys پورت را گرفته باشد، سایت مربوطه متوقف و `serverAutoStart` آن خاموش میشود (با هشدار در لاگ)؛ در صورت نیاز `W3SVC` متوقف و Manual میشود. با `-NoAutoStopIis` میتوان جلوی این کار را گرفت.
+4. **پورت ۸۰**: اگر IIS/HTTP.sys پورت را گرفته باشد، نصب به‌طور پیش‌فرض متوقف می‌شود. تنها با اجازهٔ صریح `-AllowStopIis` سایت مربوطه متوقف و `serverAutoStart` خاموش می‌شود و ممکن است سرویس `W3SVC` نیز متوقف شود؛ یا پورت دیگری انتخاب کنید.
 5. **فایروال**: قانون ورودی `Babol Toyor - HTTP (TCP 80)` برای پروفایلهای Domain/Private/Public.
 6. **اجرای خودکار**: Scheduled Task با نام `Babol Toyor - Application Server`، حساب `SYSTEM`، trigger هنگام بوت، بدون محدودیت زمان اجرا و ریاستارت در خطا. یک supervisor هم در صورت خروج `node` ظرف ۵ ثانیه سامانه را بالا میآورد.
 7. **بررسی سلامت** (`GET /api/server-time`)، ساخت میانبر `http://localhost/` روی دسکتاپ و Start Menu، و نوشتن `C:\BabolToyor\INSTALL-INFO.txt` شامل آدرس، نام کاربری و رمز اولیه.

@@ -85,7 +85,7 @@
 
 <section class="callout big">
   <p class="big-answer">❓ آیا باید SQLite نصب کنم؟ — خیر، اصلاً.</p>
-  <p><strong>SQLite یک نرمافزار سرور نیست که نصب شود</strong>؛ یک کتابخانه است که داخل خود <strong>Node.js نسخهٔ ۲۲٫۵ به بعد</strong> کامپایل شده است. نصبکننده Node.js را خودکار نصب میکند، پس SQLite هم همراهش میآید. دیتابیس فقط یک فایل است:</p>
+  <p><strong>SQLite یک نرمافزار سرور نیست که نصب شود</strong>؛ یک کتابخانه است که داخل خود <strong>Node.js نسخهٔ ۲۲٫۱۳ به بعد</strong> کامپایل شده است. نصبکننده Node.js را خودکار نصب میکند، پس SQLite هم همراهش میآید. دیتابیس فقط یک فایل است:</p>
   <p style="text-align:center;margin:14px 0"><span class="path">C:\BabolToyor\data\baboltoyoor.db</span></p>
   <p style="margin-bottom:0">نه سرویس SQL، نه <span class="tag">sqlite3.exe</span>، نه ODBC، نه نام کاربری/رمز جداگانه. <strong>هیچ چیزی از sqlite.org دانلود نکنید</strong> مگر اینکه خودتان خواسته باشید دیتابیس را با ابزار گرافیکی نگاه کنید (کاملاً اختیاری — بخش پرسشهای متداول).</p>
 </section>
@@ -94,7 +94,7 @@
   <h2>✅ چکلیست سریع</h2>
   <table>
     <tr><th style="width:44px">✔</th><th>کار</th><th>کجا</th></tr>
-    <tr><td><span class="chk">☐</span></td><td>دانلود بستهٔ نصب</td><td><a href="https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky">BabolToyor-Windows-Setup-1.1.18.zip</a></td></tr>
+    <tr><td><span class="chk">☐</span></td><td>دانلود بستهٔ نصب</td><td><a href="https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A">BabolToyor-Windows-Setup-1.1.19.zip</a></td></tr>
     <tr><td><span class="chk">☐</span></td><td>(فقط سرور آفلاین) دانلود Node پورتابل</td><td><span class="path">node-v22.x.x-win-x64.zip</span> از <a href="https://nodejs.org/dist/">nodejs.org/dist</a></td></tr>
     <tr><td><span class="chk">☐</span></td><td>کپی فایلها در یک پوشه</td><td><span class="path">C:\BabolToyor-Install</span></td></tr>
     <tr><td><span class="chk">☐</span></td><td>استخراج ZIP</td><td>راستکلیک → Extract All</td></tr>
@@ -115,8 +115,8 @@
 
   <h3>حالت الف: سرور به اینترنت وصل است (پیشنهادی)</h3>
   <p>همین <strong>یک فایل</strong> کافی است:</p>
-  <p style="text-align:center"><a href="https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky"><strong>⬇️ دانلود BabolToyor-Windows-Setup-1.1.18.zip</strong></a><br>
-  <span style="font-size:13px;color:var(--muted)">حدود ۴٫۲ مگابایت • <a href="https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky">پوشهٔ انتشار Google Drive</a></span></p>
+  <p style="text-align:center"><a href="https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A"><strong>⬇️ دانلود BabolToyor-Windows-Setup-1.1.19.zip</strong></a><br>
+  <span style="font-size:13px;color:var(--muted)">حجم بسته را در صفحهٔ دریافت بررسی کنید • <a href="https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A">پوشهٔ انتشار Google Drive</a></span></p>
   <p>نصبکننده خودش Node.js را از <strong>winget</strong> یا سایت رسمی <strong>nodejs.org</strong> میگیرد و چکسام SHA-256اش را چک میکند.</p>
 
   <h3>حالت ب: سرور هیچ اینترنتی ندارد</h3>
@@ -139,7 +139,7 @@
   </div></div>
   <div class="step"><div class="num">۲</div><div class="step-body">
     <h3>ZIP را استخراج کنید</h3>
-    <p>راستکلیک روی <span class="path">BabolToyor-Windows-Setup-1.1.18.zip</span> → <strong>Extract All...</strong> → <strong>Extract</strong>.</p>
+    <p>راستکلیک روی <span class="path">BabolToyor-Windows-Setup-1.1.19.zip</span> → <strong>Extract All...</strong> → <strong>Extract</strong>.</p>
     <p>حالا باید این سه فایل <strong>کنار هم</strong> باشند:</p>
 <pre><code>C:\BabolToyor-Install\
   ├── BabolToyor-Setup.cmd      ← نصبکننده
@@ -162,7 +162,7 @@
   </div></div>
   <div class="step"><div class="num">۳</div><div class="step-body">
     <h3>منتظر بمانید — ۲ تا ۱۰ دقیقه</h3>
-    <p>نصبکننده بهترتیب: Node.js 22.5+ (و همراهش SQLite)، آزادسازی پورت ۸۰ از IIS، کپی برنامه به <span class="path">C:\BabolToyor</span>، ساخت دیتابیس، باز کردن فایروال TCP 80، ساخت تسک اجرای خودکار با ریاستارت در خطا، ساخت رمز تصادفی مدیر، تست سلامت و میانبر دسکتاپ.</p>
+    <p>نصبکننده بهترتیب: Node.js 22.13+ (و همراهش SQLite)، بررسی پورت ۸۰ (تغییر IIS فقط با اجازهٔ صریح)، کپی برنامه به <span class="path">C:\BabolToyor</span>، ساخت دیتابیس، باز کردن فایروال TCP 80، ساخت تسک اجرای خودکار با ریاستارت در خطا، ساخت رمز تصادفی مدیر، تست سلامت و میانبر دسکتاپ.</p>
   </div></div>
   <div class="step"><div class="num">۴</div><div class="step-body">
     <h3>پیام موفقیت</h3>
@@ -227,7 +227,7 @@ node scripts\backup-db.js D:\Backup\baboltoyoor.db</code></pre>
     <tr><td><span class="path">Health: NOT RESPONDING</span></td><td><span class="path">logs</span> را ببینید؛ معمولاً پورت اشغال یا نبود Node.js</td></tr>
     <tr><td>هشدار SmartScreen / فایل بلاکشده</td><td>راستکلیک → Properties → تیک <strong>Unblock</strong></td></tr>
     <tr><td>UAC رد شد</td><td>راستکلیک → <strong>Run as administrator</strong></td></tr>
-    <tr><td>خطای IIS / پورت ۸۰</td><td>نصبکننده خودکار متوقف میکند؛ لاگ <span class="path">install.log</span> را ببینید یا <span class="path">-NoAutoStopIis -Port 8080</span></td></tr>
+    <tr><td>خطای IIS / پورت ۸۰</td><td>نصب متوقف میشود؛ لاگ <span class="path">install.log</span> را ببینید یا پورت دیگری انتخاب کنید. تغییر IIS فقط با <span class="path">-AllowStopIis</span> مجاز است.</td></tr>
     <tr><td>از کلاینت وصل نمیشود</td><td>روی کلاینت: <span class="path">Test-NetConnection IP-سرور -Port 80</span>؛ قانون فایروال را چک کنید</td></tr>
     <tr><td>رمز را گم کردم</td><td><span class="path">INSTALL-INFO.txt</span> و <span class="path">.env</span> را ببینید</td></tr>
     <tr><td>سرور آفلاین، نصب گیر کرد</td><td><span class="path">node-v22.x.x-win-x64.zip</span> را کنار <span class="path">.cmd</span> بگذارید</td></tr>
@@ -242,7 +242,7 @@ node scripts\backup-db.js D:\Backup\baboltoyoor.db</code></pre>
   <p><strong>هیچکدام و از هیچ جا.</strong> ماژول <span class="path">node:sqlite</span> از Node.js 22.5.0 به بعد جزو خود Node است. نصبکننده خودش دیتابیس را میسازد. <a href="https://nodejs.org/docs/latest-v22.x/api/sqlite.html">مستندات رسمی Node.js</a>.</p>
 
   <h3>۲) پس دقیقاً چه نرمافزاری نصب میشود؟</h3>
-  <p>فقط <strong>Node.js 22.5+ (ترجیحاً LTS)</strong> — و آن را هم نصبکننده انجام میدهد. اگر خواستید دستی بدهید: <a href="https://nodejs.org/en/download">nodejs.org/en/download</a> → <strong>LTS</strong> → <strong>Windows Installer (.msi) x64</strong>. نسخههای ۲۰ و قدیمیتر کار نمیکنند.</p>
+  <p>فقط <strong>Node.js 22.13+ (ترجیحاً LTS)</strong> — و آن را هم نصبکننده انجام میدهد. اگر خواستید دستی بدهید: <a href="https://nodejs.org/en/download">nodejs.org/en/download</a> → <strong>LTS</strong> → <strong>Windows Installer (.msi) x64</strong>. نسخههای ۲۰ و قدیمیتر کار نمیکنند.</p>
 
   <h3>۳) دلم میخواهد خود دیتابیس را ببینم (کاملاً اختیاری)</h3>
   <p>بدون نصب چیز اضافی، از ابزار داخلی سامانه:</p>
@@ -262,9 +262,9 @@ node scripts\sql-query.js "SELECT order_no, status FROM orders"</code></pre>
   <h2>خلاصهٔ لینکها</h2>
   <table>
     <tr><th>مورد</th><th>لینک</th></tr>
-    <tr><td>پوشهٔ انتشار Google Drive</td><td><a href="https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky">فهرست دارایی‌های نسخه</a></td></tr>
-    <tr><td>بستهٔ آفلاین نصب</td><td><a href="https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky">BabolToyor-Windows-Setup-1.1.18.zip</a></td></tr>
-    <tr><td>فقط نصبکنندهٔ تکفایل</td><td><a href="https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky">BabolToyor-Setup-1.1.18.cmd</a></td></tr>
+    <tr><td>پوشهٔ انتشار Google Drive</td><td><a href="https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A">فهرست دارایی‌های نسخه</a></td></tr>
+    <tr><td>بستهٔ آفلاین نصب</td><td><a href="https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A">BabolToyor-Windows-Setup-1.1.19.zip</a></td></tr>
+    <tr><td>فقط نصبکنندهٔ تکفایل</td><td><a href="https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A">BabolToyor-Setup-1.1.19.cmd</a></td></tr>
     <tr><td>Node.js (فقط در صورت نصب دستی)</td><td><a href="https://nodejs.org/en/download">nodejs.org/en/download</a> — LTS، x64</td></tr>
     <tr><td>Node پورتابل برای سرور آفلاین</td><td><a href="https://nodejs.org/dist/">nodejs.org/dist</a> → <span class="path">v22.x.x/</span> → <span class="path">node-v22.x.x-win-x64.zip</span></td></tr>
     <tr><td>ابزار اختیاری SQLite</td><td><a href="https://www.sqlite.org/download.html">sqlite.org/download.html</a></td></tr>

@@ -15,13 +15,13 @@
 | پرسش | پاسخ |
 |---|---|
 | آیا SQLite باید نصب شود؟ | **خیر.** SQLite یک «نرمافزار سرور» نیست که نصب شود؛ یک کتابخانه است که **داخل خود Node.js کامپایل شده** است. نصبکننده Node.js را نصب میکند و SQLite همراهش میآید. |
-| پس چه چیزی نصب میشود؟ | فقط **Node.js نسخهٔ ۲۲٫۵ یا newer** — و آن را هم نصبکننده بهصورت **خودکار** انجام میدهد. شما کاری نمیکنید. |
+| پس چه چیزی نصب میشود؟ | فقط **Node.js نسخهٔ ۲۲٫۱۳ یا جدیدتر** — و آن را هم نصبکننده بهصورت **خودکار** انجام میدهد. شما کاری نمیکنید. |
 | دیتابیس کجاست؟ | یک فایل ساده: `C:\BabolToyor\data\baboltoyoor.db`. نه سرویسی، نه نام کاربری/رمز جداگانه، نه ODBC، نه SQL Server Express. |
 | آیا `sqlite3.exe` یا DB Browser لازم است؟ | **خیر، برای نصب و کار روزمره اصلاً لازم نیست.** فقط اگر خودتان خواستید محتویات دیتابیس را ببینید، ابزار اختیاری در «پرسشهای متداول» معرفی شده. |
 | اگر Node.js روی سرور قدیمی باشد (مثلاً ۲۰)؟ | نصبکننده خودش نسخهٔ ۲۲+ را کنارش نصب میکند؛ لازم نیست چیزی را حذف کنید. |
 
 **منبع فنی:** ماژول `node:sqlite` از **Node.js 22.5.0** به بعد جزو خود Node است و بههیچ `npm install`، درایور یا کتابخانهای نیاز ندارد — [مستندات رسمی Node.js](https://nodejs.org/docs/latest-v22.x/api/sqlite.html).
-حداقل نسخهٔ ثبتشده در پروژه: `>=22.5.0` (`package.json`). تستهای پروژه روی **Node.js 22 LTS** اجرا شدهاند.
+حداقل نسخهٔ ثبتشده در پروژه: `>=22.13.0` (`package.json`). تستهای پروژه روی **Node.js 22 LTS** اجرا شدهاند.
 
 > ⚠️ **یک نکتهٔ مهم:** نسخههای **Node.js 20 و قدیمیتر** این قابلیت را ندارند و سامانه بالا نمیآید. اگر سرور شما Node 20 دارد، نگران نباشید؛ نصبکننده نسخهٔ جدید را اضافه میکند.
 
@@ -31,7 +31,7 @@
 
 | ✔ | کار | کجا / چه چیزی |
 |---|---|---|
-| ☐ | ۱. دانلود بستهٔ نصب | [`BabolToyor-Windows-Setup-1.1.18.zip`](https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky) |
+| ☐ | ۱. دانلود بستهٔ نصب | [`BabolToyor-Windows-Setup-1.1.19.zip`](https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A) |
 | ☐ | ۲. (فقط سرور بدون اینترنت) دانلود Node پورتابل | `node-v22.x.x-win-x64.zip` از [nodejs.org/dist](https://nodejs.org/dist/) |
 | ☐ | ۳. کپی فایلها در پوشهای مثل `C:\BabolToyor-Install` | همان ۳ فایل کنار هم |
 | ☐ | ۴. راستکلیک روی ZIP → **Extract All** | پوشهٔ استخراجشده |
@@ -64,15 +64,15 @@
 
 | فایل | پوشهٔ دانلود | اندازه |
 |---|---|---|
-| **`BabolToyor-Windows-Setup-1.1.18.zip`** | [پوشهٔ دریافت در Google Drive](https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky) | حدود ۴٫۲ مگابایت |
+| **`BabolToyor-Windows-Setup-1.1.19.zip`** | [پوشهٔ دریافت در Google Drive](https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A) | حجم بسته را در صفحهٔ دریافت بررسی کنید |
 
 پوشهٔ انتشار Google Drive (فهرست دارایی‌های نسخه):
-<https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky>
+<https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A>
 
 > در این حالت، نصبکننده خودش Node.js را از `winget` یا سایت رسمی `nodejs.org` میگیرد و **چکسام SHA-256 اش را بررسی میکند**. شما هیچ کاری نمیکنید.
 
-**اگر فقط همان یک فایل `BabolToyor-Setup-1.1.18.cmd` را میخواهید** (بدون بستهٔ آفلاین)، آن را از پوشهٔ Google Drive دریافت کنید؛ برای دانلود برنامه و Node اینترنت لازم است:
-<https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky>
+**اگر فقط همان یک فایل `BabolToyor-Setup-1.1.19.cmd` را میخواهید** (بدون بستهٔ آفلاین)، آن را از پوشهٔ Google Drive دریافت کنید؛ برای دانلود برنامه و Node اینترنت لازم است:
+<https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A>
 
 ### حالت ب — سرور کاملاً آفلاین است (هیچ اینترنتی ندارد)
 
@@ -94,7 +94,7 @@
 
 1. روی ویندوز سرور، یک پوشهٔ ساده بسازید:
    `C:\BabolToyor-Install`
-2. فایل `BabolToyor-Windows-Setup-1.1.18.zip` را از کامپیوتر خودتان (فلش، شبکه، RDP، Share، ...) به این پوشه کپی کنید.
+2. فایل `BabolToyor-Windows-Setup-1.1.19.zip` را از کامپیوتر خودتان (فلش، شبکه، RDP، Share، ...) به این پوشه کپی کنید.
 3. **(فقط حالت ب)** فایل `node-v22.x.x-win-x64.zip` را هم به همان پوشه کپی کنید.
 
 > اگر فایل از اینترنت دانلود شده و ویندوز هشدار داد: روی فایل راستکلیک → **Properties** → تیک **Unblock** پایین پنجره → **OK**.
@@ -103,7 +103,7 @@
 
 ## گام ۳ — استخراج ZIP
 
-1. روی `BabolToyor-Windows-Setup-1.1.18.zip` **راستکلیک** کنید.
+1. روی `BabolToyor-Windows-Setup-1.1.19.zip` **راستکلیک** کنید.
 2. **Extract All...** را بزنید.
 3. محل استخراج را همان `C:\BabolToyor-Install` نگه دارید (یا پوشهای که ساختید) → **Extract**.
 
@@ -138,8 +138,8 @@ C:\BabolToyor-Install\
 
 | # | کاری که انجام میشود | توضیح ساده |
 |---|---|---|
-| ۱ | بررسی/نصب **Node.js 22.5+** | از فایل پورتابل کنارش، یا winget، یا دانلود رسمی با بررسی SHA-256. **همینجا SQLite هم میآید — جداگانه نصب نمیشود.** |
-| ۲ | آزاد کردن **پورت ۸۰** | اگر IIS یا سرویس دیگری پورت ۸۰ را گرفته باشد، نصبکننده آن را متوقف و غیرفعال میکند (در لاگ مینویسد). |
+| ۱ | بررسی/نصب **Node.js 22.13+** | از فایل پورتابل کنارش، یا winget، یا دانلود رسمی با بررسی SHA-256. **همینجا SQLite هم میآید — جداگانه نصب نمیشود.** |
+| ۲ | آزاد کردن **پورت ۸۰** | اگر پورت اشغال باشد نصب متوقف می‌شود؛ برای IIS فقط با اجازهٔ صریح `-AllowStopIis` تغییر انجام می‌شود یا پورت دیگری انتخاب کنید. |
 | ۳ | کپی برنامه در `C:\BabolToyor` | از روی `app.zip` — یعنی نیازی به دانلود سامانه نیست. |
 | ۴ | ساخت `.env` با `PORT=80` | برای همین در مرورگر پورت نمینویسید. |
 | ۵ | ساخت دیتابیس SQLite | فایل `C:\BabolToyor\data\baboltoyoor.db` با جداول واقعی ساخته میشود. **هیچ نصب SQL لازم نیست.** |
@@ -292,7 +292,7 @@ node scripts\backup-db.js D:\Backup\baboltoyoor.db
 | پیام `Health: NOT RESPONDING` | پورت ۸۰ اشغال یا Node نصب نشده | `BabolToyor-Setup.cmd logs` → لاگ نصب را ببینید |
 | هشدار SmartScreen / فایل بلاکشده | فایل دانلودشده از اینترنت | راستکلیک → **Properties** → تیک **Unblock** → **OK** |
 | درخواست UAC رد شد | اجرا بدون Administrator | راستکلیک → **Run as administrator** |
-| خطای مربوط به IIS / پورت ۸۰ | سایت IIS پورت را گرفته | نصبکننده خودکار متوقفش میکند؛ لاگ `install.log` را ببینید. یا `-NoAutoStopIis -Port 8080` |
+| خطای مربوط به IIS / پورت ۸۰ | سایت IIS پورت را گرفته | نصب متوقف می‌شود؛ لاگ `install.log` را ببینید و پورت دیگری انتخاب کنید. تغییر IIS فقط با `-AllowStopIis` مجاز است. |
 | از کامپیوترهای دیگر وصل نمیشود | فایروال یا پروفایل شبکه | روی کلاینت: `Test-NetConnection IP-سرور -Port 80`؛ قانون فایروال `Babol Toyor - HTTP (TCP 80)` را بررسی کنید |
 | رمز مدیر را گم کردم | — | فایل `INSTALL-INFO.txt` و `.env` را ببینید (رمز اولیه فقط تا اولین تعویض معتبر است) |
 | سرور بدون اینترنت، نصب گیر کرد | Node پورتابل کنار فایلها نیست | فایل `node-v22.x.x-win-x64.zip` را کنار `.cmd` بگذارید و دوباره اجرا کنید |
@@ -311,7 +311,7 @@ node scripts\backup-db.js D:\Backup\baboltoyoor.db
 
 ### ۲) پس دقیقاً چه نرمافزاری نصب میشود؟
 
-فقط **Node.js نسخهٔ ۲۲٫۵ یا newer** (ترجیحاً LTS). نصبکننده خودکار انجام میدهد. اگر خواستید دستی بدهید:
+فقط **Node.js نسخهٔ ۲۲٫۱۳ یا جدیدتر** (ترجیحاً LTS). نصبکننده خودکار انجام میدهد. اگر خواستید دستی بدهید:
 <https://nodejs.org/en/download> → گزینهٔ **LTS** → **Windows Installer (.msi) x64** → Next تا Finish.
 برای سرور بدون اینترنت: همان صفحه → **Windows x64 ZIP (Standalone Binary)** → فایل `node-v22.x.x-win-x64.zip` کنار نصبکننده.
 
@@ -347,9 +347,9 @@ node scripts\backup-db.js D:\Backup\baboltoyoor.db
 
 | مورد | لینک |
 |---|---|
-| پوشهٔ انتشار Google Drive | <https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky> |
-| بستهٔ آفلاین نصب (پیشنهادی) | <https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky> |
-| فقط نصبکنندهٔ تکفایل | <https://drive.google.com/drive/folders/19DFc94CCHHCsYZSZoe5W7z1_GAsQrAky> |
+| پوشهٔ انتشار Google Drive | <https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A> |
+| بستهٔ آفلاین نصب (پیشنهادی) | <https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A> |
+| فقط نصبکنندهٔ تکفایل | <https://drive.google.com/drive/folders/1MCo1f77BkuRNprIU3R9RIm9ubNcq1C1A> |
 | Node.js (فقط اگر خواستید دستی نصب کنید) | <https://nodejs.org/en/download> — LTS، Windows x64 |
 | فایل پورتابل Node برای سرور آفلاین | <https://nodejs.org/dist/> → `v22.x.x/` → `node-v22.x.x-win-x64.zip` |
 | ابزار اختیاری SQLite (نیازی نیست) | <https://www.sqlite.org/download.html> |
