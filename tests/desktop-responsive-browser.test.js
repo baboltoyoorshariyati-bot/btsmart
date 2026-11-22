@@ -18,7 +18,7 @@ test('مرورگر: دسکتاپ کوچک و بزرگ، کارت‌ها و پن�
   await post('/api/admin/users',{username:'desktop-shop',roleCode:'store',fullName:'فروشگاه تست',storeName:'فروشگاه مرکزی با عنوان طولانی برای بررسی نمایش',position:'تست',password:'Changed!2345',mustChangePassword:false});
   let regular=(await post('/api/orders/remote',{name:'مشتری با نام نسبتاً طولانی برای بررسی نمایش',phone:'09121112233',scheduledTime:'00:00',items:[{productId:'p01',requestedQty:18,requestedUnit:'کیلوگرم'}]})).order;
   const shopCtx=await browser.newContext();await post('/api/login',{username:'desktop-shop',password:'Changed!2345'},shopCtx);
-  let shop=(await post('/api/store/orders',{name:'مشتری فروشگاه',phone:'09121112233',items:[{productId:'p01',requestedQty:12,requestedUnit:'کیلوگرم'}]},shopCtx)).order;await shopCtx.close();
+  let shop=(await post('/api/store/orders',{name:'مشتری فروشگاه',phone:'09121112234',items:[{productId:'p01',requestedQty:12,requestedUnit:'کیلوگرم'}]},shopCtx)).order;await shopCtx.close();
   const page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(base+'/',{waitUntil:'networkidle'});
   const sizes=[[800,600],[1024,600],[1024,768],[1152,648],[1280,720],[1366,768],[1920,1080],[390,844]];
   const check=async(selector,tag)=>{

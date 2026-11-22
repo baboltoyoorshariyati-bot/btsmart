@@ -13,7 +13,7 @@ test('مرورگر: پیام ارجاع انبار برای سفارش عادی 
   await post(sales,'/api/login',{username:'sale1',password:'Changed!2345'});await post(wh,'/api/login',{username:'warehouse1',password:'Changed!2345'});await post(shop,'/api/login',{username:'shop1',password:'Changed!2345'});
   const d=new Date(),day=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
   const regular=(await post(sales,'/api/orders/remote',{name:'مشتری پیام',phone:'09121112233',deliveryDate:day,deliveryMode:'PICKUP',scheduledTime:'00:00',items:[{productId:'p01',requestedQty:8,requestedUnit:'کیلوگرم'}]})).order;
-  const storeOrder=(await post(shop,'/api/store/orders',{name:'مشتری فروشگاه',phone:'09121112233',items:[{productId:'p02',requestedQty:8,requestedUnit:'کیلوگرم'}]})).order;
+  const storeOrder=(await post(shop,'/api/store/orders',{name:'مشتری فروشگاه',phone:'09121112234',items:[{productId:'p02',requestedQty:8,requestedUnit:'کیلوگرم'}]})).order;
   await post(sales,`/api/store/orders/${storeOrder.id}/quick-send`,{});for(const o of [regular,storeOrder])await post(wh,`/api/orders/${o.id}/warehouse/accept`,{});
   const wp=await wh.newPage(),sp=await sales.newPage(),errors=[];for(const p of [wp,sp])p.on('pageerror',e=>errors.push(e.message));await wp.goto(base,{waitUntil:'networkidle'});await sp.goto(base,{waitUntil:'networkidle'});
   const first='لطفاً مقدار مرغ را اصلاح کنید <b>متن عادی</b> & دوباره بررسی شود';
