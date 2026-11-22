@@ -245,7 +245,7 @@ ef15b9e37cd4a463ae32f1bd117130fd4c90d66d31cd5f48799148d3dc1f2cab  ./lib/warehous
 2dc935190b8a6f57a5a9c457e1cde19d20d7d79dc9b6c11441bb0078329010fe  ./lib/warehouse-weight-draft.js
 eba092ede1e86c0e82145efeee6dcaf439d3430ad89fd80de87145aa8034dbd1  ./lib/weighbridge.js
 aebc418b4d559390680c227a7845f1d4991b171244be6011d4d121ebad02f0df  ./package.json
-8cc6b12b423b7d6de87870efb0c8667de6e6635b70d8bda07fee5410808b1cbf  ./public/admin-ui.js
+f5b93bc938d50b550bbe0b6d1b734d110b3bfe80405c1f0f9345cca363b17338  ./public/admin-ui.js
 2064099995191f01a76ac032a1f70bf14fa4f33ead4b74b44c9a0786f14f4a7e  ./public/android-chrome-192x192.png
 a0bd3b3fd14e7b3ef311543c910bfeb861346022e258f3d65474aec2a5b5b4f3  ./public/android-chrome-512x512.png
 b8e8f256353b1e960239ef4e14a980751a6b428f6e942fdd1a16af852b966fac  ./public/app.js

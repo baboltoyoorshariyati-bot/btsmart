@@ -5,7 +5,7 @@
 const ADM_ROLES = { admin: 'مدیر سیستم', gate: 'نگهبانی', sales: 'فروش', warehouse: 'انبار', store: 'فروشگاه', dispatch: 'واحد پخش', driver: 'راننده' };
 const ADM_UNITS = ['کیلوگرم', 'بسته', 'عدد', 'کارتن'];
 const ADM_ENTITIES = ['user', 'customer', 'driver', 'product', 'visit', 'order', 'payment', 'price', 'report', 'weighbridge'];
-const adm = { q: '', users: [], drivers: [], products: [], paymentDevices: [], todayPrices: {}, sources: [], report: null, reportDraft: null, activity: [], tab: 'drivers' };
+const adm = { q: '', users: [], drivers: [], products: [], priceGroups: [], paymentDevices: [], todayPrices: {}, sources: [], report: null, reportDraft: null, activity: [], tab: 'drivers' };
 
 const admE = (v) => esc(v == null ? '' : String(v));
 /* fallback plateViewHtml */
@@ -393,7 +393,7 @@ function paintProducts() {
   const rows = adm.products.filter((x) => (!q || admNorm(`${x.name} ${x.quickCode}`).includes(q))&&(selected==='all'||(selected==='none'?!x.priceGroupId:x.priceGroupId===selected)));
   $('#admList').innerHTML = admTable(['کد سریع', 'محصول', 'قیمت جاری (ریال)', 'عملیات'], rows.map((x) => `<tr class="adm-row adm-row-prod${x.isActive ? '' : ' is-inactive'}">
       <td data-label="کد سریع"><div class="adm-cell"><b class="cust-code">${admE(x.quickCode)}</b></div></td>
-      <td data-label="محصول"><div class="adm-cell"><b>${admE(fa(x.name))}</b><span>واحد: ${admE(x.defaultUnit)} · گروه: ${admE(adm.priceGroups.find(g=>g.id===x.priceGroupId)?.name||'بدون گروه')}</span></div></td>
+      <td data-label="محصول"><div class="adm-cell"><b>${admE(fa(x.name))}</b><span>واحد: ${admE(x.defaultUnit)} · گروه: ${admE((adm.priceGroups||[]).find(g=>g.id===x.priceGroupId)?.name||'بدون گروه')}</span></div></td>
       <td data-label="قیمت جاری (ریال)"><div class="adm-cell">
         <div class="adm-price"><input type="text" inputmode="numeric" data-price-for="${admE(x.id)}" aria-label="قیمت جاری ${admE(x.name)} (ریال)" value="${admE(admFormatPrice(adm.todayPrices[x.id] ?? ''))}" placeholder="مثلاً ۲۵۰٬۰۰۰" autocomplete="off">
         <button class="btn btn-primary btn-sm" type="button" data-adm="prod-price" data-id="${admE(x.id)}">ثبت قیمت</button></div></div></td>
