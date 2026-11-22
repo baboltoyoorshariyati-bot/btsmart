@@ -249,7 +249,9 @@ function renderSalesStoresV41(orders,deliveries={}){ // v37.7.9 — فروشگا
     </tr>`;
   };
   // v37.33.0 — محموله‌های ارسالی انبار (هر دو سرویس) در سربرگ «ورودی» فروشگاه‌های فروش نمایش داده می‌شوند (جای قبلی: «در جریان»؛ فروش آن‌ها را در ورودی پیدا نمی‌کرد)
-  const shipmentsPanel=renderStoreRunShipmentsPanel(deliveries.storeRunShipments||[]);
+  const requests=all.filter(o=>(o.storeCancellationRequests||[]).some(r=>r.status==='PENDING'));
+  const cancellationPanel=requests.length?`<section class="sd-panel"><h3>درخواست‌های لغو فروشگاه</h3><p>درخواست به‌تنهایی سفارش یا اسناد را لغو نمی‌کند و عملیات تحویل را متوقف نمی‌کند؛ وضعیت کالا، تحویل و امور مالی را بررسی و نتیجه را ثبت کنید.</p>${requests.map(o=>{const r=o.storeCancellationRequests.find(x=>x.status==='PENDING');return `<article data-store-cancel-queue="${esc(o.id)}"><b>${esc(o.storeName||'فروشگاه')} — سفارش ${esc(fa(o.orderNo||'—'))}</b><p>${esc(r.reason)}</p><button type="button" class="btn btn-secondary" data-action="store-order-details-v25" data-id="${esc(o.id)}">بررسی درخواست و جزئیات</button></article>`;}).join('')}</section>`:'';
+  const shipmentsPanel=cancellationPanel+renderStoreRunShipmentsPanel(deliveries.storeRunShipments||[]);
   const panel=(id,title,rows,kind,emptyTitle,emptyText,extra='')=>`<section class="sales-store-subpanel-v43" data-store-section="${id}"${(app.salesStoreTab||'incoming')===id?'':' hidden'}><header class="sales-store-subhead-v43"><h2>${title}</h2><span>${qty(rows.length)} سفارش</span></header>${extra}<div class="bt-table-wrap"><table class="bt-table sd-store-table"><thead><tr><th>فروشگاه</th><th>شماره سفارش</th><th>تاریخ</th><th>وضعیت</th><th>اقلام</th><th>عملیات</th></tr></thead><tbody>${rows.map(o=>card(o,kind)).join('')||`<tr><td colspan="6">${salesEmptyV25('sales',emptyTitle,emptyText)}</td></tr>`}</tbody></table></div></section>`;
   const shipCount=(deliveries.storeRunShipments||[]).length;
   const tabs=[['incoming','ورودی',incoming.length+shipCount],['processing','در جریان',processing.length],['approved','تأیید شده',approved.length],['history','سوابق',history.length]];
@@ -992,7 +994,7 @@ async function openPickupExit(id,btn){
   if(!document.contains(host)||app.gateExitEditorSeq!==seq)return;
   const cancelled=o.cancellation?.status==='EXIT_APPROVED',person=o.recipient||{};
   const items=(o.items||[]).map(i=>`<tr><td data-label="تطبیق"><label class="gt-check"><input type="checkbox" data-pickup-check="${esc(i.itemId)}"><span>تطبیق ${esc(i.productName||'قلم')}</span></label></td><td data-label="محصول">${esc(i.productName||'—')}</td><td data-label="وزن تحویلی">${qty(i.deliveredKg)} کیلوگرم</td></tr>`).join('');
-  host.innerHTML=`<section class="sd-panel gt-exit-editor" data-pickup-exit-editor="${esc(o.id)}"><div class="sd-head"><div><h2>کنترل خروج سفارش ${esc(fa(o.orderNo||'—'))}</h2><p>صاحب سفارش: ${esc(o.customerName||'—')} • ${esc(fa(o.customerPhone||'—'))}</p><p>تحویل‌گیرنده: ${esc(person.name||'—')} • ${esc(fa(person.phone||'—'))} • ${esc([person.vehicleType,person.carType,person.plate].filter(Boolean).join(' — ')||'بدون وسیله')}</p></div></div><div class="sd-pad">${cancelled?'<p>خروج بدون کالا؛ انصراف توسط انبار و فروش تأیید شده است.</p>':`<div class="bt-table-wrap"><table class="bt-table gt-exit-items-table"><caption class="bt-caption">کنترل اقلام خروج</caption><thead><tr><th>تطبیق</th><th>محصول</th><th>وزن تحویلی</th></tr></thead><tbody>${items||'<tr><td colspan="3">قلمی برای کنترل نیست.</td></tr>'}</tbody></table></div>`}</div><p id="exitMsg" class="form-error gt-exit-msg" role="alert" hidden></p><div class="sd-submit-bar"><small>${cancelled?'خروج بدون کالا ثبت می‌شود.':'همه اقلام را با بار واقعی تطبیق دهید.'}</small><button type="button" class="btn btn-success btn-lg" data-action="${cancelled?'pickup-cancellation-exit':'pickup-goods-exit'}" data-id="${esc(o.id)}">ثبت خروج نهایی${cancelled?' بدون کالا':''}</button></div></section>`;
+  host.innerHTML=`<section class="sd-panel gt-exit-editor" data-pickup-exit-editor="${esc(o.id)}"><div class="sd-head"><div><h2>کنترل خروج سفارش ${esc(fa(o.orderNo||'—'))}</h2><p>صاحب سفارش: ${esc(o.customerName||'—')} • ${esc(fa(o.customerPhone||'—'))}</p><p>تحویل‌گیرنده: ${esc(person.name||'—')} • ${esc(fa(person.phone||'—'))} • ${esc([person.vehicleType,person.carType,person.plate].filter(Boolean).join(' — ')||'بدون وسیله')}</p></div></div><div class="sd-pad">${cancelled?`<p>خروج بدون کالا؛ انصراف توسط انبار و فروش تأیید شده است.</p>${o.cancellation.returnedGoods?'<label class="gt-check"><input type="checkbox" data-pickup-no-goods><span>کنترل کردم مراجعه‌کننده هیچ کالایی همراه ندارد.</span></label>':''}`:`<div class="bt-table-wrap"><table class="bt-table gt-exit-items-table"><caption class="bt-caption">کنترل اقلام خروج</caption><thead><tr><th>تطبیق</th><th>محصول</th><th>وزن تحویلی</th></tr></thead><tbody>${items||'<tr><td colspan="3">قلمی برای کنترل نیست.</td></tr>'}</tbody></table></div>`}</div><p id="exitMsg" class="form-error gt-exit-msg" role="alert" hidden></p><div class="sd-submit-bar"><small>${cancelled?'خروج بدون کالا ثبت می‌شود.':'همه اقلام را با بار واقعی تطبیق دهید.'}</small><button type="button" class="btn btn-success btn-lg" data-action="${cancelled?'pickup-cancellation-exit':'pickup-goods-exit'}" data-id="${esc(o.id)}">ثبت خروج نهایی${cancelled?' بدون کالا':''}</button></div></section>`;
   host.scrollIntoView({behavior:'smooth',block:'nearest'});
  }catch(e){if(document.contains(host)&&app.gateExitEditorSeq===seq){host.innerHTML=`<section class="sd-panel gt-exit-editor"><p class="form-error" role="alert">${esc(e.message||'دریافت اطلاعات ناموفق بود.')}</p></section>`;toast(e.message);}}
  finally{if(btn&&document.contains(btn)){btn.disabled=false;btn.removeAttribute('aria-busy');}}
@@ -1001,9 +1003,10 @@ async function confirmPickupExit(button){
  const editor=button.closest('[data-pickup-exit-editor]');if(!editor||button.disabled)return;
  const checks=[...editor.querySelectorAll('[data-pickup-check]')],missing=checks.filter(x=>!x.checked),msg=editor.querySelector('#exitMsg');
  checks.forEach(x=>x.closest('.gt-check')?.classList.toggle('gt-check-missing',!x.checked));
+ if(editor.querySelector('[data-pickup-no-goods]')&&!editor.querySelector('[data-pickup-no-goods]').checked){msg.textContent='ابتدا خروج بدون کالا را کنترل و تأیید کنید.';msg.hidden=false;return;}
  if(missing.length){msg.textContent='ابتدا همهٔ اقلام بار را کنترل و تیک بزنید.';msg.hidden=false;missing[0].scrollIntoView({behavior:'smooth',block:'center'});return;}
  const action=button.dataset.action==='pickup-goods-exit'?'goods-exit':'cancellation-exit';button.disabled=true;button.setAttribute('aria-busy','true');
- try{await api('/api/pickup/'+encodeURIComponent(button.dataset.id)+'/'+action,{method:'POST',body:JSON.stringify({checkedItems:checks.filter(x=>x.checked).map(x=>x.dataset.pickupCheck)})});toast('خروج نهایی ثبت شد.');await renderGate('exit');await refreshIndicators();}
+ try{await api('/api/pickup/'+encodeURIComponent(button.dataset.id)+'/'+action,{method:'POST',body:JSON.stringify({checkedItems:checks.filter(x=>x.checked).map(x=>x.dataset.pickupCheck),...(action==='cancellation-exit'?{confirmedNoGoods:true}:{})})});toast('خروج نهایی ثبت شد.');await renderGate('exit');await refreshIndicators();}
  catch(e){button.disabled=false;button.removeAttribute('aria-busy');msg.hidden=false;msg.textContent=e.message||'ثبت خروج انجام نشد؛ دوباره تلاش کنید.';toast(msg.textContent);}
 }
 function bindGate(tab){
@@ -1354,7 +1357,7 @@ function wh38List(orders,kind){
 }
 async function wh38Paint(phase){
   if(phase==='history') return; // سوابق با فیلترهای کاربر؛ نوسازی خودکار ۷ ثانیه‌ای فیلترها را به‌هم نمی‌زند
-  const host=$('#wh38Body'); if(!host||host.dataset.sheet==='1')return;
+  const host=$('#wh38Body'); if(!host||host.dataset.sheet==='1'||host.querySelector('[data-return-order] input:checked'))return;
   try{
     if(phase==='delivered'){ await whDeliveredPaint(host); return; }
     if(phase==='document-edits'){ await whDocumentEditsPaint(host); return; }
@@ -1386,7 +1389,12 @@ async function wh38Paint(phase){
       const early=active.filter(o=>['SCHEDULED_REMOTE','RETURNED_TO_SALES'].includes(o.status)&&!o.cancellation);
       if(early.length)waiting=`<section class="sd-panel"><h3>مراجعهٔ سفارش‌های هنوز فعال‌نشده در انبار</h3><div class="bt-table-wrap"><table class="bt-table wh-early-pickup-table"><caption class="bt-caption">مراجعه‌های زودهنگام انبار</caption><thead><tr><th scope="col">شماره سفارش</th><th scope="col">صاحب سفارش</th><th scope="col">تحویل‌گیرنده</th><th scope="col">عملیات</th></tr></thead><tbody>${early.map(o=>`<tr><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="صاحب سفارش">${esc(o.customerName)}</td><td data-label="تحویل‌گیرنده">${esc(o.recipient?.name||'—')}</td><td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-secondary btn-sm" data-action="pickup-cancel" data-id="${esc(o.id)}">ثبت انصراف بدون تحویل</button></td></tr>`).join('')}</tbody></table></div></section>`;
     }
-    host.innerHTML=waiting+wh38List(orders,phase);
+    let returns='';
+    if(phase==='incoming'){
+      const requests=(await fetchPagedList('/api/warehouse/settlement-cancellations','orders')).orders;
+      if(requests.length)returns=`<section class="sd-panel"><h3>انصراف از تسویه — بررسی بازگشت کالا</h3><p>برای هر قلم وزن‌دار بازگشت کامل و نداشتن کالا نزد مراجعه‌کننده را کنترل کنید.</p>${requests.map(o=>`<article class="sd-panel" data-return-order="${esc(o.id)}"><h4>سفارش ${esc(fa(o.orderNo||'—'))} — ${esc(o.customerName||'—')}</h4><p>سند انبار: ${esc(fa(o.warehouseDocumentNo||'—'))} · دلیل: ${esc(o.reason)}</p>${o.items.filter(i=>Number(i.deliveredKg)>0).map(i=>`<label><input type="checkbox" data-return-item="${esc(i.itemId)}"> بازگشت کامل ${esc(i.productName)} — ${qty(i.deliveredKg)} کیلوگرم</label><br>`).join('')}<label><input type="checkbox" data-return-no-goods> تأیید می‌کنم مراجعه‌کننده هیچ کالایی همراه ندارد.</label><br><button type="button" class="btn btn-primary" data-action="confirm-settlement-return" data-id="${esc(o.id)}">تأیید بازگشت و لغو سفارش</button></article>`).join('')}</section>`;
+    }
+    host.innerHTML=returns+waiting+wh38List(orders,phase);
   }
   catch{ host.innerHTML='<div class="empty">خطا در دریافت صف انبار.</div>'; }
 }
@@ -1616,6 +1624,12 @@ function wh38Shell(phase){
     const el=e.target.closest('[data-action]'); if(!el)return;
     const a=el.dataset.action, id=el.dataset.id;
     try{
+      if(a==='confirm-settlement-return'){
+        const box=el.closest('[data-return-order]'),checks=[...box.querySelectorAll('[data-return-item]')];
+        if(checks.some(x=>!x.checked)||!box.querySelector('[data-return-no-goods]')?.checked)return toast('ابتدا بازگشت همه اقلام و نبود کالا نزد مراجعه‌کننده را تأیید کنید.');
+        if(!confirm('بازگشت کامل کالا و خروج بدون کالا تأیید و سفارش لغو شود؟'))return;
+        el.disabled=true;await api('/api/warehouse/settlement-cancellations/'+encodeURIComponent(id)+'/confirm',{method:'POST',body:JSON.stringify({returnedItems:checks.map(x=>x.dataset.returnItem),confirmedNoGoods:true})});toast('انصراف ثبت شد؛ خروج بدون کالا به نگهبانی ارجاع شد.');await refreshIndicators();wh38Shell(app.wh38.phase);return;
+      }
       if(a==='pickup-cancel'){ const reason=prompt('دلیل انصراف را وارد کنید:');if(!reason?.trim())return;if(!confirm('آیا انبار تأیید می‌کند هیچ کالایی به این مراجعه تحویل نشده است؟'))return;el.disabled=true;await api('/api/pickup/'+encodeURIComponent(id)+'/cancellation',{method:'POST',body:JSON.stringify({reason,confirmedNoGoods:true})});toast('عدم تحویل ثبت شد و در انتظار تأیید فروش است.');await refreshIndicators();wh38Shell(app.wh38.phase);return;}
       if(a==='wh-stock-preview')return wh38StockPreview(el.dataset.branch);
       if(a==='wh-history-document')return whDeliveredDetails(id);
@@ -2396,9 +2410,10 @@ async function openTransportDeliveryWork(id){
 function transportInvoicePriceDefault(order,line){
  const item=(order.items||[]).find(row=>String(row.id)===String(line.itemId));
  const productId=line.productId??item?.productId;
- const listedPrice=productId==null?0:Number(stl.priceMap?.[String(productId)]||0);
+ const hasListedPrice=productId!=null&&Object.hasOwn(stl.priceMap||{},String(productId));
+ const listedPrice=hasListedPrice?Number(stl.priceMap[String(productId)]):0;
  const savedPrice=Number(line.unitPrice??item?.unitPrice??0);
- const amount=listedPrice>0?listedPrice:savedPrice;
+ const amount=hasListedPrice?listedPrice:savedPrice;
  return Number.isSafeInteger(amount)&&amount>0?fa(amount.toLocaleString('en-US').replace(/,/g,'٬')):'';
 }
 function transportSalesInvoicePanel(order,host=$('#stlMain'),reload=()=>stlOpen(order.id),onClosed=null){

@@ -199,6 +199,9 @@ const NOTIF_ROUTES={
   RETURN_FROM_WAREHOUSE:{page:'sales',sub:'flow'},
   WAREHOUSE_DONE:{page:'sales',sub:'settlement'},
   STORE_ORDER_PENDING:{page:'sales',sub:'stores'},
+  STORE_CANCELLATION_REQUESTED:{page:'sales',sub:'stores'},
+  STORE_CANCELLATION_REVIEWED:{page:'store',sub:'registered'},
+  SETTLEMENT_CANCELLATION_REQUESTED:{page:'warehouse',sub:'incoming'},
   STORE_ORDER_QUICK_SENT:{page:'warehouse'},
   STORE_RECEIPT_CONFIRMED:{page:'sales',sub:'delivery'},
   TRANSPORT_ORDER_READY:{page:'drivers',sub:'orders'},
@@ -469,6 +472,10 @@ async function openNotificationTarget(id,type,role,entityType,entityId){
       const active=(await fetchPagedList('/api/pickup/active','orders')).orders.find(o=>o.id===entityId);if(!active)return toast('این مراجعه دیگر در جریان نیست.');
       await go('warehouse',active.status==='WAREHOUSE_PREPARING'?'preparing':'incoming');
       const el=document.querySelector(`[data-action="pickup-cancel"][data-id="${CSS.escape(entityId)}"]`);if(focusNotificationElement(el))return finish(true);return toast('این مراجعه دیگر در صف انبار نیست.');
+    }
+    if(type==='SETTLEMENT_CANCELLATION_REQUESTED'&&route.page==='warehouse'){
+      await go('warehouse','incoming');await wh38Paint('incoming');const el=document.querySelector(`[data-return-order="${CSS.escape(entityId)}"]`);
+      if(focusNotificationElement(el))return finish(true);return toast('این درخواست دیگر در صف انبار نیست.');
     }
     const order=(await api('/api/orders/'+encodeURIComponent(entityId))).order;
     if(route.page==='warehouse'){

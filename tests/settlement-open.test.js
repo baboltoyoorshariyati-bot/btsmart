@@ -27,6 +27,14 @@ test('قیمت جاری فهرست محصول روی قیمت خالی یا صف
  assert.deepEqual(h.c.stl.items.map(item=>item.price),[123456,78000,99000]);
  assert.equal(h.c.stl.priceMap.p01,123456);
 });
+test('قیمت صفر ثبت‌شده، قیمت قدیمی قلم را دوباره فعال نمی‌کند',async()=>{
+ const h=harness(async url=>{
+  if(url==='/api/orders/zero')return {order:order('zero',{items:[{id:'i1',productId:'p01',unitPrice:45000,deliveredKg:1,product:{name:'مرغ'}}]})};
+  if(url==='/api/prices')return {prices:[{productId:'p01',price:0}]};
+  throw Error('درخواست غیرمنتظره '+url);
+ });
+ await h.c.stlOpen('zero');assert.equal(h.c.stl.items[0].price,0);
+});
 test('خطای پوز تسویه پخش را مسدود نمی‌کند اما در وضعیت فرم ثبت می‌شود',async()=>{
  const h=harness(async url=>{if(url==='/api/orders/a')return {order:order('a',{transportReturn:{outcome:'DELIVERED'}})};throw Error('دستگاه در دسترس نیست')});
  await h.c.stlOpen('a');assert.equal(h.c.stl.devicesError,true);assert.equal(h.c.stl.devices.length,0);assert.deepEqual(h.painted,['a']);

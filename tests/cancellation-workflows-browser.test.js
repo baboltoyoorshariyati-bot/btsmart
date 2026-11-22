@@ -1,0 +1,52 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const {spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),net=require('node:net');
+const executablePath=process.env.BT_CHROMIUM_PATH;
+test('cancellation flows in sales, warehouse, gate and store',{skip:!executablePath,timeout:120000},async()=>{
+ const {chromium}=require('playwright-core');const port=await new Promise(r=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>r(p));});});
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-pickup-browser-')),base=`http://127.0.0.1:${port}`;
+ const env={...process.env,HOST:'127.0.0.1',PORT:String(port),DATA_DIR:dir,ADMIN_INITIAL_PASSWORD:'Initial!2345'};delete env.BT_PICKUP_STAGING;
+ const proc=spawn(process.execPath,['server.js'],{cwd:path.join(__dirname,'..'),env,stdio:['ignore','pipe','pipe']});let browser;
+ try{
+  await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(Error('startup timeout')),15000);proc.stdout.on('data',d=>{if(String(d).includes('"listening"')){clearTimeout(t);resolve();}});proc.once('exit',c=>reject(Error('server exit '+c)));});
+  browser=await chromium.launch({executablePath,args:['--no-sandbox','--disable-dev-shm-usage']});const admin=await browser.newContext(),gate=await browser.newContext({viewport:{width:1280,height:900}}),wh=await browser.newContext({viewport:{width:1280,height:900}}),sales=await browser.newContext({viewport:{width:1280,height:900}});
+  await wh.addInitScript(()=>{if(window!==window.top)window.print=()=>{window.parent.__prints=(window.parent.__prints||0)+1;};});
+  const post=async(ctx,url,data)=>{const r=await ctx.request.post(base+url,{data});assert(r.ok(),url+' '+r.status()+' '+await r.text());return r.json();};
+  await post(admin,'/api/login',{username:'admin',password:'Initial!2345'});await post(admin,'/api/account/password',{currentPassword:'Initial!2345',newPassword:'Changed!2345'});
+  for(const roleCode of ['gate','warehouse','sales'])await post(admin,'/api/admin/users',{username:'test-'+roleCode,roleCode,fullName:roleCode,position:'تست',password:'Changed!2345',mustChangePassword:false});
+  for(const [ctx,role] of [[gate,'gate'],[wh,'warehouse'],[sales,'sales']])await post(ctx,'/api/login',{username:'test-'+role,password:'Changed!2345'});
+  await post(admin,'/api/admin/users',{username:'test-store',roleCode:'store',fullName:'فروشگاه تست',storeName:'فروشگاه تست',position:'تست',password:'Changed!2345',mustChangePassword:false});
+  const shop=await browser.newContext({viewport:{width:1280,height:900}});await post(shop,'/api/login',{username:'test-store',password:'Changed!2345'});
+  const gp=await gate.newPage(),wp=await wh.newPage(),sp=await sales.newPage(),storePage=await shop.newPage(),errors=[];
+  for(const p of [gp,wp,sp,storePage]){p.on('pageerror',e=>errors.push(e.message));await p.goto(base+'/',{waitUntil:'networkidle'});}
+  const visit=(await post(gate,'/api/visits',{name:'مشتری حضوری',phone:'09121112255',noVehicle:true})).visit;
+  const order=(await post(sales,'/api/orders',{visitId:visit.id,deliveryMode:'PICKUP',items:[{productId:'p01',requestedQty:2,requestedUnit:'کیلوگرم'}]})).order;
+  await post(wh,`/api/orders/${order.id}/warehouse/accept`,{});await post(wh,`/api/orders/${order.id}/warehouse/start-preparing`,{});
+  await post(wh,`/api/orders/${order.id}/warehouse`,{physicalHandoverConfirmed:true,items:[{itemId:order.items[0].id,deliveredKg:2}]});
+  await sp.evaluate(()=>go('sales','settlement'));await sp.evaluate(id=>stlOpen(id),order.id);
+  const cancel=sp.locator('[data-stl=cancel-purchase]');await cancel.waitFor();const dialogs=d=>d.accept(d.type()==='prompt'?'انصراف مشتری':undefined);sp.on('dialog',dialogs);
+  const requested=sp.waitForResponse(r=>r.url().endsWith('/settlement-cancellation')&&r.request().method()==='POST');await cancel.click();assert.equal((await requested).status(),200);sp.off('dialog',dialogs);
+  await wp.evaluate(()=>go('warehouse','incoming'));const box=wp.locator(`[data-return-order="${order.id}"]`);await box.waitFor();await box.locator('[data-return-item]').check();await box.locator('[data-return-no-goods]').check();
+  await wp.waitForTimeout(7200);assert(await box.locator('[data-return-item]').isChecked());wp.once('dialog',d=>d.accept());await box.locator('[data-action=confirm-settlement-return]').click();await box.waitFor({state:'detached'});
+  await gp.evaluate(()=>go('gate','exit'));const row=gp.locator(`[data-cancelled-visit="${visit.id}"]`);await row.waitFor();
+  gp.once('dialog',d=>d.accept());await row.locator('[data-action=cancelled-onsite-exit]').click();await row.waitFor({state:'detached'});
+  const date=new Date(),day=[date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');
+  const pickup=(await post(sales,'/api/orders/remote',{name:'مشتری غیرحضوری',phone:'09121112257',deliveryMode:'PICKUP',deliveryDate:day,scheduledTime:'00:00',items:[{productId:'p01',requestedQty:3,requestedUnit:'کیلوگرم'}],deposit:{type:'CASH',amount:100}})).order;
+  await post(gate,`/api/pickup/${pickup.id}/entry`,{recipientIsBuyer:true,name:'مشتری غیرحضوری',phone:'09121112257',noVehicle:true});await post(wh,`/api/orders/${pickup.id}/warehouse/accept`,{});
+  await post(wh,`/api/pickup/${pickup.id}/handover`,{physicalHandoverConfirmed:true,items:[{itemId:pickup.items[0].id,deliveredKg:3}]});
+  await sp.evaluate(()=>go('sales','settlement'));await sp.evaluate(id=>stlOpen(id),pickup.id);sp.on('dialog',dialogs);
+  const pickupRequest=sp.waitForResponse(r=>r.url().endsWith('/settlement-cancellation')&&r.request().method()==='POST');await sp.locator('[data-stl=cancel-purchase]').click();assert.equal((await pickupRequest).status(),200);sp.off('dialog',dialogs);
+  await wp.evaluate(()=>go('warehouse','incoming'));const pickupBox=wp.locator(`[data-return-order="${pickup.id}"]`);await pickupBox.waitFor();await pickupBox.locator('[data-return-item]').check();await pickupBox.locator('[data-return-no-goods]').check();wp.once('dialog',d=>d.accept());await pickupBox.locator('[data-action=confirm-settlement-return]').click();await pickupBox.waitFor({state:'detached'});
+  await gp.evaluate(()=>go('gate','exit'));const pickupRow=gp.locator(`[data-pickup-exit="${pickup.id}"]`);await pickupRow.waitFor();await pickupRow.locator('[data-action=open-pickup-exit]').click();const editor=gp.locator(`[data-pickup-exit-editor="${pickup.id}"]`);await editor.locator('[data-pickup-no-goods]').waitFor();await editor.locator('[data-action=pickup-cancellation-exit]').click();assert.match(await editor.locator('#exitMsg').innerText(),/بدون کالا/);await editor.locator('[data-pickup-no-goods]').check();await editor.locator('[data-action=pickup-cancellation-exit]').click();await pickupRow.waitFor({state:'detached'});
+  assert.equal((await (await sales.request.get(base+`/api/orders/${pickup.id}`)).json()).order.deposit.status,'REFUND_REQUIRED');
+  const storeOrder=(await post(shop,'/api/store/orders',{name:'مشتری فروشگاه',phone:'09121112256',items:[{productId:'p01',requestedQty:3,requestedUnit:'کیلوگرم'}]})).order;
+  await post(sales,`/api/store/orders/${storeOrder.id}/quick-send`,{});
+  await storePage.evaluate(()=>go('store','registered'));await storePage.evaluate(id=>openStoreOrderDetails(id),storeOrder.id);
+  storePage.on('dialog',dialogs);const storeResp=storePage.waitForResponse(r=>r.url().endsWith('/cancellation-request')&&r.request().method()==='POST');await storePage.locator('[data-store-cancel-request]').click();assert.equal((await storeResp).status(),200);storePage.off('dialog',dialogs);
+  await storePage.getByText('درخواست لغو: در انتظار بررسی فروش').waitFor();
+  await sp.evaluate(()=>go('sales','stores'));await sp.evaluate(()=>fetchSalesCache(true));await sp.evaluate(()=>paintSalesPaneV29('stores',app.salesCache));
+  const pending=sp.locator(`[data-store-cancel-queue="${storeOrder.id}"]`);await pending.waitFor();await pending.locator('button').click();
+  sp.on('dialog',dialogs);const reviewed=sp.waitForResponse(r=>r.url().endsWith('/review')&&r.request().method()==='POST');await sp.locator('[data-store-cancel-review]').click();assert.equal((await reviewed).status(),200);sp.off('dialog',dialogs);
+  assert.deepEqual(errors,[]);
+ }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
+});

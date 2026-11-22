@@ -249,7 +249,9 @@ function renderSalesStoresV41(orders,deliveries={}){ // v37.7.9 — فروشگا
     </tr>`;
   };
   // v37.33.0 — محموله‌های ارسالی انبار (هر دو سرویس) در سربرگ «ورودی» فروشگاه‌های فروش نمایش داده می‌شوند (جای قبلی: «در جریان»؛ فروش آن‌ها را در ورودی پیدا نمی‌کرد)
-  const shipmentsPanel=renderStoreRunShipmentsPanel(deliveries.storeRunShipments||[]);
+  const requests=all.filter(o=>(o.storeCancellationRequests||[]).some(r=>r.status==='PENDING'));
+  const cancellationPanel=requests.length?`<section class="sd-panel"><h3>درخواست‌های لغو فروشگاه</h3><p>درخواست به‌تنهایی سفارش یا اسناد را لغو نمی‌کند و عملیات تحویل را متوقف نمی‌کند؛ وضعیت کالا، تحویل و امور مالی را بررسی و نتیجه را ثبت کنید.</p>${requests.map(o=>{const r=o.storeCancellationRequests.find(x=>x.status==='PENDING');return `<article data-store-cancel-queue="${esc(o.id)}"><b>${esc(o.storeName||'فروشگاه')} — سفارش ${esc(fa(o.orderNo||'—'))}</b><p>${esc(r.reason)}</p><button type="button" class="btn btn-secondary" data-action="store-order-details-v25" data-id="${esc(o.id)}">بررسی درخواست و جزئیات</button></article>`;}).join('')}</section>`:'';
+  const shipmentsPanel=cancellationPanel+renderStoreRunShipmentsPanel(deliveries.storeRunShipments||[]);
   const panel=(id,title,rows,kind,emptyTitle,emptyText,extra='')=>`<section class="sales-store-subpanel-v43" data-store-section="${id}"${(app.salesStoreTab||'incoming')===id?'':' hidden'}><header class="sales-store-subhead-v43"><h2>${title}</h2><span>${qty(rows.length)} سفارش</span></header>${extra}<div class="bt-table-wrap"><table class="bt-table sd-store-table"><thead><tr><th>فروشگاه</th><th>شماره سفارش</th><th>تاریخ</th><th>وضعیت</th><th>اقلام</th><th>عملیات</th></tr></thead><tbody>${rows.map(o=>card(o,kind)).join('')||`<tr><td colspan="6">${salesEmptyV25('sales',emptyTitle,emptyText)}</td></tr>`}</tbody></table></div></section>`;
   const shipCount=(deliveries.storeRunShipments||[]).length;
   const tabs=[['incoming','ورودی',incoming.length+shipCount],['processing','در جریان',processing.length],['approved','تأیید شده',approved.length],['history','سوابق',history.length]];

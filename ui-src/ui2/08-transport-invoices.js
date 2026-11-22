@@ -114,9 +114,10 @@ async function openTransportDeliveryWork(id){
 function transportInvoicePriceDefault(order,line){
  const item=(order.items||[]).find(row=>String(row.id)===String(line.itemId));
  const productId=line.productId??item?.productId;
- const listedPrice=productId==null?0:Number(stl.priceMap?.[String(productId)]||0);
+ const hasListedPrice=productId!=null&&Object.hasOwn(stl.priceMap||{},String(productId));
+ const listedPrice=hasListedPrice?Number(stl.priceMap[String(productId)]):0;
  const savedPrice=Number(line.unitPrice??item?.unitPrice??0);
- const amount=listedPrice>0?listedPrice:savedPrice;
+ const amount=hasListedPrice?listedPrice:savedPrice;
  return Number.isSafeInteger(amount)&&amount>0?fa(amount.toLocaleString('en-US').replace(/,/g,'٬')):'';
 }
 function transportSalesInvoicePanel(order,host=$('#stlMain'),reload=()=>stlOpen(order.id),onClosed=null){

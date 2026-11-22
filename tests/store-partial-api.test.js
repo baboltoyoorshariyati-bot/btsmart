@@ -46,6 +46,13 @@ assert.equal(bulk.storeOrderKind,'BULK');assert.equal(bulk.customerId,null);
  const doc=(await ok('GET',`/api/warehouse/store-documents/${stock.id}/1`,null,wh)).document;assert.equal(doc.lines[0].deliveredKg,2.5);assert.equal(doc.driverName,'راننده');await ok('POST',`/api/warehouse/transport-handovers/${stock.id}`,{run:1,physicalHandoverConfirmed:true,handoverToken:doc.handoverToken},wh);
  await ok('POST',`/api/sales/store-transport/${stock.id}/1/review`,{reviewConfirmed:true},sales);await ok('POST',`/api/gate/store-shipments/${stock.id}/1/depart`,{departureConfirmed:true},admin);assert.equal((await call('POST',`/api/store/orders/${stock.id}/confirm-receipt`,{run:1},other)).status,404);await ok('POST',`/api/store/orders/${stock.id}/confirm-receipt`,{run:1},admin);await ok('POST',`/api/sales/store-transport/${stock.id}/1/return`,{documentsReturned:true},sales);
  order=(await ok('GET',`/api/orders/${stock.id}`,null,sales)).order;assert.equal(order.status,'CLOSED');assert.equal(order.payments.length,0);assert.equal(order.transportStoreTrips['1'].status,'CLOSED');
+ // A request after actual delivery must not roll back the shipment, documents or status.
+ const deliveredBefore=order;
+ const cancellation=(await ok('POST',`/api/store/orders/${stock.id}/cancellation-request`,{reason:'بررسی پس از تحویل'},shop)).request;
+ await ok('POST',`/api/sales/store-cancellation-requests/${stock.id}/review`,{requestId:cancellation.id,resolution:'نیاز به تعیین تکلیف دستی'},sales);
+ const deliveredAfter=(await ok('GET',`/api/orders/${stock.id}`,null,sales)).order;
+ assert.equal(deliveredAfter.status,'CLOSED');assert.deepEqual(deliveredAfter.transportStoreTrips,deliveredBefore.transportStoreTrips);assert.deepEqual(deliveredAfter.items,deliveredBefore.items);
+ assert.equal(deliveredAfter.storeCancellationRequests[0].status,'REVIEWED');
  // All items unavailable: close without driver, shipment, invoice or payment.
  const empty=(await ok('POST','/api/store/orders',{storeOrderKind:'PARTIAL',storePurpose:'STOCK',items},shop)).order;
  await ok('POST',`/api/store/orders/${empty.id}/quick-send`,{},sales);await ok('POST',`/api/orders/${empty.id}/warehouse/accept`,{},wh);await ok('POST',`/api/orders/${empty.id}/warehouse/start-preparing`,{},wh);
