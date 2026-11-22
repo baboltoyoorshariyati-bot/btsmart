@@ -28,7 +28,7 @@
 | `users` | کاربران و رمزها | `username`, `role_code`, `full_name`, `is_active` |
 | `roles` | ۷ نقش سامانه | `title` |
 | `customers` | مشتریان | `name`, `phone`, `code` |
-| `products` | کاتالوگ ۹۰ محصول | `quick_code`, `name`, `is_active` |
+| `products` | کاتالوگ محصولات ثبت‌شده توسط کاربران (نصب تازه خالی است) | `quick_code`, `name`, `is_active` |
 | `price_list` | قیمتهای روز | `product_id`, `price`, `date` |
 | `orders` | سفارشها | `order_no`, `customer_id`, `status`, `order_type`, `source` |
 | `order_items` | اقلام سفارش | `order_id`, `product_id`, `quantity` |

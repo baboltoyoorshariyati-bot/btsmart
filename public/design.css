@@ -481,6 +481,9 @@ select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3
 
 /* --- تب ۵: روزهای آتی --- */
 .fx-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;align-items:start}
+/* Future orders: keep the complete form full-width and the registered list below it. */
+.fx-grid.fx-future-layout{grid-template-columns:minmax(0,1fr)}
+.fx-future-layout > *{min-width:0}
 .fx-form{display:grid;gap:14px}
 .fx-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-xs)}
 .fx-card-head{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line)}

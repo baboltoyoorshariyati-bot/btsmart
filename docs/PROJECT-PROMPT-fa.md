@@ -61,7 +61,7 @@ docs/                      deployment-windows-server-2025.md ، weighbridge-pu85
 windows-installer/         BabolToyor-Setup.cmd + INSTALL-STEPS-fa.md/html (راهنمای نصب گامبهگام)
 scripts/                   start.ps1 / start-hidden.ps1 / weighbridge-bridge.js
 assets/logo.png            لوگوی رسمی (سرویس /logo.png)
-data/baboltoyoor.db        دیتابیس SQL خام (ساخته‌شده در اولین اجرا): فقط admin + ۹۰ محصول
+data/baboltoyoor.db        دیتابیس SQL خام (ساخته‌شده در اولین اجرا): فقط admin، بدون محصول پیش‌فرض
 CHANGELOG.md               صدر فایل = آخرین نسخه
 docs/sqlite-database-fa.md  اسکما، پرسوجو، مهاجرت و پشتیبانگیری SQL
 scripts/sql-query.js        پرسوجوی فقطخواندنی SQL / --stats / --tables

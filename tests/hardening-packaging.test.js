@@ -5,7 +5,7 @@ test('release archive has a self-consistent manifest despite excluding GitHub to
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-package-check-')),root=path.join(__dirname,'..');
  try{
   const script=String.raw`
-import hashlib, pathlib, subprocess, sys, zipfile
+import hashlib, json, os, pathlib, subprocess, sys, zipfile
 root, output = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
 version = (root / 'RELEASE_VERSION.txt').read_text().strip()
 subprocess.run([sys.executable, str(root / 'scripts/arena-release-build.py'), str(output), str(root), '--expected-version', version], check=True)
@@ -20,8 +20,17 @@ with zipfile.ZipFile(output / f'BabolToyor-App-{version}.zip') as archive:
         assert hashlib.sha256(archive.read(name)).hexdigest() == digest, name
         listed.add(name)
     assert listed == names - {'SHA256SUMS.txt'}
+with zipfile.ZipFile(output / f'BabolToyor-App-{version}-bootstrap.zip') as archive:
+    names = set(archive.namelist())
+    assert 'lib/catalog.js' not in names
+    assert not any(name.startswith('tests/') for name in names)
+    extracted = output.parent / 'installed'
+    archive.extractall(extracted)
+env = dict(os.environ, DATA_DIR=str(output.parent / 'installed-data'), ADMIN_INITIAL_PASSWORD='Initial!2345', NODE_OPTIONS='')
+result = subprocess.run([sys.argv[3], '-e', "const s=require('./lib/store'); console.log('RESULT:'+s.init().products.length)"], cwd=extracted, env=env, capture_output=True, text=True, check=True)
+assert 'RESULT:0' in result.stdout, result.stdout
 `;
-  const result=spawnSync(process.platform==='win32'?'python':'python3',['-c',script,root,path.join(dir,'assets')],{cwd:root,encoding:'utf8',timeout:30000});
+  const result=spawnSync(process.platform==='win32'?'python':'python3',['-c',script,root,path.join(dir,'assets'),process.execPath],{cwd:root,encoding:'utf8',timeout:30000});
   assert.equal(result.status,0,result.stderr);
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });

@@ -339,19 +339,38 @@ async function renderProductsPage() {
   adm.todayPrices = Object.fromEntries((pr.prices || []).map((x) => [x.productId, x.price]));
   const active = adm.products.filter((x) => x.isActive);
   const priced = active.filter((x) => Number(adm.todayPrices[x.id]) > 0).length;
-  const desc = isAdmin
+  const desc = (isAdmin
     ? 'قیمت هر محصول تا ثبت قیمت جدید معتبر می‌ماند؛ دسته‌ها و تغییرات گروهی را از همین صفحه مدیریت کنید.'
-    : 'قیمت هر محصول تا ثبت قیمت جدید معتبر می‌ماند؛ گروه محصول را در ویرایش محصول انتخاب کنید.';
+    : 'قیمت هر محصول تا ثبت قیمت جدید معتبر می‌ماند؛ گروه محصول را در ویرایش محصول انتخاب کنید.') + ' خروجی اکسل شامل همهٔ محصولات (حتی غیرفعال) و فقط کد و نام است، نه پشتیبان قیمت، وضعیت یا سوابق.';
   host.innerHTML = admHead('receipt', isAdmin ? 'محصولات و قیمت‌ها' : 'کارتابل محصولات و قیمت‌ها', desc, adm.products.length,
     `${admSearchBox('admProdSearch', 'جستجوی نام یا کد سریع', adm.q)}
      <span class="adm-count">${fa(priced)} از ${fa(active.length)} محصول فعال قیمت مثبت دارند</span>
+     <button class="btn btn-secondary" type="button" data-adm="prod-export">خروجی اکسل / قالب</button>
+     <button class="btn btn-secondary" type="button" data-adm="prod-import">ورود از اکسل</button><input type="file" id="admProductExcel" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
      <button class="btn btn-secondary" type="button" data-adm="prod-print">${icon('receipt',16)} چاپ لیست قیمت</button>
      <button class="btn btn-primary" type="button" data-adm="prod-new">${icon('plus', 16)} محصول جدید</button>`)
     + `${priceGroupsHtml()}<div class="price-group-filter"><label for="priceGroupFilter">فیلتر گروه محصول</label><select id="priceGroupFilter"><option value="all">همهٔ محصولات</option><option value="none">بدون گروه</option>${adm.priceGroups.map(g=>`<option value="${admE(g.id)}">${admE(g.name)}</option>`).join('')}</select></div><div id="admList" class="adm-list"></div></section>`;
   $('#priceGroupFilter').addEventListener('change',()=>paintProducts());
   $('#admProdSearch').addEventListener('input', (e) => { adm.q = e.target.value; paintProducts(); });
   bindAdm('products', host);
+  host.querySelector('#admProductExcel').addEventListener('change', async e=>{const file=e.target.files[0];e.target.value='';if(file) await admImportProducts(file);});
   paintProducts();
+}
+async function admImportProducts(file) {
+ try {
+  const rows=await productExcelRead(file);
+  openModal('ورود محصولات از اکسل', `<p>${fa(rows.length)} ردیف خوانده شد. محصول جدید با واحد پیش‌فرض کیلوگرم ثبت می‌شود. کدهای موجود (حتی غیرفعال) تغییر نمی‌کنند و از آنها صرف‌نظر می‌شود؛ قیمت‌ها و سوابق حفظ می‌شوند.</p><p>کدهای تکراری در خود فایل یا داده نامعتبر باعث رد کل فایل می‌شوند.</p><p data-import-error role="alert" class="form-error"></p><div class="modal-actions"><button type="button" class="btn btn-secondary" data-import-cancel>انصراف</button><button type="button" class="btn btn-primary" data-import-confirm>تأیید ورود</button></div>`);
+  $('#modal [data-import-cancel]').onclick=closeModal;
+  $('#modal [data-import-confirm]').onclick=async e=>{
+   const button=e.currentTarget;button.disabled=true;
+   try {
+    const result=await api('/api/admin/products/import',{method:'POST',body:JSON.stringify({rows})});
+    closeModal();await renderProductsPage();
+    openModal('نتیجه ورود اکسل',`<p>${fa(result.added)} محصول جدید ثبت شد و ${fa(result.skipped.length)} کد موجود بدون تغییر باقی ماند.</p>${result.skipped.length?`<ul>${result.skipped.map(x=>`<li>${admE(x.quickCode)} — نام موجود: ${admE(x.existingName)}؛ نام فایل: ${admE(x.name)}</li>`).join('')}</ul>`:''}<div class="modal-actions"><button type="button" class="btn btn-primary" data-import-done>بستن</button></div>`);
+    $('#modal [data-import-done]').onclick=closeModal;
+   } catch(err){const error=$('#modal [data-import-error]');if(error)error.textContent=err.message;if(button.isConnected)button.disabled=false;}
+  };
+ }catch(err){toast(err.message);}
 }
 function priceGroupsHtml(){
  const groups=adm.priceGroups||[];
@@ -712,6 +731,8 @@ function bindAdm(page, root = $('#content')) {
     if (a === 'drv-sign') return showDriverSignature(id);
     if (a === 'price-group-new' || a === 'price-group-rename' || a === 'price-group-delete') return priceGroupManage(a,id);
     if (a === 'price-group-preview') return previewPriceGroup(id,el);
+    if (a === 'prod-import') return c.querySelector('#admProductExcel').click();
+    if (a === 'prod-export') { try { await productExcelExport(adm.products); } catch(err) { toast('ساخت فایل اکسل ناموفق بود: '+err.message); } return; }
     if (a === 'prod-print') return openPriceListSelection();
     if (a === 'prod-new') return openProductForm(null);
     if (a === 'prod-edit') return openProductForm(find(adm.products));

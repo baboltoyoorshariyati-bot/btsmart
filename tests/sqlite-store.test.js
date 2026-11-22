@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
-const { PRODUCTS_SEED } = require('../lib/catalog');
+const { PRODUCTS_SEED } = require('./helpers/catalog-fixture');
 
 const root = path.join(__dirname, '..');
 const NEW_PROCESS = (body, setup = '') => `
@@ -42,7 +42,7 @@ test('SQLite is the source of truth: a real table per entity with typed columns'
   assert.equal(value.schema, 1);
 });
 
-test('fresh install writes admin, roles and the 90-product catalog into SQL tables', () => {
+test('fresh install writes admin and roles with an empty catalog', () => {
   const { value } = child(`
     s.init();
     const sql=s.sql;
@@ -51,14 +51,14 @@ test('fresh install writes admin, roles and the 90-product catalog into SQL tabl
       admin:sql.query("SELECT username, role_code, is_active FROM users WHERE role_code = ?",['admin']),
       productCols:sql.query("SELECT quick_code, name, is_active FROM products LIMIT 1"),
     }));
-  `);
+  `, { env: { BT_TEST_EMPTY_CATALOG: '1' } });
   assert.equal(value.stats.users, 1);
   assert.equal(value.stats.roles, 7);
-  assert.equal(value.stats.products, 90);
+  assert.equal(value.stats.products, 0);
   assert.equal(value.admin[0].username, 'admin');
   assert.equal(value.admin[0].role_code, 'admin');
   assert.equal(value.admin[0].is_active, 1);
-  assert.ok(value.productCols[0].quick_code);
+  assert.deepEqual(value.productCols, []);
 });
 
 test('SQL queries read real typed columns and parameters are bound safely', () => {
@@ -168,13 +168,12 @@ test('legacy data/db.json is migrated into SQL and archived (no data loss)', () 
   assert.deepEqual(value.nested, { weight: 12.5, lines: [1, 2] });
   assert.equal(value.counter, 5);
   assert.deepEqual(value.products, [
-    { id: firstProductId, quick_code: '01', name: PRODUCTS_SEED[0].name },
-    { id: 'p90', quick_code: '90', name: PRODUCTS_SEED[89].name },
+    { id: firstProductId, quick_code: '01', name: 'نام قبلی 01' },
   ]);
-  assert.equal(value.productCount, 90);
+  assert.equal(value.productCount, 63);
   assert.equal(value.orderItemProductId, firstProductId);
   assert.equal(value.priceProductId, firstProductId);
-  assert.equal(value.catalogVersion, '2026-11-11-catalog-90');
+  assert.equal(value.catalogVersion, '2026-10-05-catalog-63');
   assert.equal(fs.existsSync(path.join(dir, 'db.json')), false, 'legacy file must be archived, not left as a second source of truth');
   assert.ok(fs.readdirSync(dir).some((f) => f.startsWith('db.json.migrated-')));
 });
