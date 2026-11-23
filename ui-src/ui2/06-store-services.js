@@ -290,7 +290,7 @@ async function renderStorePortal(){
             ${isPartial?`<div class="field"><label for="storePurpose">هدف سفارش جزئی</label><select id="storePurpose" name="storePurpose"><option value="CUSTOMER">مشتری مشخص</option><option value="STOCK">تأمین تکمیلی فروشگاه</option></select></div>`:''}
             ${isPartial?`<div class="gt-grid2" data-store-customer>
               <div class="field"><label for="storeCustomerName">نام مشتری</label><div class="input-shell"><span>${icon('user',16)}</span><input id="storeCustomerName" name="name" required placeholder="نام و نام خانوادگی مشتری"></div></div>
-              <div class="field"><label for="storeCustomerPhone">شماره تماس</label><div class="input-shell"><span>${icon('phone',16)}</span><input id="storeCustomerPhone" name="phone" required inputmode="tel" placeholder="۰۹۱۲ ..."></div></div>
+              <div class="field"><label for="storeCustomerPhone">شماره تماس (اختیاری)</label><div class="input-shell"><span>${icon('phone',16)}</span><input id="storeCustomerPhone" name="phone" inputmode="tel" placeholder="۰۹۱۲ ..."></div></div>
             </div>`:''}
             </div><div class="st38-lock" style="margin-top:13px"><span>${icon('lock',17)}</span><div><strong>زمان ارسال</strong><span>توسط واحد فروش تعیین می‌شود؛ فروشگاه مستقیم به انبار دسترسی ندارد.</span></div></div>
           </div>
@@ -330,7 +330,7 @@ async function renderStorePortal(){
     else if(a==='store-confirm-delivery'){return confirmStoreDelivery(el)}
     else if(a==='cancel-store-order'){if(confirm('این سفارش لغو شود؟')){try{await api('/api/store/orders/'+el.dataset.id+'/cancel',{method:'POST',body:JSON.stringify({reason:'لغو توسط فروشگاه'})});toast('سفارش لغو شد.');await renderStorePortal()}catch(err){toast(err.message)}}}
   };
-  const purpose=$('#storePurpose');if(purpose){const sync=()=>{const stock=purpose.value==='STOCK',fields=$('[data-store-customer]');fields.hidden=stock;fields.style.display=stock?'none':'';fields.querySelectorAll('input').forEach(x=>{x.required=!stock;x.disabled=stock;});};purpose.addEventListener('change',sync);sync();}
+  const purpose=$('#storePurpose');if(purpose){const sync=()=>{const stock=purpose.value==='STOCK',fields=$('[data-store-customer]');fields.hidden=stock;fields.style.display=stock?'none':'';fields.querySelectorAll('input').forEach(x=>{x.required=!stock&&x.name==='name';x.disabled=stock;});};purpose.addEventListener('change',sync);sync();}
   $('#storeOrderForm')?.addEventListener('submit',async e=>{
     e.preventDefault(); const f=Object.fromEntries(new FormData(e.target));
     const items=app.storeDraft.filter(x=>x.productId&&n(x.requestedQty)>0).map(x=>({productId:x.productId,requestedQty:n(x.requestedQty),requestedUnit:x.requestedUnit,description:String(x.description||'').trim()}));

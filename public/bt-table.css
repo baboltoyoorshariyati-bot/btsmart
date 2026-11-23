@@ -449,3 +449,28 @@
 #appView[data-cartable-page="gate"] #content .gate-dispatch-table tbody .gate-dispatch-table-row>td{height:auto;max-height:none}
 #appView[data-cartable-page="gate"] #content .gt-pickup-recipient{display:block;font-size:11px;overflow-wrap:anywhere}
 #appView[data-cartable-page="gate"] #content .gt-pickup-search-table .bt-actions{flex-wrap:wrap}
+
+/* Review queues match their normal store-order tables; detail rows stay readable on mobile. */
+.store-addition-queue{min-width:0;margin:0 0 16px}
+.store-addition-queue h3{margin:0 0 6px;font-size:15px}
+.store-addition-queue p{margin:0 0 10px;color:var(--muted);font-size:12px}
+#modal .store-addition-review{min-width:0}
+#modal .store-addition-review h3{margin:18px 0 8px;font-size:14px}
+#modal .store-addition-review p{color:var(--muted);line-height:1.8}
+#modal .store-addition-detail-table th,#modal .store-addition-detail-table td{white-space:normal;overflow-wrap:anywhere}
+#modal .store-addition-detail-table th:first-child{width:9%}
+#modal .store-addition-detail-table th:nth-child(2){width:27%}
+#modal .store-addition-detail-table th:nth-child(3),#modal .store-addition-detail-table th:nth-child(4){width:14%}
+@media(max-width:900px){
+ #modal .store-addition-detail-table td{flex-wrap:wrap;overflow-wrap:anywhere}
+ #modal .store-addition-review .modal-actions{display:flex;flex-wrap:wrap;gap:8px}
+ #modal .store-addition-review .modal-actions .btn{flex:1 1 150px;white-space:normal}
+}
+
+/* Read-only live warehouse weights; an ordinary draft is not a delivery. */
+.sales-live-weights-list{display:grid;gap:3px;list-style:none;margin:6px 0 0;padding:0;min-width:0}
+.sales-live-weights-list li{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:11px;line-height:1.6;overflow-wrap:anywhere}
+.sales-live-weights-list li span{color:var(--muted,#667085)}
+#modal .sales-live-weights{padding:12px;margin:14px 0;border:1px solid var(--line);border-radius:12px;background:#f8f9fb}
+#modal .sales-live-weights h3{margin:0 0 4px;font-size:14px}
+#modal .sales-live-weights p{margin:0;color:var(--muted);font-size:12px}

@@ -5,7 +5,7 @@ const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 function setup(){
  const c={esc,fa:String,qty:String,formatDateTime24:v=>v||'—',storeAwareOrderName:o=>o.customer?.name||'—',storeAwareOrderPhone:o=>o.customer?.phone||'—',activeItemsOf:o=>o.items||[],badge:s=>`<span>${esc(s)}</span>`,icon:()=>'',canSalesEditRemote:o=>!!o.editable,salesEmptyV25:(_i,title)=>title,sdEmpty:(_i,title)=>title,sdStatusAccent:()=>'',sdTypeBadge:()=>'<span>تلفنی</span>',pickupSalesActions:()=>'<button data-action="pickup">دریافت</button>',warehouseReturnNoteHtml:o=>`<div class="warehouse-return-note">${esc(o.warehouseReturn.reason)}</div>`,salesOrderDateTime:o=>o.scheduledAt,sr38Chips:()=>'<span>سرویس</span>'};
  vm.createContext(c);
- for(const [start,end] of [['function remotePhoneQueueRowsV40','function renderSalesRemoteV32'],['function sdFlowCard','function renderSalesFlowV25']]) vm.runInContext(source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start))),c);
+ for(const [start,end] of [['function remotePhoneQueueRowsV40','function renderSalesRemoteV32'],['function salesLiveWeightsHtml','function renderSalesFlowV25']]) vm.runInContext(source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start))),c);
  return c;
 }
 test('صف تلفنی فقط سفارش‌های فعال غیرحضوری را در جدول با عملیات حفظ می‌کند',()=>{
