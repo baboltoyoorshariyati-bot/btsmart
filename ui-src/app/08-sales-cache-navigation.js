@@ -86,7 +86,7 @@ function renderNav(){
   // v37.10.0 — هر ورودی: [کلید، عنوان، آیکن موضوعی بخش، کلید شمارنده]؛ آیکن و شمارنده دیگر قاطی نمی‌شوند.
   const entries={
     gate:[['entry','ورود','entry',null],['waiting','در انتظار','bell','gateEntry'],['exit','خروج','exitDoor','gateExit'],['dispatch','پخش','truck','gateDispatchPending'],['history','سوابق','history',null],['reports','گزارش','reports',null]],
-    sales:[['dashboard','داشبورد','dashboard',null],['onsite','حضوری','user','salesIntake'],['remote','غیرحضوری','phone','salesRemote'],['stores','فروشگاه','store','store'],['settlement','تسویه','receipt','salesSettlement'],['flow','درجریان','flow','salesFlow'],['future','سفارش آتی','calendar','salesFuture'],['history','سوابق','history',null],['customers','مشتریان','users',null],['products','محصولات','package',null],['reports','گزارش','reports',null]],
+    sales:[['dashboard','داشبورد','dashboard',null],['onsite','حضوری','user','salesIntake'],['remote','غیرحضوری','phone','salesRemote'],['stores','فروشگاه','store','store'],['settlement','تسویه','receipt','salesSettlement'],['delivery','پخش','truck',null],['flow','درجریان','flow','salesFlow'],['future','سفارش آتی','calendar','salesFuture'],['history','سوابق','history',null],['customers','مشتریان','users',null],['products','محصولات','package',null],['reports','گزارش','reports',null]],
     warehouse:[['dashboard','داشبورد','dashboard',null],['incoming','ورودی','inbox','warehouseIncomingRegular'],['preparing','تحویل','scale','warehousePreparingRegular'],['stores','فروشگاه','store','warehouseStores'],['document-edits','اصلاح','edit',null],['returns','مرجوعی','receipt',null],['history','سوابق','history',null],['reports','گزارش','reports',null]],
     dispatch:[['dashboard','داشبورد','dashboard',null],['transport-resources','رانندگان و خودروها','driver',null],['transport-fleet','خودروهای پخش','truck',null],['orders','سفارشات','route','dispatchPending'],['reports','گزارشات','reports',null]],
     store:[['dashboard','داشبورد','dashboard',null],['create','سفارش کلی','clipboard',null],...(app.features?.partialStoreOrders?[['partial','سفارشات جزئی','clipboard',null]]:[]),['registered','ثبت‌شده','history',null],['delivery','تحویل','truck',null],['reports','گزارشات','reports',null]],
@@ -96,8 +96,8 @@ function renderNav(){
     if(app.adminActiveRole&&entries[app.adminActiveRole]){
       const role=app.adminActiveRole,railPage=role==='dispatch'?'drivers':role;
       const list=entries[role];
-      const selected=key=>(app.sub?.[railPage]||'dashboard')===key||(role==='warehouse'&&key==='preparing'&&app.sub?.warehouse==='delivered')||(role==='sales'&&key==='settlement'&&app.sub?.sales==='delivery');
-      $('#railNav').innerHTML=`<button type="button" class="cartable-nav-home" data-admin-home><span class="nav-icon">${icon('arrow',18)}</span><span class="nav-label">بازگشت به کارتابل‌ها</span></button><div class="cartable-nav-title">${esc(ROLE[role]||role)}</div>`+list.map(([key,label,ico,badgeKey])=>`<button type="button" class="cartable-nav-item ${selected(key)?'active':''}" data-cartable="${key}" data-role-page="${railPage}"><span class="nav-icon">${icon(ico,19)}</span><span class="nav-label">${label}</span>${((count)=>count?navBadge(count):'')(navUnread(role,key)+(role==='warehouse'&&key==='preparing'?navUnread(role,'delivered'):0)+(role==='sales'&&key==='settlement'?navUnread(role,'delivery'):0))}</button>`).join('');return;
+      const selected=key=>(app.sub?.[railPage]||'dashboard')===key||(role==='warehouse'&&key==='preparing'&&app.sub?.warehouse==='delivered');
+      $('#railNav').innerHTML=`<button type="button" class="cartable-nav-home" data-admin-home><span class="nav-icon">${icon('arrow',18)}</span><span class="nav-label">بازگشت به کارتابل‌ها</span></button><div class="cartable-nav-title">${esc(ROLE[role]||role)}</div>`+list.map(([key,label,ico,badgeKey])=>`<button type="button" class="cartable-nav-item ${selected(key)?'active':''}" data-cartable="${key}" data-role-page="${railPage}"><span class="nav-icon">${icon(ico,19)}</span><span class="nav-label">${label}</span>${((count)=>count?navBadge(count):'')(navUnread(role,key)+(role==='warehouse'&&key==='preparing'?navUnread(role,'delivered'):0))}</button>`).join('');return;
     }
     const items=[['dashboard','داشبورد مدیر','dashboard',0],['gate','کارتابل نگهبانی','shield',navUnread('gate')],['sales','کارتابل فروش','sales',navUnread('sales')],['warehouse','کارتابل انبار','warehouse',navUnread('warehouse')],['dispatch','کارتابل ترابری','truck',navUnread('dispatch')],['store','کارتابل فروشگاه','store',navUnread('store')],['reports','گزارش‌ها','reports',0],['customers','مشتریان','users',0],['users','کاربران','user',0],['store-branches','شعب فروشگاه','store',0],['payment-devices','دستگاه‌های پوز','pos',0],['orders-history','سوابق کامل سفارش‌ها','history',0],['activity','سوابق فعالیت','activity',0],['backups','پشتیبان‌گیری و بازیابی','settings',0],['admin','تنظیمات سیستم','settings',0]];
     $('#railNav').innerHTML='<div class="cartable-nav-title admin-root-title">مدیریت سامانه</div>'+items.map(([p,l,i,c])=>p==='gate'||p==='sales'||p==='warehouse'||p==='dispatch'||p==='store'?`<button type="button" class="cartable-nav-item" data-admin-cartable="${p}"><span class="nav-icon">${icon(i,19)}</span><span class="nav-label">${l}</span>${c?navBadge(c):''}</button>`:`<button type="button" class="cartable-nav-item ${app.page===p?'active':''}" data-page="${p}"><span class="nav-icon">${icon(i,19)}</span><span class="nav-label">${l}</span>${c?navBadge(c):''}</button>`).join('');return;
@@ -107,8 +107,8 @@ function renderNav(){
   $('#railNav').innerHTML=`<div class="cartable-nav-title">${esc(ROLE[r]||'کارتابل')}</div>`+list.map(([key,label,ico,badgeKey])=>{
     // The internal legacy dispatch tab may remain selected while another
     // cartable page is open; only the current section selects a rail item.
-    const active=sub===key || (r==='warehouse'&&key==='preparing'&&sub==='delivered') || (r==='sales'&&key==='settlement'&&sub==='delivery');
-    const count=navUnread(r,key)+(r==='warehouse'&&key==='preparing'?navUnread(r,'delivered'):0)+(r==='sales'&&key==='settlement'?navUnread(r,'delivery'):0);
+    const active=sub===key || (r==='warehouse'&&key==='preparing'&&sub==='delivered');
+    const count=navUnread(r,key)+(r==='warehouse'&&key==='preparing'?navUnread(r,'delivered'):0);
     return `<button type="button" class="cartable-nav-item ${active?'active':''}" data-cartable="${key}" data-role-page="${page}"><span class="nav-icon">${icon(ico,19)}</span><span class="nav-label">${label}</span>${count?navBadge(count):''}</button>`;
   }).join('');
 }
@@ -163,7 +163,7 @@ function ensureSalesShellV29(){
   }
   app.salesV29.shellReady=false;
   // The role rail is the single sales navigator. Keep the seven panes, not a second legacy tab bar.
-  content.innerHTML=`<div class="v29-sales-shell" role="region" aria-label="کارتابل فروش"><nav class="cartable-section-tabs" data-settlement-subtabs aria-label="بخش‌های تسویه" hidden><button type="button" data-settlement-subtab="settlement">تسویه</button><button type="button" data-settlement-subtab="delivery">پخش</button></nav>${SALES_TABS_V29.map((t,i)=>`<section class="v28-sales-pane ${i===0?'active':''}" id="${salesV29PaneId(t)}" data-tab="${t}" ${i===0?'':'hidden'}></section>`).join('')}</div>`;
+  content.innerHTML=`<div class="v29-sales-shell" role="region" aria-label="کارتابل فروش">${SALES_TABS_V29.map((t,i)=>`<section class="v28-sales-pane ${i===0?'active':''}" id="${salesV29PaneId(t)}" data-tab="${t}" ${i===0?'':'hidden'}></section>`).join('')}</div>`;
   app.salesV29.panes=Object.fromEntries(SALES_TABS_V29.map(t=>[t,content.querySelector('#'+salesV29PaneId(t))]));
   app.salesV29.shellReady=true;
   bindSalesRootV29();
@@ -297,8 +297,6 @@ async function salesV29ClickHandler(e){
     const selected=app.salesStoreTab;
     if(selected==='processing'||selected==='history')void fetchSalesCache(true).then(data=>{if(app.page==='sales'&&app.sub.sales==='stores'&&app.salesStoreTab===selected)paintSalesPaneV29('stores',data);}).catch(()=>{});
     return; }
-  const settlementTab=e.target.closest('[data-settlement-subtab]');
-  if(settlementTab){e.preventDefault();return renderSales(settlementTab.dataset.settlementSubtab);}
   const tab=e.target.closest('[data-sales-tab]');
   if(tab){ e.preventDefault(); e.stopPropagation(); return renderSales(tab.dataset.salesTab); }
   const legacySub=e.target.closest('[data-sub^="sales:"]');
@@ -432,7 +430,6 @@ function bindSalesPaneV29(tab){
 function salesV29Activate(tab){
   if(!SALES_TABS_V29.includes(tab))tab='onsite';
   const content=$('#content');
-  const subtabs=content?.querySelector('[data-settlement-subtabs]');if(subtabs){subtabs.hidden=!['settlement','delivery'].includes(tab);subtabs.querySelectorAll('[data-settlement-subtab]').forEach(b=>{const active=b.dataset.settlementSubtab===tab;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false');});}
   content?.querySelectorAll('[data-sales-tab]').forEach(b=>b.classList.toggle('active',b.dataset.salesTab===tab));
   SALES_TABS_V29.forEach(t=>{
     const p=app.salesV29.panes?.[t]; if(!p)return;
