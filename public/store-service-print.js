@@ -14,12 +14,13 @@
     if(partial)document.querySelector('#service-run').previousElementSibling.textContent='نوع سفارش';
     set('service-heading',partial?'برگه وزنی سفارش جزئی':'برگه وزنی سرویس '+label);set('service-order',fa(d.orderNo||'—'));set('service-store',d.storeName);set('service-sent',date(d.sentAt));set('service-destination',d.dispatchPlace);set('service-run',label);
     const tbody=document.querySelector('.service-table tbody');
-    for(const [i,x] of d.lines.entries()){
+    const lines=partial?groupStorePrintLines(d.lines):d.lines;
+    for(const [i,x] of lines.entries()){
       const tr=document.createElement('tr');
       for(const value of [fa(i+1),x.productName||'—',...['deliveredKg','returnKg','shortageKg','netKg'].map(key=>x[key]==null?'—':qty(x[key]))]){const td=document.createElement('td');td.textContent=value;tr.append(td);}
       tbody.append(tr);
     }
-    set('service-total',d.lines.some(x=>x.deliveredKg==null)?'نامشخص':qty(d.lines.reduce((sum,x)=>sum+Number(x.deliveredKg||0),0))+' کیلوگرم');
+    set('service-total',lines.some(x=>x.deliveredKg==null)?'نامشخص':qty(lines.reduce((sum,x)=>sum+Number(x.deliveredKg||0),0))+' کیلوگرم');
     BTPrintDigits.convert(document.querySelector('.service-sheet'));
     document.title=BTPrintDigits.persian(document.title);
     message.hidden=true;document.querySelector('.service-sheet').hidden=false;

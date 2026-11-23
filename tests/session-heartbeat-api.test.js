@@ -19,15 +19,15 @@ test('سرور نشست بدون پیام خروج را پاک می‌کند و 
   const a='a'.repeat(32),b='b'.repeat(32);
   let sid=(await ok('POST','/api/login',credentials)).cookie;
   await ok('POST','/api/session/presence',{tabId:a},sid);await ok('POST','/api/session/presence',{tabId:b},sid);
-  await advance(100000);await ok('POST','/api/session/presence',{tabId:b},sid);await advance(80000);
+  await advance(30000);await ok('POST','/api/session/presence',{tabId:b},sid);await advance(31000);
   assert.equal((await call('POST','/api/login',credentials)).status,409,'one live tab retains the login lock');
   await ok('POST','/api/session/leave',{tabId:b},sid);await advance(8100);
   assert.equal((await call('GET','/api/me',null,sid)).status,401,'the stale tab does not block clean last-tab close');
   sid=(await ok('POST','/api/login',credentials)).cookie;await ok('POST','/api/session/presence',{tabId:a},sid);
-  await advance(180001);const next=await ok('POST','/api/login',credentials);
+  await advance(60001);const next=await ok('POST','/api/login',credentials);
   assert.equal((await call('GET','/api/me',null,sid)).status,401,'missing leave is reclaimed without a timer tick');
   await ok('POST','/api/logout',{},next.cookie);assert.equal((await call('GET','/api/me',null,next.cookie)).status,401);
-  const noPresence=(await ok('POST','/api/login',credentials)).cookie;await advance(180001);
+  const noPresence=(await ok('POST','/api/login',credentials)).cookie;await advance(60001);
   await ok('POST','/api/login',credentials);assert.equal((await call('GET','/api/me',null,noPresence)).status,401,'login without initial ping is reclaimed');
  }finally{if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(resolve=>proc.once('exit',resolve));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });

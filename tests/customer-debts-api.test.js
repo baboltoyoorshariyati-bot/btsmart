@@ -21,11 +21,11 @@ test('حساب معوق مشتری: سفارش جدید، دریافت انتخ�
   };
   const first=await make(),second=await make(),cid=first.customerId;assert.equal(second.customerId,cid);
 
-  // Same phone really links a store order to the same customer. A run of more
-  // than 30 store orders must not consume the customer history cap.
+  // A store contact is order-specific, even when its phone matches a customer.
+  // Store orders must not consume the customer history cap.
   assert.equal((await req('POST','/api/admin/users',{username:'store1',fullName:'فروشگاه',position:'فروشگاه',roleCode:'store',storeName:'فروشگاه شعبه 1 حمزه کلا',password:'Shop!12345',mustChangePassword:false})).status,201);
   const shopLogin=await fetch(base+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'store1',password:'Shop!12345'})});assert.equal(shopLogin.status,200);const shop=shopLogin.headers.get('set-cookie').match(/sid=[^;]+/)[0];
-  const shopIds=[];for(let i=0;i<31;i++){const so=await req('POST','/api/store/orders',{name:'مشتری بدهکار',phone:'09121112233',items:[{productId:'p01',requestedQty:1,requestedUnit:'کیلوگرم'}]},{cookie:shop,key:`shop-create-${i}`});assert.equal(so.status,201,JSON.stringify(so.json));assert.equal(so.json.order.customerId,cid);assert.match(so.json.order.orderNo,/^B41/);shopIds.push(so.json.order.id);}
+  const shopIds=[];for(let i=0;i<31;i++){const so=await req('POST','/api/store/orders',{name:'مشتری بدهکار',phone:'09121112233',items:[{productId:'p01',requestedQty:1,requestedUnit:'کیلوگرم'}]},{cookie:shop,key:`shop-create-${i}`});assert.equal(so.status,201,JSON.stringify(so.json));assert.equal(so.json.order.customerId,null);assert.equal(so.json.order.customer.phone,'09121112233');assert.match(so.json.order.orderNo,/^B41/);shopIds.push(so.json.order.id);}
   let profile=await req('GET',`/api/customers/${cid}`);assert.equal(profile.status,200);assert.equal(profile.json.customer.orderCount,2);assert.equal(profile.json.customer.lastActivityAt,second.createdAt);assert.deepEqual(profile.json.orders.map(o=>o.id),[second.id,first.id]);
   const customerList=await req('GET','/api/customers?q=09121112233');const row=customerList.json.customers.find(c=>c.id===cid);assert.equal(row.orderCount,2);assert.equal(row.debtBalance,3000);assert.equal(row.lastActivityAt,second.createdAt);
   const shopList=await req('GET','/api/store/orders',undefined,{cookie:shop});assert.equal(shopList.status,200);assert.equal(shopList.json.total,31);assert(shopIds.every(id=>shopList.json.orders.some(o=>o.id===id)));

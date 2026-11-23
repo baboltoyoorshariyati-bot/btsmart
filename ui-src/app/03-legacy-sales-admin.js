@@ -27,7 +27,7 @@ function salesVisitRows(visits){return visits.map(v=>`<button class="queue-item"
 const productSearchStates=new WeakMap();
 function productPickerInfo(inp){
   if(inp.dataset.productSearch!==undefined){const i=inp.dataset.productSearch;return {box:$(`[data-suggest-for="${i}"]`),row:app.orderDraft?.[i]};}
-  if(inp.dataset.opProductSearch!==undefined){const value=inp.dataset.opProductSearch,cut=value.lastIndexOf('-'),prefix=value.slice(0,cut),i=value.slice(cut+1);const key=({phone:'phoneDraft',remote:'remoteDraft',future:'futureDraft',store:'storeDraft',storeedit:'storeEditDraft',sales:'orderDraft',onsite:'orderDraft'})[prefix];return {box:$(`[data-op-suggest="${value}"]`),row:app[key]?.[i]};}
+  if(inp.dataset.opProductSearch!==undefined){const value=inp.dataset.opProductSearch,cut=value.lastIndexOf('-'),prefix=value.slice(0,cut),i=value.slice(cut+1);const key=({phone:'phoneDraft',remote:'remoteDraft',future:'futureDraft',store:'storeDraft',storeedit:'storeEditDraft',storeaddition:'storeAdditionDraft',sales:'orderDraft',onsite:'orderDraft'})[prefix];return {box:$(`[data-op-suggest="${value}"]`),row:app[key]?.[i]};}
   if(inp.dataset.returnProductSearch!==undefined){const i=inp.dataset.returnProductSearch;return {box:$(`[data-return-suggest="${i}"]`),row:app.returnEdit?.items?.[i]};}
   if(inp.dataset.ssProductSearch!==undefined){const i=inp.dataset.ssProductSearch;return {box:$(`[data-ss-suggest="${i}"]`),row:app.salesStoreEdit?.items?.[i]};}
   return null;

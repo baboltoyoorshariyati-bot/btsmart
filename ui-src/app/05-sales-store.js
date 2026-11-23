@@ -11,7 +11,7 @@ function pickOperationProduct(i,id,label,quick,prefix,draftKey){
   toast('محصول انتخاب شد.');
 }
 function renderOrderLineArea(prefix,draftKey){
-  const box=prefix==='storeedit'?$('#store-edit-lines'):$(`#${prefix}-lines`); if(!box)return;
+  const box=prefix==='storeedit'?$('#store-edit-lines'):prefix==='storeaddition'?$('#store-addition-lines'):$(`#${prefix}-lines`); if(!box)return;
   box.innerHTML=renderDraftLinesTable(app[draftKey].map((x,i)=>renderProductPickerLine(x,i,prefix)));
   bindOperationLines(prefix,draftKey); updateOpSummary(draftKey,`${prefix}-summary`);
 }
@@ -162,6 +162,14 @@ async function renderStorePortal(){
   $('#storeOrderForm')?.addEventListener('submit',async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));const items=app.storeDraft.filter(x=>x.productId&&n(x.requestedQty)>0).map(x=>({productId:x.productId,requestedQty:n(x.requestedQty),requestedUnit:x.requestedUnit,description:String(x.description||'').trim()}));if(!items.length)return toast('حداقل یک محصول معتبر وارد کنید.');try{await api('/api/store/orders',{method:'POST',body:JSON.stringify({...f,items})});toast('سفارش برای تایید واحد فروش ارسال شد. زمان ارسال بعداً توسط فروش تعیین می‌شود.');await renderStorePortal()}catch(err){toast(err.message)}});
   app.timer=setInterval(async()=>{try{let x=(await api('/api/store/orders')).orders||[];if(app.sub.store==='delivery')x=app.storeDeliveryTab==='delivered'?x.filter(isStoreDeliveryComplete):x.filter(isStoreDeliveryInProgress);const el=$('#storeOrderList');if(el)el.innerHTML=storeOrderRowsV22(x)}catch{}},3500);
 }
+// Requested rows are shown independently from measured weights. The latter
+// belong to the physical order item and cannot be split reliably by request.
+function storeRequestRowsHtml(rows){
+ if(!Array.isArray(rows)||!rows.length)return '';
+ const counts=new Map();for(const r of rows){const name=String(r.productName||'').trim().normalize('NFC');if(name&&name!=='—'&&name!=='کالای حذف‌شده')counts.set(name,(counts.get(name)||0)+1);}
+ const body=rows.map((r,i)=>{const name=String(r.productName||'').trim().normalize('NFC'),count=counts.get(name)||1;return `<tr><td data-label="ردیف">${fa(i+1)}</td><td data-label="محصول">${esc(r.productName||'—')}${count>1?` <small>(${qty(count)} ردیف هم‌نام)</small>`:''}</td><td data-label="مقدار درخواستی">${r.requestedQty==null?'نامشخص':qty(r.requestedQty)+' '+esc(r.requestedUnit||'')}</td><td data-label="منبع">${r.source==='ADDITION'?'درخواست افزوده‌شده':'سفارش اولیه'}</td></tr>`;}).join('');
+ return `<section class="store-request-detail" data-store-request-rows><h3>ریز ردیف‌های ثبت‌شده</h3><p>ردیف‌های اولیه و افزوده‌شده جدا نمایش داده می‌شوند؛ وزن اندازه‌گیری‌شده به هر ردیف درخواست جداگانه نسبت داده نمی‌شود.</p><div class="bt-table-wrap"><table class="bt-table"><thead><tr><th>ردیف</th><th>محصول</th><th>مقدار درخواستی</th><th>منبع</th></tr></thead><tbody>${body}</tbody></table></div></section>`;
+}
 async function openStoreOrderDetails(id){
  const notices=captureEntityNotices('order',id);
  try{
@@ -179,6 +187,7 @@ async function openStoreOrderDetails(id){
     ${o.storeOrderKind!=='PARTIAL'&&o.storeRun?.enabled&&!['STORE_PENDING_SALES','CANCELLED'].includes(o.status)?`<div class="st-run-letterhead"><div class="st-run-chips"><span class="st-run-chip st-run-r1">سرویس اول: ${esc(o.storeRun.r1StageLabel||'هنوز به فروش ارسال نشده')}</span><span class="st-run-chip st-run-r2">سرویس دوم: ${esc(o.storeRun.r2StageLabel||'هنوز به فروش ارسال نشده')}</span></div></div>`:''}
     ${st38RunSummaryHtml(o)}
     <h3 class="store-detail-items-title">اقلام سفارش</h3><div class="detail-item-list">${active.map(it=>{const v=progress.get(it.id),show=v&&!['STORE_PENDING_SALES','CANCELLED'].includes(o.status);return `<div class="detail-item-row"><div><strong>${esc(it.product?.name||'—')}</strong><small>${esc(it.description||'بدون توضیح')}</small>${show?`<small>${o.storeOrderKind==='PARTIAL'?`وزن ثبت‌شده: ${qty(v.totalKg||0)} کیلوگرم${v.shortageClosed?' · کسری / عدم موجودی':''}`:`${esc(v.runStatus==='IN_SHIPPING'?'وزن‌کشی ثبت شده':(v.runStatusLabel||SR38_STATUS_LABEL[v.runStatus]||'در انتظار'))} · وزن ثبت‌شده: سرویس اول ${qty(v.r1Kg||0)} و سرویس دوم ${qty(v.r2Kg||0)} کیلوگرم · جمع ${qty(v.totalKg||0)} کیلوگرم${v.shortageKg?` · کسری ${qty(v.shortageKg)} کیلوگرم`:''}`}</small>`:''}</div><b>${qty(it.requestedQty)} ${esc(it.requestedUnit||'')}</b></div>`;}).join('')||'<div class="empty">قلم فعالی برای این سفارش وجود ندارد.</div>'}</div>
+    ${storeRequestRowsHtml(o.storeRequestRows)}
     <div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button>${o.status!=='CANCELLED'&&!(o.storeCancellationRequests||[]).some(r=>r.status==='PENDING')?`<button type="button" class="btn btn-secondary" data-store-cancel-request>${o.status==='STORE_PENDING_SALES'?'لغو سفارش':'درخواست لغو برای بررسی فروش'}</button>`:''}</div></div>`);
   const cancelButton=$('#modal [data-store-cancel-request]');
   if(cancelButton)cancelButton.onclick=async()=>{

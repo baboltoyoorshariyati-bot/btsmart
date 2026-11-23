@@ -378,6 +378,10 @@ async function salesV29ClickHandler(e){
       if((app.orderDraft||[]).length>1){app.orderDraft.splice(idx,1);renderOrderLines();updateOrderDraftSummary();}
       return;
     }
+    if(a==='store-addition-sales'){
+      if(!confirm(el.dataset.decision==='APPROVE'?'درخواست افزودن کالا تأیید و به انبار ارسال شود؟':'درخواست افزودن کالا رد شود؟'))return;
+      el.disabled=true;await api('/api/sales/store-orders/'+encodeURIComponent(el.dataset.id)+'/additions/review',{method:'POST',body:JSON.stringify({requestId:el.dataset.request,decision:el.dataset.decision})});toast('نتیجه بررسی ثبت شد.');await refreshIndicators();await fetchSalesCache(true);await renderSales('stores');return;
+    }
     if(a==='sales-edit-store-order')return openSalesStoreOrderEdit(el.dataset.id);
     if(a==='store-approve-v25')return openStoreApprovalV25(el.dataset.id);
     if(a==='store-quick-send-v40')return quickSendStoreOrder(el);

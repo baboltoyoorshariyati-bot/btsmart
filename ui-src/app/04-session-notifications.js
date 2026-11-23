@@ -199,6 +199,10 @@ const NOTIF_ROUTES={
   RETURN_FROM_WAREHOUSE:{page:'sales',sub:'flow'},
   WAREHOUSE_DONE:{page:'sales',sub:'settlement'},
   STORE_ORDER_PENDING:{page:'sales',sub:'stores'},
+  STORE_ADDITION_REQUESTED:{page:'sales',sub:'stores'},
+  STORE_ADDITION_RESULT:{page:'sales',sub:'stores'},
+  STORE_ADDITION_APPROVED:{page:'warehouse',sub:'stores'},
+  STORE_ADDITION_UPDATE:{page:'store',sub:'registered'},
   STORE_CANCELLATION_REQUESTED:{page:'sales',sub:'stores'},
   STORE_CANCELLATION_REVIEWED:{page:'store',sub:'registered'},
   SETTLEMENT_CANCELLATION_REQUESTED:{page:'warehouse',sub:'incoming'},
@@ -482,6 +486,7 @@ async function openNotificationTarget(id,type,role,entityType,entityId){
       const phase=order.orderType==='STORE'?'stores':(order.status==='SETTLEMENT_PENDING'&&type==='TRANSPORT_ASSIGNED'?'delivered':order.status==='WAREHOUSE_PREPARING'?'preparing':'incoming');
       if(order.orderType==='STORE')app.wh38.storeTab=order.status==='WAREHOUSE_PREPARING'?'preparing':'incoming';
       await go('warehouse',phase);
+      if(type==='STORE_ADDITION_APPROVED'){const el=document.querySelector(`[data-store-addition-warehouse="${CSS.escape(entityId)}"]`);if(el&&el.dataset.request===notice?.requestId&&focusNotificationElement(el))return finish(true);return toast('درخواست افزودن کالا در این مرحله نیست.');}
       if(order.orderType==='STORE'&&order.status==='WAREHOUSE_PENDING')return finish(await wh38StoreDetails(entityId));
       if(phase==='delivered')return finish(await whDeliveredDetails(entityId));
       return finish(await openOrderDetails(entityId));
@@ -493,8 +498,9 @@ async function openNotificationTarget(id,type,role,entityType,entityId){
       // صفحه فروش ممکن است دادهٔ چند ثانیه قبل را در حافظه داشته باشد.
       if(app.salesFetchPromise)await app.salesFetchPromise.catch(()=>{});
       await fetchSalesCache(true);
-      app.salesStoreTab=type==='STORE_RUN_R1_SENT'||type==='STORE_RUN_R2_SENT'||order.status==='STORE_PENDING_SALES'?'incoming':order.status==='CLOSED'?'history':'processing';
+      app.salesStoreTab=type==='STORE_ADDITION_REQUESTED'||type==='STORE_RUN_R1_SENT'||type==='STORE_RUN_R2_SENT'||order.status==='STORE_PENDING_SALES'?'incoming':order.status==='CLOSED'?'history':'processing';
       await go('sales','stores');
+      if(type==='STORE_ADDITION_REQUESTED'){const el=document.querySelector(`[data-store-addition-sales="${CSS.escape(entityId)}"]`);if(el&&el.dataset.request===notice?.requestId&&focusNotificationElement(el))return finish(true);return toast('این درخواست دیگر در انتظار فروش نیست.');}
       if(type==='STORE_RUN_R1_SENT'||type==='STORE_RUN_R2_SENT'){
         const run=type==='STORE_RUN_R2_SENT'?'2':'1';
         const el=document.querySelector(`[data-action="sr-ship-open"][data-order="${CSS.escape(entityId)}"][data-run="${run}"]`);
@@ -598,19 +604,19 @@ function orderKindBadge(o){if(o?.orderType==='STORE')return `<span class="type-c
 function dateLabel(v){ if(!v) return '—'; const parts=String(v).split('-'); if(parts.length!==3)return esc(v); const d=new Date(`${v}T00:00:00`); const p=faDateParts(d,{day:'numeric',month:'long',year:'numeric'}); return [p.day,p.month,p.year].filter(Boolean).join(' '); }
 function defaultOrderLine(){return {productId:'',productLabel:'',quickCode:'',requestedQty:'',requestedUnit:'کیلوگرم',description:''}}
 function bindOperationLines(prefix, draftKey){
-  $$(prefix==='storeedit'?'#modal [data-op-product-search]':'#content [data-op-product-search]').filter(el=>el.dataset.opProductSearch.startsWith(prefix+'-')).forEach(inp=>{
+  $$(['storeedit','storeaddition'].includes(prefix)?'#modal [data-op-product-search]':'#content [data-op-product-search]').filter(el=>el.dataset.opProductSearch.startsWith(prefix+'-')).forEach(inp=>{
     inp.addEventListener('input',()=>{
       const idx=Number(inp.dataset.opProductSearch.split('-').pop());
       operationProductSearch(idx, inp.value, prefix, draftKey);
     });
   });
-  $$(prefix==='storeedit'?'#modal [data-op-qty]':'#content [data-op-qty]').filter(el=>el.dataset.opQty.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('input',()=>{
+  $$(['storeedit','storeaddition'].includes(prefix)?'#modal [data-op-qty]':'#content [data-op-qty]').filter(el=>el.dataset.opQty.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('input',()=>{
     const idx=Number(inp.dataset.opQty.split('-').pop()); app[draftKey][idx].requestedQty=inp.value; updateOpSummary(draftKey, `${prefix}-summary`);
   }));
-  $$(prefix==='storeedit'?'#modal [data-op-unit]':'#content [data-op-unit]').filter(el=>el.dataset.opUnit.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('change',()=>{
+  $$(['storeedit','storeaddition'].includes(prefix)?'#modal [data-op-unit]':'#content [data-op-unit]').filter(el=>el.dataset.opUnit.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('change',()=>{
     const idx=Number(inp.dataset.opUnit.split('-').pop()); app[draftKey][idx].requestedUnit=inp.value; updateOpSummary(draftKey, `${prefix}-summary`);
   }));
-  $$(prefix==='storeedit'?'#modal [data-op-desc]':'#content [data-op-desc]').filter(el=>el.dataset.opDesc.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('input',()=>{
+  $$(['storeedit','storeaddition'].includes(prefix)?'#modal [data-op-desc]':'#content [data-op-desc]').filter(el=>el.dataset.opDesc.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('input',()=>{
     const idx=Number(inp.dataset.opDesc.split('-').pop()); app[draftKey][idx].description=inp.value;
   }));
 }
