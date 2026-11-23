@@ -26,7 +26,7 @@ test('پنل محموله‌های انبار در سربرگ «ورودی» ر�
 
 test('نشان سربرگ «ورودی» محموله‌های در انتظار تعیین راننده را هم می‌شمارد', () => {
   assert.match(storesFn, /const shipCount=\(deliveries\.storeRunShipments\|\|\[\]\)\.length;/);
-  assert.match(storesFn, /\['incoming','ورودی',incoming\.length\+shipCount\]/);
+  assert.match(storesFn, /\['incoming','ورودی',incoming\.length\+shipCount\+additions\.length\]/);
   assert.match(storesFn, /\['processing','در جریان',processing\.length\]/, 'در جریان دیگر محموله‌ها را در نشانش نمی‌شمارد');
 });
 

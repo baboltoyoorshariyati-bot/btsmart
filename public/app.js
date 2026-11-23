@@ -996,7 +996,7 @@ function salesVisitRows(visits){return visits.map(v=>`<button class="queue-item"
 const productSearchStates=new WeakMap();
 function productPickerInfo(inp){
   if(inp.dataset.productSearch!==undefined){const i=inp.dataset.productSearch;return {box:$(`[data-suggest-for="${i}"]`),row:app.orderDraft?.[i]};}
-  if(inp.dataset.opProductSearch!==undefined){const value=inp.dataset.opProductSearch,cut=value.lastIndexOf('-'),prefix=value.slice(0,cut),i=value.slice(cut+1);const key=({phone:'phoneDraft',remote:'remoteDraft',future:'futureDraft',store:'storeDraft',storeedit:'storeEditDraft',sales:'orderDraft',onsite:'orderDraft'})[prefix];return {box:$(`[data-op-suggest="${value}"]`),row:app[key]?.[i]};}
+  if(inp.dataset.opProductSearch!==undefined){const value=inp.dataset.opProductSearch,cut=value.lastIndexOf('-'),prefix=value.slice(0,cut),i=value.slice(cut+1);const key=({phone:'phoneDraft',remote:'remoteDraft',future:'futureDraft',store:'storeDraft',storeedit:'storeEditDraft',storeaddition:'storeAdditionDraft',sales:'orderDraft',onsite:'orderDraft'})[prefix];return {box:$(`[data-op-suggest="${value}"]`),row:app[key]?.[i]};}
   if(inp.dataset.returnProductSearch!==undefined){const i=inp.dataset.returnProductSearch;return {box:$(`[data-return-suggest="${i}"]`),row:app.returnEdit?.items?.[i]};}
   if(inp.dataset.ssProductSearch!==undefined){const i=inp.dataset.ssProductSearch;return {box:$(`[data-ss-suggest="${i}"]`),row:app.salesStoreEdit?.items?.[i]};}
   return null;
@@ -1585,6 +1585,10 @@ const NOTIF_ROUTES={
   RETURN_FROM_WAREHOUSE:{page:'sales',sub:'flow'},
   WAREHOUSE_DONE:{page:'sales',sub:'settlement'},
   STORE_ORDER_PENDING:{page:'sales',sub:'stores'},
+  STORE_ADDITION_REQUESTED:{page:'sales',sub:'stores'},
+  STORE_ADDITION_RESULT:{page:'sales',sub:'stores'},
+  STORE_ADDITION_APPROVED:{page:'warehouse',sub:'stores'},
+  STORE_ADDITION_UPDATE:{page:'store',sub:'registered'},
   STORE_CANCELLATION_REQUESTED:{page:'sales',sub:'stores'},
   STORE_CANCELLATION_REVIEWED:{page:'store',sub:'registered'},
   SETTLEMENT_CANCELLATION_REQUESTED:{page:'warehouse',sub:'incoming'},
@@ -1868,6 +1872,7 @@ async function openNotificationTarget(id,type,role,entityType,entityId){
       const phase=order.orderType==='STORE'?'stores':(order.status==='SETTLEMENT_PENDING'&&type==='TRANSPORT_ASSIGNED'?'delivered':order.status==='WAREHOUSE_PREPARING'?'preparing':'incoming');
       if(order.orderType==='STORE')app.wh38.storeTab=order.status==='WAREHOUSE_PREPARING'?'preparing':'incoming';
       await go('warehouse',phase);
+      if(type==='STORE_ADDITION_APPROVED'){const el=document.querySelector(`[data-store-addition-warehouse="${CSS.escape(entityId)}"]`);if(el&&el.dataset.request===notice?.requestId&&focusNotificationElement(el))return finish(true);return toast('درخواست افزودن کالا در این مرحله نیست.');}
       if(order.orderType==='STORE'&&order.status==='WAREHOUSE_PENDING')return finish(await wh38StoreDetails(entityId));
       if(phase==='delivered')return finish(await whDeliveredDetails(entityId));
       return finish(await openOrderDetails(entityId));
@@ -1879,8 +1884,9 @@ async function openNotificationTarget(id,type,role,entityType,entityId){
       // صفحه فروش ممکن است دادهٔ چند ثانیه قبل را در حافظه داشته باشد.
       if(app.salesFetchPromise)await app.salesFetchPromise.catch(()=>{});
       await fetchSalesCache(true);
-      app.salesStoreTab=type==='STORE_RUN_R1_SENT'||type==='STORE_RUN_R2_SENT'||order.status==='STORE_PENDING_SALES'?'incoming':order.status==='CLOSED'?'history':'processing';
+      app.salesStoreTab=type==='STORE_ADDITION_REQUESTED'||type==='STORE_RUN_R1_SENT'||type==='STORE_RUN_R2_SENT'||order.status==='STORE_PENDING_SALES'?'incoming':order.status==='CLOSED'?'history':'processing';
       await go('sales','stores');
+      if(type==='STORE_ADDITION_REQUESTED'){const el=document.querySelector(`[data-store-addition-sales="${CSS.escape(entityId)}"]`);if(el&&el.dataset.request===notice?.requestId&&focusNotificationElement(el))return finish(true);return toast('این درخواست دیگر در انتظار فروش نیست.');}
       if(type==='STORE_RUN_R1_SENT'||type==='STORE_RUN_R2_SENT'){
         const run=type==='STORE_RUN_R2_SENT'?'2':'1';
         const el=document.querySelector(`[data-action="sr-ship-open"][data-order="${CSS.escape(entityId)}"][data-run="${run}"]`);
@@ -1984,19 +1990,19 @@ function orderKindBadge(o){if(o?.orderType==='STORE')return `<span class="type-c
 function dateLabel(v){ if(!v) return '—'; const parts=String(v).split('-'); if(parts.length!==3)return esc(v); const d=new Date(`${v}T00:00:00`); const p=faDateParts(d,{day:'numeric',month:'long',year:'numeric'}); return [p.day,p.month,p.year].filter(Boolean).join(' '); }
 function defaultOrderLine(){return {productId:'',productLabel:'',quickCode:'',requestedQty:'',requestedUnit:'کیلوگرم',description:''}}
 function bindOperationLines(prefix, draftKey){
-  $$(prefix==='storeedit'?'#modal [data-op-product-search]':'#content [data-op-product-search]').filter(el=>el.dataset.opProductSearch.startsWith(prefix+'-')).forEach(inp=>{
+  $$(['storeedit','storeaddition'].includes(prefix)?'#modal [data-op-product-search]':'#content [data-op-product-search]').filter(el=>el.dataset.opProductSearch.startsWith(prefix+'-')).forEach(inp=>{
     inp.addEventListener('input',()=>{
       const idx=Number(inp.dataset.opProductSearch.split('-').pop());
       operationProductSearch(idx, inp.value, prefix, draftKey);
     });
   });
-  $$(prefix==='storeedit'?'#modal [data-op-qty]':'#content [data-op-qty]').filter(el=>el.dataset.opQty.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('input',()=>{
+  $$(['storeedit','storeaddition'].includes(prefix)?'#modal [data-op-qty]':'#content [data-op-qty]').filter(el=>el.dataset.opQty.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('input',()=>{
     const idx=Number(inp.dataset.opQty.split('-').pop()); app[draftKey][idx].requestedQty=inp.value; updateOpSummary(draftKey, `${prefix}-summary`);
   }));
-  $$(prefix==='storeedit'?'#modal [data-op-unit]':'#content [data-op-unit]').filter(el=>el.dataset.opUnit.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('change',()=>{
+  $$(['storeedit','storeaddition'].includes(prefix)?'#modal [data-op-unit]':'#content [data-op-unit]').filter(el=>el.dataset.opUnit.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('change',()=>{
     const idx=Number(inp.dataset.opUnit.split('-').pop()); app[draftKey][idx].requestedUnit=inp.value; updateOpSummary(draftKey, `${prefix}-summary`);
   }));
-  $$(prefix==='storeedit'?'#modal [data-op-desc]':'#content [data-op-desc]').filter(el=>el.dataset.opDesc.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('input',()=>{
+  $$(['storeedit','storeaddition'].includes(prefix)?'#modal [data-op-desc]':'#content [data-op-desc]').filter(el=>el.dataset.opDesc.startsWith(prefix+'-')).forEach(inp=>inp.addEventListener('input',()=>{
     const idx=Number(inp.dataset.opDesc.split('-').pop()); app[draftKey][idx].description=inp.value;
   }));
 }
@@ -2157,7 +2163,7 @@ function pickOperationProduct(i,id,label,quick,prefix,draftKey){
   toast('محصول انتخاب شد.');
 }
 function renderOrderLineArea(prefix,draftKey){
-  const box=prefix==='storeedit'?$('#store-edit-lines'):$(`#${prefix}-lines`); if(!box)return;
+  const box=prefix==='storeedit'?$('#store-edit-lines'):prefix==='storeaddition'?$('#store-addition-lines'):$(`#${prefix}-lines`); if(!box)return;
   box.innerHTML=renderDraftLinesTable(app[draftKey].map((x,i)=>renderProductPickerLine(x,i,prefix)));
   bindOperationLines(prefix,draftKey); updateOpSummary(draftKey,`${prefix}-summary`);
 }
@@ -2308,6 +2314,14 @@ async function renderStorePortal(){
   $('#storeOrderForm')?.addEventListener('submit',async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));const items=app.storeDraft.filter(x=>x.productId&&n(x.requestedQty)>0).map(x=>({productId:x.productId,requestedQty:n(x.requestedQty),requestedUnit:x.requestedUnit,description:String(x.description||'').trim()}));if(!items.length)return toast('حداقل یک محصول معتبر وارد کنید.');try{await api('/api/store/orders',{method:'POST',body:JSON.stringify({...f,items})});toast('سفارش برای تایید واحد فروش ارسال شد. زمان ارسال بعداً توسط فروش تعیین می‌شود.');await renderStorePortal()}catch(err){toast(err.message)}});
   app.timer=setInterval(async()=>{try{let x=(await api('/api/store/orders')).orders||[];if(app.sub.store==='delivery')x=app.storeDeliveryTab==='delivered'?x.filter(isStoreDeliveryComplete):x.filter(isStoreDeliveryInProgress);const el=$('#storeOrderList');if(el)el.innerHTML=storeOrderRowsV22(x)}catch{}},3500);
 }
+// Requested rows are shown independently from measured weights. The latter
+// belong to the physical order item and cannot be split reliably by request.
+function storeRequestRowsHtml(rows){
+ if(!Array.isArray(rows)||!rows.length)return '';
+ const counts=new Map();for(const r of rows){const name=String(r.productName||'').trim().normalize('NFC');if(name&&name!=='—'&&name!=='کالای حذف‌شده')counts.set(name,(counts.get(name)||0)+1);}
+ const body=rows.map((r,i)=>{const name=String(r.productName||'').trim().normalize('NFC'),count=counts.get(name)||1;return `<tr><td data-label="ردیف">${fa(i+1)}</td><td data-label="محصول">${esc(r.productName||'—')}${count>1?` <small>(${qty(count)} ردیف هم‌نام)</small>`:''}</td><td data-label="مقدار درخواستی">${r.requestedQty==null?'نامشخص':qty(r.requestedQty)+' '+esc(r.requestedUnit||'')}</td><td data-label="منبع">${r.source==='ADDITION'?'درخواست افزوده‌شده':'سفارش اولیه'}</td></tr>`;}).join('');
+ return `<section class="store-request-detail" data-store-request-rows><h3>ریز ردیف‌های ثبت‌شده</h3><p>ردیف‌های اولیه و افزوده‌شده جدا نمایش داده می‌شوند؛ وزن اندازه‌گیری‌شده به هر ردیف درخواست جداگانه نسبت داده نمی‌شود.</p><div class="bt-table-wrap"><table class="bt-table"><thead><tr><th>ردیف</th><th>محصول</th><th>مقدار درخواستی</th><th>منبع</th></tr></thead><tbody>${body}</tbody></table></div></section>`;
+}
 async function openStoreOrderDetails(id){
  const notices=captureEntityNotices('order',id);
  try{
@@ -2325,6 +2339,7 @@ async function openStoreOrderDetails(id){
     ${o.storeOrderKind!=='PARTIAL'&&o.storeRun?.enabled&&!['STORE_PENDING_SALES','CANCELLED'].includes(o.status)?`<div class="st-run-letterhead"><div class="st-run-chips"><span class="st-run-chip st-run-r1">سرویس اول: ${esc(o.storeRun.r1StageLabel||'هنوز به فروش ارسال نشده')}</span><span class="st-run-chip st-run-r2">سرویس دوم: ${esc(o.storeRun.r2StageLabel||'هنوز به فروش ارسال نشده')}</span></div></div>`:''}
     ${st38RunSummaryHtml(o)}
     <h3 class="store-detail-items-title">اقلام سفارش</h3><div class="detail-item-list">${active.map(it=>{const v=progress.get(it.id),show=v&&!['STORE_PENDING_SALES','CANCELLED'].includes(o.status);return `<div class="detail-item-row"><div><strong>${esc(it.product?.name||'—')}</strong><small>${esc(it.description||'بدون توضیح')}</small>${show?`<small>${o.storeOrderKind==='PARTIAL'?`وزن ثبت‌شده: ${qty(v.totalKg||0)} کیلوگرم${v.shortageClosed?' · کسری / عدم موجودی':''}`:`${esc(v.runStatus==='IN_SHIPPING'?'وزن‌کشی ثبت شده':(v.runStatusLabel||SR38_STATUS_LABEL[v.runStatus]||'در انتظار'))} · وزن ثبت‌شده: سرویس اول ${qty(v.r1Kg||0)} و سرویس دوم ${qty(v.r2Kg||0)} کیلوگرم · جمع ${qty(v.totalKg||0)} کیلوگرم${v.shortageKg?` · کسری ${qty(v.shortageKg)} کیلوگرم`:''}`}</small>`:''}</div><b>${qty(it.requestedQty)} ${esc(it.requestedUnit||'')}</b></div>`;}).join('')||'<div class="empty">قلم فعالی برای این سفارش وجود ندارد.</div>'}</div>
+    ${storeRequestRowsHtml(o.storeRequestRows)}
     <div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button>${o.status!=='CANCELLED'&&!(o.storeCancellationRequests||[]).some(r=>r.status==='PENDING')?`<button type="button" class="btn btn-secondary" data-store-cancel-request>${o.status==='STORE_PENDING_SALES'?'لغو سفارش':'درخواست لغو برای بررسی فروش'}</button>`:''}</div></div>`);
   const cancelButton=$('#modal [data-store-cancel-request]');
   if(cancelButton)cancelButton.onclick=async()=>{
@@ -3579,6 +3594,10 @@ async function salesV29ClickHandler(e){
       const idx=Number(el.dataset.index);
       if((app.orderDraft||[]).length>1){app.orderDraft.splice(idx,1);renderOrderLines();updateOrderDraftSummary();}
       return;
+    }
+    if(a==='store-addition-sales'){
+      if(!confirm(el.dataset.decision==='APPROVE'?'درخواست افزودن کالا تأیید و به انبار ارسال شود؟':'درخواست افزودن کالا رد شود؟'))return;
+      el.disabled=true;await api('/api/sales/store-orders/'+encodeURIComponent(el.dataset.id)+'/additions/review',{method:'POST',body:JSON.stringify({requestId:el.dataset.request,decision:el.dataset.decision})});toast('نتیجه بررسی ثبت شد.');await refreshIndicators();await fetchSalesCache(true);await renderSales('stores');return;
     }
     if(a==='sales-edit-store-order')return openSalesStoreOrderEdit(el.dataset.id);
     if(a==='store-approve-v25')return openStoreApprovalV25(el.dataset.id);

@@ -13,13 +13,13 @@ test('browser sessions expire after missing heartbeats, while open tabs and relo
   sec.browserLeave(sid,'c');t+=4000;sec.browserLeave(sid,'c');sec.browserLeave(sid,'unknown');t+=4001;
   assert.equal(sec.getSession(sid),null,'duplicate or unknown leaves cannot extend the reload grace');
   const long=sec.createSession('u','ip',true);sec.browserPing(long,'a');
-  for(let i=0;i<48*60;i++){t+=60000;assert(sec.browserPing(long,'a'));}
+  for(let i=0;i<48*60*3;i++){t+=20000;assert(sec.browserPing(long,'a'));}
   assert(sec.getSession(long),'open browser stays logged in with heartbeats for days');
-  t+=179999;assert(sec.getSession(long));t+=1;
+  t+=59999;assert(sec.getSession(long));t+=1;
   assert.equal(sec.countUserSessions('u'),0,'a missing heartbeat releases the account on next login check');
   assert.equal(sec.getSession(long),null);
-  const never=sec.createSession('u','ip',true);t+=180000;assert.equal(sec.getSession(never),null,'a login without an initial presence also expires');
-  const tabs=sec.createSession('u','ip',true);sec.browserPing(tabs,'a');sec.browserPing(tabs,'b');t+=100000;sec.browserPing(tabs,'b');t+=80000;
+  const never=sec.createSession('u','ip',true);t+=60000;assert.equal(sec.getSession(never),null,'a login without an initial presence also expires');
+  const tabs=sec.createSession('u','ip',true);sec.browserPing(tabs,'a');sec.browserPing(tabs,'b');t+=30000;sec.browserPing(tabs,'b');t+=31000;
   assert(sec.getSession(tabs),'a fresh tab keeps the session alive when another tab stops pinging');
   sec.browserLeave(tabs,'b');t+=8001;assert.equal(sec.getSession(tabs),null,'a stale tab does not prevent last-tab closure');
   const api=sec.createSession('u','ip');t+=48*60*60*1000;assert(sec.getSession(api),'non-browser sessions remain compatible');sec.destroySession(api);assert.equal(sec.getSession(api),null);

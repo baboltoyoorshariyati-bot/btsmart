@@ -55,9 +55,10 @@ test('customer identity uses normalized phones across creation, edits, visits an
     const sharedPlate=await call('POST','/api/visits',{name:'شخص خودرو',phone:'09121117772',vehicleType:'خودرو',carType:'وانت',plate:'12ب34567'});assert.equal(sharedPlate.status,201);assert.notEqual(sharedPlate.body.visit.customerId,withPlate.body.visit.customerId);
     const shop=await call('POST','/api/admin/users',{username:'identity-shop',roleCode:'store',fullName:'فروشگاه آزمون',position:'آزمون',storeName:'فروشگاه',password:'Changed!2345',mustChangePassword:false});assert.equal(shop.status,201);
     const storeOrder={storeId:shop.body.user.id,name:'نام دیگر',phone:'09121112233',items:[{productId:'p01',requestedQty:1,requestedUnit:'کیلوگرم'}]};
-    assert.equal((await call('POST','/api/store/orders',storeOrder)).status,409);
-    const storeOk=await call('POST','/api/store/orders',{...storeOrder,name:'علی رضایی'});assert.equal(storeOk.status,201,JSON.stringify(storeOk.body));assert.equal(storeOk.body.order.customerId,id);
-    assert.equal((await call('PUT',`/api/store/orders/${storeOk.body.order.id}`,{...storeOrder,name:'علی رضایی',phone:'09121112255'})).status,409);
+    const storeDifferent=await call('POST','/api/store/orders',storeOrder);assert.equal(storeDifferent.status,201);assert.equal(storeDifferent.body.order.customerId,null);assert.equal(storeDifferent.body.order.customer.name,'نام دیگر');
+    const storeOk=await call('POST','/api/store/orders',{...storeOrder,name:'علی رضایی'});assert.equal(storeOk.status,201,JSON.stringify(storeOk.body));assert.equal(storeOk.body.order.customerId,null);
+    const storeEdit=await call('PUT',`/api/store/orders/${storeOk.body.order.id}`,{...storeOrder,name:'علی رضایی',phone:'09121112255'});assert.equal(storeEdit.status,200);assert.equal(storeEdit.body.order.customer.phone,'09121112255');
+    assert.equal((await call('GET',`/api/customers/${id}`)).body.customer.name,'علی رضایی');
     const concurrent=await Promise.all([create({name:'الف همزمان',phone:'09121116666'}),create({name:'ب همزمان',phone:'+989121116666'})]);
     assert.deepEqual(concurrent.map(x=>x.status).sort(),[201,409]);
     assert.deepEqual((await call('GET','/api/customers/duplicate-phones')).body.duplicates,[]);

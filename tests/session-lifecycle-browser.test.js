@@ -41,6 +41,6 @@ test('مرورگر: با نرسیدن پیام بستن، نشست پس از ق�
   const page=await sales.newPage();await page.addInitScript(()=>{navigator.sendBeacon=()=>true;});
   const presence=page.waitForResponse(r=>r.url().endsWith('/api/session/presence')&&r.status()===200);await page.goto(base,{waitUntil:'networkidle'});await presence;
   await page.close({runBeforeUnload:true});assert.equal((await post(other,'/api/login',credentials)).status(),409,'without a leave the session remains alive until timeout');
-  await advance(180001);assert.equal((await post(other,'/api/login',credentials)).status(),200);assert.equal((await sales.request.get(base+'/api/me')).status(),401);
+  await advance(60001);assert.equal((await post(other,'/api/login',credentials)).status(),200);assert.equal((await sales.request.get(base+'/api/me')).status(),401);
  }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(resolve=>proc.once('exit',resolve));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });
