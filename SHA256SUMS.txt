@@ -399,7 +399,7 @@ f13bfb9fc2f4d9d85e9af1e99d13a3bd6d4413133e63ba257301f770025a39e8  ./tests/long-t
 0b3dda9df0a96ce47557513e990a487fb8541156c65fab9939c7e81255133411  ./tests/notification-count-consistency.test.js
 141661545521728646d6a764f8b31d433f1263fe18b08274361bc86d6337956b  ./tests/notification-precision-browser.test.js
 232f7cf65367bb6459b348d30bb2d3a371020a1bf400e265abe9751884f4c3c1  ./tests/notification-precision.test.js
-7fa2c06359c1f4c0af79ad214120bc8427b6d6510a3f47fd2befe17676c340d5  ./tests/notification-roles-compact-browser.test.js
+460760c16756aecdecc41a88ebcd4f0ded8fe53844bed592dde07f1bc16246be  ./tests/notification-roles-compact-browser.test.js
 90170bd150103f317752838f50f21cbcd1d5b0d3737581f6b643d94b7caacbea  ./tests/notification-sound.test.js
 55cba038db893396ffa19774586e46c7484a079cd9139de98c7986530f9ac0f7  ./tests/onsite-cancellation-api.test.js
 4806c54efa409dad40b3b7393ef86d8911763ce97d90c8f08739532342bd1ae0  ./tests/onsite-cancellation-browser.test.js
