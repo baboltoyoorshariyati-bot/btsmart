@@ -34,13 +34,20 @@ test('store contacts are order-only, reusable, isolated from customer profiles, 
   assert(history.orders.some(o=>o.id===second.id));assert(history.orders.some(o=>o.id===third.id));
   const adminHistory=await ok('GET',`/api/admin/orders/${second.id}/history`,null,admin);assert.match(JSON.stringify(adminHistory),/تماس اصلاحی/);assert.match(JSON.stringify(adminHistory),/09121117777/);
   assert.equal((await call('POST','/api/store/orders',{...payload,phone:'bad'},shop)).status,400);
+  const {phone:ignored,...withoutPhone}=payload;
+  const noPhone=(await ok('POST','/api/store/orders',{...withoutPhone,name:'بدون شماره'},shop)).order;
+  assert.deepEqual(noPhone.customer,{name:'بدون شماره',phone:''});assert.equal(noPhone.customerId,null);
+  const cleared=(await ok('PUT',`/api/store/orders/${second.id}`,{...payload,phone:''},shop)).order;assert.equal(cleared.customer.phone,'');
+  assert.equal((await call('PUT',`/api/store/orders/${noPhone.id}`,{...withoutPhone,phone:'bad'},shop)).status,400);
+  assert.equal((await call('POST','/api/store/orders',{...withoutPhone,name:''},shop)).status,400);
+  assert.equal((await call('POST','/api/store/orders',{name:'کلی',items},shop)).status,400,'legacy bulk contact phone remains required');
   await stop();
   // Construct a historical customer-linked store order and verify no automatic migration/deletion.
   const {DatabaseSync}=require('node:sqlite'),sql=new DatabaseSync(path.join(dir,'baboltoyoor.db'));
   try{sql.prepare("UPDATE orders SET customer_id=?,payload=json_set(json_remove(payload,'$.customerName','$.customerPhone'),'$.customerId',?) WHERE id=?").run(profile.id,profile.id,third.id);}finally{sql.close();}
   await start();admin=(await call('POST','/api/login',{username:'admin',password:'Changed!2345'})).cookie;shop=(await call('POST','/api/login',{username:'shop',password:'Changed!2345'})).cookie;
   const old=(await ok('GET',`/api/store/orders/${third.id}`,null,shop)).order;assert.equal(old.customerId,profile.id);assert.equal(old.customer.name,'پرونده عادی');
-  const editOld=(await ok('PUT',`/api/store/orders/${third.id}`,{...payload,name:'تماس مستقل قدیمی'},shop)).order;assert.equal(editOld.customerId,profile.id);assert.equal(editOld.customer.name,'تماس مستقل قدیمی');
+  const editOld=(await ok('PUT',`/api/store/orders/${third.id}`,{...payload,name:'تماس مستقل قدیمی',phone:''},shop)).order;assert.equal(editOld.customerId,profile.id);assert.equal(editOld.customer.name,'تماس مستقل قدیمی');assert.equal(editOld.customer.phone,'');
   assert.equal((await ok('GET',`/api/customers/${profile.id}`,null,admin)).customer.name,'پرونده عادی');
   const dossier=await ok('GET',`/api/admin/orders/${third.id}/history`,null,admin);assert.match(JSON.stringify(dossier),/تماس مستقل قدیمی/);
   const staleSearch=await ok('GET','/api/sales/history?q='+encodeURIComponent('پرونده عادی'),null,admin);assert(!staleSearch.orders.some(o=>o.id===third.id));

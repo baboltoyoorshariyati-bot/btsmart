@@ -228,6 +228,33 @@ function storeReceiptEntries(o){
 }
 function storeReceiptSummary(o){const rows=storeReceiptEntries(o);if(!rows.length)return '';return `<div class="store-receipt-summary">${rows.map(d=>`<span class="badge ${d.confirmed?'green':'orange'}">${d.run?`سرویس ${d.run===2?'دوم':'اول'}: `:''}${d.confirmed?`دریافت فروشگاه تأیید شد · ${esc(formatDateTime24(d.confirmedAt))}`:'منتظر تأیید دریافت فروشگاه'}</span>`).join('')}</div>`;}
 function storeReturnPrintButton(o){return o?.hasReturnedGoods?`<button type="button" class="btn btn-secondary btn-sm" data-action="print-store-return" data-id="${esc(o.id)}">${icon('receipt',14)} چاپ مرجوعی</button>`:'';}
+// Addition reviews use the same order-table and details pattern in both roles.
+// Fetch again on opening so another workstation's decision is not shown as current.
+async function openStoreAdditionReview(id,requestId,role){
+ const status=role==='warehouse'?'PENDING_WAREHOUSE':'PENDING_SALES';
+ try{
+  const o=(await api('/api/orders/'+encodeURIComponent(id))).order;
+  const request=(o.storeAdditionRequests||[]).find(r=>r.id===requestId&&r.status===status);
+  if(!request){toast('این درخواست دیگر در انتظار بررسی نیست.');return false;}
+  const identity=o.storePurpose==='STOCK'?'تأمین تکمیلی فروشگاه':`مشتری: ${o.customer?.name||'—'}`;
+  const lines=(rows,added)=>rows.map((i,k)=>`<tr><td data-label="ردیف">${fa(k+1)}</td><td data-label="محصول">${esc((added?i.productName:i.product?.name)||'—')}</td><td data-label="مقدار">${qty(i.requestedQty)}</td><td data-label="واحد">${esc(i.requestedUnit||'')}</td><td data-label="توضیحات">${esc(i.description||'—')}</td></tr>`).join('');
+  const table=(rows,added)=>`<div class="bt-table-wrap"><table class="bt-table store-addition-detail-table"><thead><tr><th>ردیف</th><th>محصول</th><th>مقدار</th><th>واحد</th><th>توضیحات</th></tr></thead><tbody>${lines(rows,added)}</tbody></table></div>`;
+  openModal('جزئیات درخواست افزودن کالا',`<div class="store-addition-review"><div class="whd35-head"><div class="whd35-title"><h2>${esc(o.storeName||'فروشگاه')}</h2><span>${esc(identity)}</span></div><span class="badge orange">${role==='warehouse'?'در انتظار تأیید انبار':'در انتظار تأیید فروش'}</span></div><div class="whd35-meta"><span>شماره سفارش <b>${esc(fa(o.orderNo||'—'))}</b></span><span>تاریخ درخواست <b>${esc(formatDateTime24(request.requestedAt))}</b></span>${o.dispatchPlace?`<span>محل ارسال <b>${esc(o.dispatchPlace)}</b></span>`:''}</div><p>درخواست زیر به همین سفارش مربوط است و تا تأیید انبار به اقلام سفارش اضافه نمی‌شود.</p><h3>کالاهای درخواستی جدید</h3>${table(request.items||[],true)}<h3>اقلام فعلی سفارش</h3>${table(activeItemsOf(o),false)}<div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button><button type="button" class="btn btn-secondary" data-addition-decision="REJECT">رد درخواست</button><button type="button" class="btn btn-primary" data-addition-decision="APPROVE">${role==='warehouse'?'تأیید و افزودن به سفارش':'تأیید و ارسال به انبار'}</button></div></div>`);
+  const review=$('#modal .store-addition-review');
+  review.querySelectorAll('[data-addition-decision]').forEach(button=>button.addEventListener('click',async()=>{
+   const decision=button.dataset.additionDecision;
+   if(!confirm(decision==='APPROVE'?(role==='warehouse'?'کالاها به همین سفارش اضافه شوند؟':'درخواست افزودن کالا تأیید و به انبار ارسال شود؟'):'درخواست افزودن کالا رد شود؟'))return;
+   const buttons=[...review.querySelectorAll('[data-addition-decision]')];buttons.forEach(b=>b.disabled=true);
+   try{
+    await api(`/api/${role==='warehouse'?'warehouse':'sales'}/store-orders/${encodeURIComponent(id)}/additions/review`,{method:'POST',body:JSON.stringify({requestId,decision})});
+    closeModal();toast('نتیجه بررسی ثبت شد.');await refreshIndicators();
+    if(role==='warehouse'&&app.page==='warehouse'&&app.wh38.phase==='stores')await wh38Paint('stores');
+    if(role==='sales'&&app.page==='sales'&&app.sub.sales==='stores'){await fetchSalesCache(true);await renderSales('stores');}
+   }catch(e){buttons.forEach(b=>b.disabled=false);toast(e.message);}
+  }));
+  return true;
+ }catch(e){toast(e.message);return false;}
+}
 function renderSalesStoresV41(orders,deliveries={}){ // v37.7.9 — فروشگاه با چهار سربرگ عمودی
   const all=(Array.isArray(orders)?orders:[]).filter(o=>o&&o.orderType==='STORE');
   const incoming=all.filter(o=>o.status==='STORE_PENDING_SALES').sort((a,b)=>String(a.createdAt||'').localeCompare(String(b.createdAt||'')));
@@ -244,7 +271,7 @@ function renderSalesStoresV41(orders,deliveries={}){ // v37.7.9 — فروشگا
       <td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td>
       <td data-label="تاریخ">${esc(formatDateTime24(o.createdAt))}</td>
       <td data-label="وضعیت">${badge(o.status)}</td>
-      <td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td>
+      <td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم${kind==='processing'?salesLiveWeightsHtml(o):''}</td>
       <td data-label="عملیات" class="bt-col-actions">${actions}${notes?`<div class="bt-cell-notes">${notes}</div>`:''}</td>
     </tr>`;
   };
@@ -252,7 +279,7 @@ function renderSalesStoresV41(orders,deliveries={}){ // v37.7.9 — فروشگا
   const requests=all.filter(o=>(o.storeCancellationRequests||[]).some(r=>r.status==='PENDING'));
   const cancellationPanel=requests.length?`<section class="sd-panel"><h3>درخواست‌های لغو فروشگاه</h3><p>درخواست به‌تنهایی سفارش یا اسناد را لغو نمی‌کند و عملیات تحویل را متوقف نمی‌کند؛ وضعیت کالا، تحویل و امور مالی را بررسی و نتیجه را ثبت کنید.</p>${requests.map(o=>{const r=o.storeCancellationRequests.find(x=>x.status==='PENDING');return `<article data-store-cancel-queue="${esc(o.id)}"><b>${esc(o.storeName||'فروشگاه')} — سفارش ${esc(fa(o.orderNo||'—'))}</b><p>${esc(r.reason)}</p><button type="button" class="btn btn-secondary" data-action="store-order-details-v25" data-id="${esc(o.id)}">بررسی درخواست و جزئیات</button></article>`;}).join('')}</section>`:'';
   const additions=all.filter(o=>(o.storeAdditionRequests||[]).some(r=>r.status==='PENDING_SALES'));
-  const additionPanel=additions.length?`<section class="sd-panel"><h3>کالاهای افزوده‌شده به سفارش جزئی</h3><p>پس از تأیید فروش، درخواست برای تأیید انبار ارسال می‌شود.</p>${additions.map(o=>{const r=o.storeAdditionRequests.find(x=>x.status==='PENDING_SALES');return `<article data-store-addition-sales="${esc(o.id)}" data-request="${esc(r.id)}"><b>${esc(o.storeName||'فروشگاه')} — سفارش ${esc(fa(o.orderNo||'—'))}</b><ul>${r.items.map(i=>`<li>${esc(i.productName)} — ${qty(i.requestedQty)} ${esc(i.requestedUnit)} ${i.description?`· ${esc(i.description)}`:''}</li>`).join('')}</ul><button class="btn btn-primary btn-sm" data-action="store-addition-sales" data-id="${esc(o.id)}" data-request="${esc(r.id)}" data-decision="APPROVE">تأیید و ارسال به انبار</button> <button class="btn btn-secondary btn-sm" data-action="store-addition-sales" data-id="${esc(o.id)}" data-request="${esc(r.id)}" data-decision="REJECT">رد درخواست</button></article>`;}).join('')}</section>`:'';
+  const additionPanel=additions.length?`<section class="store-addition-queue"><h3>درخواست‌های افزودن کالا به سفارش جزئی</h3><p>پس از تأیید فروش، درخواست برای تأیید انبار ارسال می‌شود.</p><div class="bt-table-wrap"><table class="bt-table sd-store-table"><thead><tr><th>فروشگاه</th><th>شماره سفارش</th><th>تاریخ</th><th>وضعیت</th><th>اقلام</th><th>عملیات</th></tr></thead><tbody>${additions.map(o=>{const r=o.storeAdditionRequests.find(x=>x.status==='PENDING_SALES');const identity=o.storePurpose==='STOCK'?'تأمین تکمیلی فروشگاه':`مشتری: ${o.customer?.name||'—'}`;return `<tr data-store-addition-sales="${esc(o.id)}" data-request="${esc(r.id)}"><td data-label="فروشگاه"><span class="bt-cell-main">${esc(o.storeName||'فروشگاه')}</span><span class="bt-cell-sub">سفارش جزئی · ${esc(identity)}</span></td><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="تاریخ">${esc(formatDateTime24(r.requestedAt))}</td><td data-label="وضعیت"><span class="badge orange">در انتظار تأیید فروش</span></td><td data-label="اقلام">${qty((r.items||[]).length)} قلم افزوده</td><td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-secondary btn-sm" data-action="store-addition-open" data-role="sales" data-id="${esc(o.id)}" data-request="${esc(r.id)}">${icon('eye',14)} جزئیات درخواست</button></td></tr>`;}).join('')}</tbody></table></div></section>`:'';
   const shipmentsPanel=additionPanel+cancellationPanel+renderStoreRunShipmentsPanel(deliveries.storeRunShipments||[]);
   const panel=(id,title,rows,kind,emptyTitle,emptyText,extra='')=>`<section class="sales-store-subpanel-v43" data-store-section="${id}"${(app.salesStoreTab||'incoming')===id?'':' hidden'}><header class="sales-store-subhead-v43"><h2>${title}</h2><span>${qty(rows.length)} سفارش</span></header>${extra}<div class="bt-table-wrap"><table class="bt-table sd-store-table"><thead><tr><th>فروشگاه</th><th>شماره سفارش</th><th>تاریخ</th><th>وضعیت</th><th>اقلام</th><th>عملیات</th></tr></thead><tbody>${rows.map(o=>card(o,kind)).join('')||`<tr><td colspan="6">${salesEmptyV25('sales',emptyTitle,emptyText)}</td></tr>`}</tbody></table></div></section>`;
   const shipCount=(deliveries.storeRunShipments||[]).length;
@@ -274,6 +301,32 @@ async function pickupApprove(id,button){
  if(!confirm('انصراف و عدم تحویل تأیید شود؟ بیعانه برای استرداد دستی در انتظار می‌ماند.'))return;
  button.disabled=true;try{await api('/api/pickup/'+encodeURIComponent(id)+'/cancellation-approval',{method:'POST',body:'{}'});toast('انصراف تأیید شد؛ نگهبانی خروج را ثبت می‌کند.');await fetchSalesCache(true);await renderSales(app.sub.sales);await refreshIndicators();}catch(e){button.disabled=false;toast(e.message);}
 }
+// Saved warehouse weights are observational only: drafts are not delivery.
+function salesLiveWeightsHtml(o){
+ const drafts=new Map((o.status==='WAREHOUSE_PREPARING'?o.warehouseWeightDraft?.items||[]:[]).map(x=>[x.itemId,x]));
+ const runs=new Map((o.storeRun?.items||[]).map(x=>[x.itemId,x]));
+ const entries=activeItemsOf(o).map(i=>{
+  const draft=drafts.get(i.id),run=runs.get(i.id);let value='هنوز وزنی ذخیره نشده';
+  if(o.orderType==='STORE'){
+   const parts=[];if(Number(run?.r1Kg)>0)parts.push(`سرویس اول ${qty(run.r1Kg)} کیلوگرم`);if(Number(run?.r2Kg)>0)parts.push(`سرویس دوم ${qty(run.r2Kg)} کیلوگرم`);
+   if(parts.length)value='وزن ثبت‌شده: '+parts.join('، ');
+   if(i.shortageClosed)value=parts.length?value+' · کسری ثبت‌شده':'عدم موجودی / کسری ثبت‌شده';
+  }else if(draft?.outOfStock)value='عدم موجودی (پیش‌نویس ذخیره‌شده)';
+  else if(draft&&draft.deliveredKg!=null)value=`پیش‌نویس ذخیره‌شده: ${qty(draft.deliveredKg)} کیلوگرم`;
+  else if(i.deliveredKg!=null)value=`وزن نهایی: ${qty(i.deliveredKg)} کیلوگرم`;
+  return `<li><b>${esc(i.product?.name||'—')}</b><span>${esc(value)}</span></li>`;
+ }).join('');
+ return `<ul class="sales-live-weights-list">${entries||'<li>قلم فعالی وجود ندارد.</li>'}</ul>`;
+}
+function refreshSalesLiveWeightModal(data,failed=false){
+ const box=document.querySelector('#modal [data-sales-live-order]');if(!box||app.page!=='sales')return;
+ const state=box.querySelector('[data-live-weight-status]');
+ if(failed){if(state)state.textContent='دریافت تازه ناموفق بود؛ وزن‌های زیر ممکن است قدیمی باشند.';return;}
+ const order=(data?.orders||[]).find(o=>o.id===box.dataset.salesLiveOrder);
+ if(!order){if(state)state.textContent='این سفارش دیگر در فهرست جاری نیست؛ برای بررسی وضعیت دوباره باز کنید.';return;}
+ box.querySelector('[data-live-weight-rows]').innerHTML=salesLiveWeightsHtml(order);
+ if(state)state.textContent='بر اساس آخرین وزن ذخیره‌شدهٔ انبار؛ پیش‌نویس تحویل نهایی نیست.';
+}
 function sdFlowCard(o,idx){
  const items=activeItemsOf(o);
  const actions=`<button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>${pickupSalesActions(o)}${o.orderType==='ONSITE'&&o.visitId?`<button type="button" class="btn btn-secondary btn-sm" data-action="cancel-onsite" data-id="${esc(o.visitId)}">لغو سفارش حضوری</button>`:''}${o.status==='RETURNED_TO_SALES'&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button class="btn btn-secondary btn-sm" data-action="edit-returned-order" data-id="${esc(o.id)}">${icon('edit',14)} اصلاح سفارش</button><button class="btn btn-primary btn-sm" data-action="resubmit-order" data-id="${esc(o.id)}">${icon('send',14)} ارسال مجدد به انبار</button>`:''}`;
@@ -281,7 +334,7 @@ function sdFlowCard(o,idx){
    <td data-label="نام مشتری"><span class="bt-cell-main"><strong>${esc(storeAwareOrderName(o)||'—')}</strong></span></td>
    <td data-label="شماره سفارش"><bdi>${esc(fa(o.orderNo||'—'))}</bdi></td>
    <td data-label="تاریخ">${esc(formatDateTime24(o.createdAt))}</td>
-   <td data-label="وضعیت">${badge(o.status)} ${sdTypeBadge(o)} <span>${qty(items.length)} قلم</span></td>
+   <td data-label="وضعیت">${badge(o.status)} ${sdTypeBadge(o)} <span>${qty(items.length)} قلم</span>${salesLiveWeightsHtml(o)}</td>
    <td data-label="عملیات" class="bt-col-actions"><div class="bt-actions">${actions}</div></td>
  </tr>`;
 }
