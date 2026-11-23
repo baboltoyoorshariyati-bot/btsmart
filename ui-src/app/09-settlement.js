@@ -1,4 +1,4 @@
-function stlReset(){ app.stl = {orderId:null, order:null, items:[], prices:[], priceMap:Object.create(null), drivers:[], devices:[], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false, dispatchBusy:false, paymentRows:[{type:'CASH',amount:''}]}; Object.assign(stl, app.stl); app.selectedSettlement=null; }
+function stlReset(){ app.stl = {previousBalance:null,orderId:null, order:null, items:[], prices:[], priceMap:Object.create(null), drivers:[], devices:[], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false, dispatchBusy:false, paymentRows:[{type:'CASH',amount:''}]}; Object.assign(stl, app.stl); app.selectedSettlement=null; }
 function stlPrice(v){ return Number(en(String(v ?? '')).replace(/[^0-9]/g,'')) || 0; }
 function stlFmtPrice(v){ return v ? new Intl.NumberFormat('fa-IR').format(v) : ''; }
 function stlFormatPriceInput(input){
@@ -178,10 +178,20 @@ function stlFormHtml(o){
   </section>`;
 }
 window.BTSettlementRenderers={row:stlRowHtml,form:stlFormHtml};
+async function salesPriorBalance(order){
+ const id=order.customerId||order.visit?.customerId;
+ if(!id||order.orderType==='STORE')return {unavailable:true};
+ try{return await api('/api/customers/'+encodeURIComponent(id)+'/debts');}catch(_){return {error:true};}
+}
+function salesPriorBalanceHtml(data){
+ if(!data||data.error)return '<section class="stl-prior-balance" role="status">ماندهٔ قبلی دریافت نشد؛ برای بررسی دوباره فرم را باز کنید.</section>';
+ if(data.unavailable)return '<section class="stl-prior-balance" role="status">پروندهٔ مالی مشتری برای نمایش ماندهٔ قبلی در دسترس نیست.</section>';
+ return `<section class="stl-prior-balance" data-prior-balance><b>ماندهٔ قبلی مشتری</b><span>بدهکار از قبل: ${money(data.balance||0)}</span><span>بستانکار از قبل: ${money(data.credit||0)}</span><small>فقط حساب‌های ثبت‌شده در سامانه نمایش داده می‌شوند؛ سوابق قدیمی ممکن است ثبت نشده باشند. این مانده در مبلغ فاکتور اعمال نشده است.</small></section>`;
+}
 function stlPaintForm(){
   const host = $('#stlMain'); if(!host || !stl.order) return;
-  if(stl.order.transportWorkflow===1&&stl.order.deliveryMode==='DELIVERY'&&typeof transportSalesInvoicePanel==='function'){transportSalesInvoicePanel(stl.order);return;}
-  host.innerHTML = stlFormHtml(stl.order);
+  if(stl.order.transportWorkflow===1&&stl.order.deliveryMode==='DELIVERY'&&typeof transportSalesInvoicePanel==='function'){transportSalesInvoicePanel(stl.order);host.insertAdjacentHTML('beforeend',salesPriorBalanceHtml(stl.previousBalance));return;}
+  host.innerHTML = stlFormHtml(stl.order)+salesPriorBalanceHtml(stl.previousBalance);
   const driverSelect=host.querySelector('[data-stl-driver]');if(driverSelect)driverSelect.addEventListener('change',()=>{host.querySelector('[data-stl-plate]').innerHTML=plateViewHtml(stl.drivers.find(x=>x.id===driverSelect.value)?.plate,'—',true);});
   stlRecalc(); stlBindPayments();
 }
@@ -255,8 +265,9 @@ async function stlOpen(id){
       const [p,driverData,deviceData]=await Promise.all([api('/api/prices'),api('/api/dispatch/drivers'),api('/api/payment-devices')]);
       prices=p.prices||[];drivers=driverData.drivers||[];devices=deviceData.devices||[];
     }
+    const previousBalance=await salesPriorBalance(o);
     if(!current())return;
-    Object.assign(stl, {orderId:id, order:o, items:stlItemsOf(o,prices), prices, priceMap:Object.fromEntries(prices.map(x=>[x.productId,Number(x.price)])), drivers, devices, devicesError, paymentRows:[{type:'CASH',amount:''}], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false});
+    Object.assign(stl, {previousBalance,orderId:id, order:o, items:stlItemsOf(o,prices), prices, priceMap:Object.fromEntries(prices.map(x=>[x.productId,Number(x.price)])), drivers, devices, devicesError, paymentRows:[{type:'CASH',amount:''}], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false});
     stl.discountAmount=Number(o.payment?.discountAmount ?? o.dispatch?.discountAmount ?? 0);
     stl.additionsAmount=Number(o.payment?.additionsAmount ?? o.dispatch?.additionsAmount ?? 0);
     app.selectedSettlement=id;

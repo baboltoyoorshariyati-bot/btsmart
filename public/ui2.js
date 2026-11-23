@@ -436,24 +436,24 @@ function documentEditMethodDetails(method,devices,disabled=false){
 }
 function documentEditMethodRow(method={},devices=[],review=false){
  const type=DOCUMENT_EDIT_METHODS.some(row=>row[0]===method.type)?method.type:'CASH';
- const protectedReceipt=review&&['CASH','POS','CARD_TRANSFER','CHECK'].includes(type),typeLock=protectedReceipt||(review&&type==='CREDIT')?'disabled':'';
- return `<tr data-doc-method-row data-protected-receipt="${protectedReceipt?'1':'0'}"><td data-label="روش تسویه"><label><span class="bt-caption">روش تسویه</span><select data-doc-method-type ${typeLock}>${DOCUMENT_EDIT_METHODS.map(([value,label])=>`<option value="${value}" ${type===value?'selected':''}>${label}${value==='CREDIT'?' — بدون دریافت وجه':''}</option>`).join('')}</select></label></td><td data-label="مبلغ (ریال)"><label><span class="bt-caption">مبلغ (ریال)</span><input data-doc-method-amount inputmode="numeric" value="${method.amount==null?'':esc(String(method.amount))}" ${protectedReceipt?'disabled':''}></label></td><td data-label="جزئیات"><div class="document-edit-method-extra" data-doc-method-extra>${documentEditMethodDetails({...method,type},devices,protectedReceipt)}</div></td><td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-ghost btn-sm document-edit-remove" data-doc-remove-method ${protectedReceipt?'disabled title="دریافت واقعی حفظ می‌شود"':''}>حذف</button></td></tr>`;
+ const protectedReceipt=false,typeLock='';
+ return `<tr data-doc-method-row data-protected-receipt="${protectedReceipt?'1':'0'}"><td data-label="روش تسویه"><label><span class="bt-caption">روش تسویه</span><select data-doc-method-type ${typeLock}>${DOCUMENT_EDIT_METHODS.map(([value,label])=>`<option value="${value}" ${type===value?'selected':''}>${label}${value==='CREDIT'?' — بدون دریافت وجه':''}</option>`).join('')}</select></label></td><td data-label="مبلغ (ریال)"><label><span class="bt-caption">مبلغ (ریال)</span><input data-doc-method-amount inputmode="numeric" value="${method.amount==null?'':esc(new Intl.NumberFormat('fa-IR').format(method.amount))}" ${protectedReceipt?'disabled':''}></label></td><td data-label="جزئیات"><div class="document-edit-method-extra" data-doc-method-extra>${documentEditMethodDetails({...method,type},devices,protectedReceipt)}</div></td><td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-ghost btn-sm document-edit-remove" data-doc-remove-method ${protectedReceipt?'disabled title="دریافت واقعی حفظ می‌شود"':''}>حذف</button></td></tr>`;
 }
 function documentEditInvoiceHtml(data,devices){
  const {order,payment,lines}=data,review=data.edit?.status==='PENDING_SALES_REVIEW'||payment.settlementReviewRequired;
  const methods=Array.isArray(payment.settlementMethods)?payment.settlementMethods:[];
  const methodSum=methods.reduce((sum,row)=>sum+Number(row.amount||0),0);
- const itemRows=lines.map((line,index)=>`<tr data-doc-invoice-line data-item-id="${esc(line.itemId)}" data-kg="${esc(line.deliveredKg)}" data-return-kg="${esc(line.returnKg||0)}"><td data-label="ردیف">${fa(index+1)}</td><td data-label="محصول"><div class="document-edit-line-name"><b>${esc(line.productName||'—')}</b><small>${qty(line.deliveredKg)} کیلوگرم${Number(line.returnKg)>0?` • مرجوعی ${qty(line.returnKg)} کیلوگرم`:''}</small></div></td><td data-label="قیمت هر کیلو (ریال)"><label><span class="bt-caption">قیمت هر کیلو (ریال) برای ${esc(line.productName||'محصول')}</span><input data-doc-unit-price inputmode="numeric" value="${esc(String(line.unitPrice||0))}" required></label></td><td data-label="مبلغ"><strong data-doc-line-total>${money(line.amount||0)}</strong></td></tr>`).join('');
+ const itemRows=lines.map((line,index)=>`<tr data-doc-invoice-line data-item-id="${esc(line.itemId)}" data-kg="${esc(line.deliveredKg)}" data-return-kg="${esc(line.returnKg||0)}"><td data-label="ردیف">${fa(index+1)}</td><td data-label="محصول"><div class="document-edit-line-name"><b>${esc(line.productName||'—')}</b><small>${qty(line.deliveredKg)} کیلوگرم${Number(line.returnKg)>0?` • مرجوعی ${qty(line.returnKg)} کیلوگرم`:''}</small></div></td><td data-label="قیمت هر کیلو (ریال)"><label><span class="bt-caption">قیمت هر کیلو (ریال) برای ${esc(line.productName||'محصول')}</span><input data-doc-unit-price inputmode="numeric" value="${esc(new Intl.NumberFormat('fa-IR').format(line.unitPrice||0))}" required></label></td><td data-label="مبلغ"><strong data-doc-line-total>${money(line.amount||0)}</strong></td></tr>`).join('');
  const methodsHtml=methods.map(row=>documentEditMethodRow(row,devices,review)).join('')||documentEditMethodRow({type:review?'CREDIT':'CASH',amount:''},devices,review);
  const expiry=data.expiresAt?`مهلت ویرایش تا ${esc(formatDateTime24(data.expiresAt))}`:'مهلت ثبت‌شده نیست؛ ویرایش فقط با تأیید مدیر';
  const noEdit=!data.canEdit;
- return `<form id="salesInvoiceEditForm" class="document-edit-form" data-order-id="${esc(order.id)}" data-payment-id="${esc(payment.id)}" data-review="${review?'1':'0'}" data-can-edit="${data.canEdit?'1':'0'}">
-  <section class="document-edit-notice ${review?'is-review':''}"><div><b>${review?'بازبینی پس از اصلاح انبار':'ویرایش قیمت و روش تسویه'}</b><span>${esc(order.customerName||'—')} • سفارش ${esc(fa(order.orderNo||'—'))} • فاکتور ${esc(fa(payment.invoiceNumber||'—'))}</span></div><small>${expiry}</small><p>${review?'دریافت‌ها و چک‌های قبلی قفل و حفظ شده‌اند. در صورت افزایش مبلغ، تفاوت را به‌عنوان معوق ثبت کنید؛ اگر مبلغ جدید از دریافت واقعی کمتر باشد، ابتدا بازپرداخت را جداگانه تعیین تکلیف کنید.':'ویرایش مالی نیاز به تأیید انبار ندارد. ثبت تغییرات به‌تنهایی پولی دریافت یا جابه‌جا نمی‌کند.'}</p>${payment.settlementReviewReason?`<p class="document-edit-reason">${esc(payment.settlementReviewReason)}</p>`:''}</section>
+ return `<form id="salesInvoiceEditForm" class="document-edit-form" data-order-id="${esc(order.id)}" data-payment-id="${esc(payment.id)}" data-review="${review?'1':'0'}" data-can-edit="${data.canEdit?'1':'0'}" data-paid="${Number(payment.accountSummary?.paid||0)}" data-pending="${Number(payment.accountSummary?.pending||0)}" >
+  <section class="document-edit-notice ${review?'is-review':''}"><div><b>${review?'بازبینی پس از اصلاح انبار':'ویرایش قیمت و روش تسویه'}</b><span>${esc(order.customerName||'—')} • سفارش ${esc(fa(order.orderNo||'—'))} • فاکتور ${esc(fa(payment.invoiceNumber||'—'))}</span></div><small>${expiry}</small><p>ویرایش روش و مبلغ، ثبت پرداخت را اصلاح می‌کند. اختلاف فاکتور و پرداخت در حساب مشتری ثبت می‌شود؛ این عملیات وجهی دریافت یا بازپرداخت نمی‌کند. چک ثبت‌شده و دریافت‌های قبلی حساب معوق محفوظ‌اند.</p>${payment.settlementReviewReason?`<p class="document-edit-reason">${esc(payment.settlementReviewReason)}</p>`:''}</section>
   ${data.waitingForWarehouse?'<p class="document-edit-error" role="alert">این فاکتور اکنون در صف اصلاح انبار است و تا بازگشت سند قابل ویرایش نیست.</p>':''}
   <section class="document-edit-section"><header><div><b>اقلام و قیمت قبلی</b><small>وزن نهایی انبار و شناسهٔ قلم تغییر نمی‌کند.</small></div></header><div class="bt-table-wrap"><table class="bt-table document-edit-invoice-table"><caption class="bt-caption">اقلام و قیمت فاکتور</caption><thead><tr><th scope="col">ردیف</th><th scope="col">محصول</th><th scope="col">قیمت هر کیلو (ریال)</th><th scope="col">مبلغ</th></tr></thead><tbody>${itemRows||'<tr><td colspan="4">قلم قیمت‌گذاری‌شده‌ای در این فاکتور نیست.</td></tr>'}</tbody></table></div></section>
-  <section class="document-edit-finance"><label><span>تخفیف (ریال)</span><input data-doc-discount inputmode="numeric" value="${esc(String(payment.discountAmount||0))}"></label><label><span>اضافات (ریال)</span><input data-doc-additions inputmode="numeric" value="${esc(String(payment.additionsAmount||0))}"></label></section>
+  <section class="document-edit-finance"><label><span>تخفیف (ریال)</span><input data-doc-discount inputmode="numeric" value="${esc(new Intl.NumberFormat('fa-IR').format(payment.discountAmount||0))}"></label><label><span>اضافات (ریال)</span><input data-doc-additions inputmode="numeric" value="${esc(new Intl.NumberFormat('fa-IR').format(payment.additionsAmount||0))}"></label></section>
   <section class="document-edit-totals"><div><span>جمع اقلام</span><b data-doc-subtotal>${money(payment.subtotalAmount||0)}</b></div><div><span>کسر مرجوعی</span><b data-doc-returns>${money(payment.returnDeduction||0)}</b></div><div><span>مبلغ نهایی</span><b data-doc-total>${money(payment.totalAmount||0)}</b></div><div><span>بیعانهٔ لحاظ‌شده</span><b data-doc-deposit>${money(payment.depositAmount||0)}</b></div><div class="document-edit-due"><span>مبلغ قابل تطبیق با روش‌های تسویه</span><b data-doc-due>${money(payment.amountDue||0)}</b></div><div><span>جمع روش‌های فعلی</span><b data-doc-method-sum>${money(methodSum)}</b></div><p data-doc-method-message role="status"></p></section>
-  <section class="document-edit-section document-edit-settlement"><header><div><b>${review?'روش‌های باقی‌ماندهٔ فاکتور':'روش‌های تسویه'}</b><small>${review?'دریافت‌های واقعی قبلی قابل حذف یا کاهش نیستند؛ ماندهٔ جدید را به معوق تخصیص دهید.':'روش‌ها را متناسب با مبلغ نهایی فاکتور اصلاح کنید.'}</small></div></header><div class="bt-table-wrap"><table class="bt-table document-edit-methods-table"><caption class="bt-caption">روش‌های تسویه فاکتور</caption><thead><tr><th scope="col">روش تسویه</th><th scope="col">مبلغ (ریال)</th><th scope="col">جزئیات</th><th scope="col">عملیات</th></tr></thead><tbody id="documentEditMethods">${methodsHtml}</tbody></table></div><div class="document-edit-method-actions">${review?'<button type="button" class="btn btn-secondary btn-sm" data-doc-fill-credit>تطبیق مانده با معوق</button><button type="button" class="btn btn-ghost btn-sm" data-doc-add-credit>افزودن ردیف معوق</button>':'<button type="button" class="btn btn-secondary btn-sm" data-doc-add-method>افزودن روش تسویه</button>'}</div></section>
+  <section class="document-edit-section document-edit-settlement"><header><div><b>${review?'روش‌های باقی‌ماندهٔ فاکتور':'روش‌های تسویه'}</b><small>روش و مبلغ ثبت‌شده را در صورت اشتباه اصلاح کنید؛ اختلاف خودکار در حساب مشتری منظور می‌شود.</small></div></header><div class="bt-table-wrap"><table class="bt-table document-edit-methods-table"><caption class="bt-caption">روش‌های تسویه فاکتور</caption><thead><tr><th scope="col">روش تسویه</th><th scope="col">مبلغ (ریال)</th><th scope="col">جزئیات</th><th scope="col">عملیات</th></tr></thead><tbody id="documentEditMethods">${methodsHtml}</tbody></table></div><div class="document-edit-method-actions"><button type="button" class="btn btn-secondary btn-sm" data-doc-add-method>افزودن روش تسویه</button></div></section>
   ${noEdit?'<p class="document-edit-error" role="alert">مهلت ۷۲ ساعته پایان یافته یا زمان صدور ثبت نشده است؛ فقط مدیر سیستم مجاز به ویرایش است.</p>':''}
   <div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button><button type="submit" class="btn btn-primary" ${noEdit?'disabled':''}>${icon('check',15)} ${review?'تأیید بازبینی و ثبت نهایی':'ذخیره ویرایش فاکتور'}</button></div>
  </form>`;
@@ -479,14 +479,16 @@ function documentEditRecalc(form){
  const discount=documentEditNumber(form.querySelector('[data-doc-discount]')?.value),additions=documentEditNumber(form.querySelector('[data-doc-additions]')?.value);
  if(discount===null||additions===null||!Number.isSafeInteger(discount)||!Number.isSafeInteger(additions)||discount<0||additions<0)invalid=true;
  const gross=subtotal-(Number(discount)||0)+(Number(additions)||0),total=Math.max(0,gross-returns),deposit=Number(form.dataset.deposit||0),due=total-deposit;
- const safeDue=Math.max(0,due),methods=documentEditPaymentMethods(form),methodSum=methods.reduce((sum,row)=>sum+Number(row.amount||0),0),gap=safeDue-methodSum;
+ const safeDue=Math.max(0,due),methods=documentEditPaymentMethods(form),methodSum=methods.reduce((sum,row)=>sum+Number(row.amount||0),0),gap=due-methodSum;
+ const accountBase=methods.reduce((sum,row)=>sum+((row.type==='CREDIT'||row.type==='CHECK')?Number(row.amount||0):0),0),net=accountBase+gap-Number(form.dataset.paid||0),pending=Number(form.dataset.pending||0);
+ if(methods.some(row=>!Number.isSafeInteger(row.amount)||row.amount<1)||!Number.isSafeInteger(methodSum)||methodSum>1e12)invalid=true;
  const set=(selector,value)=>{const node=form.querySelector(selector);if(node)node.textContent=value;};
  set('[data-doc-subtotal]',money(subtotal));set('[data-doc-returns]',money(returns));set('[data-doc-total]',money(total));set('[data-doc-due]',money(safeDue));set('[data-doc-method-sum]',money(methodSum));
- form.dataset.due=String(safeDue);form.dataset.invalid=invalid||due<0?'1':'0';
+ form.dataset.due=String(safeDue);form.dataset.invalid=invalid?'1':'0';
  const message=form.querySelector('[data-doc-method-message]');
- if(message){message.className=gap===0&&!invalid&&due>=0?'is-balanced':'is-unbalanced';message.textContent=invalid?'قیمت، تخفیف یا اضافات را به‌صورت مبلغ صحیح و معتبر وارد کنید.':due<0?'بیعانه از مبلغ نهایی بیشتر است؛ ویرایش بدون استرداد دستی ممکن نیست.':gap===0?'جمع روش‌های تسویه با مبلغ قابل پرداخت برابر است.':gap>0?`روش‌های تسویه هنوز ${money(gap)} کمتر از مبلغ قابل پرداخت هستند.`:`روش‌های فعلی ${money(-gap)} بیشتر از مبلغ قابل پرداخت‌اند؛ دریافت واقعی را کاهش ندهید و بازپرداخت را جداگانه ثبت کنید.`;}
- const fill=form.querySelector('[data-doc-fill-credit]');if(fill)fill.disabled=invalid||due<0||gap===0;
- const submit=form.querySelector('[type="submit"]');if(submit)submit.disabled=form.dataset.canEdit!=='1'||invalid||due<0||gap!==0;
+ if(message){message.className=!invalid&&pending<=Math.max(0,net)?'is-balanced':'is-unbalanced';message.textContent=invalid?'قیمت و مبلغ روش‌ها باید معتبر و صحیح باشد.':pending>Math.max(0,net)?'مانده با چک در انتظار سازگار نیست؛ ابتدا وضعیت چک را بررسی کنید.':net>0?`بدهکار این فاکتور پس از اصلاح: ${money(net)}`:net<0?`بستانکار این فاکتور پس از اصلاح: ${money(-net)}`:'این فاکتور پس از اصلاح مانده ندارد.';}
+ const submit=form.querySelector('[type="submit"]');if(submit)submit.disabled=form.dataset.canEdit!=='1'||invalid||pending>Math.max(0,net);
+
 }
 function documentEditBindMethodRow(row,devices,review){
  const type=row.querySelector('[data-doc-method-type]');
@@ -504,7 +506,7 @@ function documentEditFillCredit(form,devices){
  if(!gap)return;
  const host=form.querySelector('#documentEditMethods'),credits=[...host.querySelectorAll('[data-doc-method-row]')].filter(row=>row.querySelector('[data-doc-method-type]')?.value==='CREDIT');
  if(gap>0){
-  if(credits.length){const input=credits.at(-1).querySelector('[data-doc-method-amount]'),value=documentEditNumber(input.value)||0;input.value=String(value+gap);}
+  if(credits.length){const input=credits.at(-1).querySelector('[data-doc-method-amount]'),value=documentEditNumber(input.value)||0;input.value=new Intl.NumberFormat('fa-IR').format(value+gap);}
   else documentEditAddMethod(form,devices,true,'CREDIT',String(gap));
  }else{
   let remove=-gap;
@@ -526,7 +528,7 @@ async function salesInvoiceEditOpen(orderId,paymentId){
   form.dataset.deposit=String(data.payment.depositAmount||0);
   const review=form.dataset.review==='1';
   form.querySelectorAll('[data-doc-method-row]').forEach(row=>documentEditBindMethodRow(row,app.documentEditInvoice.devices,review));
-  form.addEventListener('input',event=>{if(event.target.matches('[data-doc-unit-price],[data-doc-discount],[data-doc-additions]'))documentEditRecalc(form);});
+  form.addEventListener('input',event=>{if(event.target.matches('[data-doc-unit-price],[data-doc-discount],[data-doc-additions],[data-doc-method-amount]')){transportFormatMoneyInput(event.target);documentEditRecalc(form);}});
   form.addEventListener('click',event=>{
    const button=event.target.closest('[data-doc-fill-credit],[data-doc-add-credit],[data-doc-add-method],[data-doc-remove-method]');if(!button)return;
    if(button.matches('[data-doc-fill-credit]')){documentEditFillCredit(form,app.documentEditInvoice.devices);return;}
@@ -536,16 +538,16 @@ async function salesInvoiceEditOpen(orderId,paymentId){
   });
   form.addEventListener('submit',async event=>{
    event.preventDefault();if(form.dataset.canEdit!=='1')return;
-   documentEditRecalc(form);if(form.dataset.invalid==='1')return toast('مقادیر مالی را بررسی کنید.');
+   documentEditRecalc(form);if(form.dataset.invalid==='1'||form.querySelector('[type=submit]').disabled)return toast('مقادیر مالی یا وضعیت چک را بررسی کنید.');
    const due=Number(form.dataset.due||0),settlementMethods=documentEditPaymentMethods(form);
-   if(settlementMethods.reduce((sum,row)=>sum+Number(row.amount||0),0)!==due)return toast('جمع روش‌های تسویه باید دقیقاً با مبلغ قابل تطبیق برابر باشد.');
+   if(settlementMethods.some(row=>!Number.isSafeInteger(row.amount)||row.amount<=0))return toast('مبلغ روش تسویه معتبر نیست.');
    const items=[...form.querySelectorAll('[data-doc-invoice-line]')].map(row=>({itemId:row.dataset.itemId,unitPrice:documentEditNumber(row.querySelector('[data-doc-unit-price]')?.value)}));
    if(items.some(row=>row.unitPrice===null||!Number.isSafeInteger(row.unitPrice)))return toast('قیمت همهٔ اقلام باید مبلغ صحیح ریال باشد.');
    const body={items,discountAmount:documentEditNumber(form.querySelector('[data-doc-discount]')?.value),additionsAmount:documentEditNumber(form.querySelector('[data-doc-additions]')?.value),settlementMethods};
    const button=form.querySelector('[type="submit"]');button.disabled=true;
    try{
     const result=await api(`/api/sales/orders/${encodeURIComponent(orderId)}/invoices/${encodeURIComponent(paymentId)}`,{method:'PUT',body:JSON.stringify(body)});
-    closeModal();toast(review?'بازبینی فروش ثبت شد؛ دریافت‌های قبلی حفظ شدند. هیچ وجهی جابه‌جا نشد.':'ویرایش فاکتور ثبت شد؛ هیچ وجهی جابه‌جا نشد.');
+    closeModal();toast(review?'بازبینی فروش ثبت شد؛ سوابق قبلی حفظ شدند. هیچ وجهی جابه‌جا نشد.':'ویرایش فاکتور ثبت شد؛ هیچ وجهی جابه‌جا نشد.');
     const refreshed=await fetchSalesCache(true);documentEditRefreshSalesPane(refreshed);await refreshIndicators();
     return result;
    }catch(error){button.disabled=false;toast(error.message);}
@@ -2477,9 +2479,10 @@ async function openTransportDeliveryWork(id){
    let devices=[],devicesError=false;
    if(order.transportDeparture){try{devices=(await api('/api/payment-devices')).devices||[];}catch(_){devicesError=true;}}
    if(!host.isConnected||$('#transportDeliveryWork')!==host)return;
-   Object.assign(stl,{orderId:id,order,devices,devicesError});
+   const previousBalance=await salesPriorBalance(order);if(!host.isConnected||$('#transportDeliveryWork')!==host)return;
+   Object.assign(stl,{orderId:id,order,devices,devicesError,previousBalance});
    const done=async()=>{closeModal();stlReset();app.salesDeliveryTab='history';try{if(app.salesFetchPromise)await app.salesFetchPromise.catch(()=>{});const fresh=await fetchSalesCache(true);if(app.page==='sales'&&app.sub.sales==='delivery')paintSalesPaneV29('delivery',fresh);}catch(e){toast('پرداختی ثبت شد اما نوسازی فهرست ناموفق بود.');}};
-   transportSalesInvoicePanel(order,host,load,done);
+   transportSalesInvoicePanel(order,host,load,done);host.insertAdjacentHTML('beforeend',salesPriorBalanceHtml(previousBalance));
    finishEntityNotices(notices);
    return true;
   }catch(e){
@@ -2629,12 +2632,13 @@ function invoiceHtml(o,paySel){
   const credit=noCollection?0:methodsComplete?methods.reduce((sum,m)=>sum+(String(m.type).toUpperCase()==='CREDIT'?Number(m.amount):0),0):(depositOnly?0:null);
   const account=p.debtAccount;
   const paid=account&&Array.isArray(account.receipts)&&account.receipts.every(r=>r&&amountKnown(r.amount)&&['CLEARED','PENDING','RETURNED','REVERSED'].includes(r.status))?account.receipts.filter(r=>r.status==='CLEARED').reduce((sum,r)=>sum+Number(r.amount),0):null;
-  const current=account&&amountKnown(account.initial)&&paid!==null&&paid<=Number(account.initial)?Number(account.initial)-paid:null;
+  const adjustment=account&&Object.hasOwn(account,'adjustment')&&Number.isSafeInteger(account.adjustment)?account.adjustment:0;
+  const current=account&&amountKnown(account.initial)&&paid!==null&&(Object.hasOwn(account,'adjustment')?Number.isSafeInteger(account.adjustment):paid<=Number(account.initial))?Number(account.initial)+adjustment-paid:null;
   const recordedSum=methodsComplete?methods.reduce((sum,m)=>sum+Number(m.amount),0):null;
   const checksKnown=methods.every(m=>String(m?.type||'').toUpperCase()!=='CHECK'||['CLEARED','PENDING','RETURNED','REVERSED'].includes(m.checkStatus));
   const outstandingChecks=methodsComplete&&checksKnown?methods.reduce((sum,m)=>sum+(String(m.type).toUpperCase()==='CHECK'&&m.checkStatus!=='CLEARED'?Number(m.amount):0),0):null;
   const balance=account?current:credit===null||!checksKnown?null:credit+(outstandingChecks||0);
-  const paymentConsistent=recordedSum===null||due===null||recordedSum===due;
+  const paymentConsistent=recordedSum===null||due===null||recordedSum===due||Object.hasOwn(account||{},'adjustment');
   const collected=paymentConsistent&&balance!==null&&amountKnown(p.totalAmount)&&balance<=Number(p.totalAmount)?Number(p.totalAmount)-balance:null;
   const paymentRows=methods.map(m=>{
     m=m||{};const type=String(m.type||'').toUpperCase();
@@ -2646,7 +2650,7 @@ function invoiceHtml(o,paySel){
   </div></div><div class="inv38-rule"></div>
 
   <p class="inv38-scroll-hint">برای مشاهده همه ستون‌های اقلام، جدول را افقی پیمایش کنید.</p><div class="inv38-table-scroll" role="region" aria-label="اقلام فاکتور؛ برای مشاهده همه ستون‌ها افقی پیمایش کنید" tabindex="0"><table class="inv38-table"><thead><tr><th>#</th><th>محصول</th><th>وزن تحویلی</th><th>فی</th><th>مبلغ</th></tr></thead><tbody>${items.map((i,k)=>`<tr><td>${fa(String(k+1))}</td><td><b>${esc(i.product?.name||'—')}</b></td><td>${qty(i.deliveredKg)} کیلوگرم</td><td>${money(i.unitPrice)}</td><td>${money(i.finalAmount)}</td></tr>`).join('')}</tbody></table></div>
-  <div class="inv38-bottom inv38-with-payments"><div class="inv38-total"><div class="inv38-total-box"><div><span>جمع اقلام</span><b>${money(subtotal)}</b></div><div><span>تخفیفات</span><b>${money(discount)}</b></div><div><span>اضافات</span><b>${money(additions)}</b></div>${returns?`<div><span>کسر مرجوعی</span><b>${money(returns)}</b></div>`:''}${p.deposit?`<div><span>بیعانه دریافت‌شده (${esc(({CASH:'نقدی',POS:'پوز',CARD_TRANSFER:'کارت‌به‌کارت'})[p.deposit?.type]||'')})${p.deposit?.reference?` • پیگیری ${esc(p.deposit.reference)}`:''}</span><b>${money(p.deposit.amount)}</b></div>${p.deposit.refundedAmount?`<div><span>استرداد دستی بیعانه</span><b>${money(p.deposit.refundedAmount)}</b></div><div><span>بیعانه لحاظ‌شده</span><b>${money(p.depositAmount)}</b></div>`:''}<div><span>مانده پس از کسر بیعانه (پیش از تسویه)</span><b>${amountKnown(p.amountDue)?money(p.amountDue):'نامشخص'}</b></div>`:''}<div class="grand"><span>مبلغ نهایی</span><b>${money(p.totalAmount)}</b></div><div class="inv38-collected"><span>مبلغ پرداختی</span><b>${collected===null?'نامشخص':money(collected)}</b></div><div class="inv38-payment-balance"><span>مانده حساب</span><b>${balance===null?'نامشخص':money(balance)}</b></div>${!paymentConsistent?'<small class="inv38-payment-note">جمع روش‌های ثبت‌شده با مبلغ قابل تسویه یکسان نیست؛ بررسی لازم است.</small>':''}</div></div>
+  <div class="inv38-bottom inv38-with-payments"><div class="inv38-total"><div class="inv38-total-box"><div><span>جمع اقلام</span><b>${money(subtotal)}</b></div><div><span>تخفیفات</span><b>${money(discount)}</b></div><div><span>اضافات</span><b>${money(additions)}</b></div>${returns?`<div><span>کسر مرجوعی</span><b>${money(returns)}</b></div>`:''}${p.deposit?`<div><span>بیعانه دریافت‌شده (${esc(({CASH:'نقدی',POS:'پوز',CARD_TRANSFER:'کارت‌به‌کارت'})[p.deposit?.type]||'')})${p.deposit?.reference?` • پیگیری ${esc(p.deposit.reference)}`:''}</span><b>${money(p.deposit.amount)}</b></div>${p.deposit.refundedAmount?`<div><span>استرداد دستی بیعانه</span><b>${money(p.deposit.refundedAmount)}</b></div><div><span>بیعانه لحاظ‌شده</span><b>${money(p.depositAmount)}</b></div>`:''}<div><span>مانده پس از کسر بیعانه (پیش از تسویه)</span><b>${amountKnown(p.amountDue)?money(p.amountDue):'نامشخص'}</b></div>`:''}<div class="grand"><span>مبلغ نهایی</span><b>${money(p.totalAmount)}</b></div><div class="inv38-collected"><span>مبلغ پرداختی</span><b>${collected===null?'نامشخص':money(collected)}</b></div><div class="inv38-payment-balance"><span>${balance!==null&&balance<0?'بستانکار':'مانده حساب'}</span><b>${balance===null?'نامشخص':money(Math.abs(balance))}</b></div>${!paymentConsistent?'<small class="inv38-payment-note">جمع روش‌های ثبت‌شده با مبلغ قابل تسویه یکسان نیست؛ بررسی لازم است.</small>':''}</div></div>
   ${paymentBox}
   <div class="inv38-verify">
     ${o.deliveryMode==='DELIVERY'?transportDeliverySignatureHtml(customerNameRaw,p.driverName||o.transportInvoice?.driverName||o.transportHandovers?.['0']?.driverName||o.dispatch?.driverName):`<div class="inv38-verify-box"><div class="inv38-verify-grid"><div class="inv38-vitem"><span>${recipient?'امضاء تحویل‌گیرنده':'امضاء'}</span><strong>${signatureContact}</strong></div></div></div>`}

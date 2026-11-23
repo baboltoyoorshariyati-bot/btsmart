@@ -75,8 +75,15 @@ test('final warehouse documents return through an audited edit queue; invoice pr
   assert.equal(whDoc.order.items[0].productId,'p02');assert.equal(whDoc.order.items[0].deliveredKg,3.5);
   assert.equal((await ok('GET','/api/warehouse/document-edits',null,warehouse)).requests.length,0);
 
-  assert.equal((await call('PUT',`/api/sales/orders/${first.order.id}/invoices/${first.payment.id}`,{items:[{itemId:first.order.items[0].id,unitPrice:1200}],settlementMethods:[{type:'CASH',amount:4000}]},sales)).status,400,'روش‌های تسویه باید با مبلغ جدید فاکتور برابر باشند');
-  assert.equal((await call('PUT',`/api/sales/orders/${first.order.id}/invoices/${first.payment.id}`,{items:[{itemId:first.order.items[0].id,unitPrice:1200}],settlementMethods:[{type:'CARD_TRANSFER',amount:4200,bank:'بانک نمونه',reference:'REF-1'}]},sales)).status,409,'بازبینی سند نباید پرداخت قبلی را به دریافت جدید تبدیل کند');
+  result=await ok('PUT',`/api/sales/orders/${first.order.id}/invoices/${first.payment.id}`,{items:[{itemId:first.order.items[0].id,unitPrice:1200}],settlementMethods:[{type:'CASH',amount:2400}]},sales);
+  assert.equal(result.order.payment.documentEditHistory.at(-1).before.settlementMethods[0].amount,2400);
+  let debtData=await ok('GET',`/api/customers/${first.order.customerId}/debts`,null,sales);
+  assert.equal(debtData.invoices.find(x=>x.paymentId===first.payment.id).balance,1800);
+  result=await ok('PUT',`/api/sales/orders/${first.order.id}/invoices/${first.payment.id}`,{items:[{itemId:first.order.items[0].id,unitPrice:1200}],settlementMethods:[{type:'CARD_TRANSFER',amount:5000,bank:'بانک نمونه',reference:'REF-1'}]},sales);
+  debtData=await ok('GET',`/api/customers/${first.order.customerId}/debts`,null,sales);
+  assert.equal(debtData.invoices.find(x=>x.paymentId===first.payment.id).credit,800,'پرداخت اصلاح‌شدهٔ بیشتر، بستانکاری بسازد');
+  assert.equal(result.order.payment.documentEditHistory.at(-1).before.settlementMethods[0].type,'CASH');
+  assert.equal(result.order.payment.settlementMethods[0].type,'CARD_TRANSFER');
   result=await ok('PUT',`/api/sales/orders/${first.order.id}/invoices/${first.payment.id}`,{items:[{itemId:first.order.items[0].id,unitPrice:1200}],settlementMethods:[{type:'CASH',amount:2400},{type:'CREDIT',amount:1800,reason:'تفاوت مبلغ پس از اصلاح وزن'}]},sales);
   assert.equal(result.order.payment.settlementReviewRequired,false);
   assert.equal(result.order.payment.settlementMethods[0].type,'CASH');assert.equal(result.order.payment.settlementMethods[0].amount,2400);
@@ -123,6 +130,46 @@ test('final warehouse documents return through an audited edit queue; invoice pr
   assert.equal(depositCorrected.deposit.refundedAmount,undefined,'اصلاح وزن نباید بیعانه را خودکار مسترد کند');assert.equal(depositCorrected.payment.settlementMethods[0].amount,500);
   assert.equal(depositCorrected.payment.documentEditHistory.at(-1).after.totalAmount,500,'پس از اصلاح، نسخهٔ جدید نیز در سابقه ثبت شود');
 
+  result=await ok('PUT',`/api/sales/orders/${depositOverage.order.id}/invoices/${depositOverage.payment.id}`,{items:[{itemId:depositOverage.order.items[0].id,unitPrice:1000}],settlementMethods:[{type:'CASH',amount:500}]},sales);
+  debtData=await ok('GET',`/api/customers/${depositOverage.order.customerId}/debts`,null,sales);
+  assert.equal(debtData.invoices.find(x=>x.paymentId===depositOverage.payment.id).credit,1500,'اضافه بیعانه و پرداخت قبلی هر دو در بستانکاری محاسبه شوند');
+  assert.equal(result.order.deposit.refundedAmount,undefined);
+
+  const historyCase=await makeInvoice(sales,warehouse,'p01',2);
+  for(let i=0;i<27;i++) await ok('PUT',`/api/sales/orders/${historyCase.order.id}/invoices/${historyCase.payment.id}`,{items:[{itemId:historyCase.order.items[0].id,unitPrice:1000}],settlementMethods:[{type:'CASH',amount:2000}]},sales);
+  const historyData=await ok('GET',`/api/orders/${historyCase.order.id}`,null,sales);assert.equal(historyData.order.payment.documentEditHistory.length,27,'سابقهٔ اصلاحات قبلی نباید با تکرار ویرایش حذف شود');
+
+  const cheque=await makeInvoice(sales,warehouse,'p01',2);
+  const chequeUrl=`/api/sales/orders/${cheque.order.id}/invoices/${cheque.payment.id}`;
+  const chequeRow={type:'CHECK',amount:1000,bank:'بانک نمونه',checkNumber:'12345',dueDate:'2030-01-01'};
+  result=await ok('PUT',chequeUrl,{items:[{itemId:cheque.order.items[0].id,unitPrice:1000}],settlementMethods:[{type:'CASH',amount:1000},chequeRow]},sales);
+  debtData=await ok('GET',`/api/customers/${cheque.order.customerId}/debts`,null,sales);
+  let chequeDebt=debtData.invoices.find(x=>x.paymentId===cheque.payment.id);
+  assert.equal(chequeDebt.balance,1000);assert.equal(chequeDebt.pending,1000);assert.equal(chequeDebt.available,0);
+  assert.equal((await call('PUT',chequeUrl,{items:[{itemId:cheque.order.items[0].id,unitPrice:100}],settlementMethods:[{type:'CASH',amount:1000},chequeRow]},sales)).status,409,'چک در انتظار را نباید به بستانکاری تبدیل کرد');
+  assert.equal((await call('PUT',chequeUrl,{items:[{itemId:cheque.order.items[0].id,unitPrice:1000}],settlementMethods:[{type:'CASH',amount:2000}]},sales)).status,409,'سوابق چک قابل حذف نیست');
+  await ok('POST',`/api/customers/${cheque.order.customerId}/debts/${cheque.payment.id}/receipts/${chequeDebt.receipts[0].id}/resolve`,{status:'CLEARED'},sales);
+  debtData=await ok('GET',`/api/customers/${cheque.order.customerId}/debts`,null,sales);chequeDebt=debtData.invoices.find(x=>x.paymentId===cheque.payment.id);assert.equal(chequeDebt.balance,0);assert.equal(chequeDebt.pending,0);
+  result=await ok('PUT',chequeUrl,{items:[{itemId:cheque.order.items[0].id,unitPrice:500}],settlementMethods:[{type:'CASH',amount:1000},chequeRow]},sales);
+  debtData=await ok('GET',`/api/customers/${cheque.order.customerId}/debts`,null,sales);chequeDebt=debtData.invoices.find(x=>x.paymentId===cheque.payment.id);assert.equal(chequeDebt.credit,1000);assert.equal(chequeDebt.receipts.length,1);
+  assert.equal(result.order.payment.settlementMethods[1].checkStatus,'CLEARED');
+
+  const later=await makeInvoice(sales,warehouse,'p01',2);
+  const laterUrl=`/api/sales/orders/${later.order.id}/invoices/${later.payment.id}`;
+  await ok('PUT',laterUrl,{items:[{itemId:later.order.items[0].id,unitPrice:1500}],settlementMethods:[{type:'CASH',amount:2000}]},sales);
+  const newReceipt=await ok('POST',`/api/customers/${later.order.customerId}/debts/${later.payment.id}/receipts`,{operationId:'correction-receipt-01',type:'CASH',amount:700},sales,201);
+  await ok('PUT',laterUrl,{items:[{itemId:later.order.items[0].id,unitPrice:1000}],settlementMethods:[{type:'CASH',amount:2000}]},sales);
+  debtData=await ok('GET',`/api/customers/${later.order.customerId}/debts`,null,sales);
+  let laterDebt=debtData.invoices.find(x=>x.paymentId===later.payment.id);assert.equal(laterDebt.credit,700);assert.equal(laterDebt.receipts.length,1);
+  await ok('POST',`/api/customers/${later.order.customerId}/debts/${later.payment.id}/receipts/${newReceipt.receipt.id}/resolve`,{status:'REVERSED'},admin);
+  debtData=await ok('GET',`/api/customers/${later.order.customerId}/debts`,null,sales);laterDebt=debtData.invoices.find(x=>x.paymentId===later.payment.id);assert.equal(laterDebt.credit,0);assert.equal(laterDebt.balance,0);
+
+  const orphan=await makeInvoice(sales,warehouse,'p02',2);
+  const orphanDb=new DatabaseSync(path.join(dir,'baboltoyoor.db'));
+  const rawOrder=JSON.parse(orphanDb.prepare('SELECT payload FROM orders WHERE id=?').get(orphan.order.id).payload);rawOrder.customerId=null;rawOrder.visitId=null;
+  orphanDb.prepare('UPDATE orders SET payload=? WHERE id=?').run(JSON.stringify(rawOrder),orphan.order.id);orphanDb.close();
+  assert.equal((await call('PUT',`/api/sales/orders/${orphan.order.id}/invoices/${orphan.payment.id}`,{items:[{itemId:orphan.order.items[0].id,unitPrice:1500}],settlementMethods:[{type:'CASH',amount:2000}]},sales)).status,409,'اختلاف مالی بدون پرونده معتبر نباید حذف یا صفر نشان داده شود');
+
   // A store-service document follows the same referral queue, while retaining
   // its no-settlement/no-invoice nature and per-run corrected snapshot.
   const storeOrder=(await ok('POST','/api/store/orders',{name:'مشتری فروشگاه آزمون',phone:'09123334444',items:[{productId:'p01',requestedQty:10,requestedUnit:'کیلوگرم'}]},shop,201)).order;
@@ -153,6 +200,12 @@ test('final warehouse documents return through an audited edit queue; invoice pr
   assert.equal(storePrint.document.lines[0].productId,'p02');assert.equal(storePrint.document.lines[0].deliveredKg,6);
   assert.equal((await ok('GET',`/api/warehouse/document-edits/history/${storeOrder.id}/${storePayment.id}`,null,sales)).edits.at(-1).status,'COMPLETED');
   assert.equal((await ok('GET','/api/admin/audit/verify',null,admin)).ok,true);
+  await stop();proc=start();await ready();
+  const adminAgain=(await call('POST','/api/login',{username:'admin',password})).cookie;
+  debtData=await ok('GET',`/api/customers/${cheque.order.customerId}/debts`,null,adminAgain);
+  chequeDebt=debtData.invoices.find(x=>x.paymentId===cheque.payment.id);assert.equal(chequeDebt.credit,1000);assert.equal(chequeDebt.receipts[0].status,'CLEARED');
+  debtData=await ok('GET',`/api/customers/${depositOverage.order.customerId}/debts`,null,adminAgain);assert.equal(debtData.invoices.find(x=>x.paymentId===depositOverage.payment.id).credit,1500);
+
  }finally{
   await stop();fs.rmSync(dir,{recursive:true,force:true});
  }
