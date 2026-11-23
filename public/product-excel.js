@@ -43,24 +43,25 @@ async function productExcelRead(file) {
   try { await workbook.xlsx.load(bytes); } catch { throw Error('خواندن فایل اکسل ناموفق بود.'); }
   if(workbook.worksheets.length!==1) throw Error('فایل باید دقیقاً یک برگه داشته باشد.');
   const sheet=workbook.worksheets[0];
-  if(sheet.rowCount>101 || sheet.columnCount>2) throw Error('فایل باید فقط دو ستون و حداکثر ۱۰۰ ردیف محصول داشته باشد.');
-  if(String(productExcelValue(sheet.getCell('A1'),1)).trim()!=='کد سریع' || String(productExcelValue(sheet.getCell('B1'),1)).trim()!=='نام محصول') throw Error('عنوان ستون‌های A و B باید «کد سریع» و «نام محصول» باشد.');
+  if(sheet.rowCount>101 || sheet.columnCount>3) throw Error('فایل باید فقط سه ستون و حداکثر ۱۰۰ ردیف محصول داشته باشد.');
+  const legacyTwoColumns=sheet.columnCount<=2;
+  if(String(productExcelValue(sheet.getCell('A1'),1)).trim()!=='کد سریع' || String(productExcelValue(sheet.getCell('B1'),1)).trim()!=='نام محصول' || (!legacyTwoColumns && String(productExcelValue(sheet.getCell('C1'),1)).trim()!=='قیمت')) throw Error('عنوان ستون‌های A، B و C باید «کد سریع»، «نام محصول» و «قیمت» باشد.');
   const rows=[];
   for(let n=2;n<=sheet.rowCount;n++) {
-    const code=productExcelValue(sheet.getCell(n,1),n), name=productExcelValue(sheet.getCell(n,2),n);
-    if(code==='' && name==='') throw Error(`ردیف ${n} خالی است؛ ردیف‌های خالی میان محصولات را حذف کنید.`);
+    const code=productExcelValue(sheet.getCell(n,1),n), name=productExcelValue(sheet.getCell(n,2),n), price=productExcelValue(sheet.getCell(n,3),n);
+    if(code==='' && name==='' && price==='') throw Error(`ردیف ${n} خالی است؛ ردیف‌های خالی میان محصولات را حذف کنید.`);
     if(typeof name!=='string') throw Error(`نام محصول ردیف ${n} باید متن باشد.`);
-    rows.push({quickCode:code,name});
+    rows.push({quickCode:code,name,price});
   }
   if(!rows.length) throw Error('فایل محصولی برای ورود ندارد.');
   return rows;
 }
-async function productExcelExport(products) {
+async function productExcelExport(products, prices) {
   await loadProductExcelLibrary();
   const workbook=new ExcelJS.Workbook(), sheet=workbook.addWorksheet('محصولات', {views:[{rightToLeft:true}]});
-  sheet.columns=[{header:'کد سریع',key:'code',width:18},{header:'نام محصول',key:'name',width:45}];
+  sheet.columns=[{header:'کد سریع',key:'code',width:18},{header:'نام محصول',key:'name',width:45},{header:'قیمت',key:'price',width:22}];
   sheet.getRow(1).font={bold:true};
-  for(const p of products) { const row=sheet.addRow([String(p.quickCode),String(p.name)]);row.getCell(1).numFmt='@'; }
+  for(const p of products) { const row=sheet.addRow([String(p.quickCode),String(p.name),prices[p.id] ?? null]);row.getCell(1).numFmt='@'; }
   const bytes=await workbook.xlsx.writeBuffer();
   const url=URL.createObjectURL(new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
   const a=document.createElement('a');a.href=url;a.download='products.xlsx';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);

@@ -341,7 +341,7 @@ async function renderProductsPage() {
   const priced = active.filter((x) => Number(adm.todayPrices[x.id]) > 0).length;
   const desc = (isAdmin
     ? 'قیمت هر محصول تا ثبت قیمت جدید معتبر می‌ماند؛ دسته‌ها و تغییرات گروهی را از همین صفحه مدیریت کنید.'
-    : 'قیمت هر محصول تا ثبت قیمت جدید معتبر می‌ماند؛ گروه محصول را در ویرایش محصول انتخاب کنید.') + ' خروجی اکسل شامل همهٔ محصولات (حتی غیرفعال) و فقط کد و نام است، نه پشتیبان قیمت، وضعیت یا سوابق.';
+    : 'قیمت هر محصول تا ثبت قیمت جدید معتبر می‌ماند؛ گروه محصول را در ویرایش محصول انتخاب کنید.') + ' خروجی اکسل شامل کد، نام و قیمت مؤثر امروز به ریال برای همهٔ محصولات (حتی غیرفعال) است؛ پشتیبان وضعیت و سوابق نیست.';
   host.innerHTML = admHead('receipt', isAdmin ? 'محصولات و قیمت‌ها' : 'کارتابل محصولات و قیمت‌ها', desc, adm.products.length,
     `${admSearchBox('admProdSearch', 'جستجوی نام یا کد سریع', adm.q)}
      <span class="adm-count">${fa(priced)} از ${fa(active.length)} محصول فعال قیمت مثبت دارند</span>
@@ -359,7 +359,7 @@ async function renderProductsPage() {
 async function admImportProducts(file) {
  try {
   const rows=await productExcelRead(file);
-  openModal('ورود محصولات از اکسل', `<p>${fa(rows.length)} ردیف خوانده شد. محصول جدید با واحد پیش‌فرض کیلوگرم ثبت می‌شود. کدهای موجود (حتی غیرفعال) تغییر نمی‌کنند و از آنها صرف‌نظر می‌شود؛ قیمت‌ها و سوابق حفظ می‌شوند.</p><p>کدهای تکراری در خود فایل یا داده نامعتبر باعث رد کل فایل می‌شوند.</p><p data-import-error role="alert" class="form-error"></p><div class="modal-actions"><button type="button" class="btn btn-secondary" data-import-cancel>انصراف</button><button type="button" class="btn btn-primary" data-import-confirm>تأیید ورود</button></div>`);
+  openModal('ورود محصولات از اکسل', `<p>${fa(rows.length)} ردیف خوانده شد. محصول جدید با واحد پیش‌فرض کیلوگرم و قیمت فایل به ریال ثبت می‌شود؛ خانهٔ قیمت خالی یعنی بدون قیمت. کدهای موجود (حتی غیرفعال) تغییر نمی‌کنند و از آنها صرف‌نظر می‌شود؛ قیمت‌ها و سوابق حفظ می‌شوند.</p><p>کدهای تکراری در خود فایل یا داده نامعتبر باعث رد کل فایل می‌شوند.</p><p data-import-error role="alert" class="form-error"></p><div class="modal-actions"><button type="button" class="btn btn-secondary" data-import-cancel>انصراف</button><button type="button" class="btn btn-primary" data-import-confirm>تأیید ورود</button></div>`);
   $('#modal [data-import-cancel]').onclick=closeModal;
   $('#modal [data-import-confirm]').onclick=async e=>{
    const button=e.currentTarget;button.disabled=true;
@@ -732,7 +732,7 @@ function bindAdm(page, root = $('#content')) {
     if (a === 'price-group-new' || a === 'price-group-rename' || a === 'price-group-delete') return priceGroupManage(a,id);
     if (a === 'price-group-preview') return previewPriceGroup(id,el);
     if (a === 'prod-import') return c.querySelector('#admProductExcel').click();
-    if (a === 'prod-export') { try { await productExcelExport(adm.products); } catch(err) { toast('ساخت فایل اکسل ناموفق بود: '+err.message); } return; }
+    if (a === 'prod-export') { try { const day=admToday(); const [products,prices]=await Promise.all([api('/api/admin/products'),api('/api/prices?date='+encodeURIComponent(day))]); if(admToday()!==day) throw Error('تاریخ تغییر کرده است؛ دوباره خروجی بگیرید.'); await productExcelExport(products.products||[],Object.fromEntries((prices.prices||[]).map(p=>[p.productId,p.price]))); } catch(err) { toast('ساخت فایل اکسل ناموفق بود: '+err.message); } return; }
     if (a === 'prod-print') return openPriceListSelection();
     if (a === 'prod-new') return openProductForm(null);
     if (a === 'prod-edit') return openProductForm(find(adm.products));

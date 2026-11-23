@@ -2,7 +2,7 @@
 140cfcfb7c0df73812316f8915a5d58279261f52366f80bc7922472f6d46858f  ./.github/workflows/ci.yml
 1bd57d4d8e439aca6eb9d360b9e3ef036c1494ad8f936fbd5e10b919fedf8778  ./.github/workflows/release.yml
 45a4a240ad89728268c09abcd811ed7e16ef5a4feb3103d89a445ce82e9d5e9b  ./.gitignore
-2a0d32b195b3b7282a02ef16141f1522b5dcdad7bd0871295c9d1600b101ff97  ./CHANGELOG.md
+16eb473933da6cd1a06834cee9cbca6aa73e57f56e79d7bfb5680680e28b635a  ./CHANGELOG.md
 cf5db6b7c699488e4f4fbb243af67205f640173bce553f01a8d9d20414eff31b  ./NOTICE.txt
 ef1202764652abe2f6d6f96ea1964e49cbc38a25740e0e852a78763db69b90e2  ./README.md
 3e1ee924f1c80a1a1ebcd4f7ad4bebd26a86f8834cf65d953690b7a115d8513e  ./RELEASE-1.0.0-fa.md
@@ -142,7 +142,7 @@ d5369d338a135a5e0818fd49119ba2640e66ba0ad7ce14722ffc2985679fc779  ./docs/custome
 49a40741a2f46075084ff2c0be1ec3f65207a2eb11dd3ac90fdd06e625e78e25  ./docs/deployment-windows-server-2025.md
 84ef2fcaff7e118259ca6e5572972e1d42ab0850f069959dbb8f3bf08df386e0  ./docs/domain-https-fa.md
 6791cb09b6006a317ee05d3ef8461ca1ae9749f44e2c250418d88e7fb5401e96  ./docs/hardening-rollout-fa.md
-c1ff3896cacdc75e131d913ea3e4ac5f36c82c35fce0a42bfa4afdf4cd170a8f  ./docs/product-excel-fa.md
+27004200f1ead81b7ffd5fe7b6d487d3db9d2a0099e11d7ba8c085b669eee178  ./docs/product-excel-fa.md
 2a7873950eb386ed75253fa2a927e6c5fff8a300a4a751946cc77f51103571c9  ./docs/product-prices-fa.md
 ac240bde2e96b1b51d57cdd19a50c3a210bef8d6322b9b3f2369fd9116907e3b  ./docs/regression-analysis-1.1.10-fa.md
 f089836e1878ed22217a25f8cc826d63abe8cc197c80ffcfad9f9bef08b40d53  ./docs/remaining-work-fa.md
@@ -185,7 +185,7 @@ f87b7f06ab428eb030d81aa95525fe55b9d019ec5d991d9853fc47806ccfc9a5  ./lib/pickup-w
 27e2150490e4e0a80bb2da4bc36b820a75c556c7b61a144465b138fc5ffe7f5e  ./lib/product-prices.js
 1c165ea9a8897b86e406d7d5ebe133cc1d161b746b22fe2518e8899ec5a68d75  ./lib/reports.js
 3eae70cf43b0bfc962e8c23210f0702c26e31e090499add614b61af7cf7d3003  ./lib/routes/admin-ext.js
-83c2e168ae1b0ca10406fa59e70dff3b36d21f617412bb51a435bb2c4374ce5c  ./lib/routes/admin.js
+b754b47e21cf52b4dbe756a8baa2b479a028757075552c7573bff18ede6c5d91  ./lib/routes/admin.js
 70fa815e0a2acfc28d70d553f68b0d911268642f7b1c6e3d525f74b702976f14  ./lib/routes/auth.js
 5f797bdef2dd64e0946f0546d97c61cf6a88db866fd6615cec588f0dcd03fd05  ./lib/routes/backups.js
 52b4d049933869f5917fdd9eafaa5a600a066f30e0cf888972eb26ec95e40463  ./lib/routes/core.js
@@ -250,10 +250,10 @@ ef15b9e37cd4a463ae32f1bd117130fd4c90d66d31cd5f48799148d3dc1f2cab  ./lib/warehous
 2dc935190b8a6f57a5a9c457e1cde19d20d7d79dc9b6c11441bb0078329010fe  ./lib/warehouse-weight-draft.js
 eba092ede1e86c0e82145efeee6dcaf439d3430ad89fd80de87145aa8034dbd1  ./lib/weighbridge.js
 ee9b329210dcf62cace7afcbd523aee8ff4f9e5b70b59c7194c23429637f38e2  ./package.json
-1f61bc25606b0fac42f6394727469a507cd4955c46f8ba8f6e6dd6093a2cfde7  ./public/admin-ui.js
+ad7147367fa32242c613548edbbfa78dd628737b47d2fa01007afbcadfacd9b4  ./public/admin-ui.js
 2064099995191f01a76ac032a1f70bf14fa4f33ead4b74b44c9a0786f14f4a7e  ./public/android-chrome-192x192.png
 a0bd3b3fd14e7b3ef311543c910bfeb861346022e258f3d65474aec2a5b5b4f3  ./public/android-chrome-512x512.png
-4523c83fe7c715cf362a57de3c0736784903f7f74689f27f08e2ce9818ca6fea  ./public/app.js
+f7ee217a1c2fc3540d827aaaf7e83e2fe28b4a9548f8144ae21aded1fc4b6522  ./public/app.js
 cea98dba58c31f5d95773c711c10b626d0253a7281d7bfa0d9928b9c99650110  ./public/apple-touch-icon.png
 1642993b1c31e4b873f97cb56f8aa80de4d43efbbc29e3f4daa1bd73e840987d  ./public/bt-table.css
 9c3384203f176cbb131e6bb5414d2a4d90b7598efd676c8632a32db39213c08b  ./public/compatibility.css
@@ -268,7 +268,7 @@ f8cb83a40e5c663a3a0c1951222f4eac1f91b42e50cda020e002399393023f86  ./public/dispa
 17e355067c8284f47743a1ee3b1ef7ff684ff0601eda357f9353b10b3016ab31  ./public/fonts/OFL.txt
 4e3fa217d38fdafc1fea4414ceb58ca5e662cf0ab5fa735a8c8c20e8b42cad92  ./public/fonts/Vazirmatn-Variable.woff2
 a85456faaed8f29d884bfb2dc3148dffbf22d22ecff589176764cfe2679a1e3f  ./public/form-layout.css
-89e4c88c55dc96485bbef073d9ddea29c1f0abe330f390afc172244d1c546c27  ./public/index.html
+e24758db1e4930fd1748891d1a62885aae2efca50dacf637b5d114a84d9d6540  ./public/index.html
 284700944c4c628fee6cf7edc6517cd83bbf20d597c1891b4436f21b05a86982  ./public/invoice-compact.css
 a263d2a2a90d57bc19f385933f4c486d814d0eacc74dac6b6a9488f241d6e9a8  ./public/invoice-print.html
 538d7d1fe00569ec69cac470798012076eeb5da5ac5b5c5c500022548196ae35  ./public/invoice-print.js
@@ -279,7 +279,7 @@ a0bd3b3fd14e7b3ef311543c910bfeb861346022e258f3d65474aec2a5b5b4f3  ./public/logo.
 187d5b6399f6842ddeaca5fbbc32672523cb684cc823b7e7e8410a0dd3308fc2  ./public/price-list-print-ready.js
 d425d3593095258faff04188e3b71087240ca219fcaf2a1731a30191803cc4f6  ./public/print-frame.js
 b110f9152075488b89c0709591a06dc51fea109840e56fbfe6cc24f6701ddcbd  ./public/print-ready.js
-0475636913060d3a702452b527ce11712986c907b86f4f70f90451f71d920cfb  ./public/product-excel.js
+4e53618a7d8312d0cd88465e8db4b5ec43b540659a013e9a8e627a7e241c5c7b  ./public/product-excel.js
 1619a61e2739c3971192ba5552f05a16eab63eada799356c8f70aa67cf47e33a  ./public/responsive.css
 4dd11a3baa2dac4e89aed002362f9e8dd3762648bfefcdf504c67812f04e4965  ./public/signature-pad.js
 0f1a248ae8e5ff64af9cf5c65d73228b7d91ba25abc45b99fa2c19e34d272d5f  ./public/site.webmanifest
@@ -326,7 +326,7 @@ fe5163f6e70d7c2ed3047227243d2093c03c510b06589abfeafd4333fe7886a0  ./tests/auto-b
 561f0956306a8f110526d2ae84241573ca80e1832e90566a67e61a0223356a29  ./tests/auto-backup.test.js
 5959fabb1a8161cf00f01ae86d8454f404509446048cc345e9908edb3decb4b2  ./tests/cancellation-workflows-browser.test.js
 23c369c135d904cd6d78f5e1738233ade48255b9f95de73fa4f70dfce6937e35  ./tests/cartable-layout-adjustments.test.js
-e396fd478be6578def09f2dcc73302cc3c812aa76eb8fa29ebed05d58be0e570  ./tests/cartable-navigation-grouping-browser.test.js
+ba34f0f4958a323e3daf514be8a3ee236f808eb11ced2a4dc4b04945d3cf6168  ./tests/cartable-navigation-grouping-browser.test.js
 6aeb7ad7b78f05d5c4eb9a865c8a7b6d18b703d604651ca891381409e4530f44  ./tests/cartable-runtime-regressions.test.js
 6ce0f89b61a6f107c8c05791c80dce56fe6710ca6f4b2f115d810454cdac2f90  ./tests/cartable-side-nav-redesign.test.js
 d56509ab28394fc0bcab04540148fd1e789a90c03a7b4a96bb7add463894a1e9  ./tests/cartable-ux-fixes.test.js
@@ -341,7 +341,7 @@ aab5a8a64ed4e0388a50e654d4a9aa481e996ade2dbb1a9f4789e59ccec208c6  ./tests/catalo
 b04f253c8ff05d5e445fd4a7c9d9fbd20e02e02a8bf34d7915e39e80c22f49de  ./tests/customers.test.js
 104644a54a0a8e50c0987dc2c8f05c3511bf10e68f953da323ebfd5ec42b23dd  ./tests/dashboard-modern-logo.test.js
 50fc4a5bdeeacc6e83749ee0438327228321bdc1ad21df3940d88ee40dbd5936  ./tests/dashboard-product-charts.test.js
-5aeac04c98016f29b519f8be17531a1e1d28f8d6cb2c5246dd1e2d4f2fd13dc0  ./tests/datepicker-sales-products.test.js
+31d843e77f91769274bb1139f0c4006b4f0d556469a97da5b98bc02b0264ac8b  ./tests/datepicker-sales-products.test.js
 dfb4f420a8d5cc3ad3335801c69c2deb99e6251ba7de14f9a1c11141a2abcebe  ./tests/delivery-date-browser.test.js
 4c67909fc2b079258ea1d8b1ffcad14f3c770a13be5263526efda5c7efa38f04  ./tests/delivery-date.test.js
 4e74ce04e852c1875db7fb0444f2376541a9e702622eb1f77439da6e50268e54  ./tests/deposits-api.test.js
@@ -428,8 +428,8 @@ f9395398afd123b0d1a28c7ae1bcd3e0c0789e002aff8a6fdb04b1c9ff976d04  ./tests/pickup
 d042287e65d66843bb98c097660a34c22c1f5a60ead05dd7cfa83929dd36c9c3  ./tests/pos-display-label.test.js
 1278012ed0c5e4e056bf96d7d5c69e4927168d79f11dd840278e4f74d22e5124  ./tests/print-no-popup-browser.test.js
 c600490cafacfc8d5e79e2b11ba83545add2f7aeb88fbda6d42985a630f45db7  ./tests/product-catalog-seed.test.js
-086ff68a1cb5566ed18df04b979f2a80923fbaf3616cfcec784519b88f285852  ./tests/product-excel-api.test.js
-7a55b092e311d85ace5b4d03604c1948239596e266ac749985f1f53e301dc4e6  ./tests/product-excel-browser.test.js
+bef3340b4d769e7e077b326050aea98ec32ce40cf16be9cce3672de22ea9dbbd  ./tests/product-excel-api.test.js
+37ac5c8d39a4280ff37f61a323f9a7f8d14c5fcf547444e87bf6feadde23b43c  ./tests/product-excel-browser.test.js
 ac179cd7cee7f8f6be270bdf7c14a541dc901ef3178508461601887786c781fb  ./tests/product-price-groups-api.test.js
 21fe93b26abe1842b1454af2ae8eb160c0b51292e3682661ed2f63c3ea198f81  ./tests/product-price-groups-browser.test.js
 d3b00331bb591046bb0c9e4a59f306abfd538d7902356bfd48e2f29940166ea7  ./tests/product-price-print-browser.test.js
@@ -438,7 +438,7 @@ c5f3e6b7ebe0b08eceb0baafbecd40cb1c1f81c558b92bec2ffb31990d564e22  ./tests/produc
 38a77be539fca1b7a97a92aa767b7394c50f4c3983a8bcd38a94afa5bcb792c7  ./tests/rail-branding.test.js
 7c4bd10f4ecf9a63552856ea08ab67238c7ef79a18fca745db0b2a6d6d0fb239  ./tests/rail-clock-bell.test.js
 498dfcb5abaf16e077d129f90738d24d5fb3afddb121d7851213c96af962e2a6  ./tests/rail-small-desktop-browser.test.js
-561baf9fed0e2fb130bc1c22a48e0f28f397df8f5b4a7ff06fb5875fae1b979d  ./tests/release-cache-busting.test.js
+2673a1b75b1879fe0af6c45a3bb47b0e918b5b5dc7e74ce89fe45c86f571d72e  ./tests/release-cache-busting.test.js
 e9bb4505439cd15fc5aeb4686dcea7fe0becc1ec7cde314e1903dbe453c5c245  ./tests/release-version.test.js
 094767e0af9c2b398dbec2403d482da0a6e0d25a96dfd563657cf6f74f0788e5  ./tests/remaining-order-tables-browser.test.js
 93fe84c739f74dfc8a28781815ff264f335c155424ddc8c94fba05913cd193ff  ./tests/remaining-work.test.js
@@ -450,7 +450,7 @@ d44284e8cb8a776303251d9ecf8bf99689b0dfb0ec76653ad285692edfe52a18  ./tests/respon
 82bc673780ed401e9d1488991fe006b2fc7f4425b6428da71a09a7e78a59252b  ./tests/sales-daily-stats.test.js
 55e8d052af6a10bb575f9d5c3d48cd95b3fcaa31ab1530d50a90a075c06206aa  ./tests/sales-delivery-mode-edit-api.test.js
 995a33429ef6e33688800b43fcfc18778df0d9d699c641e4e929e47d988f6459  ./tests/sales-delivery-mode-edit-browser.test.js
-5781eab0f933b3f942f69582ddc9c5c3f9123754c9d171308467c70fa68dbb7a  ./tests/sales-delivery-sections.test.js
+50b2db9ed6af3a85b9d3ef0c6e71cf8d8b4dd723fba375f9f32fbb83cd03ebc0  ./tests/sales-delivery-sections.test.js
 d27622e1151c54a064ce7a9442eefde9b022cc5136373f3fdd2fd4b3e6a429ca  ./tests/sales-delivery-tabs-browser.test.js
 a85db24a246f806fe8e03ae7ae50e86e909aa9be3ebaf61f91b4b6975fe20a0f  ./tests/sales-flow-compact.test.js
 a08259d197dd56d12e86ac6020e8389a09dcbb972d98afd0678982589b1e960e  ./tests/sales-layout-daily-browser.test.js
@@ -536,7 +536,7 @@ d863ab4511d7a6a8bea37759edb9888f46e2c31540b895d93d121a7384afe08f  ./tests/transp
 bcb07b718ff8f248d4eb51adcb8088a85f00575f9018d0009aa047755d4b3b51  ./tests/transport-planning.test.js
 cb31dd90921ffa8d2b421cba5795f6095211b5b283a21beb4ef1a05fd959c74c  ./tests/transport-plans-api.test.js
 2cdca47c40c47af68cc8a65fd1d3aeb020fa98c12c851fc991d6ee40f66e8571  ./tests/transport-plans-ui.test.js
-142fbff50fc6d4e6ad805286708ae7e56fd184dd606b1cb2fe9038febcb972d9  ./tests/transport-resources-browser.test.js
+a88c107e97e1e40425c416aa7d8dfcba99eba6c07592a74363e13fbbe24f67ea  ./tests/transport-resources-browser.test.js
 aac8f7ae4e3cee841d5070b6aab06cc90ee1678278a807ca0bb0871b80ec128f  ./tests/transport-sales-views.test.js
 df753f137e80bc58484e1b55502c7c187a34c5ac3a75f746b2581f96aa24b77a  ./tests/transport-settlement.test.js
 473926d0696af787857c9dfe4b96bbca9489af8caba13f2c154a92c4e9e1caab  ./tests/ui-alignment-browser.test.js
@@ -582,7 +582,7 @@ d70c810a56420918e90fb9b3e58c48a4e3350f9abd835954cf74d0e17e6b2289  ./ui-src/app/0
 cd7db7acad5a146cf208b521bade9be16e69cc0620d7410de1d1a7a17c200552  ./ui-src/app/05-sales-store.js
 14813b415546422b05e749bf1a37bb99abd330a63453ac7af3e5997f095f244e  ./ui-src/app/06-warehouse-documents.js
 9ec115e348eeec99bc2b85323d35e056559317f0203c6a378aae2c19e80248fd  ./ui-src/app/07-dashboard-history.js
-8bf94ea1241ffd4d422cb6c05906d8500f3203b2150a5542b4ca2a1abd448003  ./ui-src/app/08-sales-cache-navigation.js
+ea1b5bf15dfa84dfc6649ce1fe775ac00e6ee4f8e31f888016b24325a8539363  ./ui-src/app/08-sales-cache-navigation.js
 12fd366377ae8d3d04a6ba09c92a6f46e7c31e18ea8e25f8b63d5c4cc9fa627c  ./ui-src/app/09-settlement.js
 66cdb4561bd6eb9af44f174d6a6c9fbe9b853a76a66a366c46ea7160b841c48a  ./ui-src/app/10-weighbridge-history.js
 b9afcc489a500be9b963ec217cac475bf09a2a2b86c3b766cad40a426d387dfe  ./ui-src/manifest.json

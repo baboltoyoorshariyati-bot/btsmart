@@ -13,23 +13,26 @@ test('empty installation, safe atomic additive import, permissions, audit and re
   const sales=(await call('POST','/api/login',{username:'test-sales',password:'Changed!2345'})).cookie,gate=(await call('POST','/api/login',{username:'test-gate',password:'Changed!2345'})).cookie;
   const products=async()=>(await call('GET','/api/admin/products',null,admin)).data.products;
   assert.deepEqual(await products(),[]);
-  const valid={rows:[{quickCode:1,name:'مرغ'}, {quickCode:'۰۲',name:'ران'}, {quickCode:'03',name:'=1+1'}]};
+  const valid={rows:[{quickCode:1,name:'مرغ',price:'۱۲۳٬۴۵۶'}, {quickCode:'۰۲',name:'ران',price:0}, {quickCode:'03',name:'=1+1',price:''}]};
   assert.equal((await call('POST','/api/admin/products/import',valid,gate)).status,403);
   assert.equal((await call('POST','/api/admin/products/import',{rows:[{quickCode:'04',name:'سالم'},{quickCode:'۰۴',name:'تکراری'}]},sales)).status,400);
   assert.equal((await call('POST','/api/admin/products/import',{rows:[{quickCode:'04',name:'سالم'},{quickCode:'xx',name:'نامعتبر'}]},sales)).status,400);assert.deepEqual(await products(),[]);
+  for(const price of [-1,1e12+1,'۱۲,۳۴',{},true]) { const bad=await call('POST','/api/admin/products/import',{rows:[{quickCode:'04',name:'سالم',price:100},{quickCode:'05',name:'نامعتبر',price}]},sales);assert.equal(bad.status,400,JSON.stringify(bad));assert.deepEqual(await products(),[]); }
   const first=await call('POST','/api/admin/products/import',valid,sales,{'Idempotency-Key':'product-import-01'});assert.equal(first.status,200,JSON.stringify(first));assert.equal(first.data.added,3);
   const replay=await call('POST','/api/admin/products/import',valid,sales,{'Idempotency-Key':'product-import-01'});assert.equal(replay.data.added,3);
   let current=await products();assert.deepEqual(current.map(p=>p.quickCode),['01','02','03']);assert(current.every(p=>p.defaultUnit==='کیلوگرم'));const old=current[0];
+  const prices=async()=>(await call('GET','/api/prices',null,admin)).data.prices;let effective=await prices();assert.equal(effective.find(p=>p.productId===old.id).price,123456);assert.equal(effective.find(p=>p.productId===current[1].id).price,0);assert(!effective.some(p=>p.productId===current[2].id));
   assert.equal((await call('PUT','/api/admin/products/'+old.id,{isActive:false},admin)).status,200);
-  const repeat=await call('POST','/api/admin/products/import',{rows:[{quickCode:'1',name:'نام دیگر'},{quickCode:'04',name:'محصول جدید'}]},sales);assert.equal(repeat.status,200);assert.equal(repeat.data.added,1);assert.deepEqual(repeat.data.skipped,[{quickCode:'01',name:'نام دیگر',existingName:'مرغ'}]);
-  current=await products();assert.equal(current.find(p=>p.id===old.id).name,'مرغ');assert.equal(current.find(p=>p.id===old.id).isActive,false);
+  const repeat=await call('POST','/api/admin/products/import',{rows:[{quickCode:'1',name:'نام دیگر',price:999},{quickCode:'04',name:'محصول جدید',price:700}]},sales);assert.equal(repeat.status,200);assert.equal(repeat.data.added,1);assert.deepEqual(repeat.data.skipped,[{quickCode:'01',name:'نام دیگر',existingName:'مرغ'}]);
+  current=await products();assert.equal(current.find(p=>p.id===old.id).name,'مرغ');assert.equal(current.find(p=>p.id===old.id).isActive,false);effective=await prices();assert.equal(effective.find(p=>p.productId===old.id).price,123456);assert.equal(effective.find(p=>p.productId===current[3].id).price,700);
   const {DatabaseSync}=require('node:sqlite'),sql=new DatabaseSync(path.join(dir,'baboltoyoor.db'));
   try {
    sql.exec("CREATE TRIGGER test_import_rollback BEFORE INSERT ON products WHEN NEW.quick_code='06' BEGIN SELECT RAISE(ABORT,'simulated failure'); END");
    const failed=await call('POST','/api/admin/products/import',{rows:[{quickCode:'05',name:'نباید ثبت شود'},{quickCode:'06',name:'خطای آزمایشی'}]},sales);
    assert.equal(failed.status,500);assert.deepEqual(await products(),current);
   } finally {sql.exec('DROP TRIGGER IF EXISTS test_import_rollback');sql.close();}
+  const beforePrices=await prices();const sql2=new DatabaseSync(path.join(dir,'baboltoyoor.db'));try {sql2.exec("CREATE TRIGGER test_price_rollback BEFORE INSERT ON price_list WHEN NEW.price=99999 BEGIN SELECT RAISE(ABORT,'simulated price failure'); END");const failed=await call('POST','/api/admin/products/import',{rows:[{quickCode:'05',name:'یک',price:100},{quickCode:'06',name:'دو',price:99999}]},sales);assert.equal(failed.status,500);assert.deepEqual(await products(),current);assert.deepEqual(await prices(),beforePrices);} finally {sql2.exec('DROP TRIGGER IF EXISTS test_price_rollback');sql2.close();}
   const events=(await call('GET','/api/admin/audit?action=PRODUCTS_IMPORTED',null,admin)).data.audit;assert.equal(events.length,2);assert.equal(events[0].username,'test-sales');
-  await stop();await start();admin=(await call('POST','/api/login',{username:'admin',password:'Changed!2345'})).cookie;assert.deepEqual(await products(),current);
+  await stop();await start();admin=(await call('POST','/api/login',{username:'admin',password:'Changed!2345'})).cookie;assert.deepEqual(await products(),current);assert.deepEqual(await prices(),beforePrices);
  }finally{await stop();fs.rmSync(dir,{recursive:true,force:true});}
 });
