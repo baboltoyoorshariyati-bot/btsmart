@@ -98,9 +98,10 @@ async function openTransportDeliveryWork(id){
    let devices=[],devicesError=false;
    if(order.transportDeparture){try{devices=(await api('/api/payment-devices')).devices||[];}catch(_){devicesError=true;}}
    if(!host.isConnected||$('#transportDeliveryWork')!==host)return;
-   Object.assign(stl,{orderId:id,order,devices,devicesError});
+   const previousBalance=await salesPriorBalance(order);if(!host.isConnected||$('#transportDeliveryWork')!==host)return;
+   Object.assign(stl,{orderId:id,order,devices,devicesError,previousBalance});
    const done=async()=>{closeModal();stlReset();app.salesDeliveryTab='history';try{if(app.salesFetchPromise)await app.salesFetchPromise.catch(()=>{});const fresh=await fetchSalesCache(true);if(app.page==='sales'&&app.sub.sales==='delivery')paintSalesPaneV29('delivery',fresh);}catch(e){toast('پرداختی ثبت شد اما نوسازی فهرست ناموفق بود.');}};
-   transportSalesInvoicePanel(order,host,load,done);
+   transportSalesInvoicePanel(order,host,load,done);host.insertAdjacentHTML('beforeend',salesPriorBalanceHtml(previousBalance));
    finishEntityNotices(notices);
    return true;
   }catch(e){
@@ -250,12 +251,13 @@ function invoiceHtml(o,paySel){
   const credit=noCollection?0:methodsComplete?methods.reduce((sum,m)=>sum+(String(m.type).toUpperCase()==='CREDIT'?Number(m.amount):0),0):(depositOnly?0:null);
   const account=p.debtAccount;
   const paid=account&&Array.isArray(account.receipts)&&account.receipts.every(r=>r&&amountKnown(r.amount)&&['CLEARED','PENDING','RETURNED','REVERSED'].includes(r.status))?account.receipts.filter(r=>r.status==='CLEARED').reduce((sum,r)=>sum+Number(r.amount),0):null;
-  const current=account&&amountKnown(account.initial)&&paid!==null&&paid<=Number(account.initial)?Number(account.initial)-paid:null;
+  const adjustment=account&&Object.hasOwn(account,'adjustment')&&Number.isSafeInteger(account.adjustment)?account.adjustment:0;
+  const current=account&&amountKnown(account.initial)&&paid!==null&&(Object.hasOwn(account,'adjustment')?Number.isSafeInteger(account.adjustment):paid<=Number(account.initial))?Number(account.initial)+adjustment-paid:null;
   const recordedSum=methodsComplete?methods.reduce((sum,m)=>sum+Number(m.amount),0):null;
   const checksKnown=methods.every(m=>String(m?.type||'').toUpperCase()!=='CHECK'||['CLEARED','PENDING','RETURNED','REVERSED'].includes(m.checkStatus));
   const outstandingChecks=methodsComplete&&checksKnown?methods.reduce((sum,m)=>sum+(String(m.type).toUpperCase()==='CHECK'&&m.checkStatus!=='CLEARED'?Number(m.amount):0),0):null;
   const balance=account?current:credit===null||!checksKnown?null:credit+(outstandingChecks||0);
-  const paymentConsistent=recordedSum===null||due===null||recordedSum===due;
+  const paymentConsistent=recordedSum===null||due===null||recordedSum===due||Object.hasOwn(account||{},'adjustment');
   const collected=paymentConsistent&&balance!==null&&amountKnown(p.totalAmount)&&balance<=Number(p.totalAmount)?Number(p.totalAmount)-balance:null;
   const paymentRows=methods.map(m=>{
     m=m||{};const type=String(m.type||'').toUpperCase();
@@ -267,7 +269,7 @@ function invoiceHtml(o,paySel){
   </div></div><div class="inv38-rule"></div>
 
   <p class="inv38-scroll-hint">برای مشاهده همه ستون‌های اقلام، جدول را افقی پیمایش کنید.</p><div class="inv38-table-scroll" role="region" aria-label="اقلام فاکتور؛ برای مشاهده همه ستون‌ها افقی پیمایش کنید" tabindex="0"><table class="inv38-table"><thead><tr><th>#</th><th>محصول</th><th>وزن تحویلی</th><th>فی</th><th>مبلغ</th></tr></thead><tbody>${items.map((i,k)=>`<tr><td>${fa(String(k+1))}</td><td><b>${esc(i.product?.name||'—')}</b></td><td>${qty(i.deliveredKg)} کیلوگرم</td><td>${money(i.unitPrice)}</td><td>${money(i.finalAmount)}</td></tr>`).join('')}</tbody></table></div>
-  <div class="inv38-bottom inv38-with-payments"><div class="inv38-total"><div class="inv38-total-box"><div><span>جمع اقلام</span><b>${money(subtotal)}</b></div><div><span>تخفیفات</span><b>${money(discount)}</b></div><div><span>اضافات</span><b>${money(additions)}</b></div>${returns?`<div><span>کسر مرجوعی</span><b>${money(returns)}</b></div>`:''}${p.deposit?`<div><span>بیعانه دریافت‌شده (${esc(({CASH:'نقدی',POS:'پوز',CARD_TRANSFER:'کارت‌به‌کارت'})[p.deposit?.type]||'')})${p.deposit?.reference?` • پیگیری ${esc(p.deposit.reference)}`:''}</span><b>${money(p.deposit.amount)}</b></div>${p.deposit.refundedAmount?`<div><span>استرداد دستی بیعانه</span><b>${money(p.deposit.refundedAmount)}</b></div><div><span>بیعانه لحاظ‌شده</span><b>${money(p.depositAmount)}</b></div>`:''}<div><span>مانده پس از کسر بیعانه (پیش از تسویه)</span><b>${amountKnown(p.amountDue)?money(p.amountDue):'نامشخص'}</b></div>`:''}<div class="grand"><span>مبلغ نهایی</span><b>${money(p.totalAmount)}</b></div><div class="inv38-collected"><span>مبلغ پرداختی</span><b>${collected===null?'نامشخص':money(collected)}</b></div><div class="inv38-payment-balance"><span>مانده حساب</span><b>${balance===null?'نامشخص':money(balance)}</b></div>${!paymentConsistent?'<small class="inv38-payment-note">جمع روش‌های ثبت‌شده با مبلغ قابل تسویه یکسان نیست؛ بررسی لازم است.</small>':''}</div></div>
+  <div class="inv38-bottom inv38-with-payments"><div class="inv38-total"><div class="inv38-total-box"><div><span>جمع اقلام</span><b>${money(subtotal)}</b></div><div><span>تخفیفات</span><b>${money(discount)}</b></div><div><span>اضافات</span><b>${money(additions)}</b></div>${returns?`<div><span>کسر مرجوعی</span><b>${money(returns)}</b></div>`:''}${p.deposit?`<div><span>بیعانه دریافت‌شده (${esc(({CASH:'نقدی',POS:'پوز',CARD_TRANSFER:'کارت‌به‌کارت'})[p.deposit?.type]||'')})${p.deposit?.reference?` • پیگیری ${esc(p.deposit.reference)}`:''}</span><b>${money(p.deposit.amount)}</b></div>${p.deposit.refundedAmount?`<div><span>استرداد دستی بیعانه</span><b>${money(p.deposit.refundedAmount)}</b></div><div><span>بیعانه لحاظ‌شده</span><b>${money(p.depositAmount)}</b></div>`:''}<div><span>مانده پس از کسر بیعانه (پیش از تسویه)</span><b>${amountKnown(p.amountDue)?money(p.amountDue):'نامشخص'}</b></div>`:''}<div class="grand"><span>مبلغ نهایی</span><b>${money(p.totalAmount)}</b></div><div class="inv38-collected"><span>مبلغ پرداختی</span><b>${collected===null?'نامشخص':money(collected)}</b></div><div class="inv38-payment-balance"><span>${balance!==null&&balance<0?'بستانکار':'مانده حساب'}</span><b>${balance===null?'نامشخص':money(Math.abs(balance))}</b></div>${!paymentConsistent?'<small class="inv38-payment-note">جمع روش‌های ثبت‌شده با مبلغ قابل تسویه یکسان نیست؛ بررسی لازم است.</small>':''}</div></div>
   ${paymentBox}
   <div class="inv38-verify">
     ${o.deliveryMode==='DELIVERY'?transportDeliverySignatureHtml(customerNameRaw,p.driverName||o.transportInvoice?.driverName||o.transportHandovers?.['0']?.driverName||o.dispatch?.driverName):`<div class="inv38-verify-box"><div class="inv38-verify-grid"><div class="inv38-vitem"><span>${recipient?'امضاء تحویل‌گیرنده':'امضاء'}</span><strong>${signatureContact}</strong></div></div></div>`}

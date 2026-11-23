@@ -1357,14 +1357,15 @@ function invoiceHtml(o,paySel){
   const credit=methodsComplete?methods.reduce((sum,m)=>sum+(String(m.type).toUpperCase()==='CREDIT'?Number(m.amount):0),0):(depositOnly?0:null);
   const account=p.debtAccount;
   const paid=account&&Array.isArray(account.receipts)&&account.receipts.every(r=>r&&amountKnown(r.amount)&&['CLEARED','PENDING','RETURNED','REVERSED'].includes(r.status))?account.receipts.filter(r=>r.status==='CLEARED').reduce((sum,r)=>sum+Number(r.amount),0):null;
-  const current=account&&amountKnown(account.initial)&&paid!==null&&paid<=Number(account.initial)?Number(account.initial)-paid:null;
+  const adjustment=account&&Object.hasOwn(account,'adjustment')&&Number.isSafeInteger(account.adjustment)?account.adjustment:0;
+  const current=account&&amountKnown(account.initial)&&paid!==null&&(Object.hasOwn(account,'adjustment')?Number.isSafeInteger(account.adjustment):paid<=Number(account.initial))?Number(account.initial)+adjustment-paid:null;
   const recordedSum=methodsComplete?methods.reduce((sum,m)=>sum+Number(m.amount),0):null;
   const paymentRows=methods.map(m=>{
     m=m||{};const type=String(m.type||'').toUpperCase();
     const details=[m.deviceSnapshot?.title?`دستگاه ${m.deviceSnapshot.title}`:'',m.deviceSnapshot?.bank?`بانک ${m.deviceSnapshot.bank}`:'',m.bank?`بانک ${m.bank}`:'',m.reference?`پیگیری ${m.reference}`:'',m.checkNumber?`شماره چک ${m.checkNumber}`:'',m.dueDate?`سررسید ${m.dueDate}`:'',type==='CHECK'&&m.checkStatus==='PENDING'?'در انتظار وصول':'',type!=='CREDIT'&&m.reason?`علت ${m.reason}`:''].filter(Boolean).join(' • ');
     return `<div class="inv38-payment-row"><div><span>${esc(settlementMethodLabel(m))}</span>${details?`<small>${esc(details)}</small>`:''}</div><b>${amountKnown(m.amount)?money(m.amount):'نامشخص'}</b></div>`;
   }).join('');
-  const paymentBox=`<section class="inv38-payment-box" aria-label="روش‌های تسویه"><h3>روش‌های تسویه</h3><div class="inv38-payment-row"><span>نوع تسویه</span><b>${esc(settlementKind)}</b></div>${due!==null?`<div class="inv38-payment-row"><span>قابل تسویه</span><b>${money(due)}</b></div>`:''}${paymentRows||`<div class="inv38-payment-empty">${depositOnly?'تمام مبلغ از بیعانه لحاظ‌شده تأمین شده است.':'جزئیات روش پرداخت ثبت نشده است.'}</div>`}<div class="inv38-payment-row inv38-payment-balance"><span>${account?'مانده معوق':'معوق'}</span><b>${account?(current===null?'نامشخص':money(current)):(credit===null?'نامشخص':money(credit))}</b></div>${recordedSum!==null&&due!==null&&recordedSum!==due?'<small class="inv38-payment-note">جمع روش‌های ثبت‌شده با مبلغ قابل تسویه یکسان نیست؛ بررسی لازم است.</small>':''}</section>`;
+  const paymentBox=`<section class="inv38-payment-box" aria-label="روش‌های تسویه"><h3>روش‌های تسویه</h3><div class="inv38-payment-row"><span>نوع تسویه</span><b>${esc(settlementKind)}</b></div>${due!==null?`<div class="inv38-payment-row"><span>قابل تسویه</span><b>${money(due)}</b></div>`:''}${paymentRows||`<div class="inv38-payment-empty">${depositOnly?'تمام مبلغ از بیعانه لحاظ‌شده تأمین شده است.':'جزئیات روش پرداخت ثبت نشده است.'}</div>`}<div class="inv38-payment-row inv38-payment-balance"><span>${account?(current<0?'بستانکار':'مانده معوق'):'معوق'}</span><b>${account?(current===null?'نامشخص':money(Math.abs(current))):(credit===null?'نامشخص':money(credit))}</b></div>${recordedSum!==null&&due!==null&&recordedSum!==due&&!Object.hasOwn(account||{},'adjustment')?'<small class="inv38-payment-note">جمع روش‌های ثبت‌شده با مبلغ قابل تسویه یکسان نیست؛ بررسی لازم است.</small>':''}</section>`;
   return `<div class="inv38-sheet inv38-compact${recipient?' inv38-pickup-recipient':''}">
   <div class="inv38-head${recipient?' inv38-pickup-header':''}">
     ${recipient?'':`<div class="inv38-sales-title">فاکتور فروش و تحویل</div>`}
@@ -3813,7 +3814,7 @@ async function cancelOnsiteVisit(id,button){
  try{await api('/api/visits/'+encodeURIComponent(id)+'/cancel-onsite',{method:'POST',body:JSON.stringify({reason:reason.trim(),confirmedNoGoods:true})});toast('لغو ثبت شد؛ مشتری برای خروج بدون کالا به نگهبانی مراجعه کند.');app.orderDraft=[];await fetchSalesCache(true);await renderSales(app.sub.sales);}
  catch(e){toast(e.message);}finally{button.disabled=false;}
 }
-function stlReset(){ app.stl = {orderId:null, order:null, items:[], prices:[], priceMap:Object.create(null), drivers:[], devices:[], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false, dispatchBusy:false, paymentRows:[{type:'CASH',amount:''}]}; Object.assign(stl, app.stl); app.selectedSettlement=null; }
+function stlReset(){ app.stl = {previousBalance:null,orderId:null, order:null, items:[], prices:[], priceMap:Object.create(null), drivers:[], devices:[], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false, dispatchBusy:false, paymentRows:[{type:'CASH',amount:''}]}; Object.assign(stl, app.stl); app.selectedSettlement=null; }
 function stlPrice(v){ return Number(en(String(v ?? '')).replace(/[^0-9]/g,'')) || 0; }
 function stlFmtPrice(v){ return v ? new Intl.NumberFormat('fa-IR').format(v) : ''; }
 function stlFormatPriceInput(input){
@@ -3993,10 +3994,20 @@ function stlFormHtml(o){
   </section>`;
 }
 window.BTSettlementRenderers={row:stlRowHtml,form:stlFormHtml};
+async function salesPriorBalance(order){
+ const id=order.customerId||order.visit?.customerId;
+ if(!id||order.orderType==='STORE')return {unavailable:true};
+ try{return await api('/api/customers/'+encodeURIComponent(id)+'/debts');}catch(_){return {error:true};}
+}
+function salesPriorBalanceHtml(data){
+ if(!data||data.error)return '<section class="stl-prior-balance" role="status">ماندهٔ قبلی دریافت نشد؛ برای بررسی دوباره فرم را باز کنید.</section>';
+ if(data.unavailable)return '<section class="stl-prior-balance" role="status">پروندهٔ مالی مشتری برای نمایش ماندهٔ قبلی در دسترس نیست.</section>';
+ return `<section class="stl-prior-balance" data-prior-balance><b>ماندهٔ قبلی مشتری</b><span>بدهکار از قبل: ${money(data.balance||0)}</span><span>بستانکار از قبل: ${money(data.credit||0)}</span><small>فقط حساب‌های ثبت‌شده در سامانه نمایش داده می‌شوند؛ سوابق قدیمی ممکن است ثبت نشده باشند. این مانده در مبلغ فاکتور اعمال نشده است.</small></section>`;
+}
 function stlPaintForm(){
   const host = $('#stlMain'); if(!host || !stl.order) return;
-  if(stl.order.transportWorkflow===1&&stl.order.deliveryMode==='DELIVERY'&&typeof transportSalesInvoicePanel==='function'){transportSalesInvoicePanel(stl.order);return;}
-  host.innerHTML = stlFormHtml(stl.order);
+  if(stl.order.transportWorkflow===1&&stl.order.deliveryMode==='DELIVERY'&&typeof transportSalesInvoicePanel==='function'){transportSalesInvoicePanel(stl.order);host.insertAdjacentHTML('beforeend',salesPriorBalanceHtml(stl.previousBalance));return;}
+  host.innerHTML = stlFormHtml(stl.order)+salesPriorBalanceHtml(stl.previousBalance);
   const driverSelect=host.querySelector('[data-stl-driver]');if(driverSelect)driverSelect.addEventListener('change',()=>{host.querySelector('[data-stl-plate]').innerHTML=plateViewHtml(stl.drivers.find(x=>x.id===driverSelect.value)?.plate,'—',true);});
   stlRecalc(); stlBindPayments();
 }
@@ -4070,8 +4081,9 @@ async function stlOpen(id){
       const [p,driverData,deviceData]=await Promise.all([api('/api/prices'),api('/api/dispatch/drivers'),api('/api/payment-devices')]);
       prices=p.prices||[];drivers=driverData.drivers||[];devices=deviceData.devices||[];
     }
+    const previousBalance=await salesPriorBalance(o);
     if(!current())return;
-    Object.assign(stl, {orderId:id, order:o, items:stlItemsOf(o,prices), prices, priceMap:Object.fromEntries(prices.map(x=>[x.productId,Number(x.price)])), drivers, devices, devicesError, paymentRows:[{type:'CASH',amount:''}], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false});
+    Object.assign(stl, {previousBalance,orderId:id, order:o, items:stlItemsOf(o,prices), prices, priceMap:Object.fromEntries(prices.map(x=>[x.productId,Number(x.price)])), drivers, devices, devicesError, paymentRows:[{type:'CASH',amount:''}], discountAmount:0, additionsAmount:0, sig:false, fp:'', manual:false, busy:false});
     stl.discountAmount=Number(o.payment?.discountAmount ?? o.dispatch?.discountAmount ?? 0);
     stl.additionsAmount=Number(o.payment?.additionsAmount ?? o.dispatch?.additionsAmount ?? 0);
     app.selectedSettlement=id;

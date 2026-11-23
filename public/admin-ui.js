@@ -353,6 +353,11 @@ async function renderProductsPage() {
   $('#priceGroupFilter').addEventListener('change',()=>paintProducts());
   $('#admProdSearch').addEventListener('input', (e) => { adm.q = e.target.value; paintProducts(); });
   bindAdm('products', host);
+  host.querySelectorAll('[data-price-group]').forEach(card=>{
+    const input=card.querySelector('[data-group-amount]'),mode=card.querySelector('[data-group-mode]');
+    input.addEventListener('input',()=>{if(mode.value==='fixed')transportFormatMoneyInput(input);else input.value=fa(input.value);});
+    mode.addEventListener('change',()=>{input.value='';input.setCustomValidity('');input.inputMode=mode.value==='fixed'?'numeric':'decimal';});
+  });
   host.querySelector('#admProductExcel').addEventListener('change', async e=>{const file=e.target.files[0];e.target.value='';if(file) await admImportProducts(file);});
   paintProducts();
 }
@@ -394,7 +399,7 @@ async function priceGroupManage(action,id){
 }
 async function previewPriceGroup(id,button){
  const card=button.closest('[data-price-group]');if(!card||button.disabled)return;
- const body={direction:card.querySelector('[data-group-direction]').value,mode:card.querySelector('[data-group-mode]').value,amount:en(card.querySelector('[data-group-amount]').value).replace(/٫/g,'.')};
+ const body={direction:card.querySelector('[data-group-direction]').value,mode:card.querySelector('[data-group-mode]').value,amount:en(card.querySelector('[data-group-amount]').value).replace(/٫/g,'.').replace(/[,٬\s]/g,'')};
  button.disabled=true;
  try{
   const preview=await api('/api/admin/price-groups/'+encodeURIComponent(id)+'/preview',{method:'POST',body:JSON.stringify(body)});

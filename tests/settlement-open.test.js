@@ -2,11 +2,12 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const app=fs.readFileSync('public/app.js','utf8');
 const code=app.slice(app.indexOf('let stlOpenSequence=0;'),app.indexOf('\nfunction stlClose()',app.indexOf('let stlOpenSequence=0;')));
+const balanceCode=app.slice(app.indexOf('async function salesPriorBalance('),app.indexOf('function stlPaintForm()',app.indexOf('async function salesPriorBalance(')));
 const itemsCode=app.slice(app.indexOf('function stlItemsOf(o, prices){'),app.indexOf('\n}',app.indexOf('function stlItemsOf(o, prices){'))+2);
 function harness(api){
  const host={innerHTML:'',isConnected:true},painted=[],messages=[];
  const c={captureEntityNotices:()=>[],finishEntityNotices:()=>{},api,stl:{},app:{page:'sales',sub:{sales:'settlement'}},$:()=>host,document:{querySelectorAll:()=>[]},stlPaintForm:()=>painted.push(c.stl.orderId),stlEmptyHtml:()=>'<p>empty</p>',stlReset:()=>{},renderSales:()=>{},toast:m=>messages.push(m),esc:s=>String(s).replace(/[<>&"]/g,x=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[x]))};
- vm.createContext(c);vm.runInContext(itemsCode,c);vm.runInContext(code,c);return {c,host,painted,messages};
+ vm.createContext(c);vm.runInContext(itemsCode,c);vm.runInContext(balanceCode,c);vm.runInContext(code,c);return {c,host,painted,messages};
 }
 const order=(id,extra={})=>({id,status:'SETTLEMENT_PENDING',orderType:'REMOTE',transportWorkflow:1,deliveryMode:'DELIVERY',items:[],...extra});
 test('فرم پخش قیمت فهرست امروز را به‌صورت best-effort می‌گیرد و به فهرست راننده قدیمی وابسته نیست',async()=>{
