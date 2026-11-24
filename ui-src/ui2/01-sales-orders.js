@@ -302,24 +302,14 @@ async function pickupApprove(id,button){
  button.disabled=true;try{await api('/api/pickup/'+encodeURIComponent(id)+'/cancellation-approval',{method:'POST',body:'{}'});toast('انصراف تأیید شد؛ نگهبانی خروج را ثبت می‌کند.');await fetchSalesCache(true);await renderSales(app.sub.sales);await refreshIndicators();}catch(e){button.disabled=false;toast(e.message);}
 }
 // Saved warehouse weights are observational only: drafts are not delivery.
-function salesLiveWeightsHtml(o){
- const drafts=new Map((o.status==='WAREHOUSE_PREPARING'?o.warehouseWeightDraft?.items||[]:[]).map(x=>[x.itemId,x]));
- const runs=new Map((o.storeRun?.items||[]).map(x=>[x.itemId,x]));
- const entries=activeItemsOf(o).map(i=>{
-  const draft=drafts.get(i.id),run=runs.get(i.id);let value='هنوز وزنی ذخیره نشده';
-  if(o.orderType==='STORE'){
-   const parts=[];if(Number(run?.r1Kg)>0)parts.push(`سرویس اول ${qty(run.r1Kg)} کیلوگرم`);if(Number(run?.r2Kg)>0)parts.push(`سرویس دوم ${qty(run.r2Kg)} کیلوگرم`);
-   if(parts.length)value='وزن ثبت‌شده: '+parts.join('، ');
-   if(i.shortageClosed)value=parts.length?value+' · کسری ثبت‌شده':'عدم موجودی / کسری ثبت‌شده';
-  }else if(draft?.outOfStock)value='عدم موجودی (پیش‌نویس ذخیره‌شده)';
-  else if(draft&&draft.deliveredKg!=null)value=`پیش‌نویس ذخیره‌شده: ${qty(draft.deliveredKg)} کیلوگرم`;
-  else if(i.deliveredKg!=null)value=`وزن نهایی: ${qty(i.deliveredKg)} کیلوگرم`;
-  return `<li><b>${esc(i.product?.name||'—')}</b><span>${esc(value)}</span></li>`;
- }).join('');
- return `<ul class="sales-live-weights-list">${entries||'<li>قلم فعالی وجود ندارد.</li>'}</ul>`;
+function salesDraftSavedWeight(item,draft){
+ if(!item||item.itemStatus==='CANCELLED')return '—';
+ if(draft?.outOfStock)return 'عدم موجودی (پیش‌نویس)';
+ if(draft&&draft.deliveredKg!=null)return qty(draft.deliveredKg)+' کیلوگرم';
+ return 'هنوز وزنی ذخیره نشده';
 }
 function salesStoreSavedWeight(item,run){
- if(item?.itemStatus==='CANCELLED')return '—';
+ if(!item||item.itemStatus==='CANCELLED')return '—';
  if(!run)return '۰ کیلوگرم';
  const total=(Number(run.r1Kg)||0)+(Number(run.r2Kg)||0);
  return qty(total)+' کیلوگرم';
@@ -335,8 +325,12 @@ function refreshSalesLiveWeightModal(data,failed=false){
   const items=new Map((order.items||[]).map(x=>[String(x.id),x]));
   box.querySelectorAll('[data-store-saved-item]').forEach(cell=>{const id=cell.dataset.storeSavedItem;cell.textContent=salesStoreSavedWeight(items.get(id),runs.get(id));});
   for(const [attr,key] of [['storeRun1Item','r1Kg'],['storeRun2Item','r2Kg']])box.querySelectorAll(`[data-${attr==='storeRun1Item'?'store-run1-item':'store-run2-item'}]`).forEach(cell=>{const value=Number(runs.get(cell.dataset[attr])?.[key])||0;cell.textContent=value>0?qty(value)+' کیلوگرم':'—';});
- }else{const rows=box.querySelector('[data-live-weight-rows]');if(rows)rows.innerHTML=salesLiveWeightsHtml(order);}
- if(state)state.textContent=box.dataset.salesStoreLive==='true'?'جمع وزن ذخیره‌شدهٔ سرویس‌ها؛ به معنی تحویل نهایی نیست.':'بر اساس آخرین وزن ذخیره‌شدهٔ انبار؛ پیش‌نویس تحویل نهایی نیست.';
+ }else{
+  const drafts=new Map((order.status==='WAREHOUSE_PREPARING'?order.warehouseWeightDraft?.items||[]:[]).map(x=>[String(x.itemId),x]));
+  const items=new Map((order.items||[]).map(x=>[String(x.id),x]));
+  box.querySelectorAll('[data-draft-saved-item]').forEach(cell=>{const id=cell.dataset.draftSavedItem;cell.textContent=salesDraftSavedWeight(items.get(id),drafts.get(id));});
+ }
+ if(state)state.textContent=!['WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES'].includes(order.status)?'وضعیت سفارش تغییر کرده است؛ برای مشاهده اطلاعات جدید جزئیات را دوباره باز کنید.':box.dataset.salesStoreLive==='true'?'جمع وزن ذخیره‌شدهٔ سرویس‌ها؛ به معنی تحویل نهایی نیست.':'بر اساس آخرین وزن ذخیره‌شدهٔ انبار؛ پیش‌نویس تحویل نهایی نیست.';
 }
 function sdFlowCard(o,idx){
  const items=activeItemsOf(o);
@@ -345,7 +339,7 @@ function sdFlowCard(o,idx){
    <td data-label="نام مشتری"><span class="bt-cell-main"><strong>${esc(storeAwareOrderName(o)||'—')}</strong></span></td>
    <td data-label="شماره سفارش"><bdi>${esc(fa(o.orderNo||'—'))}</bdi></td>
    <td data-label="تاریخ">${esc(formatDateTime24(o.createdAt))}</td>
-   <td data-label="وضعیت">${badge(o.status)} ${sdTypeBadge(o)} <span>${qty(items.length)} قلم</span>${salesLiveWeightsHtml(o)}</td>
+   <td data-label="وضعیت">${badge(o.status)} ${sdTypeBadge(o)} <span>${qty(items.length)} قلم</span></td>
    <td data-label="عملیات" class="bt-col-actions"><div class="bt-actions">${actions}</div></td>
  </tr>`;
 }

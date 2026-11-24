@@ -5,7 +5,7 @@ const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 function setup(){
  const c={esc,fa:String,qty:String,formatDateTime24:v=>v||'—',storeAwareOrderName:o=>o.customer?.name||'—',storeAwareOrderPhone:o=>o.customer?.phone||'—',activeItemsOf:o=>o.items||[],badge:s=>`<span>${esc(s)}</span>`,icon:()=>'',canSalesEditRemote:o=>!!o.editable,salesEmptyV25:(_i,title)=>title,sdEmpty:(_i,title)=>title,sdStatusAccent:()=>'',sdTypeBadge:()=>'<span>تلفنی</span>',pickupSalesActions:()=>'<button data-action="pickup">دریافت</button>',warehouseReturnNoteHtml:o=>`<div class="warehouse-return-note">${esc(o.warehouseReturn.reason)}</div>`,salesOrderDateTime:o=>o.scheduledAt,sr38Chips:()=>'<span>سرویس</span>'};
  vm.createContext(c);
- for(const [start,end] of [['function remotePhoneQueueRowsV40','function renderSalesRemoteV32'],['function salesLiveWeightsHtml','function renderSalesFlowV25']]) vm.runInContext(source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start))),c);
+ for(const [start,end] of [['function remotePhoneQueueRowsV40','function renderSalesRemoteV32'],['function salesDraftSavedWeight','function renderSalesFlowV25']]) vm.runInContext(source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start))),c);
  return c;
 }
 test('صف تلفنی فقط سفارش‌های فعال غیرحضوری را در جدول با عملیات حفظ می‌کند',()=>{
@@ -17,4 +17,16 @@ test('جدول در جریان جزئیات و کنش‌های ارجاع و و�
  const c=setup(),order={id:'4',orderNo:'321',status:'RETURNED_TO_SALES',customer:{name:'آزمایش',phone:'0922'},dispatchPlace:'<مقصد>',warehouseReturn:{reason:'<اصلاح>'},scheduledAt:'فردا',items:[{}]};
  const html=c.salesFlowRowsV27([order]);assert.match(html,/<table class="bt-table sd-flow-table"/);assert.match(html,/data-order="4"/);assert.doesNotMatch(html,/data-label="مشخصات"|&lt;مقصد&gt;|&lt;اصلاح&gt;/);for(const action of ['order-details','pickup','edit-returned-order','resubmit-order'])assert.ok(html.includes(`data-action="${action}"`));assert.doesNotMatch(html,/زمان ارسال: فردا/);
  assert.match(c.salesFlowRowsV27([]),/<td colspan="5">سفارشی در جریان نیست/);
+});
+
+test('در جریان وضعیت سفارش‌های حضوری و غیرحضوری وزن پیش‌نویس را نمایش نمی‌دهد',()=>{
+ const c=setup();
+ for(const orderType of ['ONSITE','REMOTE']){
+  const order={id:orderType,orderNo:'123',orderType,status:'WAREHOUSE_PREPARING',customer:{name:'مشتری'},items:[{id:'a',product:{name:'کالای تست'}}],warehouseWeightDraft:{items:[{itemId:'a',deliveredKg:7.5}]}};
+  const html=c.salesFlowRowsV27([order]);assert.doesNotMatch(html,/۷٫۵|7\.5|ذخیره|کیلوگرم|کالای تست/);
+ }
+ assert.equal(c.salesDraftSavedWeight({itemStatus:'ACTIVE'},{deliveredKg:7.5}),'7.5 کیلوگرم');
+ assert.equal(c.salesDraftSavedWeight({itemStatus:'ACTIVE'},{outOfStock:true,deliveredKg:0}),'عدم موجودی (پیش‌نویس)');
+ assert.equal(c.salesDraftSavedWeight({itemStatus:'ACTIVE'},null),'هنوز وزنی ذخیره نشده');
+ assert.equal(c.salesDraftSavedWeight({itemStatus:'CANCELLED'},{deliveredKg:10}),'—');
 });

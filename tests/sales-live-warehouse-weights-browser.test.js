@@ -21,10 +21,20 @@ test('sales sees saved ordinary and store weights live, including an open detail
   for(const o of [store,bulk])await post(sales,`/api/store/orders/${o.id}/quick-send`,{});
   for(const o of [ordinary,store,bulk]){await post(wh,`/api/orders/${o.id}/warehouse/accept`,{});await post(wh,`/api/orders/${o.id}/warehouse/start-preparing`,{});}
   const page=await sales.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(base,{waitUntil:'networkidle'});await page.evaluate(()=>renderSales('flow'));
-  const row=page.locator(`[data-order="${ordinary.id}"]`);await row.waitFor();assert.match(await row.innerText(),/هنوز وزنی ذخیره نشده/);
+  const row=page.locator(`[data-order="${ordinary.id}"]`);await row.waitFor();assert.doesNotMatch(await row.locator('[data-label="وضعیت"]').innerText(),/وزن|ذخیره|کیلوگرم/);
   await row.locator('[data-action=order-details]').click();const modal=page.locator(`[data-sales-live-order="${ordinary.id}"]`);await modal.waitFor();
+  assert.equal(await modal.locator('th').filter({hasText:'ذخیره‌شده'}).count(),1);
+  assert.match(await modal.locator(`[data-draft-saved-item="${ordinary.items[0].id}"]`).innerText(),/هنوز وزنی ذخیره نشده/);
+  assert.equal(await page.locator('#modal .sales-live-weights').count(),0);
   await post(wh,`/api/orders/${ordinary.id}/warehouse/draft`,{revision:0,items:[{itemId:ordinary.items[0].id,deliveredKg:7.5},{itemId:ordinary.items[1].id,outOfStock:true}]});
-  await modal.getByText(/پیش‌نویس ذخیره‌شده: ۷٫۵ کیلوگرم/).waitFor({timeout:15000});assert.match(await modal.innerText(),/عدم موجودی/);assert.match(await row.innerText(),/پیش‌نویس ذخیره‌شده/);
+  await modal.locator(`[data-draft-saved-item="${ordinary.items[0].id}"]`).getByText(/۷٫۵ کیلوگرم/).waitFor({timeout:15000});
+  assert.match(await modal.locator(`[data-draft-saved-item="${ordinary.items[1].id}"]`).innerText(),/عدم موجودی/);
+  assert.doesNotMatch(await row.locator('[data-label="وضعیت"]').innerText(),/وزن|ذخیره|کیلوگرم|۷٫۵/);
+  await post(wh,`/api/orders/${ordinary.id}/warehouse/draft`,{revision:1,items:[{itemId:ordinary.items[0].id,deliveredKg:8.25}]});
+  await modal.locator(`[data-draft-saved-item="${ordinary.items[0].id}"]`).getByText(/۸٫۲۵ کیلوگرم/).waitFor({timeout:15000});
+  assert.match(await modal.locator(`[data-draft-saved-item="${ordinary.items[1].id}"]`).innerText(),/هنوز وزنی ذخیره نشده/);
+  await page.evaluate(()=>refreshSalesLiveWeightModal(null,true));assert.match(await modal.locator('[data-live-weight-status]').innerText(),/ناموفق/);
+  await page.evaluate(async()=>refreshSalesLiveWeightModal(await fetchSalesCache(true)));assert.match(await modal.locator('[data-live-weight-status]').innerText(),/پیش‌نویس تحویل نهایی نیست/);
   await page.locator('#modal [data-action=close-modal]').last().click();await page.evaluate(()=>renderSales('stores'));await page.locator('[data-store-subtab=processing]').click();const storeRow=page.locator(`[data-store-summary-id="${store.id}"]`);await storeRow.waitFor();
   await storeRow.locator('[data-action=store-order-details-v25]').click();const storeModal=page.locator(`[data-sales-live-order="${store.id}"]`);await storeModal.waitFor();
   await post(wh,`/api/orders/${store.id}/store-run/weights`,{run:1,items:[{itemId:store.items[0].id,deliveredKg:3.75}]});
@@ -34,6 +44,12 @@ test('sales sees saved ordinary and store weights live, including an open detail
   assert.match(await storeModal.innerText(),/ذخیره‌شده/);assert.match(await storeModal.locator(`[data-store-saved-item="${store.items[1].id}"]`).innerText(),/۰ کیلوگرم/);
   assert.equal(await page.locator('[data-store-section=processing] th').filter({hasText:'اقلام'}).count(),0);
   await page.locator('#modal [data-action=close-modal]').last().click();await page.locator(`[data-store-summary-id="${bulk.id}"] [data-action=store-order-details-v25]`).click();
-  assert.match(await page.locator(`[data-store-saved-item="${bulk.items[0].id}"]`).innerText(),/۶ کیلوگرم/);assert.deepEqual(errors,[]);
+  assert.match(await page.locator(`[data-store-saved-item="${bulk.items[0].id}"]`).innerText(),/۶ کیلوگرم/);
+  await page.locator('#modal [data-action=close-modal]').last().click();
+  // Details reached from elsewhere in sales use the same table, not the old list.
+  await page.evaluate(id=>openOrderDetails(id),bulk.id);
+  const otherStoreModal=page.locator(`[data-sales-live-order="${bulk.id}"]`);await otherStoreModal.waitFor();
+  assert.match(await otherStoreModal.locator(`[data-store-saved-item="${bulk.items[0].id}"]`).innerText(),/۶ کیلوگرم/);
+  assert.equal(await page.locator('#modal .sales-live-weights').count(),0);assert.deepEqual(errors,[]);
  }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });
