@@ -21,6 +21,7 @@ window.addEventListener('pagehide',()=>{
 });
 window.addEventListener('pageshow',e=>{if(e.persisted&&app.user)browserPresence();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&app.user)browserPresence();});
+window.addEventListener('online',()=>{if(app.user)browserPresence();});
 async function handleLoginSubmit(e){
   e.preventDefault();
   const f=e.currentTarget;
@@ -31,7 +32,14 @@ async function handleLoginSubmit(e){
   if(!username||!password){ if(msg) msg.textContent='نام کاربری و رمز عبور را وارد کنید.'; return; }
   if(btn){btn.disabled=true;btn.dataset.originalText=btn.innerHTML;btn.innerHTML='<span>در حال ورود...</span>';}
   try{
-    const data=await api('/api/login',{method:'POST',body:JSON.stringify({username,password,browserSession:true})});
+    const login=replaceSession=>api('/api/login',{method:'POST',body:JSON.stringify({username,password,browserSession:true,...(replaceSession?{replaceSession:true}:{})})});
+    let data;
+    try{ data=await login(false); }
+    catch(err){
+      if(err.code!=='SESSION_ACTIVE') throw err;
+      if(!window.confirm('این حساب نشست فعالی دارد. با ادامه، نشست قبلی بسته می‌شود و اطلاعات ذخیره‌نشدهٔ آن ممکن است از دست برود. آیا می‌خواهید وارد شوید؟')) { showLoginView('نشست قبلی همچنان فعال است.'); return; }
+      data=await login(true);
+    }
     app.user=data.user;
     syncServerTime();
     showAppView();
@@ -48,7 +56,7 @@ async function handleLoginSubmit(e){
 async function handleLogout(){
   // Do not tell the user they have logged out when the server did not confirm
   // revocation. They can retry; closing a disconnected browser falls back to
-  // the server-side heartbeat timeout.
+  // authenticated session replacement on the next login.
   try{await api('/api/logout',{method:'POST',body:'{}'});}
   catch{toast('خروج در سرور تأیید نشد؛ اتصال را بررسی کنید و دوباره تلاش کنید.');return;}
   resetClientState();
@@ -90,6 +98,7 @@ async function bootstrap(){
     if(a==='print-invoice'){e.stopPropagation();return printInvoice(el.dataset.id,Number(el.dataset.run)||null);}
     if(a==='resubmit-order'){e.stopPropagation();return resubmitOrder(el.dataset.id);}
     if(a==='edit-returned-order')return openReturnedOrderEditor(el.dataset.id);
+    if(a==='customer-addition')return openCustomerAddition(el.dataset.id);
     if(a==='returned-add-line')return addReturnedLine();
     if(a==='returned-delete-line')return deleteReturnedLine(Number(el.dataset.index));
     if(a==='pick-return-product')return pickReturnedProduct(Number(el.dataset.index),el.dataset.productId,el.dataset.label);

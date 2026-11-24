@@ -12,7 +12,7 @@ test('تکمیل سفارش حضوری انبار را به سند قابل مش
  assert.match(finalize,/api\('\/api\/orders\/'\+id\+'\/warehouse'/);
  assert.match(finalize,/physicalHandoverConfirmed:hasGoods/);
  assert.match(finalize,/if\(result\.allUnavailable\)/);
- assert.match(finalize,/whPrintDocument\(doc,0\)/);
+ assert.match(finalize,/whPrintDocument\(doc,0,merge\)/);
  assert.match(finalize,/تحویل فیزیکی ثبت شد/);
  assert.match(ui,/data-wh-delivered-print/);
 });

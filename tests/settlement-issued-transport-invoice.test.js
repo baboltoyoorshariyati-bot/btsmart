@@ -15,19 +15,19 @@ function context(){
 }
 function load(ctx){vm.runInContext(fragment('function salesTransportInvoiceIssued(','function renderSalesSettlementV25('),ctx);}
 const order=(extra={})=>({id:'o1',status:'SETTLEMENT_PENDING',orderNo:'000001',customer:{name:'مشتری',phone:'0912'},transportWorkflow:1,deliveryMode:'DELIVERY',payments:[],...extra});
-test('فاکتور پخش تا پیش از چاپ برگهٔ ارسال در صف تسویه می‌ماند',()=>{
+test('فاکتور پخش با ثبت و بدون نیاز به چاپ از صف تسویه منتقل می‌شود',()=>{
  const ctx=context();load(ctx);
  const prepared=order({transportInvoice:{invoiceNumber:'000123',status:'PREPARED',totalAmount:3000,createdAt:'2026-01-01T00:00:00Z'}});
- assert.equal(ctx.salesTransportInvoiceIssued(prepared),false);
- assert.deepEqual([...ctx.salesSettlementPendingOrders([prepared])].map(o=>o.id),['o1']);
+ assert.equal(ctx.salesTransportInvoiceIssued(prepared),true);
+ assert.deepEqual([...ctx.salesSettlementPendingOrders([prepared])].map(o=>o.id),[]);
  assert.deepEqual([...ctx.salesSettlementIssuedOrders([prepared])].map(o=>o.id),[]);
 });
-test('با ثبت چاپ برگهٔ ارسال، سفارش از صف تسویه به فاکتورهای صادرشده منتقل می‌شود',()=>{
+test('چاپ برگهٔ ارسال سفارش پخش باز را به تسویه بازنمی‌گرداند',()=>{
  const ctx=context();load(ctx);
  const printed=order({transportInvoice:{invoiceNumber:'000123',status:'PREPARED',totalAmount:3000,printedAt:'2026-01-01T10:00:00Z'}});
  assert.equal(ctx.salesTransportInvoiceIssued(printed),true);
  assert.deepEqual([...ctx.salesSettlementPendingOrders([printed,order({id:'o2'})])].map(o=>o.id),['o2']);
- assert.deepEqual([...ctx.salesSettlementIssuedOrders([printed,order({id:'o2'})])].map(o=>o.id),['o1']);
+ assert.deepEqual([...ctx.salesSettlementIssuedOrders([printed,order({id:'o2'})])].map(o=>o.id),[]);
 });
 test('سفارش بسته‌شدهٔ پخش و فاکتور تسویهٔ عادی هم در فهرست صادرشده‌ها می‌مانند',()=>{
  const ctx=context();load(ctx);

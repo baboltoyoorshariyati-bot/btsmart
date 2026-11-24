@@ -2,7 +2,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),net=require('node:net');
 
-test('سرور نشست بدون پیام خروج را پاک می‌کند و زبانه فعال و خروج صریح را حفظ می‌کند',{timeout:60000},async()=>{
+test('نشست معلق، بستن صفحه و جایگزینی احراز هویت‌شده',{timeout:60000},async()=>{
  const port=await new Promise(resolve=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>resolve(p));});});
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-heartbeat-api-')),base=`http://127.0.0.1:${port}`;
  const preload=path.join(dir,'clock.cjs');fs.writeFileSync(preload,"const real=Date.now;let offset=0;Date.now=()=>real()+offset;process.on('message',m=>{if(m&&Number.isFinite(m.advance)){offset+=m.advance;process.send({advanced:offset});}});");
@@ -19,15 +19,25 @@ test('سرور نشست بدون پیام خروج را پاک می‌کند و 
   const a='a'.repeat(32),b='b'.repeat(32);
   let sid=(await ok('POST','/api/login',credentials)).cookie;
   await ok('POST','/api/session/presence',{tabId:a},sid);await ok('POST','/api/session/presence',{tabId:b},sid);
-  await advance(30000);await ok('POST','/api/session/presence',{tabId:b},sid);await advance(31000);
-  assert.equal((await call('POST','/api/login',credentials)).status,409,'one live tab retains the login lock');
-  await ok('POST','/api/session/leave',{tabId:b},sid);await advance(8100);
-  assert.equal((await call('GET','/api/me',null,sid)).status,401,'the stale tab does not block clean last-tab close');
-  sid=(await ok('POST','/api/login',credentials)).cookie;await ok('POST','/api/session/presence',{tabId:a},sid);
-  await advance(60001);const next=await ok('POST','/api/login',credentials);
-  assert.equal((await call('GET','/api/me',null,sid)).status,401,'missing leave is reclaimed without a timer tick');
+  await advance(48*60*60*1000);
+  assert.equal((await call('GET','/api/me',null,sid)).status,200,'suspended session remains active');
+  assert.equal((await call('POST','/api/login',credentials)).status,409);
+  await ok('POST','/api/session/leave',{tabId:a},sid);
+  assert.equal((await call('POST','/api/login',credentials)).status,409,'other suspended tab retains lock');
+  await ok('POST','/api/session/leave',{tabId:b},sid);
+  const closed=await ok('POST','/api/login',credentials);
+  assert.equal((await call('GET','/api/me',null,sid)).status,401,'new login releases closed session without waiting for reload grace');
+  sid=closed.cookie;await ok('POST','/api/session/presence',{tabId:a},sid);
+  await advance(48*60*60*1000);
+  assert.equal((await call('POST','/api/login',{...credentials,password:'Wrong!2345',replaceSession:true})).status,401);
+  assert.equal((await call('GET','/api/me',null,sid)).status,200,'wrong password cannot revoke');
+  assert.equal((await call('POST','/api/login',{...credentials,replaceSession:'true'})).status,409,'explicit boolean confirmation required');
+  const next=await ok('POST','/api/login',{...credentials,replaceSession:true});
+  assert.equal((await call('GET','/api/me',null,sid)).status,401,'replacement revokes previous session');
   await ok('POST','/api/logout',{},next.cookie);assert.equal((await call('GET','/api/me',null,next.cookie)).status,401);
   const noPresence=(await ok('POST','/api/login',credentials)).cookie;await advance(60001);
-  await ok('POST','/api/login',credentials);assert.equal((await call('GET','/api/me',null,noPresence)).status,401,'login without initial ping is reclaimed');
+  assert.equal((await call('POST','/api/login',credentials)).status,409,'no initial ping does not prove close');
+  assert.equal((await call('GET','/api/me',null,noPresence)).status,200);
+
  }finally{if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(resolve=>proc.once('exit',resolve));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });
