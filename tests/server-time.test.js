@@ -58,9 +58,9 @@ test('کلاینت اختلاف ساعت سرور را همگام می‌کند 
   // همگام‌سازی در شروع، بعد از ورود و دوره‌ای انجام می‌شود
   assert.match(app, /async function bootstrap\(\)\{\s*syncServerTime\(\);/);
   assert.match(app, /setInterval\(syncServerTime,5\*60\*1000\)/);
-  const loginAt = app.indexOf("await api('/api/login'");
-  const syncAt = app.indexOf('syncServerTime();', loginAt);
-  assert.ok(loginAt > -1 && syncAt > loginAt && syncAt - loginAt < 200, 'بعد از ورود موفق دوباره همگام می‌شود');
+  assert.match(app, /data=await login\(false\)/);
+  assert.match(app, /data=await login\(true\)/);
+  assert.match(app, /app\.user=data\.user;\s*syncServerTime\(\);/, 'بعد از هر ورود موفق دوباره همگام می‌شود');
 });
 
 test('همهٔ نمایش‌های ساعت/تاریخ و پیش‌فرض‌های «امروز» از ساعت سرور استفاده می‌کنند', () => {

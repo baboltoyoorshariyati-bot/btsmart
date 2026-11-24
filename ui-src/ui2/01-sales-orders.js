@@ -177,7 +177,7 @@ function remotePhoneQueueRowsV40(orders){
     <td data-label="تاریخ">${esc(formatDateTime24(o.createdAt))}</td>
     <td data-label="وضعیت">${badge(o.status)}</td>
     <td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td>
-    <td data-label="عملیات" class="bt-col-actions"><div class="bt-actions"><button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>${canSalesEditRemote(o)?`<button type="button" class="btn btn-secondary btn-sm" data-action="future-edit" data-id="${esc(o.id)}">ویرایش سفارش</button>`:''}</div></td>
+    <td data-label="عملیات" class="bt-col-actions"><div class="bt-actions"><button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',14)} جزئیات سفارش</button>${canSalesEditRemote(o)?`<button type="button" class="btn btn-secondary btn-sm" data-action="future-edit" data-id="${esc(o.id)}">ویرایش سفارش</button>`:''}${canSalesCancelRemote(o)?`<button type="button" class="btn btn-ghost btn-sm danger-text" data-action="future-cancel" data-id="${esc(o.id)}">لغو سفارش</button>`:''}</div></td>
   </tr>`).join('');
   const empty=`<tr><td colspan="6">${salesEmptyV25('phone','سفارش تلفنی فعالی در روند نیست','پس از ثبت سفارش غیرحضوری، اینجا قابل پیگیری است.')}</td></tr>`;
   return {queue,html:`<div class="bt-table-wrap"><table class="bt-table phone-queue-table"><caption class="bt-caption">سفارش‌های تلفنی در روند</caption><thead><tr><th scope="col">نام مشتری</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ</th><th scope="col">وضعیت</th><th scope="col">اقلام</th><th scope="col">عملیات</th></tr></thead><tbody>${rows||empty}</tbody></table></div>`};
@@ -342,6 +342,19 @@ function sdFlowCard(o,idx){
    <td data-label="وضعیت">${badge(o.status)} ${sdTypeBadge(o)} <span>${qty(items.length)} قلم</span></td>
    <td data-label="عملیات" class="bt-col-actions"><div class="bt-actions">${actions}</div></td>
  </tr>`;
+}
+async function openCustomerAddition(id){
+ try{
+  const o=(await api('/api/orders/'+encodeURIComponent(id))).order;
+  if(!['ONSITE','REMOTE'].includes(o.orderType)||!['WAREHOUSE_PENDING','WAREHOUSE_PREPARING'].includes(o.status))return toast('این سفارش دیگر در مرحله قابل افزودن نیست.');
+  if((o.customerAdditionRequests||[]).some(r=>r.status==='PENDING_WAREHOUSE'))return toast('درخواست قبلی منتظر تأیید انبار است.');
+  app.storeAdditionDraft=[defaultOrderLine()];
+  openModal('افزودن محصول به سفارش '+fa(o.orderNo||''),`<form id="customerAdditionForm"><p>درخواست برای تأیید انبار ارسال می‌شود. کالاهای افزوده ردیف مستقل دارند و وزن هر ردیف جداگانه ثبت می‌شود.</p><div id="store-addition-lines"></div><button type="button" class="btn btn-secondary" id="customerAdditionAdd">افزودن ردیف</button><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button class="btn btn-primary" type="submit">ارسال به انبار</button></div></form>`);
+  const paint=()=>{const el=$('#store-addition-lines');if(el){el.innerHTML=renderDraftLinesTable(app.storeAdditionDraft.map((x,i)=>renderProductPickerLine(x,i,'storeaddition')));bindOperationLines('storeaddition','storeAdditionDraft')}};paint();
+  $('#customerAdditionAdd').onclick=()=>{app.storeAdditionDraft.push(defaultOrderLine());paint();};
+  $('#customerAdditionForm').addEventListener('click',e=>{const p=e.target.closest('[data-action=op-pick-product]');if(p){pickOperationProduct(+p.dataset.index,p.dataset.productId,p.dataset.label,p.dataset.quick,'storeaddition','storeAdditionDraft');return;}const x=e.target.closest('[data-action=op-remove-line]');if(x){app.storeAdditionDraft.splice(+x.dataset.index,1);if(!app.storeAdditionDraft.length)app.storeAdditionDraft.push(defaultOrderLine());paint();}});
+  $('#customerAdditionForm').addEventListener('submit',async e=>{e.preventDefault();const lines=app.storeAdditionDraft.map(x=>({productId:x.productId,requestedQty:n(x.requestedQty),requestedUnit:x.requestedUnit,description:String(x.description||'').trim()}));if(lines.some(x=>!x.productId||!(x.requestedQty>0)))return toast('همه ردیف‌ها باید محصول و مقدار معتبر داشته باشند.');const btn=e.submitter;if(btn)btn.disabled=true;try{await api('/api/sales/customer-orders/'+encodeURIComponent(id)+'/additions',{method:'POST',body:JSON.stringify({items:lines})});closeModal();toast('درخواست برای تأیید به انبار ارسال شد.');const data=await fetchSalesCache(true);if(app.page==='sales')paintSalesPaneV29(app.sub.sales,data);await refreshIndicators();}catch(err){if(btn)btn.disabled=false;toast(err.message);}});
+ }catch(e){toast(e.message);}
 }
 function salesFlowRowsV27(orders){
  const rows=(orders||[]).map(sdFlowCard).join('');

@@ -137,6 +137,7 @@ body.invoice-print{margin:0;padding:8px;background:#fff}
 .inv38-compact.inv38-distribution .inv38-distribution-meta b{font-size:10px;line-height:1.4;margin:0;min-width:0;max-width:100%;overflow-wrap:anywhere}
 /* Give the delivery declaration the complete RTL width of the signature box. */
 .inv38-compact .inv38-delivery-signature{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:10px;min-height:0;padding:7px 10px;break-inside:avoid}
+.inv38-compact .inv38-customer-ack{display:flex;flex-direction:column;gap:6px;break-inside:avoid}
 .inv38-compact .inv38-delivery-declaration{grid-column:1/-1;width:100%;margin:0;direction:rtl;text-align:right;line-height:1.8;font-size:11px;color:#111}
 .inv38-compact .inv38-delivery-signer{grid-column:1;margin:0;padding:0;align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;max-width:100%;text-align:center;overflow-wrap:anywhere}
 .inv38-compact .inv38-delivery-signature-line{display:block;width:100%;max-width:150px;height:18px;border-bottom:1px solid #555}

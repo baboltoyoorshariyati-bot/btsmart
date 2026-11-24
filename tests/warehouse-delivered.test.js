@@ -27,7 +27,7 @@ test('remote delivery documents expose current assignment and physical handover 
 
 test('remote delivery warehouse document includes all customer, handover, vehicle and plate fields',()=>{
  const ui=fs.readFileSync(path.join(__dirname,'../public/ui2.js'),'utf8');
- const start=ui.indexOf('function whDeliveredDocument(o,print=false)'),end=ui.indexOf('function whCanRegisterHandover()',start);
+ const start=ui.indexOf('function whDeliveredDocument(o,print=false,merge=false)'),end=ui.indexOf('function whCanRegisterHandover()',start);
  const c={esc:value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'),fa:String,formatDateTime24:value=>value||'—',whDocumentProducts:()=>'<table></table>'};
  vm.createContext(c);vm.runInContext(ui.slice(start,end),c);
  const html=c.whDeliveredDocument({orderType:'REMOTE',orderNo:'R-101',warehouseDocumentNo:'W-101',customerName:'مشتری نمونه',customerPhone:'09120000000',deliveryMode:'DELIVERY',driverName:'راننده نمونه',driverPhone:'09121111111',vehicleType:'وانت',vehiclePlate:'12ب34567',completedAt:'2026-01-02 09:00',handedOverAt:'2026-01-02 09:30',items:[]});

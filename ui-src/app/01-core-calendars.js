@@ -15,6 +15,8 @@ function settlementMethodLabel(method){
  return type==='POS'?['پوز',m.deviceSnapshot?.bank,m.deviceSnapshot?.terminalNumber].filter(Boolean).join(' '):(labels[type]||type||'نامشخص');
 }
 function canSalesEditRemote(o){return o?.orderType==='REMOTE'&&['SCHEDULED_REMOTE','WAREHOUSE_PENDING'].includes(o.status)&&!o.warehouseAcceptedAt&&!o.pickupHandover&&!Object.keys(o.transportHandovers||{}).length;}
+// The server rechecks delivery and financial history under its write lock.
+function canSalesCancelRemote(o){return o?.orderType==='REMOTE'&&['SCHEDULED_REMOTE','WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES'].includes(o.status)&&!o.visitId&&o.visit?.status!=='PICKUP_PRESENT'&&!o.pickupCancellation&&!o.pickupHandover&&!o.warehouseCompletedAt&&!o.warehouseDocumentNo&&!o.warehouseHandover&&!o.transportInvoice&&!o.transportDeparture&&!o.dispatch&&!Object.keys(o.transportHandovers||{}).length&&!o.payment&&!(o.payments||[]).length&&!(o.items||[]).some(i=>i.itemStatus==='DELIVERED'||i.warehouseStatus==='DELIVERED'||(i.deliveredKg!=null&&(!Number.isFinite(Number(i.deliveredKg))||Number(i.deliveredKg)!==0)));}
 // Shared compact order row. Callers supply only trusted markup for status and actions;
 // customer data and labels are escaped here. A store service remains a separate row.
 function orderSummaryRow(o,opts={}){

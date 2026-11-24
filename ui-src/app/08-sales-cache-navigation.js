@@ -450,6 +450,14 @@ function salesV29Activate(tab){
   app.salesV29.lastTab=tab;
 }
 
+// Clear only the selected, already-issued invoice; other settlement forms stay open.
+function clearIssuedTransportSettlement(data){
+  const selected=stl.orderId&&(data.orders||[]).find(o=>o.id===stl.orderId);
+  if(selected&&salesTransportInvoiceIssued(selected)&&selected.transportInvoice?.status==='PREPARED'){
+    stlClose();toast('فاکتور ثبت شده است؛ برای بررسی و چاپ به کارتابل پخش مراجعه کنید.');
+  }
+}
+
 function paintSalesPaneV29(tab,data){
   const pane=app.salesV29.panes?.[tab]; if(!pane)return;
   if(pane.dataset.renderedV29!=='1'){
@@ -467,6 +475,7 @@ function paintSalesPaneV29(tab,data){
   }else if(tab==='flow'){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]));
   }else if(tab==='settlement'){
+    clearIssuedTransportSettlement(data);
     const all=salesAllInSettlement(data.orders||[]);
     const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
     const noGoods=pane.querySelector('.sales-no-goods-list'); if(noGoods)noGoods.innerHTML=salesNoGoodsRows(all);

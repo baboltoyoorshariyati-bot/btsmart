@@ -1,6 +1,6 @@
 function futureOrderRowsV25(orders){
  const rows=(orders||[]).map(o=>{
-  const actions=`<button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',13)} جزئیات سفارش</button>`+(canSalesEditRemote(o)&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button class="btn btn-ghost btn-sm" data-action="future-edit" data-id="${esc(o.id)}">${icon('edit',13)} ویرایش سفارش</button>${o.visit?.status!=='PICKUP_PRESENT'?`<button class="btn btn-ghost btn-sm danger-text" data-action="future-cancel" data-id="${esc(o.id)}">${icon('trash',13)} لغو</button>`:''}`:'');
+  const actions=`<button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',13)} جزئیات سفارش</button>`+(canSalesEditRemote(o)&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button class="btn btn-ghost btn-sm" data-action="future-edit" data-id="${esc(o.id)}">${icon('edit',13)} ویرایش سفارش</button>`:'')+(canSalesCancelRemote(o)?`<button class="btn btn-ghost btn-sm danger-text" data-action="future-cancel" data-id="${esc(o.id)}">${icon('trash',13)} لغو سفارش</button>`:'');
   return `<tr class="fx-table-row" data-order="${esc(o.id)}"><td data-label="مشتری">${esc(storeAwareOrderName(o))}<small>${esc(storeAwareOrderPhone(o)||'—')}</small></td><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="تاریخ ثبت">${esc(formatDateTime24(o.createdAt))}</td><td data-label="وضعیت">${badge(o.status)} ${sdTypeBadge(o)}</td><td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td><td data-label="زمان‌بندی"><span>ورود به انبار: ${esc(dateLabel(o.scheduledDate))} ${esc(fa(time24(o.scheduledAt)))}</span><br><span>تاریخ تحویل: ${o.deliveryDate?esc(dateLabel(o.deliveryDate)):'ثبت نشده'}</span></td><td data-label="مقصد و بیعانه"><span>${esc(o.dispatchPlace||'ثبت نشده')}</span>${o.deposit?depositSummaryHtml(o.deposit):''}</td><td data-label="عملیات" class="bt-col-actions"><div class="fx-table-actions">${actions+pickupSalesActions(o)}</div></td></tr>`;
  }).join('');
  const empty=`<tr class="future-empty-row"><td colspan="8" class="future-empty-cell">${sdEmpty('calendar','سفارشی برای روزهای آینده برنامه‌ریزی نشده است','سفارش‌های آینده پس از ثبت در این تقویم قرار می‌گیرند.')}</td></tr>`;
@@ -244,6 +244,7 @@ function paintSalesPaneV29(tab,data){
   }else if(tab==='flow'){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]))||sdEmpty('truck','سفارشی در جریان نیست','هر سفارشی که به انبار ارسال شود در این فهرست قرار می‌گیرد.');
   }else if(tab==='settlement'){
+    clearIssuedTransportSettlement(data);
     const all=salesAllInSettlement(data.orders||[]);
     const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
     const noGoods=pane.querySelector('.sales-no-goods-list'); if(noGoods)noGoods.innerHTML=salesNoGoodsRows(all);

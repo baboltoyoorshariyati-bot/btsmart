@@ -12,6 +12,7 @@ for(const [file,end] of [['app.js','function printCss()'],['ui2.js','async funct
   const s=c.invoiceHtml({...order,orderType:'REMOTE',deliveryMode:'PICKUP',pickupHandover:{document:{customerName:'مالک',customerPhone:'09120000001',recipient:{name:'<نماینده>',phone:'09120000002',vehicleType:'خودروی محرمانه',plate:'پلاک محرمانه'}}},payment:{invoiceNumber:'000456',verifiedAt:'1405/08/23',totalAmount:100,settlementMethods:[{type:'CASH',amount:100}]}});
   const start=s.indexOf('class="inv38-head inv38-pickup-header"');const end=s.indexOf('<div class="inv38-rule"',start);assert(start>=0&&end>start);const header=s.slice(start,end);
   const labels=['نام مشتری','شماره','تحویل گیرنده','شماره','سفارش','فاکتور','تاریخ'];const positions=[];let from=0;for(const label of labels){const position=header.indexOf(`<span>${label}</span>`,from);positions.push(position);from=position+label.length+13;}assert(positions.every(x=>x>=0));assert.deepEqual(positions,[...positions].sort((a,b)=>a-b));
+  assert.match(s,/اینجانب <strong>&lt;نماینده&gt;<\/strong> اقلام فوق را صحیح و سالم تحویل گرفته و اقلام تحویلی به صورت امانت تا زمان پرداخت مبلغی ریالی آن نزد اینجانب می‌باشد\./);
   assert.match(header,/مالک/);assert.match(header,/09120000001/);assert.match(header,/&lt;نماینده&gt;/);assert.match(header,/09120000002/);assert.match(header,/123/);assert.match(header,/456/);assert.match(header,/1405\/08\/23/);assert.equal((header.match(/<div><span>/g)||[]).length,7);
   assert(s.indexOf(header)<s.indexOf('<table'));assert.doesNotMatch(s,/inv38-pickup-contacts|خودروی محرمانه|پلاک محرمانه|وسیله \/ پلاک|<نماینده>/);
  });
@@ -47,5 +48,5 @@ for(const [file,end] of [['app.js','function printCss()'],['ui2.js','async funct
   s=html({totalAmount:100,depositAmount:20,settlementMethods:[{type:'CASH',amount:80}]});assert(!s.includes('قابل تسویه ثبت‌شده'));assert(!s.includes('قابل تسویه</span>'));
  });
  test(`${file}: current debt excludes pending and reversed receipts`,()=>{const s=html({totalAmount:100,settlementMethods:[{type:'CREDIT',amount:100}],debtAccount:{initial:100,receipts:[{status:'CLEARED',amount:30},{status:'PENDING',amount:20},{status:'REVERSED',amount:10}]}});assert.match(s,/(?:مانده معوق|مانده حساب)<\/span><b>70/);assert(!s.includes('وصول بعدی'));});
- test(`${file}: store document remains weight-only`,()=>{const s=c.invoiceHtml({...order,orderType:'STORE',storeName:'فروشگاه',payment:{totalAmount:100,settlementMethods:[{type:'CREDIT',amount:100}]}});assert(s.includes('/logo.png'));assert(!s.includes('inv38-payment-box'));assert(!s.includes('معوق'));});
+ test(`${file}: store document remains weight-only`,()=>{const s=c.invoiceHtml({...order,orderType:'STORE',storeName:'فروشگاه',payment:{totalAmount:100,settlementMethods:[{type:'CREDIT',amount:100}]}});assert(s.includes('/logo.png'));assert(!s.includes('inv38-payment-box'));assert(!s.includes('معوق'));assert(!s.includes('به صورت امانت تا زمان پرداخت'));});
 }

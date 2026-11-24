@@ -13,7 +13,7 @@ test('نشست مرورگر با نوسازی و صفحهٔ دوم حفظ و ب�
   const page=await sales.newPage();let presence=page.waitForResponse(x=>x.url().endsWith('/api/session/presence')&&x.status()===200);await page.goto(base,{waitUntil:'networkidle'});await presence;await page.reload({waitUntil:'networkidle'});await page.locator('#appView:not(.hidden)').waitFor();
   const second=await sales.newPage();presence=second.waitForResponse(x=>x.url().endsWith('/api/session/presence')&&x.status()===200);await second.goto(base,{waitUntil:'networkidle'});await presence;
   await page.close({runBeforeUnload:true});await new Promise(resolve=>setTimeout(resolve,8500));assert.equal((await sales.request.get(base+'/api/me')).status(),200,'صفحهٔ دوم نشست را فعال نگه می‌دارد');assert.equal((await post(other,'/api/login',credentials)).status(),409);
-  await second.close({runBeforeUnload:true});await new Promise(resolve=>setTimeout(resolve,8500));assert.equal((await sales.request.get(base+'/api/me')).status(),401,'بستن آخرین صفحه نشست را پایان می‌دهد');assert.equal((await post(other,'/api/login',credentials)).status(),200,'ورود دوباره پس از بسته‌شدن ممکن است');
+  await second.close({runBeforeUnload:true});assert.equal((await post(other,'/api/login',credentials)).status(),200,'ورود بلافاصله پس از رسیدن پیام بسته‌شدن ممکن است');assert.equal((await sales.request.get(base+'/api/me')).status(),401,'نشست بسته‌شده با ورود جدید باطل شد');
   assert.equal((await post(other,'/api/logout',{})).status(),200);assert.equal((await other.request.get(base+'/api/me')).status(),401);assert.equal((await post(sales,'/api/login',credentials)).status(),200,'خروج حساب فوراً ورود مجدد را آزاد می‌کند');
   const retry=await sales.newPage();presence=retry.waitForResponse(x=>x.url().endsWith('/api/session/presence')&&x.status()===200);await retry.goto(base,{waitUntil:'networkidle'});await presence;
   await retry.route('**/api/logout',route=>route.abort());await retry.locator('[data-logout]').click();
@@ -25,7 +25,7 @@ test('نشست مرورگر با نوسازی و صفحهٔ دوم حفظ و ب�
  }finally{if(browser)await browser.close();if(proc&&proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });
 
-test('مرورگر: با نرسیدن پیام بستن، نشست پس از قطع ضربان آزاد می‌شود',{skip:!exe,timeout:60000},async()=>{
+test('مرورگر: با نرسیدن پیام بستن نشست محفوظ است و با تأیید جایگزین می‌شود',{skip:!exe,timeout:60000},async()=>{
  const {chromium}=require('playwright-core');const port=await new Promise(resolve=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>resolve(p));});});
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-session-lost-beacon-')),base=`http://127.0.0.1:${port}`;let browser;
  const preload=path.join(dir,'clock.cjs');fs.writeFileSync(preload,"const real=Date.now;let offset=0;Date.now=()=>real()+offset;process.on('message',m=>{if(m&&Number.isFinite(m.advance)){offset+=m.advance;process.send({advanced:offset});}});");
@@ -40,7 +40,22 @@ test('مرورگر: با نرسیدن پیام بستن، نشست پس از ق�
   const credentials={username:'sales2',password:'Changed!2345',browserSession:true};assert((await post(sales,'/api/login',credentials)).ok());
   const page=await sales.newPage();await page.addInitScript(()=>{navigator.sendBeacon=()=>true;});
   const presence=page.waitForResponse(r=>r.url().endsWith('/api/session/presence')&&r.status()===200);await page.goto(base,{waitUntil:'networkidle'});await presence;
-  await page.close({runBeforeUnload:true});assert.equal((await post(other,'/api/login',credentials)).status(),409,'without a leave the session remains alive until timeout');
-  await advance(60001);assert.equal((await post(other,'/api/login',credentials)).status(),200);assert.equal((await sales.request.get(base+'/api/me')).status(),401);
+  await page.route('**/api/session/presence',route=>route.abort());
+  await advance(48*60*60*1000);
+  assert.equal((await sales.request.get(base+'/api/me')).status(),200,'background suspension does not end the open session');
+  await page.unroute('**/api/session/presence');
+  const reconnected=page.waitForResponse(r=>r.url().endsWith('/api/session/presence')&&r.status()===200);
+  await page.evaluate(()=>window.dispatchEvent(new Event('online')));await reconnected;
+  await page.reload({waitUntil:'networkidle'});await page.locator('#appView:not(.hidden)').waitFor();
+  await page.close({runBeforeUnload:true});assert.equal((await post(other,'/api/login',credentials)).status(),409,'without a leave the session remains registered');
+  await advance(48*60*60*1000);assert.equal((await post(other,'/api/login',credentials)).status(),409);
+  assert.equal((await sales.request.get(base+'/api/me')).status(),200,'no heartbeat does not end a session');
+  const loginPage=await other.newPage();await loginPage.goto(base,{waitUntil:'networkidle'});
+  await loginPage.locator('[name=username]').fill(credentials.username);await loginPage.locator('[name=password]').fill(credentials.password);
+  loginPage.once('dialog',dialog=>dialog.dismiss());await loginPage.locator('#loginForm button[type=submit]').click();
+  await loginPage.getByText('نشست قبلی همچنان فعال است.').waitFor();assert.equal((await sales.request.get(base+'/api/me')).status(),200);
+  loginPage.once('dialog',dialog=>dialog.accept());await loginPage.locator('#loginForm button[type=submit]').click();
+  await loginPage.locator('#appView:not(.hidden)').waitFor();assert.equal((await sales.request.get(base+'/api/me')).status(),401);
+
  }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(resolve=>proc.once('exit',resolve));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });

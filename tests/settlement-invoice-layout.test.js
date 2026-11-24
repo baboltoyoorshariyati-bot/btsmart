@@ -21,11 +21,11 @@ test('settlement footer is shared and contains driver, send and invoice in RTL D
  assert.match(layout,/@container stl \(min-width:850px\)/);
 });
 test('settlement invoice table gives operations more room and keeps desktop button labels unwrapped',()=>{
- assert.match(tableCss,/:is\(th,td\):nth-child\(6\)\{width:24%\}/);
- assert.match(tableCss,/:is\(th,td\):nth-child\(7\)\{width:25%\}/);
- assert.match(tableCss,/@media\(max-width:900px\)[\s\S]*?:is\(th,td\):nth-child\(6\)\{width:29%\}[\s\S]*?:is\(th,td\):nth-child\(7\)\{width:25%\}/);
- assert.match(tableCss,/@media\(min-width:601px\)[\s\S]*?grid-template-columns:repeat\(auto-fit,minmax\(108px,1fr\)\)/);
- assert.match(tableCss,/toolbar \.btn\{width:100%;max-width:100%;min-width:0!important;flex:none!important;white-space:nowrap!important/);
+ assert.match(tableCss,/:is\(th,td\):nth-child\(6\)\{width:16%\}/);
+ assert.match(tableCss,/:is\(th,td\):nth-child\(7\)\{width:34%\}/);
+ assert.match(tableCss,/@media\(max-width:900px\)[\s\S]*?:is\(th,td\):nth-child\(6\)\{width:18%\}[\s\S]*?:is\(th,td\):nth-child\(7\)\{width:32%\}/);
+ assert.match(tableCss,/@media\(min-width:601px\)[\s\S]*?toolbar\{display:flex!important;flex-wrap:wrap!important/);
+ assert.match(tableCss,/toolbar \.btn\{width:auto;max-width:100%;min-width:0!important;flex:0 0 auto!important;white-space:nowrap!important/);
 });
 test('pickup invoice header keeps each label and value on one horizontal line',()=>{
  assert.match(css,/inv38-pickup-recipient-meta>div\{display:flex;flex-direction:row/);
@@ -38,8 +38,8 @@ test('compact invoice preview and print share a served stylesheet; no sales appr
  assert.doesNotMatch(invoice,/inv38-sales-sign|تأیید واحد فروش|inv38-cust-under/);
   assert.match(invoice,/شماره سفارش[\s\S]*?o\.orderNo/);
   assert.doesNotMatch(invoice,/کد سریع|quickCode/,'کد سریع محصول نباید در پیش‌نمایش یا چاپ فاکتور باشد');
- assert.match(read('public/index.html'),/href="\/invoice-compact\.css\?v=37\.3\.22"/);
- assert.match(read('public/invoice-print.html'),/href="\/invoice-compact\.css\?v=37\.3\.22"/);
+ assert.match(read('public/index.html'),/href="\/invoice-compact\.css\?v=37\.3\.23"/);
+ assert.match(read('public/invoice-print.html'),/href="\/invoice-compact\.css\?v=37\.3\.23"/);
  assert.match(ui.slice(ui.indexOf('async function printInvoice(id,run)')),/openInvoicePrint/);
  assert.match(read('lib/http.js'),/'\/invoice-compact\.css': \{ file: 'invoice-compact\.css'/);
  assert.match(css,/\.inv38-bottom \{[\s\S]*?direction:rtl/);

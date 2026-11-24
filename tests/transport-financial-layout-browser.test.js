@@ -41,6 +41,9 @@ test('فرم مالی پخش در عرض‌های مختلف و گردش واق�
  await page.locator('[name=discountAmount]').fill('100000');await page.locator('[name=additionsAmount]').fill('10000');
  assert.match(await page.locator('[data-ti-summary]').innerText(),/۲٬۴۶۹٬۱۳۴/);assert.match(await page.locator('[data-ti-summary]').innerText(),/۲٬۳۷۹٬۱۳۴/);
  await price.fill('12x');await page.locator('[data-ti-form] button[type=submit]').click();assert.equal((await get(sales,`/api/orders/${order.id}`)).order.transportInvoice,undefined);await price.fill('1234567');
+ // A second sales tab may still have this settlement form open when another
+ // workstation records the invoice. Its stale form must not remain usable.
+ const other=await sales.newPage();await other.goto(base+'/',{waitUntil:'networkidle'});await other.evaluate(()=>go('sales','settlement'));await other.locator(`[data-stl=select][data-id="${order.id}"]`).click();await other.locator('#stlMain [data-ti-form]').waitFor();
  await page.locator('[data-ti-form] button[type=submit]').click();
  // The actual shipment note is automatically opened, before navigation.
  const shipmentFrame=page.frameLocator('iframe[title="سند آماده چاپ"]'),shipment=shipmentFrame.locator('.tr-shipment-note');await shipment.waitFor();await page.locator('body[data-prints="1"]').waitFor();
@@ -48,8 +51,16 @@ test('فرم مالی پخش در عرض‌های مختلف و گردش واق�
  const prepared=(await get(sales,`/api/orders/${order.id}`)).order.transportInvoice;assert.equal(prepared.priceLines[0].unitPrice,1234567);assert.equal(prepared.totalAmount,2379134);
  const shipmentText=await shipment.innerText(),faDigits=value=>String(value).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);assert.match(shipmentText,/راننده تحویل/);assert.ok(shipmentText.includes(faDigits(order.orderNo)));assert.ok(shipmentText.includes(faDigits(prepared.invoiceNumber)));
  assert.match(shipmentText,/قیمت هر کیلو/);assert.match(shipmentText,/۱٬۲۳۴٬۵۶۷/);assert.match(shipmentText,/۲٬۴۶۹٬۱۳۴/);assert.match(shipmentText,/۲٬۳۷۹٬۱۳۴/);assert.match(shipmentText,/اینجانب/);
+ await other.evaluate(async()=>paintSalesPaneV29('settlement',await fetchSalesCache(true)));
+ assert.equal(await other.locator('#stlMain .tr-invoice-panel').count(),0);assert.equal(await other.evaluate(()=>stl.orderId),null);
+ await other.evaluate(id=>stlOpen(id),order.id);assert.equal(await other.locator('#stlMain .tr-invoice-panel').count(),0);await other.close();
+ // Even if the queue refresh fails, closing the print dialog must navigate to
+ // delivery rather than leaving an issued invoice panel in settlement.
+ await page.route(/\/api\/orders\?/,route=>route.abort());
  await page.locator('iframe[title="سند آماده چاپ"]').evaluate(f=>f.contentWindow.dispatchEvent(new Event('afterprint')));
- await page.waitForFunction(()=>app.sub.sales==='delivery');const deliveryRow=page.locator(`[data-delivery-section=assigned] [data-delivery-order="${order.id}"]`);await deliveryRow.waitFor();
+ await page.waitForFunction(()=>app.sub.sales==='delivery');assert.equal(await page.locator('#stlMain .tr-invoice-panel').count(),0);
+ await page.unroute(/\/api\/orders\?/);await page.evaluate(async()=>{const fresh=await fetchSalesCache(true);paintSalesPaneV29('delivery',fresh)});
+ const deliveryRow=page.locator(`[data-delivery-section=assigned] [data-delivery-order="${order.id}"]`);await deliveryRow.waitFor();
  await page.evaluate(()=>go('sales','settlement'));await page.locator('.stl-queue-list').waitFor();await page.waitForFunction(id=>![...document.querySelectorAll('[data-stl=select]')].some(el=>el.dataset.id===id),order.id);assert.equal(await page.locator(`[data-stl=select][data-id="${order.id}"]`).count(),0);await page.evaluate(()=>go('sales','delivery'));
  await deliveryRow.locator('[data-action=sales-delivery-details]').click();assert.match(await page.locator('#modal').innerText(),/بررسی فاکتور و چاپ/);await page.locator('#modal [data-action=transport-sales-work]').click();await page.locator('#transportDeliveryWork').waitFor();
  assert.equal(await page.locator('#transportDeliveryWork [data-ti-preview]').count(),0);assert.equal(await page.locator('#transportDeliveryWork [data-ts-close]').count(),0);assert.equal(await page.evaluate(()=>app.sub.sales),'delivery');
