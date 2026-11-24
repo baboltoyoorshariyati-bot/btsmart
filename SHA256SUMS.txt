@@ -122,7 +122,7 @@ e72a409af48b5055a7c9952e9f594ee690a13781db20b2789c1e61ca9978aea7  ./RELEASE-1.1.
 a022093fdff2fa002117ab80d60258565cb71e5e60aca4d18a9ec38519ea0822  ./RELEASE-1.1.20-fa.md
 14f8e54a6349a286fc94bdcf6785d463795d668d72f273e439a666e3a332f654  ./RELEASE-1.1.21-fa.md
 eb61134fac13422b1e9356ec4f53b9e944b4a5714fcaaa5e9299aef59c7a913a  ./RELEASE-1.1.22-fa.md
-3cfaf92bd1cde955be454b455949d2d9eeecad2855f2f33508f42cd86914fff9  ./RELEASE-1.1.23-fa.md
+96b8ebb0c3f2c2098404791c052cac8238a7c2883d40f4ad0320d7dac913ae02  ./RELEASE-1.1.23-fa.md
 d045df16bb26a2feb54555fda1b39f4745f44c10a635d544cbc2950b89ec32af  ./RELEASE-1.1.3-fa.md
 6b202c8dc5bf26452044e7db5bf407b58c4a551ebcfe5c5354a646790955f41f  ./RELEASE-1.1.4-fa.md
 ca4a372186b5663a2e91ddf88003492688ea84924ccbc913aec0e9a6e39a3b5b  ./RELEASE-1.1.5-fa.md
@@ -144,7 +144,7 @@ a0bd3b3fd14e7b3ef311543c910bfeb861346022e258f3d65474aec2a5b5b4f3  ./assets/logo.
 565c218885c83166612ad74b0ccffe6a33c55e4fdd115ddb60ceb412e530a038  ./docs/cancellation-workflows-fa.md
 6729e4d8c99563f1927066fd030808ef692fdb07fde4035c58b4346a8a491252  ./docs/customer-order-additions-fa.md
 d5369d338a135a5e0818fd49119ba2640e66ba0ad7ce14722ffc2985679fc779  ./docs/customer-phone-identity-fa.md
-c6cb8057eed16558d33941691dece8dc3dda93ddf663be4c628e323778fa595c  ./docs/deployment-windows-server-2025.md
+45a005365ff00f7f9e7bf5f892211008a9b8316624070928806de897fb78cde3  ./docs/deployment-windows-server-2025.md
 84ef2fcaff7e118259ca6e5572972e1d42ab0850f069959dbb8f3bf08df386e0  ./docs/domain-https-fa.md
 6791cb09b6006a317ee05d3ef8461ca1ae9749f44e2c250418d88e7fb5401e96  ./docs/hardening-rollout-fa.md
 27004200f1ead81b7ffd5fe7b6d487d3db9d2a0099e11d7ba8c085b669eee178  ./docs/product-excel-fa.md
@@ -631,6 +631,6 @@ cbe0548f44f0278831f81de32b00453c7a47f5dd268a7b7b1f52432150c4efe9  ./vendor/acme/
 15487077d6123488579535e19dd000c7f29317ee91fd4421294c0f80cccce795  ./windows-installer/BabolToyor-Setup.cmd
 da8f23e083939b82dc1da8b0f3c295deba8027b114493a34dba0f7abf49f8dcb  ./windows-installer/INSTALL-STEPS-fa.html
 530c1acf82c12a7d361b9d33898b821b93f2feef4ca18720aa620c6734272768  ./windows-installer/INSTALL-STEPS-fa.md
-e7f5c2efd91fe36bc66204b0f243e03329562adc142f978448dc1c70abb27998  ./windows-installer/Install-BabolToyor.ps1
+857a187d33f6a24cd45045d0a4370cdce859b56fa59ccd506ef1328148aca7e7  ./windows-installer/Install-BabolToyor.ps1
 fb4dca85a668d5277fdc5a05f4dbbf5880a1b2662da29775c5720b219758494c  ./windows-installer/README-fa.md
 097a3fb0f5ca372039cc7e1ec8967affa42e1049fe3f46f6abd00c377ad437aa  ./windows-installer/build-single-file.js
