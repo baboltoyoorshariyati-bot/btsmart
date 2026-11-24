@@ -124,7 +124,10 @@ test('ارسال برنامه‌ریزی ترابری مستقل از انبار
   assert.equal((await call('POST',`/api/sales/transport-invoices/${third.id}/close`,{settlementMethods:[]},sales)).status,409);
   assert.equal((await call('POST',`/api/sales/transport-invoices/${third.id}`,{items:[{itemId:third.items[0].id,unitPrice:0}]},sales)).status,400);
   let planned=(await ok('GET','/api/transport/plans',null,transport)).orders.find(x=>x.id===third.id).services[0];assert.equal(planned.handedOver,true);assert.equal(planned.canDepart,false);
+  const queueBefore=(await ok('GET','/api/workload',null,sales)).counts.salesSettlement;
   const invoice=(await ok('POST',`/api/sales/transport-invoices/${third.id}`,invoiceRequest,sales)).invoice;
+  assert.equal((await ok('GET','/api/workload',null,sales)).counts.salesSettlement,queueBefore-1);
+  cart=await ok('GET','/api/sales/dispatch-deliveries',null,sales);assert(cart.assigned.some(x=>x.id===third.id&&x.transportService.invoiceNumber===invoice.invoiceNumber));
   planned=(await ok('GET','/api/transport/plans',null,transport)).orders.find(x=>x.id===third.id).services[0];assert.equal(planned.canDepart,false);assert.equal(planned.awaitingGate,true);assert.equal(planned.invoiceNumber,invoice.invoiceNumber);assert.equal(planned.departed,false);assert(!JSON.stringify(planned).includes('unitPrice'));
   assert.equal(invoice.totalAmount,2950);assert.equal(invoice.priceLines[0].deliveredKg,2.5);assert.match(invoice.invoiceNumber,/^\d{6}$/);
   assert.equal((await call('POST',`/api/sales/transport-invoices/${third.id}`,invoiceRequest,sales)).status,409);

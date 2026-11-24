@@ -29,6 +29,11 @@ test('sales sees saved ordinary and store weights live, including an open detail
   await storeRow.locator('[data-action=store-order-details-v25]').click();const storeModal=page.locator(`[data-sales-live-order="${store.id}"]`);await storeModal.waitFor();
   await post(wh,`/api/orders/${store.id}/store-run/weights`,{run:1,items:[{itemId:store.items[0].id,deliveredKg:3.75}]});
   await post(wh,`/api/orders/${bulk.id}/store-run/weights`,{run:1,items:[{itemId:bulk.items[0].id,deliveredKg:2}]});await post(wh,`/api/orders/${bulk.id}/store-run/move`,{itemId:bulk.items[0].id});await post(wh,`/api/orders/${bulk.id}/store-run/weights`,{run:2,items:[{itemId:bulk.items[0].id,deliveredKg:4}]});
-  await storeModal.getByText(/سرویس اول ۳٫۷۵ کیلوگرم/).waitFor({timeout:15000});assert.match(await storeRow.innerText(),/سرویس اول/);const bulkText=await page.locator(`[data-store-summary-id="${bulk.id}"]`).innerText();assert.match(bulkText,/سرویس اول ۲ کیلوگرم/);assert.match(bulkText,/سرویس دوم ۴ کیلوگرم/);assert.match(await storeModal.innerText(),/هنوز وزنی ذخیره نشده/);assert.deepEqual(errors,[]);
+  await storeModal.locator(`[data-store-saved-item="${store.items[0].id}"]`).getByText(/۳٫۷۵ کیلوگرم/).waitFor({timeout:15000});
+  assert.doesNotMatch(await storeRow.innerText(),/قلم|سرویس اول/);assert.doesNotMatch(await page.locator('#modal').innerText(),/وزن‌های ذخیره‌شدهٔ انبار/);
+  assert.match(await storeModal.innerText(),/ذخیره‌شده/);assert.match(await storeModal.locator(`[data-store-saved-item="${store.items[1].id}"]`).innerText(),/۰ کیلوگرم/);
+  assert.equal(await page.locator('[data-store-section=processing] th').filter({hasText:'اقلام'}).count(),0);
+  await page.locator('#modal [data-action=close-modal]').last().click();await page.locator(`[data-store-summary-id="${bulk.id}"] [data-action=store-order-details-v25]`).click();
+  assert.match(await page.locator(`[data-store-saved-item="${bulk.items[0].id}"]`).innerText(),/۶ کیلوگرم/);assert.deepEqual(errors,[]);
  }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });

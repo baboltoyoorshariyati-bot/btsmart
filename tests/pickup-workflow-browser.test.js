@@ -37,6 +37,8 @@ test('default pickup: gate entry, warehouse handover and paper print, sales sett
    else assert(layout.b.top>=layout.a.bottom,'mobile searches stack without overlap');
   }
   await gp.setViewportSize({width:1280,height:900});
+  await gp.locator('[data-pickup-list]').click();const eligible=gp.locator('[data-pickup-results]');await eligible.getByText('خریدار نخست').waitFor();assert.match(await eligible.innerText(),/سفارش‌های امروز در انتظار ثبت ورود/);assert.doesNotMatch(await eligible.innerText(),/مبلغ|قیمت|بیعانه/);
+  await eligible.locator('tr').filter({hasText:'خریدار نخست'}).locator('[data-pickup-choose]').click();assert.match(await gp.locator('[data-pickup-selected]').innerText(),/خریدار نخست/);await gp.locator('[data-pickup-clear]').click();
   async function enter(order,name){
    await gp.evaluate(()=>go('gate','entry'));await gp.locator('#pickupOrderSearch').fill(order.orderNo);await gp.locator('[data-pickup-choose]').first().waitFor();
    for(const width of [1280,768,390,320]){await gp.setViewportSize({width,height:900});const layout=await gp.evaluate(()=>{const table=document.querySelector('.gt-pickup-search-table'),row=table.querySelector('tbody tr');return {tag:table.tagName,row:getComputedStyle(row).display,overflow:document.documentElement.scrollWidth-innerWidth};});assert.equal(layout.tag,'TABLE');assert.equal(layout.row,width>900?'table-row':'block');assert(layout.overflow<=1,`pickup results overflow ${width}: ${layout.overflow}`);}
