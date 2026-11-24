@@ -15,6 +15,11 @@ test('staged pickup API: roles, recipient, physical delivery, cancellation and l
   const {gate,warehouse:wh,sales}=cookies;const d=new Date(),day=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
   const create=async(phone,deposit)=> (await ok('POST','/api/orders/remote',{name:'مالک سفارش',phone,deliveryMode:'PICKUP',scheduledTime:'00:00',deliveryDate:day,items:[{productId:'p01',requestedQty:5,requestedUnit:'کیلوگرم'}],...(deposit?{deposit:{type:'CASH',amount:100}}:{})},sales)).order;
   const order=await create('09121112233',false),other=await create('09121112234',true),race=await create('09121112235',false);
+  assert.equal((await call('GET','/api/pickup/orders?view=entry',null,wh)).status,403);
+  let eligible=await ok('GET','/api/pickup/orders?view=entry',null,gate);
+  assert(eligible.orders.some(x=>x.id===order.id));assert(eligible.orders.some(x=>x.id===other.id));assert.equal(eligible.total,3);assert.equal(eligible.limit,50);
+  assert(!JSON.stringify(eligible).includes('deposit'));assert(!JSON.stringify(eligible).includes('unitPrice'));
+  assert.equal((await ok('GET','/api/pickup/orders?view=entry&offset=50',null,gate)).orders.length,0);
   await ok('POST',`/api/orders/${order.id}/warehouse/accept`,{},wh);
   assert.equal((await call('POST',`/api/orders/${order.id}/warehouse`,{items:[{itemId:order.items[0].id,deliveredKg:5}]},wh)).status,409,'new managed order cannot be finalized before entry');
   const person={name:'راننده مشتری',phone:'09121112244',vehicleType:'خودرو',carType:'تریلی یخچال',plate:'12ب34567'};
@@ -34,9 +39,11 @@ test('staged pickup API: roles, recipient, physical delivery, cancellation and l
   assert.equal((await call('PUT',`/api/pickup/${order.id}/delivery-date`,{deliveryDate:day},gate)).status,403);
   const tomorrow=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1),next=[tomorrow.getFullYear(),String(tomorrow.getMonth()+1).padStart(2,'0'),String(tomorrow.getDate()).padStart(2,'0')].join('-');
   await ok('PUT',`/api/pickup/${order.id}/delivery-date`,{deliveryDate:next},sales);assert.equal((await ok('GET',`/api/orders/${order.id}`,null,sales)).order.scheduledAt,order.scheduledAt);
+  assert(!(await ok('GET','/api/pickup/orders?view=entry',null,gate)).orders.some(x=>x.id===order.id),'future pickup excluded');
   assert.equal((await call('POST',`/api/pickup/${order.id}/entry`,person,gate)).status,409,'gate entry is forbidden outside delivery date');
   await ok('PUT',`/api/pickup/${order.id}/delivery-date`,{deliveryDate:day},sales);
   const entryResponse=await ok('POST',`/api/pickup/${order.id}/entry`,person,gate);assert(!JSON.stringify(entryResponse).includes('deposit'));const entered=entryResponse.visit;assert.equal(entered.recipient.name,person.name);assert.notEqual(entered.status,'WAITING_SALES');
+  assert(!(await ok('GET','/api/pickup/orders?view=entry',null,gate)).orders.some(x=>x.id===order.id),'open visit excluded');
   assert.equal((await call('POST',`/api/pickup/${order.id}/entry`,person,gate)).status,409);
   assert.equal((await call('PUT',`/api/pickup/${order.id}/delivery-date`,{deliveryDate:day},sales)).status,409);
   assert.equal((await call('POST',`/api/orders/${order.id}/warehouse`,{items:[{itemId:order.items[0].id,deliveredKg:5}]},wh)).status,409);

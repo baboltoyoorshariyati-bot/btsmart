@@ -38,8 +38,8 @@ test('compact invoice preview and print share a served stylesheet; no sales appr
  assert.doesNotMatch(invoice,/inv38-sales-sign|تأیید واحد فروش|inv38-cust-under/);
   assert.match(invoice,/شماره سفارش[\s\S]*?o\.orderNo/);
   assert.doesNotMatch(invoice,/کد سریع|quickCode/,'کد سریع محصول نباید در پیش‌نمایش یا چاپ فاکتور باشد');
- assert.match(read('public/index.html'),/href="\/invoice-compact\.css\?v=37\.3\.21"/);
- assert.match(read('public/invoice-print.html'),/href="\/invoice-compact\.css\?v=37\.3\.21"/);
+ assert.match(read('public/index.html'),/href="\/invoice-compact\.css\?v=37\.3\.22"/);
+ assert.match(read('public/invoice-print.html'),/href="\/invoice-compact\.css\?v=37\.3\.22"/);
  assert.match(ui.slice(ui.indexOf('async function printInvoice(id,run)')),/openInvoicePrint/);
  assert.match(read('lib/http.js'),/'\/invoice-compact\.css': \{ file: 'invoice-compact\.css'/);
  assert.match(css,/\.inv38-bottom \{[\s\S]*?direction:rtl/);

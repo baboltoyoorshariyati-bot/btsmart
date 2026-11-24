@@ -10,8 +10,8 @@ test('تسویه فروش همان سفارش‌های قابل نمایش را 
  const editNotif={targetRole:'warehouse',type:'WAREHOUSE_DOCUMENT_EDIT_REQUESTED',entityType:'order',entityId:'6'};assert.equal(c.notificationSection(editNotif),'document-edits');editOrder.documentEdits[0].status='COMPLETED';assert.equal(c.notificationSection(editNotif),null);
  const counts=(await c.handler({user:{roleCode:'sales'}})).body.counts;assert.equal(counts.salesSettlement,2);
  orders[0].transportWorkflow=1;orders[0].deliveryMode='DELIVERY';orders[0].transportInvoice={status:'PREPARED'};assert.equal(c.notificationSection(n('1')),'delivery');assert.equal(c.notificationSection({...n('1'),type:'WAREHOUSE_DONE'}),'delivery');
- // v37.6.1 — تا چاپ برگهٔ ارسال، سفارش پخش هنوز در صف تسویه است؛ با ثبت چاپ از صف بیرون می‌رود.
- assert.equal((await c.handler({user:{roleCode:'sales'}})).body.counts.salesSettlement,2);
+ // با ثبت فاکتور، پیش از چاپ هم شمارندهٔ تسویه کاهش می‌یابد.
+ assert.equal((await c.handler({user:{roleCode:'sales'}})).body.counts.salesSettlement,1);
  orders[0].transportInvoice={status:'PREPARED',printedAt:'2026-01-01T10:00:00Z'};
  assert.equal((await c.handler({user:{roleCode:'sales'}})).body.counts.salesSettlement,1);
  const ctx={};vm.createContext(ctx);vm.runInContext(app.slice(app.indexOf('function salesAllInSettlement('),app.indexOf(' // v37.6.0',app.indexOf('function salesAllInSettlement('))),ctx);assert.deepEqual(Array.from(ctx.salesAllInSettlement(orders),x=>x.id),['1','2']);
