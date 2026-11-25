@@ -1,4 +1,4 @@
-# نصب و استقرار روی Windows Server 2025 (نسخهٔ انتشار عمومی 1.1.23)
+# نصب و استقرار روی Windows Server 2025 (نسخهٔ انتشار عمومی 1.1.24)
 
 ## خلاصه
 
@@ -15,7 +15,7 @@
 ## نصبکننده چه میکند
 
 1. **Node.js ۲۲٫۱۳+**: اگر نباشد، بهترتیب از (الف) فایل پورتابل `node-v*-win-x64.zip` کنار نصبکننده، (ب) `winget` و (ج) دانلود رسمی `nodejs.org` **همراه بررسی SHA256** نصب میکند.
-2. **کپی فایلهای برنامه** در `C:\BabolToyor`: اگر `app.zip` کنار نصبکننده باشد از همان استفاده میکند (نصب آفلاین)، وگرنه نصب‌کننده از `AppZipUrl` پیش‌فرض، [بستهٔ پایهٔ `BabolToyor-App-1.1.23-bootstrap.zip`](https://drive.google.com/uc?export=download&id=1jH0pUlLyVOBfsCGMAiEotLDRiawL1m2F) را دریافت می‌کند؛ دیگر دارایی‌ها در [پوشهٔ انتشار نسخهٔ 1.1.23 در Google Drive](https://drive.google.com/drive/folders/1oIMfluCyKrJ56fZqq-fuyt5_1Lo7Qfcp) هستند.
+2. **کپی فایلهای برنامه** در `C:\BabolToyor`: اگر `app.zip` کنار نصبکننده باشد از همان استفاده میکند (نصب آفلاین)، وگرنه نصب‌کننده از `AppZipUrl` پیش‌فرض، [بستهٔ پایهٔ `BabolToyor-App-1.1.24-bootstrap.zip`](https://drive.google.com/uc?export=download&id=1PC8zP0t1AKgU4MHsDgP64ynnu1-nODtT) را دریافت می‌کند؛ دیگر دارایی‌ها در [پوشهٔ انتشار نسخهٔ 1.1.24 در Google Drive](https://drive.google.com/drive/folders/1Kg5EcqIGEVI8pOisQLhgZa-4NhWehJWu) هستند.
 3. **ساخت `.env`** با `PORT=80`، `HOST=0.0.0.0`، `DATA_DIR=C:\BabolToyor\data` و یک رمز تصادفی قوی برای `admin`. دسترسی فایل فقط برای `SYSTEM` و `Administrators` است.
 4. **پورت ۸۰**: اگر IIS/HTTP.sys پورت را گرفته باشد، نصب به‌طور پیش‌فرض متوقف می‌شود. تنها با اجازهٔ صریح `-AllowStopIis` سایت مربوطه متوقف و `serverAutoStart` خاموش می‌شود و ممکن است سرویس `W3SVC` نیز متوقف شود؛ یا پورت دیگری انتخاب کنید.
 5. **فایروال**: قانون ورودی `Babol Toyor - HTTP (TCP 80)` برای پروفایلهای Domain/Private/Public.
