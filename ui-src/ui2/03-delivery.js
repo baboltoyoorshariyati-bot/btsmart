@@ -224,12 +224,13 @@ window.salesV29RenderPane=function(tab,data){
 };
 
 /* ---------- به‌روزرسانی زنده (اصولِ یکسان با رندر اولیه) ---------- */
-function paintSalesPaneV29(tab,data){
+function paintSalesPaneV29(tab,data,refreshTransfers=true){
   const pane=app.salesV29.panes?.[tab]; if(!pane)return;
   if(pane.dataset.renderedV29!=='1'){
     pane.innerHTML=salesV29RenderPane(tab,data);
     pane.dataset.renderedV29='1';
     bindSalesPaneV29(tab);
+    if(tab==='stores'&&app.salesStoreTab==='transfers')ensureSalesTransferPanel(pane.querySelector('[data-transfer-panel]'),refreshTransfers);
     if(tab==='settlement' && stl.orderId) void stlOpen(stl.orderId);
     return;
   }
@@ -240,7 +241,7 @@ function paintSalesPaneV29(tab,data){
     const host=pane.querySelector('.phone-queue-list-v40'); if(host)host.innerHTML=live.html;
     const count=pane.querySelector('.phone-queue-panel-v40 .sales-section-count strong'); if(count)count.textContent=qty(live.queue.length);
   }else if(tab==='stores'){
-    pane.innerHTML=salesV29RenderPane(tab,data);
+    refreshSalesStorePane(pane,data,refreshTransfers);
   }else if(tab==='flow'){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]))||sdEmpty('truck','سفارشی در جریان نیست','هر سفارشی که به انبار ارسال شود در این فهرست قرار می‌گیرد.');
   }else if(tab==='settlement'){

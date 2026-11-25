@@ -630,7 +630,7 @@ function moneyCompact(v){
 }
 function orderKindLabel(o){return o?.orderType==='STORE'?(o.storeOrderKind==='PARTIAL'?'سفارش جزئی فروشگاه':'سفارش روزانه فروشگاه'):o?.orderType==='REMOTE'?'غیرحضوری':'حضوری'}
 function orderKindBadge(o){if(o?.orderType==='STORE')return `<span class="type-chip remote">${orderKindLabel(o)}</span>`;return o?.orderType==='REMOTE'?'<span class="type-chip remote">غیرحضوری</span>':'<span class="type-chip onsite">حضوری</span>'}
-function dateLabel(v){ if(!v) return '—'; const parts=String(v).split('-'); if(parts.length!==3)return esc(v); const d=new Date(`${v}T00:00:00`); const p=faDateParts(d,{day:'numeric',month:'long',year:'numeric'}); return [p.day,p.month,p.year].filter(Boolean).join(' '); }
+function dateLabel(v){ if(!v) return '—'; const value=String(v); if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return esc(value); const d=new Date(`${value}T00:00:00`); if(Number.isNaN(d.getTime()))return esc(value); const p=faDateParts(d,{day:'2-digit',month:'2-digit',year:'numeric'}); return p.year&&p.month&&p.day?`${p.year}/${p.month}/${p.day}`:esc(value); }
 function defaultOrderLine(){return {productId:'',productLabel:'',quickCode:'',requestedQty:'',requestedUnit:'کیلوگرم',description:''}}
 function bindOperationLines(prefix, draftKey){
   $$(['storeedit','storeaddition'].includes(prefix)?'#modal [data-op-product-search]':'#content [data-op-product-search]').filter(el=>el.dataset.opProductSearch.startsWith(prefix+'-')).forEach(inp=>{

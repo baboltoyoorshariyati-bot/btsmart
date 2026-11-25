@@ -295,7 +295,7 @@ async function salesV29ClickHandler(e){
     // Shipments and assignments may have changed at another workstation while
     // this tab was cached. Refresh on entry without changing the selected tab.
     const selected=app.salesStoreTab;
-    if(selected==='transfers'&&storePane) void transferMount(storePane.querySelector('[data-transfer-panel]'),'sales');
+    if(selected==='transfers'&&storePane) ensureSalesTransferPanel(storePane.querySelector('[data-transfer-panel]'));
     if(selected==='processing'||selected==='history')void fetchSalesCache(true).then(data=>{if(app.page==='sales'&&app.sub.sales==='stores'&&app.salesStoreTab===selected)paintSalesPaneV29('stores',data);}).catch(()=>{});
     return; }
   const tab=e.target.closest('[data-sales-tab]');
@@ -447,8 +447,36 @@ function salesV29Activate(tab){
     }else if(tab==='onsite'){
       pane.querySelector('#salesSearchV25')?.focus({preventScroll:true});
     }
+    if(tab==='stores'&&app.salesStoreTab==='transfers')ensureSalesTransferPanel(pane.querySelector('[data-transfer-panel]'));
   }
   app.salesV29.lastTab=tab;
+}
+
+// Keep the transfer panel connected during store-order refreshes. Its own
+// background refresh updates the list without blanking it or invalidating a
+// pending request, and preserves focus and any open detail dialog.
+function ensureSalesTransferPanel(host,refresh=true){
+  if(!host)return;
+  if(host._transferRefresh){if(refresh)void host._transferRefresh();}
+  else if(!host._transferLoading)void transferMount(host,'sales');
+}
+function refreshSalesStorePane(pane,data,refreshTransfers=true){
+  const existing=pane.querySelector('.sales-store-pane-v43');
+  const fresh=htmlToElement(salesV29RenderPane('stores',data));
+  const oldNav=existing?.querySelector('.sales-store-tabs-v43'),newNav=fresh.querySelector('.sales-store-tabs-v43');
+  const oldSections=existing?.querySelector('.sales-store-subpanels-v43'),newSections=fresh.querySelector('.sales-store-subpanels-v43');
+  const transfer=oldSections?.querySelector('[data-store-section="transfers"]');
+  if(oldNav&&newNav&&oldSections&&newSections&&transfer){
+    oldNav.replaceWith(newNav);
+    for(const section of [...newSections.children]){
+      const id=section.dataset.storeSection;
+      if(!id||id==='transfers')continue;
+      const old=oldSections.querySelector(`[data-store-section="${id}"]`);
+      if(old)old.replaceWith(section);else oldSections.insertBefore(section,transfer);
+    }
+    transfer.hidden=app.salesStoreTab!=='transfers';
+  }else pane.replaceChildren(fresh);
+  if(app.salesStoreTab==='transfers')ensureSalesTransferPanel(pane.querySelector('[data-store-section="transfers"] [data-transfer-panel]'),refreshTransfers);
 }
 
 // Clear only the selected, already-issued invoice; other settlement forms stay open.
@@ -459,13 +487,13 @@ function clearIssuedTransportSettlement(data){
   }
 }
 
-function paintSalesPaneV29(tab,data){
+function paintSalesPaneV29(tab,data,refreshTransfers=true){
   const pane=app.salesV29.panes?.[tab]; if(!pane)return;
   if(pane.dataset.renderedV29!=='1'){
     pane.innerHTML=salesV29RenderPane(tab,data);
     pane.dataset.renderedV29='1';
     bindSalesPaneV29(tab);
-    if(tab==='stores'&&app.salesStoreTab==='transfers')void transferMount(pane.querySelector('[data-transfer-panel]'),'sales');
+    if(tab==='stores'&&app.salesStoreTab==='transfers')ensureSalesTransferPanel(pane.querySelector('[data-transfer-panel]'),refreshTransfers);
     return;
   }
   if(tab==='onsite'){
@@ -473,8 +501,7 @@ function paintSalesPaneV29(tab,data){
   }else if(tab==='remote'){
     /* تلفنی/غیرحضوری فقط؛ صف فروشگاه در تب مستقل stores رندر می‌شود. */
   }else if(tab==='stores'){
-    pane.innerHTML=salesV29RenderPane(tab,data);
-    if(app.salesStoreTab==='transfers')void transferMount(pane.querySelector('[data-transfer-panel]'),'sales');
+    refreshSalesStorePane(pane,data,refreshTransfers);
   }else if(tab==='flow'){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]));
   }else if(tab==='settlement'){
@@ -501,10 +528,12 @@ function startSalesLiveTimerV29(){
   if(app.timer){clearInterval(app.timer);app.timer=null;}
   app.timer=setInterval(async()=>{
     if(app.page!=='sales')return;
+    const tab=app.sub.sales;
+    // The transfer queue is independent of order-cache availability.
+    if(tab==='stores'&&app.salesStoreTab==='transfers')ensureSalesTransferPanel(app.salesV29.panes?.stores?.querySelector('[data-transfer-panel]'));
     try{
-      const tab=app.sub.sales;
       const data=await fetchSalesCache(true);
-      if(app.page==='sales'&&app.sub.sales===tab){paintSalesPaneV29(tab,data);salesRefreshWarning(tab,false);refreshSalesLiveWeightModal(data);}
+      if(app.page==='sales'&&app.sub.sales===tab){paintSalesPaneV29(tab,data,false);salesRefreshWarning(tab,false);refreshSalesLiveWeightModal(data);}
     }catch{if(app.page==='sales'&&app.sub.sales===tab){salesRefreshWarning(tab,true);refreshSalesLiveWeightModal(null,true);}}
   },8000);
 }

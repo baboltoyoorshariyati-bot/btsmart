@@ -144,15 +144,15 @@ async function syncServerTime(){try{const t0=Date.now();const r=await fetch('/ap
 function today(){const d=serverNow();return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`}
 /* v37.3 — قالب یکدست تاریخ شمسی (ICU مرورگرها ترتیب و جداکنندهٔ ناهماهنگ «۱۴۰۵ مهر ۲۱, سه‌شنبه» تولید می‌کند) */
 function faDateParts(d,opts){const o={};try{new Intl.DateTimeFormat('fa-IR-u-ca-persian-nu-arabext',opts).formatToParts(d).forEach(p=>{if(p.type!=='literal')o[p.type]=p.value})}catch(e){}return o}
-function todayText(){const p=faDateParts(serverNow(),{weekday:'long',day:'numeric',month:'long',year:'numeric'});return [p.weekday,p.day,p.month,p.year].filter(Boolean).join(' ')}
+function todayText(){const p=faDateParts(serverNow(),{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});return p.year&&p.month&&p.day?`${p.weekday||''} ${p.year}/${p.month}/${p.day}`.trim():''}
 /* v37.3.3 — ساعت و تاریخ ستون کناری (زیر لوگو). هر دقیقه دقیقاً سر دقیقه به‌روز می‌شود. */
 function railClockTick(){
   const d=serverNow();
-  const p=faDateParts(d,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const p=faDateParts(d,{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
   const t=document.getElementById('railTime'); if(t) t.textContent=fa(`${pad2(d.getHours())}:${pad2(d.getMinutes())}`);
   const w=document.getElementById('railWeekday'); if(w) w.textContent=p.weekday||'';
   const c=document.getElementById('currentDate');
-  if(c){ if(p.day&&p.month&&p.year) c.innerHTML=`<span class="rc-dm">${esc(p.day+' '+p.month)}</span> <span class="rc-y">${esc(p.year)}</span>`; else c.textContent=todayText(); }
+  if(c){ if(p.day&&p.month&&p.year) c.textContent=`${p.year}/${p.month}/${p.day}`; else c.textContent=todayText(); }
 }
 function startRailClock(){
   railClockTick();
@@ -185,7 +185,6 @@ function bindJalaliDates(root=document){
 function jalaliInput(label,target,isoValue=today(),required=true){const j=isoToJalali(isoValue);return `<div class=\"field jalali-field\"><label>${esc(label)}</label><div class=\"input-shell op-input jalali-shell\"><span>${icon('calendar',17)}</span><input class=\"jalali-date-input\" aria-label=\"${esc(label)}\" data-target=\"${esc(target)}\" value=\"${esc(j)}\" placeholder=\"۱۴۰۵/۰۷/۱۴\" inputmode=\"numeric\" autocomplete=\"off\" ${required?'required':''}><button type=\"button\" class=\"date-today-btn\" data-date-today=\"${esc(target)}\">امروز</button></div><input type=\"hidden\" name=\"${esc(target)}\" value=\"${esc(isoValue)}\" ${required?'required':''}></div>`}
 
 /* ---------- تقویم جلالی تعاملی و انتخاب‌گر ساعت ---------- */
-const JALALI_MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
 const JALALI_WEEKDAYS=['ش','ی','د','س','چ','پ','ج'];
 function isJalaliLeap(jy){
   const [gy1,gm1,gd1]=jalaliToGregorian(jy,1,1);
@@ -232,7 +231,6 @@ function renderJalaliCalendar(jy,jm,selectedIso){
   const todayJ=getJalaliToday();
   const monthLen=jalaliMonthLen(jy,jm);
   const firstWD=jalaliWeekday(jy,jm,1);
-  const monthName=JALALI_MONTHS[jm-1]||'';
   let selectedJ=null;
   if(selectedIso && /^\d{4}-\d{2}-\d{2}$/.test(selectedIso)){
     const [sy,sm,sd]=selectedIso.split('-').map(Number);
@@ -241,7 +239,7 @@ function renderJalaliCalendar(jy,jm,selectedIso){
   }
   let h=`<div class="jalali-cal-head">`;
   h+=`<div class="jalali-cal-nav"><button type="button" data-cal="prev" aria-label="ماه قبل">${icon('arrow',16)}</button></div>`;
-  h+=`<div class="jalali-cal-title">${esc(monthName)} ${fa(jy)}</div>`;
+  h+=`<div class="jalali-cal-title">${fa(jy)}/${fa(pad2(jm))}</div>`;
   h+=`<div class="jalali-cal-nav"><button type="button" data-cal="next" class="is-next" aria-label="ماه بعد">${icon('arrow',16)}</button></div></div>`;
   // weekdays header - note icon arrow rotated? we swap prev/next for RTL
   h+=`<div class="jalali-cal-weekdays">`+JALALI_WEEKDAYS.map((w,i)=>`<span class="${i===6?'is-fri':''}">${w}</span>`).join('')+`</div>`;
@@ -529,7 +527,6 @@ function renderDateTimePopover(jy,jm,hour,minute,selectedIso){
   const todayJ=getJalaliToday();
   const monthLen=jalaliMonthLen(jy,jm);
   const firstWD=jalaliWeekday(jy,jm,1);
-  const monthName=JALALI_MONTHS[jm-1]||'';
   let selectedJ=null;
   if(selectedIso && /^\d{4}-\d{2}-\d{2}$/.test(selectedIso)){
     const [sy,sm,sd]=selectedIso.split('-').map(Number);
@@ -537,7 +534,7 @@ function renderDateTimePopover(jy,jm,hour,minute,selectedIso){
     selectedJ=[sj,smj,sdj];
   }
   let h=`<div class="datetime-popover-inner"><div class="dt-body"><div class="dt-cal">`;
-  h+=`<div class="jalali-cal-head"><div class="jalali-cal-nav"><button type="button" data-dt="prev" aria-label="ماه قبل">${icon('arrow',16)}</button></div><div class="jalali-cal-title">${esc(monthName)} ${fa(jy)}</div><div class="jalali-cal-nav"><button type="button" data-dt="next" class="is-next" aria-label="ماه بعد">${icon('arrow',16)}</button></div></div>`;
+  h+=`<div class="jalali-cal-head"><div class="jalali-cal-nav"><button type="button" data-dt="prev" aria-label="ماه قبل">${icon('arrow',16)}</button></div><div class="jalali-cal-title">${fa(jy)}/${fa(pad2(jm))}</div><div class="jalali-cal-nav"><button type="button" data-dt="next" class="is-next" aria-label="ماه بعد">${icon('arrow',16)}</button></div></div>`;
   h+=`<div class="jalali-cal-weekdays">`+JALALI_WEEKDAYS.map((w,i)=>`<span class="${i===6?'is-fri':''}">${w}</span>`).join('')+`</div>`;
   h+=`<div class="jalali-cal-grid">`;
   for(let i=0;i<firstWD;i++) h+=`<span class="jalali-cal-day is-other" style="visibility:hidden"></span>`;
@@ -999,6 +996,7 @@ const productSearchStates=new WeakMap();
 function productPickerInfo(inp){
   if(inp.dataset.productSearch!==undefined){const i=inp.dataset.productSearch;return {box:$(`[data-suggest-for="${i}"]`),row:app.orderDraft?.[i]};}
   if(inp.dataset.opProductSearch!==undefined){const value=inp.dataset.opProductSearch,cut=value.lastIndexOf('-'),prefix=value.slice(0,cut),i=value.slice(cut+1);const key=({phone:'phoneDraft',remote:'remoteDraft',future:'futureDraft',store:'storeDraft',storeedit:'storeEditDraft',storeaddition:'storeAdditionDraft',sales:'orderDraft',onsite:'orderDraft'})[prefix];return {box:$(`[data-op-suggest="${value}"]`),row:app[key]?.[i]};}
+  if(inp.dataset.transferProductSearch!==undefined){const line=inp.closest('[data-transfer-line]');return {box:line?.querySelector('[data-transfer-suggest]'),row:line?.dataset};}
   if(inp.dataset.returnProductSearch!==undefined){const i=inp.dataset.returnProductSearch;return {box:$(`[data-return-suggest="${i}"]`),row:app.returnEdit?.items?.[i]};}
   if(inp.dataset.ssProductSearch!==undefined){const i=inp.dataset.ssProductSearch;return {box:$(`[data-ss-suggest="${i}"]`),row:app.salesStoreEdit?.items?.[i]};}
   return null;
@@ -2019,7 +2017,7 @@ function moneyCompact(v){
 }
 function orderKindLabel(o){return o?.orderType==='STORE'?(o.storeOrderKind==='PARTIAL'?'سفارش جزئی فروشگاه':'سفارش روزانه فروشگاه'):o?.orderType==='REMOTE'?'غیرحضوری':'حضوری'}
 function orderKindBadge(o){if(o?.orderType==='STORE')return `<span class="type-chip remote">${orderKindLabel(o)}</span>`;return o?.orderType==='REMOTE'?'<span class="type-chip remote">غیرحضوری</span>':'<span class="type-chip onsite">حضوری</span>'}
-function dateLabel(v){ if(!v) return '—'; const parts=String(v).split('-'); if(parts.length!==3)return esc(v); const d=new Date(`${v}T00:00:00`); const p=faDateParts(d,{day:'numeric',month:'long',year:'numeric'}); return [p.day,p.month,p.year].filter(Boolean).join(' '); }
+function dateLabel(v){ if(!v) return '—'; const value=String(v); if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return esc(value); const d=new Date(`${value}T00:00:00`); if(Number.isNaN(d.getTime()))return esc(value); const p=faDateParts(d,{day:'2-digit',month:'2-digit',year:'numeric'}); return p.year&&p.month&&p.day?`${p.year}/${p.month}/${p.day}`:esc(value); }
 function defaultOrderLine(){return {productId:'',productLabel:'',quickCode:'',requestedQty:'',requestedUnit:'کیلوگرم',description:''}}
 function bindOperationLines(prefix, draftKey){
   $$(['storeedit','storeaddition'].includes(prefix)?'#modal [data-op-product-search]':'#content [data-op-product-search]').filter(el=>el.dataset.opProductSearch.startsWith(prefix+'-')).forEach(inp=>{
@@ -3619,7 +3617,7 @@ async function salesV29ClickHandler(e){
     // Shipments and assignments may have changed at another workstation while
     // this tab was cached. Refresh on entry without changing the selected tab.
     const selected=app.salesStoreTab;
-    if(selected==='transfers'&&storePane) void transferMount(storePane.querySelector('[data-transfer-panel]'),'sales');
+    if(selected==='transfers'&&storePane) ensureSalesTransferPanel(storePane.querySelector('[data-transfer-panel]'));
     if(selected==='processing'||selected==='history')void fetchSalesCache(true).then(data=>{if(app.page==='sales'&&app.sub.sales==='stores'&&app.salesStoreTab===selected)paintSalesPaneV29('stores',data);}).catch(()=>{});
     return; }
   const tab=e.target.closest('[data-sales-tab]');
@@ -3771,8 +3769,36 @@ function salesV29Activate(tab){
     }else if(tab==='onsite'){
       pane.querySelector('#salesSearchV25')?.focus({preventScroll:true});
     }
+    if(tab==='stores'&&app.salesStoreTab==='transfers')ensureSalesTransferPanel(pane.querySelector('[data-transfer-panel]'));
   }
   app.salesV29.lastTab=tab;
+}
+
+// Keep the transfer panel connected during store-order refreshes. Its own
+// background refresh updates the list without blanking it or invalidating a
+// pending request, and preserves focus and any open detail dialog.
+function ensureSalesTransferPanel(host,refresh=true){
+  if(!host)return;
+  if(host._transferRefresh){if(refresh)void host._transferRefresh();}
+  else if(!host._transferLoading)void transferMount(host,'sales');
+}
+function refreshSalesStorePane(pane,data,refreshTransfers=true){
+  const existing=pane.querySelector('.sales-store-pane-v43');
+  const fresh=htmlToElement(salesV29RenderPane('stores',data));
+  const oldNav=existing?.querySelector('.sales-store-tabs-v43'),newNav=fresh.querySelector('.sales-store-tabs-v43');
+  const oldSections=existing?.querySelector('.sales-store-subpanels-v43'),newSections=fresh.querySelector('.sales-store-subpanels-v43');
+  const transfer=oldSections?.querySelector('[data-store-section="transfers"]');
+  if(oldNav&&newNav&&oldSections&&newSections&&transfer){
+    oldNav.replaceWith(newNav);
+    for(const section of [...newSections.children]){
+      const id=section.dataset.storeSection;
+      if(!id||id==='transfers')continue;
+      const old=oldSections.querySelector(`[data-store-section="${id}"]`);
+      if(old)old.replaceWith(section);else oldSections.insertBefore(section,transfer);
+    }
+    transfer.hidden=app.salesStoreTab!=='transfers';
+  }else pane.replaceChildren(fresh);
+  if(app.salesStoreTab==='transfers')ensureSalesTransferPanel(pane.querySelector('[data-store-section="transfers"] [data-transfer-panel]'),refreshTransfers);
 }
 
 // Clear only the selected, already-issued invoice; other settlement forms stay open.
@@ -3783,13 +3809,13 @@ function clearIssuedTransportSettlement(data){
   }
 }
 
-function paintSalesPaneV29(tab,data){
+function paintSalesPaneV29(tab,data,refreshTransfers=true){
   const pane=app.salesV29.panes?.[tab]; if(!pane)return;
   if(pane.dataset.renderedV29!=='1'){
     pane.innerHTML=salesV29RenderPane(tab,data);
     pane.dataset.renderedV29='1';
     bindSalesPaneV29(tab);
-    if(tab==='stores'&&app.salesStoreTab==='transfers')void transferMount(pane.querySelector('[data-transfer-panel]'),'sales');
+    if(tab==='stores'&&app.salesStoreTab==='transfers')ensureSalesTransferPanel(pane.querySelector('[data-transfer-panel]'),refreshTransfers);
     return;
   }
   if(tab==='onsite'){
@@ -3797,8 +3823,7 @@ function paintSalesPaneV29(tab,data){
   }else if(tab==='remote'){
     /* تلفنی/غیرحضوری فقط؛ صف فروشگاه در تب مستقل stores رندر می‌شود. */
   }else if(tab==='stores'){
-    pane.innerHTML=salesV29RenderPane(tab,data);
-    if(app.salesStoreTab==='transfers')void transferMount(pane.querySelector('[data-transfer-panel]'),'sales');
+    refreshSalesStorePane(pane,data,refreshTransfers);
   }else if(tab==='flow'){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]));
   }else if(tab==='settlement'){
@@ -3825,10 +3850,12 @@ function startSalesLiveTimerV29(){
   if(app.timer){clearInterval(app.timer);app.timer=null;}
   app.timer=setInterval(async()=>{
     if(app.page!=='sales')return;
+    const tab=app.sub.sales;
+    // The transfer queue is independent of order-cache availability.
+    if(tab==='stores'&&app.salesStoreTab==='transfers')ensureSalesTransferPanel(app.salesV29.panes?.stores?.querySelector('[data-transfer-panel]'));
     try{
-      const tab=app.sub.sales;
       const data=await fetchSalesCache(true);
-      if(app.page==='sales'&&app.sub.sales===tab){paintSalesPaneV29(tab,data);salesRefreshWarning(tab,false);refreshSalesLiveWeightModal(data);}
+      if(app.page==='sales'&&app.sub.sales===tab){paintSalesPaneV29(tab,data,false);salesRefreshWarning(tab,false);refreshSalesLiveWeightModal(data);}
     }catch{if(app.page==='sales'&&app.sub.sales===tab){salesRefreshWarning(tab,true);refreshSalesLiveWeightModal(null,true);}}
   },8000);
 }

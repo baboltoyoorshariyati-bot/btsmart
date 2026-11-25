@@ -100,6 +100,6 @@ test('v37.3.2 — متن اعلان سفارش آینده تاریخ شمسی د
   assert.match(orders, /برای تاریخ \$\{faDateLabel\(scheduledDate\)\} ثبت شد/);
   const src = orders.slice(orders.indexOf('function faDateLabel'), orders.indexOf('// ---------- فروشگاه ----------'));
   const ctx = {}; vm.createContext(ctx); vm.runInContext(src, ctx);
-  assert.equal(ctx.faDateLabel('2026-10-29'), '۷ آبان ۱۴۰۵');
+  assert.equal(ctx.faDateLabel('2026-10-29'), '۱۴۰۵/۰۸/۰۷');
   assert.equal(ctx.faDateLabel('bad'), 'bad');
 });

@@ -147,9 +147,17 @@ async function wh38Paint(phase){
     if(phase==='document-edits'){ await whDocumentEditsPaint(host); return; }
     if(phase==='stores'){ // v37.9.0 — فروشگاه‌های انبار: سربرگ افقی، فرم/فهرست عمودی زیر آن
       const active=['incoming','preparing','history','transfers'].includes(app.wh38.storeTab)?app.wh38.storeTab:'incoming'; app.wh38.storeTab=active;
-      if(active==='transfers'){if(!host.querySelector('[data-transfer-panel]')){host.innerHTML=`<div class="wh38-store-pane">${wh38StoreTabs(active,{})}<section class="wh38-store-panel"><div data-transfer-panel></div></section></div>`;await transferMount(host.querySelector('[data-transfer-panel]'),'warehouse');}return;}
+      if(active==='transfers'){
+        let panel=host.querySelector('[data-transfer-panel]');
+        if(!panel){host.innerHTML=`<div class="wh38-store-pane">${wh38StoreTabs(active,{})}<section class="wh38-store-panel"><div data-transfer-panel></div></section></div>`;panel=host.querySelector('[data-transfer-panel]');}
+        if(panel._transferRefresh)await panel._transferRefresh();
+        else if(!panel._transferLoading)await transferMount(panel,'warehouse');
+        return;
+      }
       if(active==='history'&&host.querySelector('[data-wh38-store-history]')) return; // v37.36.0 — فیلترهای سوابق با تازه‌سازی خودکار ۷ ثانیه‌ای به‌هم نمی‌ریزد
       const [inc,prep,histAll]=(await Promise.all([fetchPagedList('/api/orders?status=WAREHOUSE_PENDING','orders'),fetchPagedList('/api/orders?status=WAREHOUSE_PREPARING','orders'),api('/api/warehouse/history?from=2000-01-01&to='+today()+'&orderType=STORE')]));
+      // A slow response for a previous tab must not replace the current one.
+      if(!host.isConnected||app.wh38.storeTab!==active)return;
       const incRows=((inc&&inc.orders)||[]).filter(o=>o.orderType==='STORE');
       // v37.19.0 — سفارشی که عملیات انبارش پایان یافته (finalizedAt) دیگر کار انباری ندارد و تا نهایی‌شدن محموله‌ها نزد فروش می‌ماند؛ در فهرست آماده‌سازی انبار نمی‌ماند.
       const prepRows=((prep&&prep.orders)||[]).filter(o=>o.orderType==='STORE'&&!(o.storeRunOps&&o.storeRunOps.finalizedAt));

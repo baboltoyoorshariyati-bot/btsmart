@@ -7,7 +7,7 @@ const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 
 test('changed application and document assets have refreshed cache keys on both page shells',()=>{
  const index=read('public/index.html');
- for(const [asset,version] of [['app.js','37.50.0.20'],['product-excel.js','2'],['admin-ui.js','37.50.0.6'],['audit-fa.js','2'],['theme.css','37.48.1'],['customers-ui.js','3'],['ui2.js','37.50.0.3.17'],['invoice-compact.css','37.3.23'],['design.css','37.48.2'],['bt-table.css','5'],['warehouse-document.css','37.50.0'],['compatibility.css','37.50.0.6'],['dispatch-ui.js','37.50.0.4']])
+ for(const [asset,version] of [['app.js','37.50.0.22'],['product-excel.js','2'],['admin-ui.js','37.50.0.6'],['audit-fa.js','2'],['theme.css','37.48.2'],['customers-ui.js','3'],['ui2.js','37.50.0.3.19'],['invoice-compact.css','37.3.23'],['design.css','37.48.2'],['bt-table.css','5'],['warehouse-document.css','37.50.0'],['compatibility.css','37.50.0.7'],['dispatch-ui.js','37.50.0.4']])
   assert.ok(index.includes(`/${asset}?v=${version}`),`${asset} must use the refreshed cache key`);
  const invoice=read('public/invoice-print.html');
  assert.match(invoice,/href="\/design\.css\?v=37\.48\.2"/);
