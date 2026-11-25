@@ -57,7 +57,7 @@ test('UI: داشبورد انبار بخش سفارشات ورودی امروز 
   assert.match(css,/\.wh-dash-prod\{/);
   assert.match(css,/#modal \.wh-dash-table\{/, 'جدول همهٔ محصولات در مودال نیز سبک ثابت دارد');
   assert.match(html,/app\.js\?v=37\.50\.0/);
-  assert.match(html,/theme\.css\?v=37\.48\.1/);
+  assert.match(html,/theme\.css\?v=37\.48\.2/);
 });
 
 test('API: آمار امروز انبار — ورودی امروز با هر وضعیت نهایی، به تفکیک محصول و واحد؛ لغوشده‌ها حذف',async()=>{

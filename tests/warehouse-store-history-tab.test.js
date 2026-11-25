@@ -62,7 +62,7 @@ test('اتصالات ایستا: تب سوابق به فهرست اسناد فر
   assert.doesNotMatch(ui, /wh-store-history-range|wh-store-history-print/, 'فیلتر و گزارش چاپ قدیمی حذف شده‌اند');
   assert.match(ui, /orderType=STORE/, 'شمارش سفارش‌های تکمیل‌شدهٔ فروشگاه همچنان فیلتر نوع سفارش دارد');
   assert.match(ui, /history:\(histAll&&histAll\.summary&&histAll\.summary\.orders\)\|\|0/);
-  assert.match(css, /\.wh38-store-tabs\{grid-template-columns:repeat\(3,minmax\(0,1fr\)\)\}/, 'سربرگ‌ها سه‌ستونه شده‌اند');
+  assert.match(css, /\.wh38-store-tabs\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)\}/, 'چهار سربرگ در یک ردیف قرار می‌گیرند');
   assert.match(route, /ctx\.query\.get\('orderType'\)/);
   assert.match(route, /if \(onlyType && String\(o\.orderType \|\| ''\) !== onlyType\) continue;/);
   assert.match(route, /r1Kg: o\.orderType === 'STORE' \? SRH\.r1Kg\(i\) : null/, 'وزن سرویس اول اقلام فروشگاهی در API هست');

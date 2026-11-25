@@ -34,5 +34,5 @@ test('منوی سفارش‌های فروشگاه چهار سربرگ افقی �
   assert.match(view, /panel\('history'/);
   assert.match(app, /data-store-subtab/);
   assert.match(app, /p\.hidden=p\.dataset\.storeSection!==app\.salesStoreTab/);
-  assert.match(css, /sales-store-tabs-v43\{position:static;display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(css, /sales-store-tabs-v43\{position:static;display:grid;grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
 });

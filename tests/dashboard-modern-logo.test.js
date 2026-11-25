@@ -90,5 +90,5 @@ test('management dashboard is branded and lively without data changes',()=>{
   assert.match(css,/prefers-reduced-motion:reduce\)\{[^}]*btDashIn|prefers-reduced-motion/);
   assert.match(html,/app\.js\?v=37\.50\.0/);
   assert.match(html,/ui2\.js\?v=37\.50\.0/);
-  assert.match(html,/theme\.css\?v=37\.48\.1/);
+  assert.match(html,/theme\.css\?v=37\.48\.2/);
 });

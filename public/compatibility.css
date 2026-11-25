@@ -609,8 +609,8 @@
 .whd35-list .whd23-box b{font-size:12.5px}
 .whd35-detail .modal-actions{margin-top:2px}
 
-/* ===== v37.36.0 — سربرگ سوم فروشگاه‌های انبار: «سوابق و گزارشات» ===== */
-#appView[data-cartable-page="warehouse"] .wh38-store-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* فروشگاه‌های انبار: چهار سربرگ هم‌اندازه، از جمله جابجایی، در یک ردیف. */
+#appView[data-cartable-page="warehouse"] .wh38-store-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:560px){
   #appView[data-cartable-page="warehouse"] .wh38-store-tabs{gap:4px}
   #appView[data-cartable-page="warehouse"] .wh38-store-tabs button{padding:2px 3px}
@@ -1700,3 +1700,31 @@
 #appView #content .gt-pickup-list-body input{width:100%;max-width:420px;min-width:0}
 #appView #content .gt-pickup-list-pages{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
 @media(max-width:600px){#appView #content .gt-pickup-list-page .sd-head{gap:10px;flex-wrap:wrap}#appView #content .gt-pickup-list-body{padding:12px}}
+
+/* Store transfer desk: reuse the store order panel and field language. */
+#appView .transfer-workspace{display:grid;gap:16px}
+#appView .transfer-panel{overflow:visible}
+#appView .transfer-tabs{padding:16px 20px 0}
+#appView .transfer-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#appView .transfer-lines-wrap{margin-bottom:12px}
+#appView .transfer-lines-table :is([data-kg],[data-price]){text-align:right}
+#appView .transfer-lines-table th:nth-child(1){width:6%}
+#appView .transfer-lines-table th:nth-child(2){width:29%}
+#appView .transfer-lines-table th:nth-child(3){width:16%}
+#appView .transfer-lines-table th:nth-child(4){width:16%}
+#appView .transfer-lines-table th:nth-child(5){width:25%}
+#appView .transfer-lines-table th:nth-child(6){width:8%}
+#appView .transfer-product .product-suggest{position:absolute;top:calc(100% + 4px);inset-inline:0;z-index:30}
+#appView .transfer-help{display:block;color:#9a521a;margin-top:6px;line-height:1.7}
+#appView .transfer-notes{margin-top:18px}
+#appView .transfer-notes textarea{width:100%}
+#appView .transfer-panel .sd-submit-bar small{display:block}
+@media(max-width:700px){
+ #appView .transfer-meta{grid-template-columns:1fr}
+}
+
+@media(max-width:900px){#appView .transfer-lines-table td::before{width:94px;white-space:normal}#appView .transfer-lines-table .sd-line-cell{min-width:0;flex:1}}
+
+/* Keep all store subtabs on one row at all widths; long labels wrap inside each tab. */
+#appView[data-cartable-page="warehouse"] .wh38-store-tabs,#appView[data-cartable-page="sales"] .sales-store-tabs-v43{min-width:0;max-width:100%}
+#appView[data-cartable-page="warehouse"] .wh38-store-tab span,#appView[data-cartable-page="sales"] .sales-store-tab-v43 span{min-width:0;overflow-wrap:anywhere}

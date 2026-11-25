@@ -34,7 +34,7 @@ test('clock and menu items turn glassy while nav contract stays intact',()=>{
   assert.match(app,/\['incoming','ورودی','inbox','warehouseIncomingRegular'\]/);
   assert.match(css,/prefers-reduced-motion:reduce\)\{[^}]*rail-logo\.logo-frame\{animation:none/);
   assert.match(html,/app\.js\?v=37\.50\.0/);
-  assert.match(html,/theme\.css\?v=37\.48\.1/);
+  assert.match(html,/theme\.css\?v=37\.48\.2/);
 });
 
 test('narrow rail scales the decorations down instead of breaking layout',()=>{
