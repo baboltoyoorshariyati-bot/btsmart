@@ -5,12 +5,12 @@ const exe=process.env.BT_CHROMIUM_PATH;
 test('داشبوردهای انبار، فروش، ترابری، نگهبانی و مدیر پس از انتقال کار بدون بازکردن مجدد به‌روز می‌شوند',{skip:!exe,timeout:120000},async()=>{
  const {chromium}=require('playwright-core');const port=await new Promise(r=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>r(p));});});
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-dash-counters-')),base=`http://127.0.0.1:${port}`,env={...process.env,HOST:'127.0.0.1',PORT:String(port),DATA_DIR:dir,ADMIN_INITIAL_PASSWORD:'Initial!2345',BT_EXPERIMENTAL_TRANSPORT_WORKFLOW:'1'};
- const proc=spawn(process.execPath,['server.js'],{cwd:path.join(__dirname,'..'),env,stdio:['ignore','pipe','pipe']});let browser;
+ const proc=spawn(process.execPath,['server.js'],{cwd:path.join(__dirname,'..'),env,stdio:['ignore','pipe','pipe']});let browser,serverErrors='';proc.stderr.on('data',d=>{serverErrors=(serverErrors+String(d)).slice(-12000);});
  try{
   await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(Error('startup timeout')),15000);proc.stdout.on('data',d=>{if(String(d).includes('"listening"')){clearTimeout(t);resolve();}});proc.once('exit',c=>reject(Error('server exit '+c)));});
   browser=await chromium.launch({executablePath:exe,args:['--no-sandbox','--disable-dev-shm-usage']});
   const admin=await browser.newContext(),gate=await browser.newContext(),sales=await browser.newContext(),wh=await browser.newContext(),dispatch=await browser.newContext(),shop=await browser.newContext();
-  const req=async(ctx,method,url,data)=>{const r=await ctx.request.fetch(base+url,{method,...(data?{data}:{})});assert.ok(r.ok(),`${url}: ${r.status()} ${await r.text()}`);return r.json();};
+  const req=async(ctx,method,url,data)=>{let r;try{r=await ctx.request.fetch(base+url,{method,...(data?{data}:{})});}catch(e){throw Error(`${method} ${url}: ${e.message}; server exit=${proc.exitCode}, signal=${proc.signalCode}; stderr=${serverErrors}`);}assert.ok(r.ok(),`${url}: ${r.status()} ${await r.text()}`);return r.json();};
   await req(admin,'POST','/api/login',{username:'admin',password:'Initial!2345'});await req(admin,'POST','/api/account/password',{currentPassword:'Initial!2345',newPassword:'Changed!2345'});
   for(const [username,roleCode,extra] of [['gate1','gate',{}],['sales1','sales',{}],['wh1','warehouse',{}],['disp1','dispatch',{}],['shop1','store',{storeName:'فروشگاه شعبه 1 حمزه کلا'}]])await req(admin,'POST','/api/admin/users',{username,roleCode,fullName:username,position:'تست',password:'Changed!2345',mustChangePassword:false,...extra});
   for(const [ctx,username] of [[gate,'gate1'],[sales,'sales1'],[wh,'wh1'],[dispatch,'disp1'],[shop,'shop1']])await req(ctx,'POST','/api/login',{username,password:'Changed!2345'});

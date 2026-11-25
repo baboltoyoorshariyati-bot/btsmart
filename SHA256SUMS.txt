@@ -370,7 +370,7 @@ f80d4876b824748ac144b5c31babcb01016f44c8dc46330fec6f2e7056a9e623  ./tests/custom
 dea782a6928cf73a2074925b5497220df0a5242f04597980116d36b4f9ba8ad6  ./tests/customer-phone-identity-api.test.js
 140a533dd36153f313aa3c76eed36471248c564cb93fb5f6ee3d3446325967b3  ./tests/customer-store-isolation.test.js
 b04f253c8ff05d5e445fd4a7c9d9fbd20e02e02a8bf34d7915e39e80c22f49de  ./tests/customers.test.js
-416eb126c8b1be028cc02cc96f2e704728d3b2f982c92262e5896bd441ec3a7b  ./tests/dashboard-counts-live-browser.test.js
+ee1af851e76cec8057440bfddca8863822fd5bb3555272dd76e358c93963c79d  ./tests/dashboard-counts-live-browser.test.js
 5bed1161c1218754ba40462c33b81631c0fbfa63e1cfc12c2ddd671e2489225c  ./tests/dashboard-modern-logo.test.js
 50fc4a5bdeeacc6e83749ee0438327228321bdc1ad21df3940d88ee40dbd5936  ./tests/dashboard-product-charts.test.js
 b7849ed6bc70d63b6196b4281ab619513f4b611077c71e423e618400ab21ad28  ./tests/dashboard-workload-counts.test.js
@@ -384,7 +384,7 @@ f7b25a054f305edf1d4a1e5696a27afa1b66dbf2098bb3b8df020a8578a73741  ./tests/deskto
 fea1c10c842cde7b304021c810bd52a21e679f53363e0cd44dd76003f6032f33  ./tests/dispatch-ui.test.js
 1de9cd09e5b1a8906a265a30d5d32a3305cbbdf084564e688c0fe2b2b22f062c  ./tests/dispatch.test.js
 caf5cc2647bb3f8814d81b63368608a1533d7c0aff9f15e5e45824b66bec972f  ./tests/document-edits-api.test.js
-3d2a879405aec34e492e07a3f69a74eaeae718c5d7c7006974d777474ae1aeb6  ./tests/draft-admin-tables-browser.test.js
+ede7c1aeb06c2c44dd10aa31fa336838d9aa5033c9518112ba878c8902c00117  ./tests/draft-admin-tables-browser.test.js
 4e66a982a2db2f4b0af62e5774b5332143cbe40060cf501eec6da11ae411544f  ./tests/driver-delivery-form-compact.test.js
 1502926a327f3401641a0d464c826d9b9cc702c0cbb4203ca394694a5c229ae9  ./tests/driver-details-compact.test.js
 20bc3cdd5c6f9e2cd23149a3e0130267e9dbca7174cd0b4f112bfc23a17b49dd  ./tests/driver-inline-record.test.js
