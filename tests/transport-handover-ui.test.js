@@ -39,7 +39,7 @@ test('فاکتور پخش سربرگ شش‌فیلدی، متن تحویل و م
  const html=ctx.transportDraftInvoiceHtml({orderNo:'123',dispatchPlace:'نشانی <مشتری>'},{invoiceNumber:'456',customerName:'<مشتری>',customerPhone:'09',driverName:'<راننده>',priceLines:[{productName:'<کالا>',deliveredKg:2,unitPrice:1000,amount:2000}],subtotalAmount:2000,discountAmount:300,additionsAmount:50,totalAmount:1750});
  for(const label of ['نام مشتری','شماره تماس','محل ارسال','شماره سفارش','شماره فاکتور','تاریخ'])assert(html.includes(`<span>${label}</span>`),label);
  assert.doesNotMatch(html,/فاکتور فروش/);assert.match(html,/<div class="inv38-distribution-contacts"><div><span>نام مشتری<\/span>[\s\S]*?<\/div><div><span>شماره تماس<\/span>/);
- assert.doesNotMatch(html,/inv38-brand|<img/);assert.match(html,/نشانی &lt;مشتری&gt;/);assert.match(html,/inv38-delivery-signature-line/);assert.match(html,/<span>محل امضا<\/span>/);assert.match(html,/اینجانب <strong>&lt;مشتری&gt;<\/strong>، تأیید می‌کنم اقلام فوق توسط رانندهٔ پخش <strong>&lt;راننده&gt;<\/strong> به اینجانب تحویل شد/);assert.match(html,/<small>نام مشتری<\/small>/);assert.match(html,/&lt;کالا&gt;/);assert.match(html,/1750/);
+ assert.doesNotMatch(html,/inv38-brand|<img/);assert.match(html,/نشانی &lt;مشتری&gt;/);assert.match(html,/inv38-delivery-signature-line/);assert.match(html,/<span>محل امضا<\/span>/);assert.match(html,/اینجانب <strong>&lt;مشتری&gt;<\/strong> اقلام فوق را صحیح و سالم تحویل گرفته و اقلام تحویلی به صورت امانت تا زمان پرداخت مبلغی ریالی آن نزد اینجانب می‌باشد\./);assert.match(html,/<small>نام مشتری<\/small>/);assert.match(html,/&lt;کالا&gt;/);assert.match(html,/1750/);
 });
 test('فاکتور بسته‌شده و فاکتور پخش، ارقام مالی و سربرگ و امضای تحویل را درست نشان می‌دهند',()=>{
  const ctx=vm.createContext({esc:escape,fa:x=>x,qty:x=>x,money:x=>String(x),dt:()=> 'تاریخ',n:x=>Number(x||0)});
@@ -53,7 +53,7 @@ test('فاکتور بسته‌شده و فاکتور پخش، ارقام مال�
  const delivery=ctx.invoiceHtml({...base,deliveryMode:'DELIVERY',dispatchPlace:'مقصد <نمونه>',orderNo:'123',customer:{name:'مشتری واقعی',phone:'0912'},transportHandovers:{'0':{driverName:'روح الله گلی'}}},{invoiceNumber:'456',totalAmount:0,settlementMethods:[]});
  for(const label of ['نام مشتری','شماره تماس','محل ارسال','شماره سفارش','شماره فاکتور','تاریخ'])assert(delivery.includes(`<span>${label}</span>`),label);
  assert.doesNotMatch(delivery,/فاکتور فروش/);assert.match(delivery,/<div class="inv38-distribution-contacts"><div><span>نام مشتری<\/span>[\s\S]*?<\/div><div><span>شماره تماس<\/span>/);
- assert.match(delivery,/مقصد &lt;نمونه&gt;/);assert.match(delivery,/inv38-distribution/);assert.doesNotMatch(delivery,/inv38-brand|<img/);assert.match(delivery,/inv38-delivery-signature-line/);assert.match(delivery,/تأیید می‌کنم اقلام فوق توسط رانندهٔ پخش <strong>روح الله گلی<\/strong> به اینجانب تحویل شد/);assert.match(delivery,/<strong>مشتری واقعی<\/strong>/);assert.match(delivery,/<small>نام مشتری<\/small>/);
+ assert.match(delivery,/مقصد &lt;نمونه&gt;/);assert.match(delivery,/inv38-distribution/);assert.doesNotMatch(delivery,/inv38-brand|<img/);assert.match(delivery,/inv38-delivery-signature-line/);assert.match(delivery,/اینجانب <strong>مشتری واقعی<\/strong> اقلام فوق را صحیح و سالم تحویل گرفته و اقلام تحویلی به صورت امانت تا زمان پرداخت مبلغی ریالی آن نزد اینجانب می‌باشد\./);assert.match(delivery,/<strong>مشتری واقعی<\/strong>/);assert.match(delivery,/<small>نام مشتری<\/small>/);
  assert.match(pending,/مبلغ پرداختی<\/span><b>0/);assert.match(pending,/مانده حساب<\/span><b>1750/);
 });
 test('محاسبه فرم فروش با مرجوعی جزئی و کامل مطابق فاکتور است و وزن نامعتبر رد می‌شود',()=>{
@@ -103,7 +103,7 @@ test('نام صاحب سفارش در اقرار تحویل تکرار نمی‌
  const ctx=vm.createContext({esc:escape,fa:x=>x,qty:x=>x,formatDateTime24:()=>''});vm.runInContext(fragment('function whDocumentTares(line){','async function whDeliveredDetails(id){'),ctx);
  const base={deliveryMode:'PICKUP',customerName:'مالک',customerPhone:'0912',recipient:{name:'مالک',phone:'0912'},items:[]};
  const declaration=ctx.whDeliveredDocument(base,true).match(/class="whd-declaration">(.*?)<\/p>/)[1];assert.equal((declaration.match(/مالک/g)||[]).length,1);assert.match(declaration,/<strong style="text-decoration:underline/);assert.doesNotMatch(declaration,/[()]/);
- const other=ctx.whDeliveredDocument({...base,recipient:{name:'نماینده',phone:'0913'}},true).match(/class="whd-declaration">(.*?)<\/p>/)[1];assert.match(other,/نماینده/);assert.match(other,/سفارش مشتری/);assert.match(other,/مالک/);
+ const otherHtml=ctx.whDeliveredDocument({...base,orderType:'REMOTE',recipient:{name:'نماینده',phone:'0913'}},true),other=otherHtml.match(/class="whd-declaration">(.*?)<\/p>/)[1];assert.match(other,/نماینده/);assert.doesNotMatch(other,/مالک/);assert.match(otherHtml,/مالک/);assert.match(other,/اقلام فوق را صحیح و سالم تحویل گرفته و اقلام تحویلی به صورت امانت تا زمان پرداخت مبلغی ریالی آن نزد اینجانب می‌باشد/);
 });
 
 test('فاکتور پخش، متن تحویل را تمام‌عرض نگه می‌دارد و امضا نسبت به تسویه و جمع عریض‌تر است',()=>{
@@ -113,26 +113,13 @@ test('فاکتور پخش، متن تحویل را تمام‌عرض نگه می
  assert.match(invoiceCss,/\.inv38-compact\.inv38-distribution \.inv38-distribution-meta>\.inv38-distribution-contacts\{[^}]*grid-template-columns:minmax\(0,1\.25fr\) minmax\(0,1fr\)/);
  assert.match(invoiceCss,/\.inv38-compact\.inv38-distribution \.inv38-distribution-meta>\.inv38-distribution-contacts\{[^}]*grid-column:1\/\-1/);
 });
-test('سربرگ برگه ارسال پخش مو‌به‌مو همان سربرگ فاکتور پخش است',()=>{
- const ctx=vm.createContext({esc:escape,fa:x=>x,qty:x=>x,money:x=>String(x),dt:()=>'۱۴۰۳/۰۱/۰۱ ۱۰:۰۰'});
- vm.runInContext(fragment('function transportDeliverySignatureHtml(','async function transportDraftPreview(id){'),ctx);
- vm.runInContext(fragment('function transportShipmentNoteHtml(','async function transportShipmentNotePrint(id){'),ctx);
- const invoice={invoiceNumber:'456',customerName:'<مشتری>',customerPhone:'0912',driverName:'راننده',createdAt:'2024-01-01',priceLines:[{productName:'کالا',deliveredKg:2,unitPrice:1000,amount:2000}],subtotalAmount:2000,discountAmount:0,additionsAmount:0,totalAmount:2000};
- const order={orderNo:'123',dispatchPlace:'مقصد <نمونه>',customer:{name:'مشتری',phone:'0912'},transportInvoice:invoice,transportHandovers:{'0':{driverName:'راننده',vehicleType:'کامیون',vehiclePlate:'۱۱ب۲۲۲',document:{warehouseDocumentNo:'W-9',items:[]}}}};
- const note=ctx.transportShipmentNoteHtml(order),invoiceHtml=ctx.transportDraftInvoiceHtml(order,invoice);
- const headerOf=html=>html.slice(html.indexOf('<div class="inv38-head">'),html.indexOf('<div class="inv38-rule">'));
- assert.equal(headerOf(note),headerOf(invoiceHtml));
- for(const label of ['نام مشتری','شماره تماس','محل ارسال','شماره سفارش','شماره فاکتور','تاریخ'])assert(note.includes(`<span>${label}</span>`),label);
- assert.match(note,/inv38-sheet inv38-compact inv38-distribution/);
- assert.doesNotMatch(note,/inv38-brand|<img/);
- assert.match(note,/W-9/);
- // برگهٔ ارسال پخش حالا همان بدنهٔ «فاکتور تحویل» است: جدول قیمت/مبلغ، جمع‌بندی مالی
- // و اظهارنامهٔ تحویل با جای امضای تحویل‌گیرنده.
- for(const label of ['محصول','وزن ارسالی','قیمت هر کیلو','مبلغ','جمع اقلام','تخفیفات','اضافات','مبلغ فاکتور','جمع وزن ارسالی'])assert(note.includes(label),label);
- // عنوان کوتاه سند بیرون از سربرگ است تا سربرگ مو‌به‌مو همان فاکتور بماند.
- assert.match(note,/<div class="tr-shipment-title"><b>برگه ارسال پخش<\/b>/);
- assert.match(note,/class="inv38-delivery-declaration"/);
- assert.match(note,/data-[a-z-]*signature|inv38-delivery-signature/);
- assert.match(note,/۱٬۰۰۰|1000/);
- assert.match(note,/۲٬۰۰۰|2000/);
+test('برگه ارسال از قالب تأییدشده و بدون اطلاعات حذف‌شده استفاده می‌کند',()=>{
+ const ctx=vm.createContext({esc:escape,fa:x=>x,qty:x=>x,money:x=>String(x),dt:()=>'۱۴۰۳/۰۱/۰۱ • ۱۰:۰۰'});
+ vm.runInContext(fragment('function transportShipmentNoteHtml(','async function transportShipmentNotePrint('),ctx);
+ const order={orderNo:'123',dispatchPlace:'مقصد <نمونه>',transportInvoice:{invoiceNumber:'456',customerName:'<مشتری>',customerPhone:'0912',createdAt:'2024-01-01',priceLines:[{productName:'کالا',deliveredKg:2,unitPrice:1000,amount:2000}],discountAmount:0,additionsAmount:0,totalAmount:2000},transportHandovers:{'0':{driverName:'<راننده>',vehicleType:'کامیون',vehiclePlate:'۱۱ب۲۲۲',document:{warehouseDocumentNo:'W-9',items:[]}}}};
+ const note=ctx.transportShipmentNoteHtml(order);
+ for(const label of ['نام مشتری','شماره تماس','شماره سفارش','شماره فاکتور','راننده تحویل','محل تحویل','تاریخ','محصول','وزن ارسالی','قیمت هر کیلو','مبلغ','جمع اقلام','تخفیفات','اضافات','مبلغ فاکتور','جمع وزن ارسالی','محل امضا'])assert(note.includes(label),label);
+ for(const removed of ['برگه ارسال پخش','همراه محموله','خودرو و پلاک','سند انبار','W-9','نام مشتری</small>','۱۰:۰۰'])assert(!note.includes(removed),removed);
+ assert.match(note,/اینجانب <strong>&lt;مشتری&gt;<\/strong> اقلام فوق را صحیح و سالم تحویل گرفته و اقلام تحویلی به صورت امانت تا زمان پرداخت مبلغی ریالی آن نزد اینجانب می‌باشد\./);assert.doesNotMatch(note,/تأیید می‌کنم اقلام فوق توسط راننده/);assert.match(note,/&lt;مشتری&gt;/);assert.match(note,/&lt;راننده&gt;/);assert.match(note,/مقصد &lt;نمونه&gt;/);
+ assert.match(note,/tr-shipment-bottom"><div class="tr-shipment-signature"/);assert.match(note,/1000/);assert.match(note,/2000/);
 });

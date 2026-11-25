@@ -28,7 +28,7 @@ async function renderCustomers() {
   c.innerHTML = `<section class="sd-panel cust-panel">
     <div class="sd-head">
       <div class="sd-head-main"><span class="sd-head-ico">${icon('user', 20)}</span>
-        <div><h2>پرونده مشتریان</h2><p>هر مشتری یک کد ثابت دارد. مراجعه‌ی بعدی با کد، شماره تماس یا پلاک به همین پرونده وصل می‌شود و نیازی به ثبت دوباره نیست.</p></div></div>
+        <div><h2>پرونده مشتریان</h2><p>هر مشتری یک کد ثابت دارد. مراجعه بعدی با کد و شماره تماس بررسی می‌شود؛ پلاک به‌تنهایی هویت مشتری را تعیین نمی‌کند.</p></div></div>
       <div class="sd-count"><strong id="custTotal">${fa(0)}</strong><span>مشتری</span></div>
     </div>
     <div class="cust-toolbar">
@@ -140,11 +140,12 @@ async function custDetail(id) {
     openModal(`پرونده مشتری — ${c.code}`, `<div class="cust-detail">
       <div class="cust-hero"><span class="cust-code cust-code-lg">${custEsc(c.code)}</span>
         <div><strong>${custEsc(c.name)}</strong><small>${custEsc(c.phone || '')}</small></div>
-        <button class="btn btn-secondary btn-sm" type="button" data-cust-edit>${icon('edit', 14)} ویرایش</button>${normalizeRole(app.user?.roleCode) === 'admin' ? `<button class="btn btn-secondary btn-sm" type="button" data-cust-delete>${icon('trash', 14)} حذف</button>` : ''}</div>
+        <button class="btn btn-secondary btn-sm" type="button" data-cust-edit>${icon('edit', 14)} ویرایش</button>${normalizeRole(app.user?.roleCode) === 'admin' ? `<button class="btn btn-secondary btn-sm" type="button" data-cust-merge>بررسی ادغام</button><button class="btn btn-secondary btn-sm" type="button" data-cust-delete>${icon('trash', 14)} حذف</button>` : ''}</div>
       <div class="cust-kv-grid">
         ${row('شماره دوم', c.phone2)}${row('کد ملی', c.nationalId)}<div class="cust-kv"><small>پلاک</small><div>${plateViewHtml(c.plate, '—', true)}</div></div>${row('نوع وسیله', c.vehicleType)}
         ${row('محله', c.district)}${row('شرکت / واحد', c.company)}${row('نشانی', c.address)}${row('یادداشت', c.notes)}
       </div>
+      ${d.historicalProfiles?.length?`<details><summary>مشخصات پرونده‌های پیشین ادغام‌شده</summary>${d.historicalProfiles.map(custHistoricalProfile).join('')}</details>`:''}
       ${debts?custDebtHtml(debts):''}
       <div class="cust-history">
         <div><h4>آخرین مراجعه‌ها (${fa((d.visits || []).length)})</h4><ul>${visits || '<li class="cust-none">مراجعه‌ای ثبت نشده است.</li>'}</ul></div>
@@ -153,12 +154,44 @@ async function custDetail(id) {
     </div>`);
     if(debts)custBindDebt(id,debts);
     $('#modal').querySelector('[data-cust-edit]').addEventListener('click', () => custForm(c));
+    $('#modal').querySelector('[data-cust-merge]')?.addEventListener('click', () => custMergeChoose(c));
     $('#modal').querySelector('[data-cust-delete]')?.addEventListener('click', async () => {
       if (!confirm(`پرونده ${c.code} — ${c.name} حذف شود؟ این کار برگشت ندارد.`)) return;
       try { await api('/api/customers/' + c.id, { method: 'DELETE' }); toast('پرونده مشتری حذف شد.'); closeModal(); await custLoad(); }
       catch (err) { toast(err.message); }
     });
   } catch (err) { toast(err.message); }
+}
+
+
+function custHistoricalProfile(p){
+ const fields=[['کد',p.code],['نام',p.name],['تلفن',p.phone],['تلفن دوم',p.phone2],['کد ملی',p.nationalId],['شرکت',p.company],['محله',p.district],['نشانی',p.address],['پلاک',p.plate],['وسیله',p.vehicleType],['یادداشت',p.notes]];
+ return `<div class="detail-note"><div>${fields.map(([k,v])=>`<p><b>${k}:</b> ${custEsc(v||'—')}</p>`).join('')}</div></div>`;
+}
+
+// Two-step admin review. The secondary profile is archived, not deleted;
+// original orders, visits and financial records keep their existing identities.
+async function custMergeChoose(customer){
+ try{
+  const data=await api('/api/customers/'+encodeURIComponent(customer.id)+'/merge-candidates');
+  if(!data.candidates?.length)return toast('پرونده دیگری با شماره تماس مشترک پیدا نشد.');
+  openModal('بررسی ادغام پرونده‌های مشتری',`<form id="custMergeForm" class="cust-form"><p>فقط زمانی ادغام کنید که مطمئن هستید هر دو پرونده متعلق به یک شخص‌اند. داشتن شماره مشترک به‌تنهایی اثبات هویت نیست.</p><div class="cust-form-grid"><label class="cust-field cust-span2"><span>پرونده دیگر</span><select name="other" required>${data.candidates.map(x=>`<option value="${custEsc(x.id)}">${custEsc(x.code)} — ${custEsc(x.name)} — ${custEsc(x.phone)}</option>`).join('')}</select></label><label class="cust-field cust-span2"><span>پرونده‌ای که به عنوان اصلی باقی می‌ماند</span><select name="primaryChoice"><option value="current">${custEsc(customer.code)} — ${custEsc(customer.name)}</option><option value="other">پرونده انتخاب‌شده در بالا</option></select></label></div><div id="custMergeMsg" class="form-error"></div><div id="custMergePreview"></div><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button type="button" class="btn btn-secondary" data-merge-preview>پیش‌نمایش و بررسی سوابق</button></div></form>`);
+  const form=$('#custMergeForm'), output=$('#custMergePreview'),msg=$('#custMergeMsg');let selected=null;
+  const clear=()=>{selected=null;output.innerHTML='';msg.textContent='';};form.elements.other.onchange=clear;form.elements.primaryChoice.onchange=clear;
+  form.querySelector('[data-merge-preview]').onclick=async()=>{
+   clear();const other=form.elements.other.value,primaryId=form.elements.primaryChoice.value==='current'?customer.id:other,secondaryId=primaryId===customer.id?other:customer.id;
+   try{
+    selected=await api('/api/customers/merge-preview',{method:'POST',body:JSON.stringify({primaryId,secondaryId})});
+    const box=(label,c)=>`<section class="detail-note"><div><b>${label}: ${custEsc(c.code)} — ${custEsc(c.name)}</b><p>${qty(c.visitCount)} مراجعه · ${qty(c.orderCount)} سفارش · ${qty(c.invoiceCount)} فاکتور/پرداخت</p><p>بدهکاری: ${money(c.balance)} · بستانکاری: ${money(c.credit)} · چک در انتظار: ${money(c.pending)}</p><details><summary>مشخصات همه پرونده‌های این گروه</summary>${c.profiles.map(custHistoricalProfile).join('')}</details><details><summary>مراجعه‌ها (${qty(c.visits.length)})</summary><ul>${c.visits.map(v=>`<li>${custEsc(v.createdAt||'—')} · ${custEsc(v.purpose||'مراجعه')} · ${custEsc(v.status||'—')} · ${custEsc(v.district||'—')}</li>`).join('')||'<li>بدون مراجعه</li>'}</ul></details><details><summary>سفارش‌ها (${qty(c.orders.length)})</summary><ul>${c.orders.map(o=>`<li>${custEsc(o.orderNo||o.id)} · ${custEsc(o.createdAt||'—')} · ${custEsc(o.orderType||'—')} · ${custEsc(o.status||'—')}</li>`).join('')||'<li>بدون سفارش</li>'}</ul></details><details><summary>فاکتورها و پرداخت‌ها (${qty(c.payments.length)})</summary><ul>${c.payments.map(p=>`<li>فاکتور ${custEsc(p.invoiceNumber||p.id)} · ${custEsc(p.verifiedAt||'—')} · ${money(p.totalAmount||0)} ${Array.isArray(p.settlementMethods)?p.settlementMethods.map(m=>` · ${custEsc(m.type||'')} ${money(m.amount||0)}`).join(''):''}</li>`).join('')||'<li>بدون فاکتور</li>'}</ul></details><details><summary>حساب معوق و دریافت‌ها (${qty(c.debts.length)})</summary><ul>${c.debts.map(i=>`<li>فاکتور ${custEsc(i.invoiceNumber||i.paymentId)} · بدهی ${money(i.balance)} · بستانکاری ${money(i.credit||0)} · چک در انتظار ${money(i.pending)}<ul>${i.receipts.map(r=>`<li>${custEsc(r.type)} · ${money(r.amount)} · ${custEsc(r.status)} ${custEsc(r.bank||'')} ${custEsc(r.checkNumber||'')} ${custEsc(r.dueDate||'')}</li>`).join('')}</ul></li>`).join('')||'<li>بدون حساب معوق</li>'}</ul></details></div></section>`;
+    output.innerHTML=box('پرونده اصلی',selected.primary)+box('پرونده‌ای که از فهرست حذف و در سوابق نگهداری می‌شود',selected.secondary)+`<p>هیچ سفارش، مراجعه، فاکتور یا دریافت حذف یا بازنویسی نمی‌شود. نام و کد قدیمی برای سوابق قبلی حفظ می‌شود؛ جمع سوابق و حساب‌ها در پرونده اصلی قابل مشاهده خواهد بود. شماره‌های پرونده قدیمی همچنان به پرونده اصلی مربوط می‌مانند.</p><label class="adm-check"><input type="checkbox" data-merge-confirm> تأیید می‌کنم هر دو پرونده مربوط به یک مشتری هستند و پیش‌نمایش را بررسی کرده‌ام.</label><div class="modal-actions"><button type="button" class="btn btn-primary" data-merge-submit>تأیید نهایی ادغام</button></div>`;
+    output.querySelector('[data-merge-submit]').onclick=async e=>{
+     if(!output.querySelector('[data-merge-confirm]').checked){msg.textContent='ابتدا تأیید بررسی هویت را انتخاب کنید.';return;}
+     if(!confirm('دو پرونده برای یک مشتری ادغام شوند؟ سوابق قبلی حفظ می‌شوند.'))return;
+     const button=e.currentTarget;button.disabled=true;msg.textContent='';try{await api('/api/customers/merge',{method:'POST',body:JSON.stringify({primaryId,secondaryId,revision:selected.revision,confirmed:true})});toast('پرونده‌ها ادغام شدند؛ سوابق اصلی حفظ شد.');await custLoad();await custDetail(primaryId);}catch(err){msg.textContent=err.message;button.disabled=true;selected=null;}
+    };
+   }catch(err){msg.textContent=err.message;}
+  };
+ }catch(err){toast(err.message);}
 }
 
 

@@ -33,7 +33,7 @@ test('login form sits on a glass panel without changing the form contract',()=>{
     assert.ok(html.includes(id),id);
   assert.match(css,/prefers-reduced-motion:reduce\)\{[^}]*#loginView \.login-hero/);
   assert.match(html,/app\.js\?v=37\.50\.0/);
-  assert.match(html,/theme\.css\?v=37\.48\.0/);
+  assert.match(html,/theme\.css\?v=37\.48\.1/);
 });
 
 test('decorative layers never intercept clicks or cover the form',()=>{

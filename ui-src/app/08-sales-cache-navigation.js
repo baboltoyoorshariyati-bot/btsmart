@@ -89,7 +89,7 @@ function renderNav(){
     sales:[['dashboard','داشبورد','dashboard',null],['onsite','حضوری','user','salesIntake'],['remote','غیرحضوری','phone','salesRemote'],['stores','فروشگاه','store','store'],['settlement','تسویه','receipt','salesSettlement'],['delivery','پخش','truck',null],['flow','درجریان','flow','salesFlow'],['future','سفارش آتی','calendar','salesFuture'],['history','سوابق','history',null],['customers','مشتریان','users',null],['products','محصولات','package',null],['reports','گزارش','reports',null]],
     warehouse:[['dashboard','داشبورد','dashboard',null],['incoming','ورودی','inbox','warehouseIncomingRegular'],['preparing','تحویل','scale','warehousePreparingRegular'],['stores','فروشگاه','store','warehouseStores'],['document-edits','اصلاح','edit',null],['returns','مرجوعی','receipt',null],['history','سوابق','history',null],['reports','گزارش','reports',null]],
     dispatch:[['dashboard','داشبورد','dashboard',null],['transport-resources','رانندگان و خودروها','driver',null],['transport-fleet','خودروهای پخش','truck',null],['orders','سفارشات','route','dispatchPending'],['reports','گزارشات','reports',null]],
-    store:[['dashboard','داشبورد','dashboard',null],['create','سفارش کلی','clipboard',null],...(app.features?.partialStoreOrders?[['partial','سفارشات جزئی','clipboard',null]]:[]),['registered','ثبت‌شده','history',null],['delivery','تحویل','truck',null],['reports','گزارشات','reports',null]],
+    store:[['dashboard','داشبورد','dashboard',null],['create','سفارش کلی','clipboard',null],...(app.features?.partialStoreOrders?[['partial','سفارشات جزئی','clipboard',null]]:[]),['registered','ثبت‌شده','history',null],['transfers','جابجایی','truck',null],['delivery','تحویل','truck',null],['reports','گزارشات','reports',null]],
     driver:[['dashboard','کارتابل راننده','driver','driverOpen'],['reports','گزارش‌ها','reports',null]]
   };
   if(r==='admin'){
@@ -295,6 +295,7 @@ async function salesV29ClickHandler(e){
     // Shipments and assignments may have changed at another workstation while
     // this tab was cached. Refresh on entry without changing the selected tab.
     const selected=app.salesStoreTab;
+    if(selected==='transfers'&&storePane) void transferMount(storePane.querySelector('[data-transfer-panel]'),'sales');
     if(selected==='processing'||selected==='history')void fetchSalesCache(true).then(data=>{if(app.page==='sales'&&app.sub.sales==='stores'&&app.salesStoreTab===selected)paintSalesPaneV29('stores',data);}).catch(()=>{});
     return; }
   const tab=e.target.closest('[data-sales-tab]');
@@ -450,12 +451,21 @@ function salesV29Activate(tab){
   app.salesV29.lastTab=tab;
 }
 
+// Clear only the selected, already-issued invoice; other settlement forms stay open.
+function clearIssuedTransportSettlement(data){
+  const selected=stl.orderId&&(data.orders||[]).find(o=>o.id===stl.orderId);
+  if(selected&&salesTransportInvoiceIssued(selected)&&selected.transportInvoice?.status==='PREPARED'){
+    stlClose();toast('فاکتور ثبت شده است؛ برای بررسی و چاپ به کارتابل پخش مراجعه کنید.');
+  }
+}
+
 function paintSalesPaneV29(tab,data){
   const pane=app.salesV29.panes?.[tab]; if(!pane)return;
   if(pane.dataset.renderedV29!=='1'){
     pane.innerHTML=salesV29RenderPane(tab,data);
     pane.dataset.renderedV29='1';
     bindSalesPaneV29(tab);
+    if(tab==='stores'&&app.salesStoreTab==='transfers')void transferMount(pane.querySelector('[data-transfer-panel]'),'sales');
     return;
   }
   if(tab==='onsite'){
@@ -464,9 +474,11 @@ function paintSalesPaneV29(tab,data){
     /* تلفنی/غیرحضوری فقط؛ صف فروشگاه در تب مستقل stores رندر می‌شود. */
   }else if(tab==='stores'){
     pane.innerHTML=salesV29RenderPane(tab,data);
+    if(app.salesStoreTab==='transfers')void transferMount(pane.querySelector('[data-transfer-panel]'),'sales');
   }else if(tab==='flow'){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]));
   }else if(tab==='settlement'){
+    clearIssuedTransportSettlement(data);
     const all=salesAllInSettlement(data.orders||[]);
     const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
     const noGoods=pane.querySelector('.sales-no-goods-list'); if(noGoods)noGoods.innerHTML=salesNoGoodsRows(all);

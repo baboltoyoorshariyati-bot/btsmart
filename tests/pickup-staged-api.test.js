@@ -15,6 +15,12 @@ test('staged pickup API: roles, recipient, physical delivery, cancellation and l
   const {gate,warehouse:wh,sales}=cookies;const d=new Date(),day=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
   const create=async(phone,deposit)=> (await ok('POST','/api/orders/remote',{name:'مالک سفارش',phone,deliveryMode:'PICKUP',scheduledTime:'00:00',deliveryDate:day,items:[{productId:'p01',requestedQty:5,requestedUnit:'کیلوگرم'}],...(deposit?{deposit:{type:'CASH',amount:100}}:{})},sales)).order;
   const order=await create('09121112233',false),other=await create('09121112234',true),race=await create('09121112235',false);
+  assert.equal((await call('GET','/api/pickup/orders?view=entry',null,wh)).status,403);
+  let eligible=await ok('GET','/api/pickup/orders?view=entry',null,gate);
+  assert(eligible.orders.some(x=>x.id===order.id));assert(eligible.orders.some(x=>x.id===other.id));assert.equal(eligible.total,3);assert.equal(eligible.limit,50);
+  assert(!JSON.stringify(eligible).includes('deposit'));assert(!JSON.stringify(eligible).includes('unitPrice'));
+  const filtered=await ok('GET','/api/pickup/orders?view=entry&q='+encodeURIComponent(order.orderNo),null,gate);assert.equal(filtered.total,1);assert.equal(filtered.orders[0].id,order.id);assert(!(await ok('GET','/api/pickup/orders?view=entry&q=ناموجود',null,gate)).orders.length);
+  assert.equal((await ok('GET','/api/pickup/orders?view=entry&offset=50',null,gate)).orders.length,0);
   await ok('POST',`/api/orders/${order.id}/warehouse/accept`,{},wh);
   assert.equal((await call('POST',`/api/orders/${order.id}/warehouse`,{items:[{itemId:order.items[0].id,deliveredKg:5}]},wh)).status,409,'new managed order cannot be finalized before entry');
   const person={name:'راننده مشتری',phone:'09121112244',vehicleType:'خودرو',carType:'تریلی یخچال',plate:'12ب34567'};
@@ -25,7 +31,7 @@ test('staged pickup API: roles, recipient, physical delivery, cancellation and l
   try{
    await new Promise((resolve,reject)=>{worker.once('message',resolve);worker.once('exit',code=>reject(Error('pickup worker exited '+code)));});
    const newEntry=new Promise(resolve=>worker.once('message',resolve));worker.send({id:race.id,person});
-   const [legacyResult,newResult]=await Promise.all([call('POST',`/api/orders/${race.id}/cancel-remote`,{reason:'انصراف'},sales),newEntry]);
+   const [legacyResult,newResult]=await Promise.all([call('POST',`/api/orders/${race.id}/cancel-remote`,{reason:'انصراف',confirmedNoGoods:true},sales),newEntry]);
    assert.equal(Number(legacyResult.status===200)+Number(newResult.ok),1,JSON.stringify({legacyResult,newResult}));
    assert.equal(legacyResult.status===200?newResult.status:legacyResult.status,409);
   }finally{if(worker.exitCode===null)worker.kill();}
@@ -34,9 +40,12 @@ test('staged pickup API: roles, recipient, physical delivery, cancellation and l
   assert.equal((await call('PUT',`/api/pickup/${order.id}/delivery-date`,{deliveryDate:day},gate)).status,403);
   const tomorrow=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1),next=[tomorrow.getFullYear(),String(tomorrow.getMonth()+1).padStart(2,'0'),String(tomorrow.getDate()).padStart(2,'0')].join('-');
   await ok('PUT',`/api/pickup/${order.id}/delivery-date`,{deliveryDate:next},sales);assert.equal((await ok('GET',`/api/orders/${order.id}`,null,sales)).order.scheduledAt,order.scheduledAt);
+  assert(!(await ok('GET','/api/pickup/orders?view=entry',null,gate)).orders.some(x=>x.id===order.id),'future pickup excluded');
   assert.equal((await call('POST',`/api/pickup/${order.id}/entry`,person,gate)).status,409,'gate entry is forbidden outside delivery date');
   await ok('PUT',`/api/pickup/${order.id}/delivery-date`,{deliveryDate:day},sales);
   const entryResponse=await ok('POST',`/api/pickup/${order.id}/entry`,person,gate);assert(!JSON.stringify(entryResponse).includes('deposit'));const entered=entryResponse.visit;assert.equal(entered.recipient.name,person.name);assert.notEqual(entered.status,'WAITING_SALES');
+  assert(!(await ok('GET','/api/pickup/orders?view=entry',null,gate)).orders.some(x=>x.id===order.id),'open visit excluded');
+  assert.equal((await ok('GET','/api/pickup/orders?view=entry&q='+encodeURIComponent(order.orderNo),null,gate)).total,0,'list search cannot include an open visit');
   assert.equal((await call('POST',`/api/pickup/${order.id}/entry`,person,gate)).status,409);
   assert.equal((await call('PUT',`/api/pickup/${order.id}/delivery-date`,{deliveryDate:day},sales)).status,409);
   assert.equal((await call('POST',`/api/orders/${order.id}/warehouse`,{items:[{itemId:order.items[0].id,deliveredKg:5}]},wh)).status,409);
@@ -73,5 +82,12 @@ test('staged pickup API: roles, recipient, physical delivery, cancellation and l
   assert.equal((await call('POST',`/api/pickup/${other.id}/cancellation-exit`,{},gate)).status,409);
   await ok('POST',`/api/pickup/${other.id}/cancellation-approval`,{},sales);await ok('POST',`/api/pickup/${other.id}/cancellation-exit`,{},gate);
   const final=(await ok('GET',`/api/orders/${other.id}`,null,sales)).order;assert.equal(final.status,'CANCELLED');assert.equal(final.deposit.status,'REFUND_REQUIRED');assert.equal(final.visit.exitReason,'CANCELLATION');
+  // All eligible records remain reachable after the first page, and filtering
+  // is applied before pagination rather than only to the displayed page.
+  let last;for(let i=0;i<51;i++)last=await create('09121118888',false);
+  const first=await ok('GET','/api/pickup/orders?view=entry',null,gate),second=await ok('GET','/api/pickup/orders?view=entry&offset=50',null,gate);
+  assert(first.total>=51);assert.equal(first.orders.length,50);assert.equal(second.orders.length,first.total-50);assert(!first.orders.some(a=>second.orders.some(b=>a.id===b.id)));
+  const exact=await ok('GET','/api/pickup/orders?view=entry&q='+encodeURIComponent(last.orderNo),null,gate);assert.equal(exact.total,1);assert.equal(exact.orders[0].id,last.id);
+
  }finally{if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });

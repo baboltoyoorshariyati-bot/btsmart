@@ -3,26 +3,20 @@
 process.env.BT_EXPERIMENTAL_TRANSPORT_WORKFLOW='0';
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {spawn}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),net=require('node:net');
-test('browser sessions expire after missing heartbeats, while open tabs and reload grace work',()=>{
+test('browser sessions survive missed heartbeats, retain reload grace and release closed tabs on login',()=>{
  const sec=require('../lib/security'),now=Date.now,base=now();let t=base;Date.now=()=>t;
  try{
   sec.destroyAllSessions();const sid=sec.createSession('u','ip',true);
   assert.doesNotMatch(sec.sessionCookie(sid,sec.getSession(sid)),/Max-Age|Expires/);
-  sec.browserPing(sid,'a');sec.browserPing(sid,'b');sec.browserLeave(sid,'a');t+=9000;assert(sec.getSession(sid));
-  sec.browserLeave(sid,'b');t+=5000;assert(sec.getSession(sid));sec.browserPing(sid,'c');t+=4000;assert(sec.getSession(sid));
+  sec.browserPing(sid,'a');sec.browserPing(sid,'b');t+=48*60*60*1000;sec.pruneSessions();assert(sec.getSession(sid),'suspended tabs must not expire');
+  sec.browserLeave(sid,'a');t+=9000;assert(sec.getSession(sid),'remaining suspended tab stays registered');
+  sec.browserLeave(sid,'b');t+=5000;assert(sec.getSession(sid));sec.browserPing(sid,'c');t+=4000;assert(sec.getSession(sid),'reload during grace');
   sec.browserLeave(sid,'c');t+=4000;sec.browserLeave(sid,'c');sec.browserLeave(sid,'unknown');t+=4001;
-  assert.equal(sec.getSession(sid),null,'duplicate or unknown leaves cannot extend the reload grace');
-  const long=sec.createSession('u','ip',true);sec.browserPing(long,'a');
-  for(let i=0;i<48*60*3;i++){t+=20000;assert(sec.browserPing(long,'a'));}
-  assert(sec.getSession(long),'open browser stays logged in with heartbeats for days');
-  t+=59999;assert(sec.getSession(long));t+=1;
-  assert.equal(sec.countUserSessions('u'),0,'a missing heartbeat releases the account on next login check');
-  assert.equal(sec.getSession(long),null);
-  const never=sec.createSession('u','ip',true);t+=60000;assert.equal(sec.getSession(never),null,'a login without an initial presence also expires');
-  const tabs=sec.createSession('u','ip',true);sec.browserPing(tabs,'a');sec.browserPing(tabs,'b');t+=30000;sec.browserPing(tabs,'b');t+=31000;
-  assert(sec.getSession(tabs),'a fresh tab keeps the session alive when another tab stops pinging');
-  sec.browserLeave(tabs,'b');t+=8001;assert.equal(sec.getSession(tabs),null,'a stale tab does not prevent last-tab closure');
-  const api=sec.createSession('u','ip');t+=48*60*60*1000;assert(sec.getSession(api),'non-browser sessions remain compatible');sec.destroySession(api);assert.equal(sec.getSession(api),null);
+  assert.equal(sec.getSession(sid),null,'duplicate leaves cannot extend reload grace');
+  const closed=sec.createSession('u','ip',true);sec.browserPing(closed,'a');sec.browserLeave(closed,'a');sec.releaseClosedUserSessions('u');assert.equal(sec.getSession(closed),null);
+  const never=sec.createSession('u','ip',true);t+=48*60*60*1000;sec.releaseClosedUserSessions('u');assert(sec.getSession(never),'unregistered tab cannot be assumed closed');
+  sec.destroySession(never);
+  const api=sec.createSession('u','ip');t+=48*60*60*1000;assert(sec.getSession(api));sec.destroySession(api);
  }finally{Date.now=now;sec.destroyAllSessions();}
 });
 test('live sales, invoice audit history and per-account login exclusion', {timeout:50000},async()=>{

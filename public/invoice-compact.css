@@ -137,6 +137,7 @@ body.invoice-print{margin:0;padding:8px;background:#fff}
 .inv38-compact.inv38-distribution .inv38-distribution-meta b{font-size:10px;line-height:1.4;margin:0;min-width:0;max-width:100%;overflow-wrap:anywhere}
 /* Give the delivery declaration the complete RTL width of the signature box. */
 .inv38-compact .inv38-delivery-signature{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:10px;min-height:0;padding:7px 10px;break-inside:avoid}
+.inv38-compact .inv38-customer-ack{display:flex;flex-direction:column;gap:6px;break-inside:avoid}
 .inv38-compact .inv38-delivery-declaration{grid-column:1/-1;width:100%;margin:0;direction:rtl;text-align:right;line-height:1.8;font-size:11px;color:#111}
 .inv38-compact .inv38-delivery-signer{grid-column:1;margin:0;padding:0;align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;max-width:100%;text-align:center;overflow-wrap:anywhere}
 .inv38-compact .inv38-delivery-signature-line{display:block;width:100%;max-width:150px;height:18px;border-bottom:1px solid #555}
@@ -183,3 +184,26 @@ body.invoice-print{margin:0;padding:8px;background:#fff}
 .tr-shipment-title b{font-size:12px;font-weight:800;color:#111;line-height:1.5}
 .tr-shipment-title span{font-size:9.5px;color:#52606d;line-height:1.5}
 @media print{.tr-shipment-title{margin-bottom:4px}}
+
+/* Customer-approved distribution shipment note, kept independent of invoices. */
+.tr-shipment-note{direction:rtl;color:#1d222a;font-size:11px;line-height:1.4;width:100%;max-width:100%;box-sizing:border-box}
+.tr-shipment-note *{box-sizing:border-box}
+.tr-shipment-meta{display:grid;grid-template-columns:1.25fr 1.15fr .8fr .8fr 1.1fr 1.1fr 1.1fr;gap:3px;break-inside:avoid}
+.tr-shipment-meta>div{min-width:0;text-align:center;border-bottom:1px solid #e3e6ea;padding:2px 1px}
+.tr-shipment-meta span,.tr-shipment-meta b{display:block;overflow-wrap:anywhere}
+.tr-shipment-meta span{font-size:9px;color:#67707d}
+.tr-shipment-meta b{font-size:10px;line-height:1.4}
+.tr-shipment-table{border-collapse:collapse;width:100%;max-width:100%;table-layout:fixed;margin-top:4px}
+.tr-shipment-table col:nth-child(1){width:5%}.tr-shipment-table col:nth-child(2){width:26%}.tr-shipment-table col:nth-child(3){width:19%}.tr-shipment-table col:nth-child(4){width:24%}.tr-shipment-table col:nth-child(5){width:26%}
+.tr-shipment-table th,.tr-shipment-table td{padding:4px 5px;overflow-wrap:anywhere;text-align:center;vertical-align:middle;border-bottom:1px solid #e3e6ea}
+.tr-shipment-table thead th,.tr-shipment-weight th{background:#eef1f4;color:#67707d;font-size:10px}
+.tr-shipment-weight th:first-child{text-align:right}
+.tr-shipment-bottom{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:12px;margin-top:4px;break-inside:avoid}
+.tr-shipment-signature p{margin:0;line-height:1.8;overflow-wrap:anywhere}
+.tr-shipment-signature>div{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:8px}
+.tr-shipment-totals>div{display:flex;justify-content:space-between;gap:8px;padding:2px 0}
+.tr-shipment-totals span{flex-shrink:0}
+.tr-shipment-totals b{min-width:0;overflow-wrap:anywhere;text-align:left;direction:rtl}
+.tr-shipment-final{font-weight:bold}
+@media screen and (max-width:520px){.tr-shipment-meta{grid-template-columns:repeat(2,minmax(0,1fr))}.tr-shipment-bottom{grid-template-columns:minmax(0,1fr)} }
+@media print{.tr-shipment-note{-webkit-print-color-adjust:exact;print-color-adjust:exact}.tr-shipment-table thead{display:table-header-group}.tr-shipment-table tr{break-inside:avoid}.tr-shipment-bottom{break-inside:avoid}}

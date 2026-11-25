@@ -21,7 +21,7 @@ test('مرورگر: یک کارتابل ترابری، منابع مستقل و 
   assert.equal(await page.locator('#railNav [data-cartable=transport-resources]').count(),1);assert.equal(await page.locator('#railNav [data-cartable=drivers]').count(),0);
   const active=async key=>{assert.deepEqual(await page.locator('#railNav .cartable-nav-item.active').evaluateAll(xs=>xs.map(x=>x.dataset.cartable)),[key]);};
   await active('dashboard');
-  const dash=page.locator('[data-dash-role=dispatch]');await dash.waitFor();assert.equal((await dash.locator('.role-dash-card').filter({hasText:'رانندگان فعال'}).locator('strong').innerText()).trim(),'۱');assert.equal((await dash.locator('.role-dash-card').filter({hasText:'سفارش‌های در برنامه'}).locator('strong').innerText()).trim(),'۱');
+  const dash=page.locator('[data-dash-role=dispatch]');await dash.waitFor();assert.equal((await dash.locator('.role-dash-card').filter({hasText:'رانندگان فعال'}).locator('strong').innerText()).trim(),'۱');assert.equal((await dash.locator('.role-dash-card').filter({hasText:'سرویس‌های در برنامه'}).locator('strong').innerText()).trim(),'۱');
   const unpaired=(await post(transport,'/api/transport/drivers',{fullName:'راننده بدون خودرو',phone:'09121117777'})).driver,vehicle2=(await post(transport,'/api/transport/vehicles',{vehicleType:'وانت',plate:'22ب34567'})).vehicle;
   await dash.locator('[data-cartable=transport-resources]').click();await page.locator('#content').getByText('راننده مستقل').first().waitFor();await active('transport-resources');
   await page.locator('#railNav [data-cartable=orders]').click();await page.locator('#transportPlans .tp-plan-row').filter({hasText:'مشتری کارتابل'}).waitFor();await active('orders');

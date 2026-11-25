@@ -5,10 +5,10 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 const ui=read('public/ui2.js'),css=read('public/theme.css'),compat=read('public/compatibility.css');
 
-test('انبار > فروشگاه‌ها: سه سربرگ و فقط پنل فعال؛ سوابق سفارش‌های ثبت‌شده در تب سوم',()=>{
+test('انبار > فروشگاه‌ها: چهار سربرگ و فقط پنل فعال؛ سوابق سفارش‌های ثبت‌شده در تب سوم',()=>{
   const paint=ui.slice(ui.indexOf('async function wh38Paint(phase)'),ui.indexOf('function wh38Shell(phase)'));
   assert.match(paint,/phase==='stores'/);
-  assert.match(paint,/\['incoming','preparing','history'\]\.includes\(app\.wh38\.storeTab\)/);
+  assert.match(paint,/\['incoming','preparing','history','transfers'\]\.includes\(app\.wh38\.storeTab\)/);
   assert.match(paint,/wh38StoreTabs\(active,counts\)/);
   assert.match(paint,/data-wh38-store-panel="\$\{active\}"/);
   assert.match(paint,/rows\.length\?wh38StoreList\(rows,active\):empty/);
@@ -21,7 +21,7 @@ test('انبار > فروشگاه‌ها: سه سربرگ و فقط پنل فع�
   assert.doesNotMatch(ui,/data-wh-store-docs-link/);
   assert.match(ui,/renderWhStoreDocuments\(\);/,'فهرست اسناد در تب سوابق باقی می‌ماند');
   assert.match(ui,/e\.target\.closest\('\[data-wh38-store-tab\]'\)/);
-  assert.match(ui,/app\.wh38\.storeTab=\['incoming','preparing','history'\]\.includes\(st\.dataset\.wh38StoreTab\)\?st\.dataset\.wh38StoreTab:'incoming'; wh38Paint\('stores'\)/);
+  assert.match(ui,/app\.wh38\.storeTab=\['incoming','preparing','history','transfers'\]\.includes\(st\.dataset\.wh38StoreTab\)\?st\.dataset\.wh38StoreTab:'incoming'; wh38Paint\('stores'\)/);
   assert.match(css,/\.wh38-store-tabs\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(compat,/\.wh38-store-table\{width:100%;table-layout:fixed/);
   assert.match(compat,/\.wh38-store-table td::before\{content:attr\(data-label\)/);

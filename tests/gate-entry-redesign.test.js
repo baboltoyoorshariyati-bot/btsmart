@@ -14,7 +14,7 @@ const entrySrc=()=>ui.slice(ui.indexOf('function renderGateEntry()'),ui.indexOf(
 test('waiting-for-sales is an independent rail menu with the queue badge',()=>{
   assert.match(app,/\['entry','ورود','entry',null\],\['waiting','در انتظار','bell','gateEntry'\]/);
   // کارت داشبورد نگهبانی هم به منوی تازه می‌رود، نه فرم ثبت ورود
-  assert.match(app,/\['در انتظار فروش',w\.gateEntry\|\|0,'waiting','user','red'\]/);
+  assert.match(app,/\['در انتظار فروش',w\.gateEntry\?\?null,'waiting','user','red'\]/);
   // renderGate شاخهٔ waiting دارد و صف کامل را می‌سازد
   assert.match(ui,/else if\(tab==='waiting'\)html\+=renderGateWaiting\(visits\.filter\(v=>v\.status==='WAITING_SALES'\)\)/);
   assert.match(ui,/function renderGateWaiting\(queue\)\{\s*return `<section class="sd-panel" id="gateWaitingPanel">/);
@@ -61,7 +61,7 @@ test('compact horizontal layout and 3D plate styles are in place',()=>{
 });
 
 test('updated assets are cache-busted for the current bundle',()=>{
-  assert.match(html,/theme\.css\?v=37\.48\.0/);
+  assert.match(html,/theme\.css\?v=37\.48\.1/);
   assert.match(html,/app\.js\?v=37\.50\.0/);
   assert.match(html,/ui2\.js\?v=37\.50\.0/);
   assert.match(html,/dispatch-ui\.js\?v=37\.50\.0/);

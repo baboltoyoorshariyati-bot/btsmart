@@ -6,7 +6,7 @@ const balanceCode=app.slice(app.indexOf('async function salesPriorBalance('),app
 const itemsCode=app.slice(app.indexOf('function stlItemsOf(o, prices){'),app.indexOf('\n}',app.indexOf('function stlItemsOf(o, prices){'))+2);
 function harness(api){
  const host={innerHTML:'',isConnected:true},painted=[],messages=[];
- const c={captureEntityNotices:()=>[],finishEntityNotices:()=>{},api,stl:{},app:{page:'sales',sub:{sales:'settlement'}},$:()=>host,document:{querySelectorAll:()=>[]},stlPaintForm:()=>painted.push(c.stl.orderId),stlEmptyHtml:()=>'<p>empty</p>',stlReset:()=>{},renderSales:()=>{},toast:m=>messages.push(m),esc:s=>String(s).replace(/[<>&"]/g,x=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[x]))};
+ const c={salesTransportInvoiceIssued:o=>!!o.transportInvoice&&['PREPARED','CLOSED'].includes(o.transportInvoice.status),stlClose:()=>{c.stl.orderId=null;host.innerHTML='<p>empty</p>';},fetchSalesCache:async()=>({orders:[]}),paintSalesPaneV29:()=>{},salesRefreshWarning:()=>{},captureEntityNotices:()=>[],finishEntityNotices:()=>{},api,stl:{},app:{page:'sales',sub:{sales:'settlement'}},$:()=>host,document:{querySelectorAll:()=>[]},stlPaintForm:()=>painted.push(c.stl.orderId),stlEmptyHtml:()=>'<p>empty</p>',stlReset:()=>{},renderSales:()=>{},toast:m=>messages.push(m),esc:s=>String(s).replace(/[<>&"]/g,x=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[x]))};
  vm.createContext(c);vm.runInContext(itemsCode,c);vm.runInContext(balanceCode,c);vm.runInContext(code,c);return {c,host,painted,messages};
 }
 const order=(id,extra={})=>({id,status:'SETTLEMENT_PENDING',orderType:'REMOTE',transportWorkflow:1,deliveryMode:'DELIVERY',items:[],...extra});
@@ -48,4 +48,19 @@ test('انتخاب سریع سفارش بعدی یا ترک صفحه مانع د
  let finishA;const h=harness(async url=>url==='/api/orders/a'?await new Promise(r=>{finishA=r}):{order:order('b')});
  const a=h.c.stlOpen('a');await h.c.stlOpen('b');finishA({order:order('a')});await a;assert.deepEqual(h.painted,['b']);
  let finishC;h.c.api=async()=>await new Promise(r=>{finishC=r});const c=h.c.stlOpen('c');h.host.isConnected=false;finishC({order:order('c')});await c;assert.deepEqual(h.painted,['b']);
+});
+
+test('فاکتور پخش ثبت‌شده از ردیف قدیمی در فرم تسویه باز نمی‌شود',async()=>{
+ const calls=[],h=harness(async url=>{calls.push(url);return {order:order('issued',{transportInvoice:{status:'PREPARED'}})}});
+ await h.c.stlOpen('issued');assert.deepEqual(calls,['/api/orders/issued']);assert.deepEqual(h.painted,[]);
+ assert.match(h.host.innerHTML,/empty/);assert(h.messages.some(m=>m.includes('پخش')));
+});
+test('به‌روزرسانی زنده فقط فرم همان فاکتور ثبت‌شده را می‌بندد',()=>{
+ const h=harness(async()=>({}));
+ vm.runInContext(app.slice(app.indexOf('function clearIssuedTransportSettlement('),app.indexOf('function paintSalesPaneV29(')),h.c);
+ h.c.stl.orderId='other';
+ h.c.clearIssuedTransportSettlement({orders:[order('issued',{transportInvoice:{status:'PREPARED'}}),order('other')]});
+ assert.equal(h.c.stl.orderId,'other');assert.equal(h.messages.length,0);
+ h.c.stl.orderId='issued';h.c.clearIssuedTransportSettlement({orders:[order('issued',{transportInvoice:{status:'PREPARED'}})]});
+ assert.equal(h.c.stl.orderId,null);assert(h.messages.some(m=>m.includes('پخش')));
 });
