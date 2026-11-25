@@ -40,7 +40,7 @@ async function renderGate(tab){
   app.sub.gate=tab;
   app.gateRenderSeq=(Number(app.gateRenderSeq)||0)+1;
   const renderSeq=app.gateRenderSeq;
-  const visits=(await api('/api/visits'+(tab==='history'&&app.gateHistoryQ?'?q='+encodeURIComponent(app.gateHistoryQ):''))).visits||[];
+  const visits=tab==='waiting'?(await fetchPagedList('/api/visits?status=WAITING_SALES','visits')).visits:(await api('/api/visits'+(tab==='history'&&app.gateHistoryQ?'?q='+encodeURIComponent(app.gateHistoryQ):''))).visits||[];
   let dispatchData={awaitingDriver:[],leaving:[],inTransit:[]};
   let dispatchError='';
   try{dispatchData=await api('/api/gate/dispatch');}
@@ -362,7 +362,7 @@ function openVisitOrderDetailsModal(order,records){
  const stagesHtml=stages.length?`<section><h3>مراحل سفارش</h3><ol class="whh-order-timeline">${stages.map(stage=>`<li><b>${esc(stage.label)}</b><small>${esc(formatDateTime24(stage.at))} · ثبت‌کننده: ${whVisitActor(stage.user)}</small></li>`).join('')}</ol></section>`:'';
  const actorNames=events.filter(event=>event.user).map(event=>`${event.user.name||event.user.username||''}`).filter(Boolean);
  const distinctActors=[...new Set(actorNames)];
- const eventsHtml=`<section><h3>همهٔ رویدادهای ثبت‌شده</h3>${distinctActors.length?`<p class="whh-detail-actor"><b>کاربران دخیل در این سفارش:</b> ${esc(distinctActors.join('، '))}</p>`:''}<ol class="whh-order-events">${events.map(event=>`<li><div class="whh-event-head"><b>${esc(event.label||WH_VISIT_EVENT_LABELS[event.action]||event.action||'اقدام ثبت‌شده')}</b><small>${esc(formatDateTime24(event.createdAt))} · ثبت‌کننده: ${whVisitActor(event.user)}</small></div></li>`).join('')||'<li>رویداد ثبت‌شده‌ای برای این سفارش موجود نیست.</li>'}</ol></section>`;
+ const eventsHtml=`<section><h3>همهٔ رویدادهای ثبت‌شده</h3>${distinctActors.length?`<p class="whh-detail-actor"><b>کاربران دخیل در این سفارش:</b> ${esc(distinctActors.join('، '))}</p>`:''}<ol class="whh-order-events">${events.map(event=>`<li><div class="whh-event-head"><b>${esc(event.action?BTAuditFa.label(event.action):(event.label||'اقدام ثبت‌شده'))}</b><small>${esc(formatDateTime24(event.createdAt))} · ثبت‌کننده: ${whVisitActor(event.user)}</small></div></li>`).join('')||'<li>رویداد ثبت‌شده‌ای برای این سفارش موجود نیست.</li>'}</ol></section>`;
  openModal(`جزئیات سفارش ${fa(o.orderNo||'—')}`,`<div class="whh-order-detail">
    <section><h3>مشخصات سفارش</h3><div class="whh-detail-grid">${orderFields.map(([label,value])=>cell(label,value)).join('')}</div>${o.warehouseReturn?.reason?`<p class="whh-detail-actor"><b>ارجاع به فروش:</b> ${esc(o.warehouseReturn.reason)}</p>`:''}</section>
    ${customerHtml}${visitHtml}${itemsHtml}${stagesHtml}${eventsHtml}

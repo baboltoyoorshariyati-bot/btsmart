@@ -53,8 +53,8 @@ test('اتصالات ایستا: تب سوابق به فهرست اسناد فر
   const route = read('lib/routes/orders.js');
   const css = read('public/compatibility.css');
   assert.ok(ui.indexOf("['incoming','ورودی']") < ui.indexOf("['history','سوابق سفارش‌های ثبت‌شده']"), 'تب سوابق بعد از دو تب کاری فروشگاه است');
-  assert.match(ui, /\['incoming','preparing','history'\]\.includes\(app\.wh38\.storeTab\)/, 'کلمپ تب history را می‌پذیرد');
-  assert.match(ui, /app\.wh38\.storeTab=\['incoming','preparing','history'\]\.includes\(st\.dataset\.wh38StoreTab\)/, 'کلیک تب history را فعال می‌کند');
+  assert.match(ui, /\['incoming','preparing','history','transfers'\]\.includes\(app\.wh38\.storeTab\)/, 'کلمپ تب history را می‌پذیرد');
+  assert.match(ui, /app\.wh38\.storeTab=\['incoming','preparing','history','transfers'\]\.includes\(st\.dataset\.wh38StoreTab\)/, 'کلیک تب history را فعال می‌کند');
   assert.match(ui, /active==='history'&&host\.querySelector\('\[data-wh38-store-history\]'\)\) return;/, 'نوسازی خودکار تب فعال را دوباره نمی‌سازد');
   assert.match(ui, /function renderWhStoreHistory\(\)/);
   assert.match(ui, /function renderWhStoreDocuments\(\)/);

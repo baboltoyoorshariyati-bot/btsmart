@@ -170,7 +170,7 @@ function sdStoreCard(o){
   </article>`;
 }
 function remotePhoneQueueRowsV40(orders){
-  const queue=(Array.isArray(orders)?orders:[]).filter(o=>o&&o.orderType==='REMOTE'&&['WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES','SETTLEMENT_PENDING'].includes(o.status));
+  const queue=(Array.isArray(orders)?orders:[]).filter(o=>o&&o.orderType==='REMOTE'&&['WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES','SETTLEMENT_PENDING'].includes(o.status)&&!(o.transportWorkflow===1&&o.deliveryMode==='DELIVERY'&&['PREPARED','CLOSED'].includes(o.transportInvoice?.status))&&!['DELIVERED','SALES_FINALIZED','CLOSED'].includes(o.dispatch?.status));
   const rows=queue.map(o=>`<tr data-order="${esc(o.id)}">
     <td data-label="نام مشتری"><span class="bt-cell-main">${esc(storeAwareOrderName(o)||'—')}</span><span class="bt-cell-sub">${esc(storeAwareOrderPhone(o)||'—')}</span></td>
     <td data-label="شماره سفارش"><bdi>${esc(fa(o.orderNo||'—'))}</bdi></td>
@@ -283,9 +283,9 @@ function renderSalesStoresV41(orders,deliveries={}){ // v37.7.9 — فروشگا
   const shipmentsPanel=additionPanel+cancellationPanel+renderStoreRunShipmentsPanel(deliveries.storeRunShipments||[]);
   const panel=(id,title,rows,kind,emptyTitle,emptyText,extra='')=>`<section class="sales-store-subpanel-v43" data-store-section="${id}"${(app.salesStoreTab||'incoming')===id?'':' hidden'}><header class="sales-store-subhead-v43"><h2>${title}</h2><span>${qty(rows.length)} سفارش</span></header>${extra}<div class="bt-table-wrap"><table class="bt-table sd-store-table"><thead><tr><th>فروشگاه</th><th>شماره سفارش</th><th>تاریخ</th><th>وضعیت</th>${kind==='processing'?'':'<th>اقلام</th>'}<th>عملیات</th></tr></thead><tbody>${rows.map(o=>card(o,kind)).join('')||`<tr><td colspan="${kind==='processing'?5:6}">${salesEmptyV25('sales',emptyTitle,emptyText)}</td></tr>`}</tbody></table></div></section>`;
   const shipCount=(deliveries.storeRunShipments||[]).length;
-  const tabs=[['incoming','ورودی',incoming.length+shipCount+additions.length],['processing','در جریان',processing.length],['approved','تأیید شده',approved.length],['history','سوابق',history.length]];
+  const tabs=[['incoming','ورودی',incoming.length+shipCount+additions.length],['processing','در جریان',processing.length],['approved','تأیید شده',approved.length],['history','سوابق',history.length],['transfers','جابجایی',0]];
   const active=(tabs.some(t=>t[0]===app.salesStoreTab)?app.salesStoreTab:'incoming');
-  return `<section class="sales-pane-v25 sales-store-pane-v40 sales-store-pane-v41 sales-store-pane-v42 sales-store-pane-v43" data-sales-pane="stores" data-sales-store-layout="v43"><nav class="sales-store-tabs-v43" aria-label="بخش‌های سفارش فروشگاه">${tabs.map(([id,label,count])=>`<button type="button" class="sales-store-tab-v43 ${active===id?'active':''}" data-store-subtab="${id}" aria-selected="${active===id}"><span>${label}</span><b>${qty(count)}</b></button>`).join('')}</nav><div class="sales-store-subpanels-v43">${panel('incoming','ورودی',incoming,'incoming',shipCount?'سفارش تازه‌ای در انتظار تأیید نیست':'سفارش ورودی وجود ندارد',shipCount?'محموله‌های وزن‌شدهٔ انبار در بالای همین بخش نمایش داده شده‌اند و برای هرکدام باید راننده تعیین شود.':'سفارش‌های تازهٔ فروشگاه در این بخش نمایش داده می‌شوند.',shipmentsPanel)}${panel('processing','در جریان',processing,'processing','سفارشی در جریان نیست','سفارش‌های در حال بررسی یا آماده‌سازی در این بخش دیده می‌شوند.')}${panel('approved','تأیید شده',approved,'approved','سفارش تأییدشده‌ای نیست','پس از تأیید و تعیین زمان، سفارش در این بخش قرار می‌گیرد.')}${panel('history','سوابق',history,'history','سابقه‌ای ثبت نشده است','سفارش‌های تکمیل‌شده و تأیید دریافت فروشگاه در این بخش نگهداری می‌شوند.')}</div></section>`;
+  return `<section class="sales-pane-v25 sales-store-pane-v40 sales-store-pane-v41 sales-store-pane-v42 sales-store-pane-v43" data-sales-pane="stores" data-sales-store-layout="v43"><nav class="sales-store-tabs-v43" aria-label="بخش‌های سفارش فروشگاه">${tabs.map(([id,label,count])=>`<button type="button" class="sales-store-tab-v43 ${active===id?'active':''}" data-store-subtab="${id}" aria-selected="${active===id}"><span>${label}</span><b>${qty(count)}</b></button>`).join('')}</nav><div class="sales-store-subpanels-v43">${panel('incoming','ورودی',incoming,'incoming',shipCount?'سفارش تازه‌ای در انتظار تأیید نیست':'سفارش ورودی وجود ندارد',shipCount?'محموله‌های وزن‌شدهٔ انبار در بالای همین بخش نمایش داده شده‌اند و برای هرکدام باید راننده تعیین شود.':'سفارش‌های تازهٔ فروشگاه در این بخش نمایش داده می‌شوند.',shipmentsPanel)}${panel('processing','در جریان',processing,'processing','سفارشی در جریان نیست','سفارش‌های در حال بررسی یا آماده‌سازی در این بخش دیده می‌شوند.')}${panel('approved','تأیید شده',approved,'approved','سفارش تأییدشده‌ای نیست','پس از تأیید و تعیین زمان، سفارش در این بخش قرار می‌گیرد.')}${panel('history','سوابق',history,'history','سابقه‌ای ثبت نشده است','سفارش‌های تکمیل‌شده و تأیید دریافت فروشگاه در این بخش نگهداری می‌شوند.')}<section data-store-section="transfers"${active==='transfers'?'':' hidden'}><div data-transfer-panel></div></section></div></section>`;
 }
 /* ---------- تب ۳: در جریان ---------- */
 function pickupSalesActions(o){
@@ -320,6 +320,15 @@ function refreshSalesLiveWeightModal(data,failed=false){
  if(failed){if(state)state.textContent='دریافت تازه ناموفق بود؛ وزن‌های زیر ممکن است قدیمی باشند.';return;}
  const order=(data?.orders||[]).find(o=>o.id===box.dataset.salesLiveOrder);
  if(!order){if(state)state.textContent='این سفارش دیگر در فهرست جاری نیست؛ برای بررسی وضعیت دوباره باز کنید.';return;}
+ const additions=document.querySelector('#modal [data-pending-order-additions]');
+ if(additions&&additions.dataset.orderId===order.id){
+  const signature=orderPendingAdditionSignature(order);
+  if(additions.dataset.pendingSignature!==signature){
+   additions.innerHTML=orderPendingAdditionsHtml(order)+'<p class="notice">وضعیت درخواست محصول تغییر کرده است؛ برای مشاهده اقلام نهایی، جزئیات سفارش را دوباره باز کنید. <button type="button" class="btn btn-secondary btn-sm" data-action="order-details" data-id="'+esc(order.id)+'">بازکردن دوباره جزئیات</button></p>';
+   additions.dataset.pendingSignature=signature;
+  }
+ }
+
  if(box.dataset.salesStoreLive==='true'){
   const runs=new Map((order.storeRun?.items||[]).map(x=>[String(x.itemId),x]));
   const items=new Map((order.items||[]).map(x=>[String(x.id),x]));
@@ -353,7 +362,11 @@ async function openCustomerAddition(id){
   const paint=()=>{const el=$('#store-addition-lines');if(el){el.innerHTML=renderDraftLinesTable(app.storeAdditionDraft.map((x,i)=>renderProductPickerLine(x,i,'storeaddition')));bindOperationLines('storeaddition','storeAdditionDraft')}};paint();
   $('#customerAdditionAdd').onclick=()=>{app.storeAdditionDraft.push(defaultOrderLine());paint();};
   $('#customerAdditionForm').addEventListener('click',e=>{const p=e.target.closest('[data-action=op-pick-product]');if(p){pickOperationProduct(+p.dataset.index,p.dataset.productId,p.dataset.label,p.dataset.quick,'storeaddition','storeAdditionDraft');return;}const x=e.target.closest('[data-action=op-remove-line]');if(x){app.storeAdditionDraft.splice(+x.dataset.index,1);if(!app.storeAdditionDraft.length)app.storeAdditionDraft.push(defaultOrderLine());paint();}});
-  $('#customerAdditionForm').addEventListener('submit',async e=>{e.preventDefault();const lines=app.storeAdditionDraft.map(x=>({productId:x.productId,requestedQty:n(x.requestedQty),requestedUnit:x.requestedUnit,description:String(x.description||'').trim()}));if(lines.some(x=>!x.productId||!(x.requestedQty>0)))return toast('همه ردیف‌ها باید محصول و مقدار معتبر داشته باشند.');const btn=e.submitter;if(btn)btn.disabled=true;try{await api('/api/sales/customer-orders/'+encodeURIComponent(id)+'/additions',{method:'POST',body:JSON.stringify({items:lines})});closeModal();toast('درخواست برای تأیید به انبار ارسال شد.');const data=await fetchSalesCache(true);if(app.page==='sales')paintSalesPaneV29(app.sub.sales,data);await refreshIndicators();}catch(err){if(btn)btn.disabled=false;toast(err.message);}});
+  $('#customerAdditionForm').addEventListener('submit',async e=>{e.preventDefault();const lines=app.storeAdditionDraft.map(x=>({productId:x.productId,requestedQty:n(x.requestedQty),requestedUnit:x.requestedUnit,description:String(x.description||'').trim()}));if(lines.some(x=>!x.productId||!(x.requestedQty>0)))return toast('همه ردیف‌ها باید محصول و مقدار معتبر داشته باشند.');const btn=e.submitter;if(btn)btn.disabled=true;
+   try{await api('/api/sales/customer-orders/'+encodeURIComponent(id)+'/additions',{method:'POST',body:JSON.stringify({items:lines})});}catch(err){if(btn)btn.disabled=false;toast(err.message);return;}
+   closeModal();toast('درخواست برای تأیید به انبار ارسال شد.');if(app.page==='sales')await openOrderDetails(id);
+   try{const data=await fetchSalesCache(true);if(app.page==='sales')paintSalesPaneV29(app.sub.sales,data);await refreshIndicators();}catch{toast('درخواست ثبت شد؛ تازه‌سازی فهرست ناموفق بود.');}
+  });
  }catch(e){toast(e.message);}
 }
 function salesFlowRowsV27(orders){
@@ -965,7 +978,7 @@ async function renderGate(tab){
   app.sub.gate=tab;
   app.gateRenderSeq=(Number(app.gateRenderSeq)||0)+1;
   const renderSeq=app.gateRenderSeq;
-  const visits=(await api('/api/visits'+(tab==='history'&&app.gateHistoryQ?'?q='+encodeURIComponent(app.gateHistoryQ):''))).visits||[];
+  const visits=tab==='waiting'?(await fetchPagedList('/api/visits?status=WAITING_SALES','visits')).visits:(await api('/api/visits'+(tab==='history'&&app.gateHistoryQ?'?q='+encodeURIComponent(app.gateHistoryQ):''))).visits||[];
   let dispatchData={awaitingDriver:[],leaving:[],inTransit:[]};
   let dispatchError='';
   try{dispatchData=await api('/api/gate/dispatch');}
@@ -1287,7 +1300,7 @@ function openVisitOrderDetailsModal(order,records){
  const stagesHtml=stages.length?`<section><h3>مراحل سفارش</h3><ol class="whh-order-timeline">${stages.map(stage=>`<li><b>${esc(stage.label)}</b><small>${esc(formatDateTime24(stage.at))} · ثبت‌کننده: ${whVisitActor(stage.user)}</small></li>`).join('')}</ol></section>`:'';
  const actorNames=events.filter(event=>event.user).map(event=>`${event.user.name||event.user.username||''}`).filter(Boolean);
  const distinctActors=[...new Set(actorNames)];
- const eventsHtml=`<section><h3>همهٔ رویدادهای ثبت‌شده</h3>${distinctActors.length?`<p class="whh-detail-actor"><b>کاربران دخیل در این سفارش:</b> ${esc(distinctActors.join('، '))}</p>`:''}<ol class="whh-order-events">${events.map(event=>`<li><div class="whh-event-head"><b>${esc(event.label||WH_VISIT_EVENT_LABELS[event.action]||event.action||'اقدام ثبت‌شده')}</b><small>${esc(formatDateTime24(event.createdAt))} · ثبت‌کننده: ${whVisitActor(event.user)}</small></div></li>`).join('')||'<li>رویداد ثبت‌شده‌ای برای این سفارش موجود نیست.</li>'}</ol></section>`;
+ const eventsHtml=`<section><h3>همهٔ رویدادهای ثبت‌شده</h3>${distinctActors.length?`<p class="whh-detail-actor"><b>کاربران دخیل در این سفارش:</b> ${esc(distinctActors.join('، '))}</p>`:''}<ol class="whh-order-events">${events.map(event=>`<li><div class="whh-event-head"><b>${esc(event.action?BTAuditFa.label(event.action):(event.label||'اقدام ثبت‌شده'))}</b><small>${esc(formatDateTime24(event.createdAt))} · ثبت‌کننده: ${whVisitActor(event.user)}</small></div></li>`).join('')||'<li>رویداد ثبت‌شده‌ای برای این سفارش موجود نیست.</li>'}</ol></section>`;
  openModal(`جزئیات سفارش ${fa(o.orderNo||'—')}`,`<div class="whh-order-detail">
    <section><h3>مشخصات سفارش</h3><div class="whh-detail-grid">${orderFields.map(([label,value])=>cell(label,value)).join('')}</div>${o.warehouseReturn?.reason?`<p class="whh-detail-actor"><b>ارجاع به فروش:</b> ${esc(o.warehouseReturn.reason)}</p>`:''}</section>
    ${customerHtml}${visitHtml}${itemsHtml}${stagesHtml}${eventsHtml}
@@ -1350,7 +1363,7 @@ function wh38OrdersTable(orders,kind){
   </table></div>`;
 }
 function wh38Tabs(active){
-  const inc=badgeCount('warehouseIncomingRegular')||badgeCount('warehouseIncoming'), prep=badgeCount('warehousePreparingRegular')||badgeCount('warehousePreparing'), st=badgeCount('warehouseStores');
+  const inc=badgeCount('warehouseIncomingRegular'), prep=badgeCount('warehousePreparingRegular'), st=badgeCount('warehouseStores');
   return `<div class="wh38-tabs">
     <button type="button" class="wh38-tab ${active==='incoming'?'active':''}" data-wh38-tab="incoming"><span class="wh38-tab-idx">۰۱</span><span>${icon('truck',22)}</span><div><b>سفارش‌های ورودی</b><small>فقط مشتریان عادی — تأیید ورود به آماده‌سازی</small></div><em>${qty(inc)}</em></button>
     <button type="button" class="wh38-tab ${active==='preparing'?'active':''}" data-wh38-tab="preparing"><span class="wh38-tab-idx">۰۲</span><span>${icon('scale',22)}</span><div><b>آماده‌سازی و تحویل</b><small>فقط مشتریان عادی — ثبت وزن و ارسال به تسویه فروش</small></div><em>${qty(prep)}</em></button>
@@ -1381,7 +1394,7 @@ function wh38IncomingHeader(o){
    Full timestamps stay in the title tooltip; the 4-cell summary is not used for stores. */
 function wh38StoreTabs(active,counts){
   // سربرگ سوم، فقط برای سفارش‌ها و اسناد فروشگاهی که در انبار ثبت شده‌اند.
-  const tabs=[['incoming','ورودی'],['preparing','آماده‌سازی و سرویس‌ها'],['history','سوابق سفارش‌های ثبت‌شده']];
+  const tabs=[['incoming','ورودی'],['preparing','آماده‌سازی و سرویس‌ها'],['history','سوابق سفارش‌های ثبت‌شده'],['transfers','جابجایی']];
   return `<nav class="wh38-store-tabs" role="tablist" aria-label="بخش‌های فروشگاه در انبار">${tabs.map(([id,label])=>`<button type="button" role="tab" class="wh38-store-tab ${active===id?'active':''}" data-wh38-store-tab="${id}" aria-selected="${active===id}"><span>${label}</span><b>${qty(counts[id]||0)}</b></button>`).join('')}</nav>`;
 }
 function wh38StoreHeader(o){
@@ -1416,7 +1429,7 @@ async function wh38StoreDetails(id){
     if(o.orderType!=='STORE') return toast('این سفارش از نوع فروشگاهی نیست.');
     const items=activeItemsOf(o);
     const canAccept=o.status==='WAREHOUSE_PENDING';
-    openModal('جزئیات سفارش فروشگاه',`<div class="whsin22-detail whd35-detail"><div class="whd35-head"><div class="whd35-title"><h2>${esc(o.storeName||'فروشگاه')}</h2><span>${o.storeOrderKind==='PARTIAL'&&o.storePurpose==='STOCK'?'تأمین تکمیلی فروشگاه':'مشتری: '+esc(o.customer?.name||'—')}</span></div>${badge(o.status)}</div><div class="whd35-meta"><span>شماره سفارش <b>${esc(fa(o.orderNo||'—'))}</b></span><span>ثبت <b>${esc(formatDateTime24(o.createdAt))}</b></span>${o.scheduledAt?`<span>زمان ارسال <b>${esc(formatDateTime24(o.scheduledAt))}</b></span>`:''}${o.dispatchPlace?`<span>محل ارسال <b>${esc(o.dispatchPlace)}</b></span>`:''}</div>${o.notes?`<div class="detail-note whd35-note"><span>${icon('info',14)}</span><div><b>یادداشت سفارش</b><p>${esc(o.notes)}</p></div></div>`:''}<div class="whd23-list whd35-list"><div class="whd23-row whd35-headrow" aria-hidden="true"><span></span><span>محصول</span><span>مقدار</span><span>واحد</span><span>توضیحات</span></div>${items.map((it,k)=>`<div class="whd23-row"><span class="whd23-num">${fa(String(k+1))}</span><div class="whd23-box whd23-product"><b title="${esc(it.product?.name||'—')}">${esc(it.product?.name||'—')}</b></div><div class="whd23-box"><b>${qty(it.requestedQty)}</b></div><div class="whd23-box"><b>${esc(it.requestedUnit||'')}</b></div><div class="whd23-box whd23-desc"><b title="${esc(it.description||'بدون توضیح')}">${esc(it.description||'بدون توضیح')}</b></div></div>`).join('')||'<div class="empty">قلمی در این سفارش ثبت نشده است.</div>'}</div><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button>${canAccept?`<button type="button" class="btn btn-primary" data-action="wh38-accept-details" data-id="${o.id}">${icon('check',16)} تأیید دریافت و ورود به آماده‌سازی</button>`:''}</div></div>`);
+    openModal('جزئیات سفارش فروشگاه',`<div class="whsin22-detail whd35-detail"><div class="whd35-head"><div class="whd35-title"><h2>${esc(o.storeName||'فروشگاه')}</h2><span>${o.storeOrderKind==='PARTIAL'&&o.storePurpose==='STOCK'?'تأمین تکمیلی فروشگاه':'مشتری: '+esc(o.customer?.name||'—')}</span></div>${badge(o.status)}</div><div class="whd35-meta"><span>شماره سفارش <b>${esc(fa(o.orderNo||'—'))}</b></span><span>ثبت <b>${esc(formatDateTime24(o.createdAt))}</b></span><span>ثبت‌کنندهٔ سفارش <b>${esc(o.createdByName||'ثبت‌کننده نامشخص')}</b></span>${o.scheduledAt?`<span>زمان ارسال <b>${esc(formatDateTime24(o.scheduledAt))}</b></span>`:''}${o.dispatchPlace?`<span>محل ارسال <b>${esc(o.dispatchPlace)}</b></span>`:''}</div>${o.notes?`<div class="detail-note whd35-note"><span>${icon('info',14)}</span><div><b>یادداشت سفارش</b><p>${esc(o.notes)}</p></div></div>`:''}<div class="whd23-list whd35-list"><div class="whd23-row whd35-headrow" aria-hidden="true"><span></span><span>محصول</span><span>مقدار</span><span>واحد</span><span>توضیحات</span></div>${items.map((it,k)=>`<div class="whd23-row"><span class="whd23-num">${fa(String(k+1))}</span><div class="whd23-box whd23-product"><b title="${esc(it.product?.name||'—')}">${esc(it.product?.name||'—')}</b></div><div class="whd23-box"><b>${qty(it.requestedQty)}</b></div><div class="whd23-box"><b>${esc(it.requestedUnit||'')}</b></div><div class="whd23-box whd23-desc"><b title="${esc(it.description||'بدون توضیح')}">${esc(it.description||'بدون توضیح')}</b></div></div>`).join('')||'<div class="empty">قلمی در این سفارش ثبت نشده است.</div>'}</div>${orderPendingAdditionsSection(o)}<div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button>${canAccept?`<button type="button" class="btn btn-primary" data-action="wh38-accept-details" data-id="${o.id}">${icon('check',16)} تأیید دریافت و ورود به آماده‌سازی</button>`:''}</div></div>`);
     finishEntityNotices(notices);return true;
   }catch(e){toast(e.message);return false;}
 }
@@ -1466,7 +1479,8 @@ async function wh38Paint(phase){
     if(phase==='delivered'){ await whDeliveredPaint(host); return; }
     if(phase==='document-edits'){ await whDocumentEditsPaint(host); return; }
     if(phase==='stores'){ // v37.9.0 — فروشگاه‌های انبار: سربرگ افقی، فرم/فهرست عمودی زیر آن
-      const active=['incoming','preparing','history'].includes(app.wh38.storeTab)?app.wh38.storeTab:'incoming'; app.wh38.storeTab=active;
+      const active=['incoming','preparing','history','transfers'].includes(app.wh38.storeTab)?app.wh38.storeTab:'incoming'; app.wh38.storeTab=active;
+      if(active==='transfers'){if(!host.querySelector('[data-transfer-panel]')){host.innerHTML=`<div class="wh38-store-pane">${wh38StoreTabs(active,{})}<section class="wh38-store-panel"><div data-transfer-panel></div></section></div>`;await transferMount(host.querySelector('[data-transfer-panel]'),'warehouse');}return;}
       if(active==='history'&&host.querySelector('[data-wh38-store-history]')) return; // v37.36.0 — فیلترهای سوابق با تازه‌سازی خودکار ۷ ثانیه‌ای به‌هم نمی‌ریزد
       const [inc,prep,histAll]=(await Promise.all([fetchPagedList('/api/orders?status=WAREHOUSE_PENDING','orders'),fetchPagedList('/api/orders?status=WAREHOUSE_PREPARING','orders'),api('/api/warehouse/history?from=2000-01-01&to='+today()+'&orderType=STORE')]));
       const incRows=((inc&&inc.orders)||[]).filter(o=>o.orderType==='STORE');
@@ -1738,7 +1752,7 @@ function wh38Shell(phase){
   c.innerHTML=`<section class="wh38-shell">${deliveryTabs}<div id="wh38Body"></div></section>`;
   c.onclick=async e=>{
     const st=e.target.closest('[data-wh38-store-tab]');
-    if(st){ app.wh38.storeTab=['incoming','preparing','history'].includes(st.dataset.wh38StoreTab)?st.dataset.wh38StoreTab:'incoming'; wh38Paint('stores'); return; }
+    if(st){ app.wh38.storeTab=['incoming','preparing','history','transfers'].includes(st.dataset.wh38StoreTab)?st.dataset.wh38StoreTab:'incoming'; wh38Paint('stores'); return; }
     const t=e.target.closest('[data-wh38-tab]');
     if(t){ app.wh38.phase=t.dataset.wh38Tab; app.sub.warehouse=app.wh38.phase; renderNav(); wh38Shell(app.wh38.phase); return; }
     if(e.target.closest('[data-wh-document-edits-refresh]')){void whDocumentEditsPaint($('#wh38Body'));return;}
@@ -2135,8 +2149,7 @@ function stRegisteredRow(o){
   const service=(run)=>{const sr=o.storeRun||{},stage=run===1?sr.r1Stage:sr.r2Stage,full=run===1?sr.r1StageLabel:sr.r2StageLabel;const weights=(sr.items||[]).some(v=>Number(run===1?v.r1Kg:v.r2Kg)>0);const label=stage?(stageLabels[stage]||full||stage):(weights?'وزن‌کشی ثبت شده':'در انتظار');return `<span class="st-registered-service" title="${esc(full||label)}">سرویس ${run===1?'اول':'دوم'}: ${esc(label)}</span>`;};
   const extras=showProgress&&o.storeRun?.enabled?(o.storeOrderKind==='PARTIAL'?[{html:`سفارش جزئی · ${esc(stageLabels[o.storeRun.r1Stage]||ST_REGISTERED_LABELS[o.status]||'در حال پیگیری')}`}]:[{html:'سفارش روزانه'},{html:service(1)},{html:service(2)}]):[{html:o.storeOrderKind==='PARTIAL'?'سفارش جزئی':'سفارش روزانه'}];
   const addition=(o.storeAdditionRequests||[]).find(r=>['PENDING_SALES','PENDING_WAREHOUSE'].includes(r.status));
-  const canAdd=o.storeOrderKind==='PARTIAL'&&['SCHEDULED_REMOTE','WAREHOUSE_PENDING','WAREHOUSE_PREPARING'].includes(o.status)&&!o.storeRunOps?.r1Shipment&&!o.storeRunOps?.finalizedAt&&!o.warehouseCompletedAt&&!o.storeWarehouseDocumentNos?.['1'];
-  const actions=`<button type="button" class="btn btn-secondary btn-sm" data-action="store-order-details" data-id="${esc(o.id)}">${icon('eye',13)} جزئیات سفارش</button>${o.status==='STORE_PENDING_SALES'?`<button type="button" class="btn btn-secondary btn-sm" data-action="edit-store-order" data-id="${esc(o.id)}">${icon('edit',13)} ویرایش</button><button type="button" class="btn btn-ghost btn-sm danger-text" data-action="cancel-store-order" data-id="${esc(o.id)}">${icon('trash',13)} لغو</button>`:''}${canAdd&&!addition?`<button type="button" class="btn btn-primary btn-sm" data-action="store-request-addition" data-id="${esc(o.id)}">افزودن کالا</button>`:''}${addition?`<span class="badge orange">${addition.status==='PENDING_SALES'?'افزودن کالا در انتظار فروش':'افزودن کالا در انتظار انبار'}</span>`:''}`;
+  const actions=`<button type="button" class="btn btn-secondary btn-sm" data-action="store-order-details" data-id="${esc(o.id)}">${icon('eye',13)} جزئیات سفارش</button>${o.status==='STORE_PENDING_SALES'?`<button type="button" class="btn btn-secondary btn-sm" data-action="edit-store-order" data-id="${esc(o.id)}">${icon('edit',13)} ویرایش</button><button type="button" class="btn btn-ghost btn-sm danger-text" data-action="cancel-store-order" data-id="${esc(o.id)}">${icon('trash',13)} لغو</button>`:''}${addition?`<span class="badge orange">${addition.status==='PENDING_SALES'?'افزودن محصول در انتظار فروش':'افزودن محصول در انتظار انبار'}</span>`:''}`;
   return `<tr data-store-order-id="${esc(o.id)}" data-order="${esc(o.id)}"><td data-label="فروشگاه">${esc(storeAwareOrderName(o))}</td><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="تاریخ ثبت">${esc(formatDateTime24(o.createdAt))}</td><td data-label="وضعیت"><span class="badge ${o.status==='CANCELLED'?'gray':o.status==='CLOSED'?'green':'blue'}">${esc(status)}</span></td><td data-label="اقلام">${qty(items.length)} قلم</td><td data-label="پیگیری"><div class="st-table-progress">${extras.map(x=>x.html).join(' ')}</div></td><td data-label="عملیات" class="bt-col-actions"><div class="st-table-actions">${actions}</div></td></tr>`;
 }
 function stRegisteredTable(rows){
@@ -2157,13 +2170,13 @@ async function storeAllOrders(){
 async function renderStoreRegistered(){
   const root=$('#content'),limit=25,generation=app.storeRenderGeneration;
   let offset=Math.max(0,Math.floor(Number(app.storeRegisteredOffset)||0)),seq=0,signature='';
-  root.innerHTML=`<section class="sd-panel st-registered-panel"><header class="st-registered-head"><div><h2>سفارش‌های ثبت‌شده</h2><p class="st38-store-identity">${esc(app.user.roleCode==='admin'?(app.storeScope?.branches.find(b=>String(b.branchNo)===String(app.storeBranchNo))?.storeName||'همه شعبه‌های فروشگاه'):app.user.storeName||app.user.fullName||'فروشگاه')}</p><p>از بررسی فروش تا آماده‌سازی انبار و تحویل؛ هر سفارش و سرویس‌های آن را اینجا پیگیری کنید.</p></div><span class="st-registered-live" role="status">در حال دریافت اطلاعات…</span></header><p class="st-registered-scroll-hint">برای دیدن تمام ستون‌ها در صفحهٔ کوچک، فهرست را افقی جابه‌جا کنید.</p><div class="st-registered-scroll" tabindex="0" role="region" aria-label="فهرست افقی سفارش‌ها"><div id="storeRegisteredList" class="st-registered-list"><div class="empty">در حال دریافت سفارش‌ها…</div></div></div><div id="storeRegisteredPages" class="st-registered-pages"></div></section>`;
+  root.innerHTML=`<section class="sd-panel st-registered-panel"><header class="st-registered-head"><div><h2>${app.storeRegisteredPending?'در انتظار بررسی فروش':'سفارش‌های ثبت‌شده'}</h2>${app.storeRegisteredPending?'<button type="button" class="btn btn-secondary btn-sm" data-store-registered-all>نمایش همه سفارش‌ها</button>':''}<p class="st38-store-identity">${esc(app.user.roleCode==='admin'?(app.storeScope?.branches.find(b=>String(b.branchNo)===String(app.storeBranchNo))?.storeName||'همه شعبه‌های فروشگاه'):app.user.storeName||app.user.fullName||'فروشگاه')}</p><p>از بررسی فروش تا آماده‌سازی انبار و تحویل؛ هر سفارش و سرویس‌های آن را اینجا پیگیری کنید.</p></div><span class="st-registered-live" role="status">در حال دریافت اطلاعات…</span></header><p class="st-registered-scroll-hint">برای دیدن تمام ستون‌ها در صفحهٔ کوچک، فهرست را افقی جابه‌جا کنید.</p><div class="st-registered-scroll" tabindex="0" role="region" aria-label="فهرست افقی سفارش‌ها"><div id="storeRegisteredList" class="st-registered-list"><div class="empty">در حال دریافت سفارش‌ها…</div></div></div><div id="storeRegisteredPages" class="st-registered-pages"></div></section>`;
   root.insertAdjacentHTML('afterbegin',storeScopeHeader());bindStoreScope();
   const current=()=>generation===app.storeRenderGeneration&&root.isConnected && app.page==='store' && app.sub.store==='registered';
   async function refresh(force=false){
     const request=++seq;
     try{
-      const data=await api(`/api/store/orders?offset=${offset}&limit=${limit}${storeScopeQuery()}`);
+      const data=await api(`/api/store/orders?offset=${offset}&limit=${limit}${app.storeRegisteredPending?'&status=STORE_PENDING_SALES':''}${storeScopeQuery()}`);
       if(!current()||request!==seq)return;
       if(offset>0&&offset>=data.total){offset=data.total?Math.floor((data.total-1)/limit)*limit:0;app.storeRegisteredOffset=offset;return refresh(true);}
       const nextSignature=JSON.stringify([data.orders,data.total,offset]);
@@ -2181,12 +2194,12 @@ async function renderStoreRegistered(){
     }catch(e){if(current()&&request===seq){root.querySelector('.st-registered-live').textContent='به‌روزرسانی ناموفق؛ تلاش مجدد خودکار';if(!signature)$('#storeRegisteredList').innerHTML=`<div class="empty">دریافت سفارش‌ها ناموفق بود: ${esc(e.message)}</div>`;}}
   }
   root.onclick=async e=>{
+    if(e.target.closest('[data-store-registered-all]')){app.storeRegisteredPending=false;app.storeRegisteredOffset=0;return renderStoreRegistered();}
     const page=e.target.closest('[data-registered-page]');
     if(page){offset=Math.max(0,offset+(page.dataset.registeredPage==='next'?limit:-limit));app.storeRegisteredOffset=offset;signature='';await refresh(true);return;}
     const el=e.target.closest('[data-action]');if(!el)return;
     if(el.dataset.action==='store-order-details')return openStoreOrderDetails(el.dataset.id);
     if(el.dataset.action==='edit-store-order')return openStoreOrderEdit(el.dataset.id);
-    if(el.dataset.action==='store-request-addition')return openStoreAddition(el.dataset.id);
     if(el.dataset.action==='cancel-store-order'&&confirm('این سفارش لغو شود؟')){el.disabled=true;try{await api('/api/store/orders/'+encodeURIComponent(el.dataset.id)+'/cancel',{method:'POST',body:JSON.stringify({reason:'لغو توسط فروشگاه'})});toast('سفارش لغو شد.');el.blur();await refresh(true);}catch(err){el.disabled=false;toast(err.message);}}
   };
   await refresh(true);
@@ -2197,6 +2210,7 @@ async function renderStorePortal(){
   app.storeRenderGeneration=(app.storeRenderGeneration||0)+1;
   if(app.timer){clearInterval(app.timer);app.timer=null}
   if(app.user.roleCode==='admin')app.storeScope=await api('/api/store/scope');
+  if(app.sub.store==='transfers')return renderStoreTransfers();
   if(app.sub.store==='registered')return renderStoreRegistered();
   const d=await storeAllOrders(); const orders=d.orders||[];const isPartial=app.sub.store==='partial';const isDeliveryView=app.sub.store==='delivery';app.storePortalTab=isDeliveryView?'delivery':'create';app.storeDeliveryTab=app.storeDeliveryTab==='delivered'?'delivered':'inProgress';
   const deliveredViews=orders.flatMap((o)=>st38ViewsOf(o)).filter((v)=>v.dispatch&&['DELIVERED','SALES_FINALIZED','CLOSED'].includes(v.dispatch.status)).sort((a,b)=>String(b.dispatch.deliveredAt||'').localeCompare(String(a.dispatch.deliveredAt||''))); // v37.5.0 — هر محموله کارت جدا
@@ -2253,7 +2267,6 @@ async function renderStorePortal(){
     else if(a==='store-order-details'){return openStoreOrderDetails(el.dataset.id)}
     else if(a==='store-delivery-details'){return openStoreDeliveryDetails(el.dataset.id,Number(el.dataset.run)||0)}
     else if(a==='edit-store-order'){return openStoreOrderEdit(el.dataset.id)}
-    else if(a==='store-request-addition'){return openStoreAddition(el.dataset.id)}
     else if(a==='store-confirm-delivery'){return confirmStoreDelivery(el)}
     else if(a==='cancel-store-order'){if(confirm('این سفارش لغو شود؟')){try{await api('/api/store/orders/'+el.dataset.id+'/cancel',{method:'POST',body:JSON.stringify({reason:'لغو توسط فروشگاه'})});toast('سفارش لغو شد.');await renderStorePortal()}catch(err){toast(err.message)}}}
   };
@@ -2276,21 +2289,21 @@ async function openStoreAddition(id){
  try{
   const o=(await api('/api/store/orders/'+encodeURIComponent(id))).order;
   app.storeAdditionDraft=[defaultOrderLine()];
-  openModal('افزودن کالا به سفارش '+fa(o.orderNo||''),`<form id="storeAdditionForm"><p>کالاهای جدید برای تأیید به فروش و سپس انبار ارسال می‌شوند. محصول تکراری با واحد یکسان به ردیف موجود اضافه می‌شود؛ واحد متفاوت ردیف مستقل دارد. وزن‌کشی همه ردیف‌ها به کیلوگرم است.</p><div id="store-addition-lines"></div><button type="button" class="btn btn-secondary" id="storeAdditionAdd">افزودن ردیف</button><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button class="btn btn-primary" type="submit">ارسال به فروش</button></div></form>`);
+  openModal('افزودن محصول به سفارش '+fa(o.orderNo||''),`<form id="storeAdditionForm"><p>کالاهای جدید برای تأیید به فروش و سپس انبار ارسال می‌شوند. محصول تکراری با واحد یکسان به ردیف موجود اضافه می‌شود؛ واحد متفاوت ردیف مستقل دارد. وزن‌کشی همه ردیف‌ها به کیلوگرم است.</p><div id="store-addition-lines"></div><button type="button" class="btn btn-secondary" id="storeAdditionAdd">افزودن ردیف</button><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button class="btn btn-primary" type="submit">ارسال به فروش</button></div></form>`);
   const paint=()=>{const el=$('#store-addition-lines');if(el){el.innerHTML=renderDraftLinesTable(app.storeAdditionDraft.map((x,i)=>renderProductPickerLine(x,i,'storeaddition')));bindOperationLines('storeaddition','storeAdditionDraft')}};paint();
   $('#storeAdditionAdd').onclick=()=>{app.storeAdditionDraft.push(defaultOrderLine());paint()};
   $('#storeAdditionForm').addEventListener('click',e=>{const p=e.target.closest('[data-action=op-pick-product]');if(p){pickOperationProduct(+p.dataset.index,p.dataset.productId,p.dataset.label,p.dataset.quick,'storeaddition','storeAdditionDraft');return;}const x=e.target.closest('[data-action=op-remove-line]');if(x){app.storeAdditionDraft.splice(+x.dataset.index,1);if(!app.storeAdditionDraft.length)app.storeAdditionDraft.push(defaultOrderLine());paint();}});
   $('#storeAdditionForm').addEventListener('submit',async e=>{e.preventDefault();const lines=app.storeAdditionDraft.map(x=>({productId:x.productId,requestedQty:n(x.requestedQty),requestedUnit:x.requestedUnit,description:String(x.description||'').trim()}));if(lines.some(x=>!x.productId||!(x.requestedQty>0)))return toast('همه ردیف‌ها باید محصول و مقدار معتبر داشته باشند.');const btn=e.submitter;btn.disabled=true;try{await api('/api/store/orders/'+encodeURIComponent(id)+'/addition-requests',{method:'POST',body:JSON.stringify({items:lines})});closeModal();toast('درخواست به فروش ارسال شد.');await renderStorePortal();}catch(err){btn.disabled=false;toast(err.message);}});
  }catch(e){toast(e.message);}
 }
-function mg38Kpi(label,value,hint,ico,tone,text=false){
-  return `<article class="mg38-kpi t-${tone}"><span class="mg38-accent" aria-hidden="true"></span><span class="mg38-ico">${icon(ico,20)}</span><div class="mg38-copy"><span class="mg38-lbl">${esc(label)}</span><b class="mg38-val">${text?value:qty(value)}</b><small>${esc(hint)}</small></div></article>`;
+function mg38Kpi(label,value,hint,ico,tone,text=false,key=''){
+  return `<article class="mg38-kpi t-${tone}"><span class="mg38-accent" aria-hidden="true"></span><span class="mg38-ico">${icon(ico,20)}</span><div class="mg38-copy"><span class="mg38-lbl">${esc(label)}</span><b class="mg38-val" data-admin-dash-count="${esc(key)}">${text?value:qty(value)}</b><small>${esc(hint)}</small></div></article>`;
 }
 
 /* ---------------- داشبورد ---------------- */
 async function renderDashboard(){
   if(app.timer){clearInterval(app.timer);app.timer=null}
-  const d=await api('/api/dashboard'); const c=d.counts||{};
+  const d=await api('/api/dashboard'); if(app.page!=='dashboard')return; const c=d.counts||{};
   $('#content').innerHTML=`<div style="display:grid;gap:16px">
     <div class="db38-hero">
       <div class="db38-hero-right"><span class="db38-logo db38-logo-img"><img src="/logo.png" alt="بابل طیور"></span><div><h2>مرکز کنترل عملیات</h2><p>نمای لحظه‌ای از ورود مشتری، فروش، انبار، تسویه و خروج؛ با تمرکز روی اقدام بعدی هر واحد.</p></div></div>
@@ -2302,11 +2315,11 @@ async function renderDashboard(){
       </div>
     </div>
     <div class="mg38-kpis">
-      ${mg38Kpi('ورودی امروز',c.visitsToday||0,'مراجعه ثبت‌شده در نگهبانی','gate','red')}
-      ${mg38Kpi('منتظر فروش',c.waitingSales||0,'مشتری آماده ثبت سفارش','sales','blue')}
-      ${mg38Kpi('در صف انبار',c.pendingWarehouse||0,'سفارش آماده اقدام انبار','warehouse','orange')}
-      ${mg38Kpi('آماده خروج',c.readyExit||0,'فاکتور نهایی و آماده کنترل','check','green')}
-      ${mg38Kpi('برنامه آینده',c.remoteScheduled||0,'سفارش‌های زمان‌بندی‌شده','calendar','purple')}
+      ${mg38Kpi('ورودی امروز',c.visitsToday||0,'مراجعه ثبت‌شده در نگهبانی','gate','red',false,'visitsToday')}
+      ${mg38Kpi('منتظر فروش',c.waitingSales||0,'مشتری آماده ثبت سفارش','sales','blue',false,'waitingSales')}
+      ${mg38Kpi('در صف انبار',c.pendingWarehouse||0,'سفارش آماده اقدام انبار','warehouse','orange',false,'pendingWarehouse')}
+      ${mg38Kpi('آماده خروج',c.readyExit||0,'فاکتور نهایی و آماده کنترل','check','green',false,'readyExit')}
+      ${mg38Kpi('برنامه آینده',c.remoteScheduled||0,'سفارش‌های زمان‌بندی‌شده','calendar','purple',false,'remoteScheduled')}
     </div>
     <section class="dbc-section" id="dbCharts" aria-label="تحلیل محصولات">${dbcShell()}</section>
     <div class="db38-grid db38-grid-single">
@@ -2317,6 +2330,12 @@ async function renderDashboard(){
     </div>
   </div>`;
   dbcLoad();
+  const host=$('#content');
+  app.timer=setInterval(async()=>{
+    if(app.page!=='dashboard'||$('#content')!==host||!host.querySelector('[data-admin-dash-count]'))return;
+    if(host.dataset.adminDashBusy==='1')return;host.dataset.adminDashBusy='1';
+    try{const data=await api('/api/dashboard');if(app.page!=='dashboard'||$('#content')!==host)return;host.querySelectorAll('[data-admin-dash-count]').forEach(el=>{const value=data.counts?.[el.dataset.adminDashCount];if(value!=null&&Number.isFinite(Number(value)))el.textContent=qty(value);});}catch{}finally{delete host.dataset.adminDashBusy;}
+  },6000);
 }
 
 /* ---------------- v37.3.18 — نمودارهای داشبورد به تفکیک محصول ----------------
@@ -2756,3 +2775,67 @@ document.addEventListener('click',async e=>{
     <script src="/print-ready.js"><\/script></body></html>`));
     }catch(err){toast(err.message)}
 });
+/* Independent inter-store transfer cartables. Amounts are handwritten, never catalog prices. */
+const transferStatus={PENDING_RECEIPT:'در انتظار دریافت فیزیکی مقصد',PENDING_SALES:'در انتظار تأیید فروش',PENDING_WAREHOUSE:'در انتظار تأیید انبار',RETURNED:'بازگشت برای اصلاح',COMPLETED:'تأیید نهایی انبار'};
+const transferEvent={CREATED:'ثبت حواله',RECEIVED:'تأیید دریافت فیزیکی مقصد',SALES_APPROVED:'تأیید فروش',WAREHOUSE_APPROVED:'تأیید انبار',RETURNED:'بازگشت برای اصلاح',REVISED:'اصلاح و ارسال مجدد'};
+async function renderStoreTransfers(){
+ $('#content').innerHTML='<section class="sd-panel"><div class="sd-pad"><h2>جابجایی بین فروشگاه‌ها</h2><p>تأیید مقصد به معنی دریافت فیزیکی است. این حواله موجودی و حسابداری را تغییر نمی‌دهد.</p><div data-transfer-panel></div></div></section>';
+ await transferMount($('#content [data-transfer-panel]'),'store');
+}
+function transferRows(items){return (items||[]).map((i,k)=>`<tr><td>${qty(k+1)}</td><td>${esc(i.productName)}</td><td>${qty(i.kg)} کیلوگرم</td><td>${money(i.price)}</td><td>${money(i.amount)}</td></tr>`).join('');}
+function transferDetails(t){
+ const total=(t.items||[]).reduce((s,i)=>s+Number(i.amount||0),0);
+ return `<h3>حواله ${esc(fa(t.number))}</h3><p><b>فرستنده:</b> ${esc(t.sourceName)} &nbsp; ← &nbsp; <b>مقصد:</b> ${esc(t.destinationName)} &nbsp; | &nbsp; <b>تاریخ ارسال:</b> ${esc(dateLabel(t.sendDate))}</p><p><b>وضعیت:</b> ${esc(transferStatus[t.status]||t.status)} — نسخه ${qty(t.revision)}</p><div class="bt-table-wrap"><table class="bt-table"><thead><tr><th>ردیف</th><th>محصول</th><th>مقدار</th><th>فی دستی</th><th>مبلغ</th></tr></thead><tbody>${transferRows(t.items)}</tbody></table></div><p><b>جمع کل: ${money(total)}</b>${t.notes?` — توضیحات: ${esc(t.notes)}`:''}</p><details><summary>سوابق جابجایی و اصلاحات</summary><ol>${(t.history||[]).map(h=>`<li>${esc(transferEvent[h.action]||h.action)} — نسخه ${qty(h.revision)} — ${esc(h.name)} — ${esc(formatDateTime24(h.at))}${h.reason?' — دلیل: '+esc(h.reason):''}${h.before?`<details><summary>اقلام پیش از اصلاح</summary><table class="bt-table"><thead><tr><th>ردیف</th><th>محصول</th><th>مقدار</th><th>فی دستی</th><th>مبلغ</th></tr></thead><tbody>${transferRows(h.before.items)}</tbody></table></details>`:''}</li>`).join('')}</ol></details>`;
+}
+function transferPrint(t){
+ const event=kind=>{const h=[...(t.history||[])].reverse().find(x=>(x.action===kind||(kind==='CREATED'&&x.action==='REVISED'))&&x.revision===t.revision);return h?`${esc(h.name)} — ${esc(formatDateTime24(h.at))}`:'—';};
+ const sum=(t.items||[]).reduce((s,i)=>s+Number(i.amount||0),0);
+ const html=`<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><link rel="stylesheet" href="/fonts.css"><title>حواله جابجایی ${esc(t.number)}</title><style>@page{size:A4;margin:12mm}body{font-family:Vazirmatn,Tahoma,sans-serif;font-size:11pt;color:#111}h1{text-align:center;font-size:16pt;border:1px solid #333;padding:10px}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;border:1px solid #555;padding:10px}.meta span{padding:3px}table{width:100%;border-collapse:collapse;margin:15px 0}td,th{border:1px solid #333;padding:7px;text-align:center}thead{display:table-header-group}tr{break-inside:avoid}th{background:#eee}.sign{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:25px;break-inside:avoid}.sign div{border:1px solid #777;min-height:70px;padding:6px;font-size:9pt}.note{font-size:9pt;margin-top:16px}</style></head><body><h1>حواله جابجایی محصول بین فروشگاه‌ها</h1><div class="meta"><span>شماره حواله: ${esc(t.number)}</span><span>تاریخ ارسال: ${esc(dateLabel(t.sendDate))}</span><span>فروشگاه فرستنده: ${esc(t.sourceName)}</span><span>فروشگاه مقصد: ${esc(t.destinationName)}</span></div><table><thead><tr><th>ردیف</th><th>نام محصول</th><th>مقدار (کیلوگرم)</th><th>فی (ریال)</th><th>مبلغ (ریال)</th></tr></thead><tbody>${(t.items||[]).map((i,k)=>`<tr><td>${qty(k+1)}</td><td>${esc(i.productName)}</td><td>${qty(i.kg)}</td><td>${esc(money(i.price).replace(' ریال',''))}</td><td>${esc(money(i.amount).replace(' ریال',''))}</td></tr>`).join('')}<tr><th colspan="4">جمع کل (ریال)</th><th>${esc(money(sum).replace(' ریال',''))}</th></tr></tbody></table><p>توضیحات: ${esc(t.notes||'—')}</p><div class="sign"><div>فرستنده<br>${event('CREATED')}<br><br>امضا:</div><div>دریافت فیزیکی مقصد<br>${event('RECEIVED')}<br><br>امضا:</div><div>تأیید فروش<br>${event('SALES_APPROVED')}<br><br>امضا:</div><div>تأیید انبار<br>${event('WAREHOUSE_APPROVED')}<br><br>امضا:</div></div><p class="note">این سند به‌تنهایی ثبت موجودی یا حسابداری ایجاد نمی‌کند.</p><script src="/print-ready.js"><\/script></body></html>`;
+ return BTPrintFrame.html(BTPrintDigits.documentHtml(html));
+}
+async function transferMount(host,role){
+ if(!host)return;
+ const token=host._transferToken=Symbol();host.innerHTML='<p>در حال دریافت جابجایی‌ها…</p>';
+ try{
+  const [data,branches,products]=await Promise.all([api(`/api/${role}/transfers`),role==='store'?api('/api/store/transfer-branches'):null,role==='store'?api('/api/products'):null]);
+  if(!host.isConnected||host._transferToken!==token)return;
+  const all=data.transfers||[];let tab=role==='store'?(app.transferStoreTab||'create'):'list';let editing=null;
+  const currentId=branches?.source?.id;
+  function rowForm(item={}){return `<div data-transfer-line style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:10px 0"><label>محصول <select data-product required><option value="">انتخاب محصول</option>${(products?.products||[]).map(p=>`<option value="${esc(p.id)}" ${p.id===item.productId?'selected':''}>${esc(p.name)}</option>`).join('')}</select></label><label>مقدار (کیلوگرم) <input data-kg type="text" inputmode="decimal" required value="${esc(item.kg??'')}" style="width:115px"></label><label>فی دستی (ریال) <input data-price type="text" inputmode="numeric" required value="${esc(item.price??'')}" style="width:145px"></label><button type="button" class="btn btn-secondary" data-transfer-remove>حذف</button></div>`;}
+  function form(t){
+   const source=t?{id:t.sourceBranchId,name:t.sourceName}:branches.source;
+   return `<h3>${t?'اصلاح حواله '+esc(t.number):'ثبت جابجایی جدید'}</h3>${t?'<p>پس از اصلاح، مقصد باید دریافت فیزیکی نسخه جدید را دوباره تأیید کند. سابقه قبلی محفوظ است.</p>':''}<form data-transfer-form><div style="display:flex;gap:15px;flex-wrap:wrap"><label>فروشگاه فرستنده ${source?`<input value="${esc(source.name)}" readonly>`:`<select name="sourceBranchId" required><option value="">انتخاب فرستنده</option>${branches.branches.map(b=>`<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('')}</select>`}</label><label>فروشگاه مقصد ${t?`<input value="${esc(t.destinationName)}" readonly>`:`<select name="destinationBranchId" required><option value="">انتخاب مقصد</option>${branches.branches.filter(b=>b.id!==currentId).map(b=>`<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('')}</select>`}</label><label>تاریخ ارسال <input id="transferSendDate" name="sendDate" type="date" value="${esc(t?.sendDate||today())}" required></label></div><div data-transfer-lines>${(t?.items?.length?t.items:[{}]).map(rowForm).join('')}</div><button type="button" class="btn btn-secondary" data-transfer-add>افزودن محصول</button><label style="display:block;margin:12px 0">توضیحات <textarea name="notes" maxlength="1000">${esc(t?.notes||'')}</textarea></label><button type="submit" class="btn btn-primary">${t?'ثبت اصلاح و ارسال به مقصد':'ثبت و ارسال به مقصد'}</button>${t?' <button type="button" class="btn btn-secondary" data-transfer-cancel>انصراف</button>':''}</form>`;
+  }
+  function list(rows){return `<div class="bt-table-wrap"><table class="bt-table"><thead><tr><th>شماره حواله</th><th>فرستنده</th><th>مقصد</th><th>تاریخ ارسال</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>${rows.map(t=>`<tr><td>${esc(fa(t.number))}</td><td>${esc(t.sourceName)}</td><td>${esc(t.destinationName)}</td><td>${esc(dateLabel(t.sendDate))}</td><td>${esc(transferStatus[t.status]||t.status)}</td><td><button type="button" class="btn btn-secondary" data-transfer-open="${esc(t.id)}">جزئیات</button></td></tr>`).join('')||'<tr><td colspan="6">جابجایی برای نمایش وجود ندارد.</td></tr>'}</tbody></table></div>`;}
+  function paint(){
+   if(role==='store'){
+    const incoming=all.filter(t=>!currentId||t.destinationBranchId===currentId),sent=all.filter(t=>!currentId||t.sourceBranchId===currentId);
+    host.innerHTML=`<nav class="wh38-store-tabs">${[['create','ثبت'],['incoming','دریافتی'],['sent','ارسال‌شده']].map(([id,label])=>`<button type="button" class="wh38-store-tab ${tab===id?'active':''}" data-transfer-tab="${id}">${label}</button>`).join('')}</nav><div data-transfer-body>${editing?form(editing):tab==='create'?form(null):list(tab==='incoming'?incoming:sent)}</div>`;
+   }else host.innerHTML=`<h2>جابجایی فروشگاه‌ها</h2><p>بررسی حواله‌های رسیده و مشاهده سوابق تأییدشده</p><button type="button" class="btn btn-secondary" data-transfer-refresh>تازه‌سازی فهرست</button>${list(all)}`;
+  }
+  paint();
+  host.onclick=async e=>{
+   const el=e.target.closest('button');if(!el)return;
+   if(el.hasAttribute('data-transfer-refresh')){await transferMount(host,role);return;}
+   if(el.dataset.transferTab){tab=app.transferStoreTab=el.dataset.transferTab;editing=null;paint();return;}
+   if(el.hasAttribute('data-transfer-add')){host.querySelector('[data-transfer-lines]').insertAdjacentHTML('beforeend',rowForm());return;}
+   if(el.hasAttribute('data-transfer-remove')){if(host.querySelectorAll('[data-transfer-line]').length>1)el.closest('[data-transfer-line]').remove();else toast('حداقل یک محصول لازم است.');return;}
+   if(el.hasAttribute('data-transfer-cancel')){editing=null;paint();return;}
+   const t=all.find(x=>x.id===el.dataset.transferOpen);if(!t)return;
+   const canReview=(role==='store'&&t.status==='PENDING_RECEIPT'&&(!currentId||currentId===t.destinationBranchId))||(role==='sales'&&t.status==='PENDING_SALES')||(role==='warehouse'&&t.status==='PENDING_WAREHOUSE');
+   const canEdit=role==='store'&&t.status==='RETURNED'&&(!currentId||currentId===t.sourceBranchId);
+   openModal('جزئیات جابجایی',transferDetails(t)+`<div class="modal-actions">${canEdit?'<button type="button" class="btn btn-primary" data-tr-modal="edit">اصلاح حواله</button>':''}${canReview?`<button type="button" class="btn btn-secondary" data-tr-modal="return">بازگشت برای اصلاح</button><button type="button" class="btn btn-primary" data-tr-modal="approve">${role==='store'?'تأیید دریافت فیزیکی':role==='sales'?'تأیید فروش':'تأیید انبار و چاپ'}</button>`:''}${t.status==='COMPLETED'&&role!=='store'?'<button type="button" class="btn btn-primary" data-tr-modal="print">چاپ حواله</button>':''}<button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button></div>`);
+   $('#modal [data-tr-modal="edit"]')?.addEventListener('click',()=>{closeModal();tab=app.transferStoreTab='sent';editing=t;paint();});
+   $('#modal [data-tr-modal="print"]')?.addEventListener('click',()=>transferPrint(t));
+   for(const action of ['return','approve'])$('#modal [data-tr-modal="'+action+'"]')?.addEventListener('click',async ev=>{
+    let reason='';if(action==='return'){reason=prompt('دلیل بازگشت برای اصلاح را وارد کنید:')||'';if(!reason.trim())return toast('دلیل بازگشت الزامی است.');}
+    else if(!confirm(role==='store'?'آیا کالاهای این نسخه را واقعاً و به‌صورت فیزیکی دریافت کرده‌اید؟':role==='warehouse'?'حواله تأیید نهایی شود؟':'حواله تأیید و به انبار ارسال شود؟'))return;
+    ev.currentTarget.disabled=true;try{const result=await api(`/api/${role}/transfers/${encodeURIComponent(t.id)}/review`,{method:'POST',body:JSON.stringify({revision:t.revision,decision:action==='return'?'RETURN':'APPROVE',reason,physicalReceipt:role==='store'&&action==='approve'})});closeModal();toast(action==='return'?'حواله برای اصلاح برگشت داده شد.':'تأیید ثبت شد.');if(role==='warehouse'&&action==='approve')transferPrint(result.transfer);await transferMount(host,role);await refreshIndicators();}catch(err){ev.currentTarget.disabled=false;toast(err.message);}
+   });
+  };
+  host.onsubmit=async e=>{
+   if(!e.target.matches('[data-transfer-form]'))return;e.preventDefault();const f=e.target;const values=Object.fromEntries(new FormData(f));const dateInput=f.querySelector('#transferSendDate');const dateVisible=dateInput.previousElementSibling;values.sendDate=dateVisible?.classList.contains('ui-jdate')?jalaliToIso(dateVisible.value):dateInput.value;if(!values.sendDate)return toast('تاریخ ارسال معتبر را وارد کنید.');if(editing)values.revision=editing.revision;values.items=[...f.querySelectorAll('[data-transfer-line]')].map(r=>({productId:r.querySelector('[data-product]').value,kg:r.querySelector('[data-kg]').value,price:r.querySelector('[data-price]').value,unit:'کیلوگرم'}));
+   const btn=e.submitter;if(btn)btn.disabled=true;try{await api('/api/store/transfers'+(editing?'/'+encodeURIComponent(editing.id):''),{method:editing?'PUT':'POST',body:JSON.stringify(values)});toast(editing?'اصلاح ثبت و برای مقصد ارسال شد.':'حواله برای مقصد ثبت شد.');app.transferStoreTab='sent';await transferMount(host,role);await refreshIndicators();}catch(err){if(btn)btn.disabled=false;toast(err.message);}
+  };
+ }catch(err){if(host.isConnected&&host._transferToken===token)host.innerHTML=`<p role="alert">خطا در دریافت جابجایی‌ها: ${esc(err.message)}</p>`;}
+}

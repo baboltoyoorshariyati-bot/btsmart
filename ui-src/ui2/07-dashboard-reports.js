@@ -1,11 +1,11 @@
-function mg38Kpi(label,value,hint,ico,tone,text=false){
-  return `<article class="mg38-kpi t-${tone}"><span class="mg38-accent" aria-hidden="true"></span><span class="mg38-ico">${icon(ico,20)}</span><div class="mg38-copy"><span class="mg38-lbl">${esc(label)}</span><b class="mg38-val">${text?value:qty(value)}</b><small>${esc(hint)}</small></div></article>`;
+function mg38Kpi(label,value,hint,ico,tone,text=false,key=''){
+  return `<article class="mg38-kpi t-${tone}"><span class="mg38-accent" aria-hidden="true"></span><span class="mg38-ico">${icon(ico,20)}</span><div class="mg38-copy"><span class="mg38-lbl">${esc(label)}</span><b class="mg38-val" data-admin-dash-count="${esc(key)}">${text?value:qty(value)}</b><small>${esc(hint)}</small></div></article>`;
 }
 
 /* ---------------- داشبورد ---------------- */
 async function renderDashboard(){
   if(app.timer){clearInterval(app.timer);app.timer=null}
-  const d=await api('/api/dashboard'); const c=d.counts||{};
+  const d=await api('/api/dashboard'); if(app.page!=='dashboard')return; const c=d.counts||{};
   $('#content').innerHTML=`<div style="display:grid;gap:16px">
     <div class="db38-hero">
       <div class="db38-hero-right"><span class="db38-logo db38-logo-img"><img src="/logo.png" alt="بابل طیور"></span><div><h2>مرکز کنترل عملیات</h2><p>نمای لحظه‌ای از ورود مشتری، فروش، انبار، تسویه و خروج؛ با تمرکز روی اقدام بعدی هر واحد.</p></div></div>
@@ -17,11 +17,11 @@ async function renderDashboard(){
       </div>
     </div>
     <div class="mg38-kpis">
-      ${mg38Kpi('ورودی امروز',c.visitsToday||0,'مراجعه ثبت‌شده در نگهبانی','gate','red')}
-      ${mg38Kpi('منتظر فروش',c.waitingSales||0,'مشتری آماده ثبت سفارش','sales','blue')}
-      ${mg38Kpi('در صف انبار',c.pendingWarehouse||0,'سفارش آماده اقدام انبار','warehouse','orange')}
-      ${mg38Kpi('آماده خروج',c.readyExit||0,'فاکتور نهایی و آماده کنترل','check','green')}
-      ${mg38Kpi('برنامه آینده',c.remoteScheduled||0,'سفارش‌های زمان‌بندی‌شده','calendar','purple')}
+      ${mg38Kpi('ورودی امروز',c.visitsToday||0,'مراجعه ثبت‌شده در نگهبانی','gate','red',false,'visitsToday')}
+      ${mg38Kpi('منتظر فروش',c.waitingSales||0,'مشتری آماده ثبت سفارش','sales','blue',false,'waitingSales')}
+      ${mg38Kpi('در صف انبار',c.pendingWarehouse||0,'سفارش آماده اقدام انبار','warehouse','orange',false,'pendingWarehouse')}
+      ${mg38Kpi('آماده خروج',c.readyExit||0,'فاکتور نهایی و آماده کنترل','check','green',false,'readyExit')}
+      ${mg38Kpi('برنامه آینده',c.remoteScheduled||0,'سفارش‌های زمان‌بندی‌شده','calendar','purple',false,'remoteScheduled')}
     </div>
     <section class="dbc-section" id="dbCharts" aria-label="تحلیل محصولات">${dbcShell()}</section>
     <div class="db38-grid db38-grid-single">
@@ -32,6 +32,12 @@ async function renderDashboard(){
     </div>
   </div>`;
   dbcLoad();
+  const host=$('#content');
+  app.timer=setInterval(async()=>{
+    if(app.page!=='dashboard'||$('#content')!==host||!host.querySelector('[data-admin-dash-count]'))return;
+    if(host.dataset.adminDashBusy==='1')return;host.dataset.adminDashBusy='1';
+    try{const data=await api('/api/dashboard');if(app.page!=='dashboard'||$('#content')!==host)return;host.querySelectorAll('[data-admin-dash-count]').forEach(el=>{const value=data.counts?.[el.dataset.adminDashCount];if(value!=null&&Number.isFinite(Number(value)))el.textContent=qty(value);});}catch{}finally{delete host.dataset.adminDashBusy;}
+  },6000);
 }
 
 /* ---------------- v37.3.18 — نمودارهای داشبورد به تفکیک محصول ----------------

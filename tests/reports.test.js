@@ -38,8 +38,11 @@ test('query: منبع و ستون نامعتبر خطای ۴۰۰ می‌دهد',
   assert.throws(() => reports.query(db, { source: 'visits', fields: ['x'] }), (e) => e.status === 400);
 });
 
-test('query: فعالیت‌ها با جزئیات JSON', () => {
+test('query: فعالیت‌ها با جزئیات فارسی و امکان انتخاب اطلاعات فنی', () => {
   const r = reports.query(db, { source: 'activity', fields: ['username', 'action', 'details'] });
   assert.equal(r.total, 1);
-  assert.match(r.rows[0].details, /plate/);
+  assert.equal(r.rows[0].action, 'ثبت مراجعه');
+  assert.match(r.rows[0].details, /پلاک : x/);
+  const raw=reports.query(db,{source:'activity',fields:['actionCode','detailsRaw']});
+  assert.equal(raw.rows[0].actionCode,'CREATE_VISIT');assert.match(raw.rows[0].detailsRaw,/plate/);
 });

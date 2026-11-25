@@ -30,7 +30,7 @@ function wh38OrdersTable(orders,kind){
   </table></div>`;
 }
 function wh38Tabs(active){
-  const inc=badgeCount('warehouseIncomingRegular')||badgeCount('warehouseIncoming'), prep=badgeCount('warehousePreparingRegular')||badgeCount('warehousePreparing'), st=badgeCount('warehouseStores');
+  const inc=badgeCount('warehouseIncomingRegular'), prep=badgeCount('warehousePreparingRegular'), st=badgeCount('warehouseStores');
   return `<div class="wh38-tabs">
     <button type="button" class="wh38-tab ${active==='incoming'?'active':''}" data-wh38-tab="incoming"><span class="wh38-tab-idx">۰۱</span><span>${icon('truck',22)}</span><div><b>سفارش‌های ورودی</b><small>فقط مشتریان عادی — تأیید ورود به آماده‌سازی</small></div><em>${qty(inc)}</em></button>
     <button type="button" class="wh38-tab ${active==='preparing'?'active':''}" data-wh38-tab="preparing"><span class="wh38-tab-idx">۰۲</span><span>${icon('scale',22)}</span><div><b>آماده‌سازی و تحویل</b><small>فقط مشتریان عادی — ثبت وزن و ارسال به تسویه فروش</small></div><em>${qty(prep)}</em></button>
@@ -61,7 +61,7 @@ function wh38IncomingHeader(o){
    Full timestamps stay in the title tooltip; the 4-cell summary is not used for stores. */
 function wh38StoreTabs(active,counts){
   // سربرگ سوم، فقط برای سفارش‌ها و اسناد فروشگاهی که در انبار ثبت شده‌اند.
-  const tabs=[['incoming','ورودی'],['preparing','آماده‌سازی و سرویس‌ها'],['history','سوابق سفارش‌های ثبت‌شده']];
+  const tabs=[['incoming','ورودی'],['preparing','آماده‌سازی و سرویس‌ها'],['history','سوابق سفارش‌های ثبت‌شده'],['transfers','جابجایی']];
   return `<nav class="wh38-store-tabs" role="tablist" aria-label="بخش‌های فروشگاه در انبار">${tabs.map(([id,label])=>`<button type="button" role="tab" class="wh38-store-tab ${active===id?'active':''}" data-wh38-store-tab="${id}" aria-selected="${active===id}"><span>${label}</span><b>${qty(counts[id]||0)}</b></button>`).join('')}</nav>`;
 }
 function wh38StoreHeader(o){
@@ -96,7 +96,7 @@ async function wh38StoreDetails(id){
     if(o.orderType!=='STORE') return toast('این سفارش از نوع فروشگاهی نیست.');
     const items=activeItemsOf(o);
     const canAccept=o.status==='WAREHOUSE_PENDING';
-    openModal('جزئیات سفارش فروشگاه',`<div class="whsin22-detail whd35-detail"><div class="whd35-head"><div class="whd35-title"><h2>${esc(o.storeName||'فروشگاه')}</h2><span>${o.storeOrderKind==='PARTIAL'&&o.storePurpose==='STOCK'?'تأمین تکمیلی فروشگاه':'مشتری: '+esc(o.customer?.name||'—')}</span></div>${badge(o.status)}</div><div class="whd35-meta"><span>شماره سفارش <b>${esc(fa(o.orderNo||'—'))}</b></span><span>ثبت <b>${esc(formatDateTime24(o.createdAt))}</b></span>${o.scheduledAt?`<span>زمان ارسال <b>${esc(formatDateTime24(o.scheduledAt))}</b></span>`:''}${o.dispatchPlace?`<span>محل ارسال <b>${esc(o.dispatchPlace)}</b></span>`:''}</div>${o.notes?`<div class="detail-note whd35-note"><span>${icon('info',14)}</span><div><b>یادداشت سفارش</b><p>${esc(o.notes)}</p></div></div>`:''}<div class="whd23-list whd35-list"><div class="whd23-row whd35-headrow" aria-hidden="true"><span></span><span>محصول</span><span>مقدار</span><span>واحد</span><span>توضیحات</span></div>${items.map((it,k)=>`<div class="whd23-row"><span class="whd23-num">${fa(String(k+1))}</span><div class="whd23-box whd23-product"><b title="${esc(it.product?.name||'—')}">${esc(it.product?.name||'—')}</b></div><div class="whd23-box"><b>${qty(it.requestedQty)}</b></div><div class="whd23-box"><b>${esc(it.requestedUnit||'')}</b></div><div class="whd23-box whd23-desc"><b title="${esc(it.description||'بدون توضیح')}">${esc(it.description||'بدون توضیح')}</b></div></div>`).join('')||'<div class="empty">قلمی در این سفارش ثبت نشده است.</div>'}</div><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button>${canAccept?`<button type="button" class="btn btn-primary" data-action="wh38-accept-details" data-id="${o.id}">${icon('check',16)} تأیید دریافت و ورود به آماده‌سازی</button>`:''}</div></div>`);
+    openModal('جزئیات سفارش فروشگاه',`<div class="whsin22-detail whd35-detail"><div class="whd35-head"><div class="whd35-title"><h2>${esc(o.storeName||'فروشگاه')}</h2><span>${o.storeOrderKind==='PARTIAL'&&o.storePurpose==='STOCK'?'تأمین تکمیلی فروشگاه':'مشتری: '+esc(o.customer?.name||'—')}</span></div>${badge(o.status)}</div><div class="whd35-meta"><span>شماره سفارش <b>${esc(fa(o.orderNo||'—'))}</b></span><span>ثبت <b>${esc(formatDateTime24(o.createdAt))}</b></span><span>ثبت‌کنندهٔ سفارش <b>${esc(o.createdByName||'ثبت‌کننده نامشخص')}</b></span>${o.scheduledAt?`<span>زمان ارسال <b>${esc(formatDateTime24(o.scheduledAt))}</b></span>`:''}${o.dispatchPlace?`<span>محل ارسال <b>${esc(o.dispatchPlace)}</b></span>`:''}</div>${o.notes?`<div class="detail-note whd35-note"><span>${icon('info',14)}</span><div><b>یادداشت سفارش</b><p>${esc(o.notes)}</p></div></div>`:''}<div class="whd23-list whd35-list"><div class="whd23-row whd35-headrow" aria-hidden="true"><span></span><span>محصول</span><span>مقدار</span><span>واحد</span><span>توضیحات</span></div>${items.map((it,k)=>`<div class="whd23-row"><span class="whd23-num">${fa(String(k+1))}</span><div class="whd23-box whd23-product"><b title="${esc(it.product?.name||'—')}">${esc(it.product?.name||'—')}</b></div><div class="whd23-box"><b>${qty(it.requestedQty)}</b></div><div class="whd23-box"><b>${esc(it.requestedUnit||'')}</b></div><div class="whd23-box whd23-desc"><b title="${esc(it.description||'بدون توضیح')}">${esc(it.description||'بدون توضیح')}</b></div></div>`).join('')||'<div class="empty">قلمی در این سفارش ثبت نشده است.</div>'}</div>${orderPendingAdditionsSection(o)}<div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button>${canAccept?`<button type="button" class="btn btn-primary" data-action="wh38-accept-details" data-id="${o.id}">${icon('check',16)} تأیید دریافت و ورود به آماده‌سازی</button>`:''}</div></div>`);
     finishEntityNotices(notices);return true;
   }catch(e){toast(e.message);return false;}
 }
@@ -146,7 +146,8 @@ async function wh38Paint(phase){
     if(phase==='delivered'){ await whDeliveredPaint(host); return; }
     if(phase==='document-edits'){ await whDocumentEditsPaint(host); return; }
     if(phase==='stores'){ // v37.9.0 — فروشگاه‌های انبار: سربرگ افقی، فرم/فهرست عمودی زیر آن
-      const active=['incoming','preparing','history'].includes(app.wh38.storeTab)?app.wh38.storeTab:'incoming'; app.wh38.storeTab=active;
+      const active=['incoming','preparing','history','transfers'].includes(app.wh38.storeTab)?app.wh38.storeTab:'incoming'; app.wh38.storeTab=active;
+      if(active==='transfers'){if(!host.querySelector('[data-transfer-panel]')){host.innerHTML=`<div class="wh38-store-pane">${wh38StoreTabs(active,{})}<section class="wh38-store-panel"><div data-transfer-panel></div></section></div>`;await transferMount(host.querySelector('[data-transfer-panel]'),'warehouse');}return;}
       if(active==='history'&&host.querySelector('[data-wh38-store-history]')) return; // v37.36.0 — فیلترهای سوابق با تازه‌سازی خودکار ۷ ثانیه‌ای به‌هم نمی‌ریزد
       const [inc,prep,histAll]=(await Promise.all([fetchPagedList('/api/orders?status=WAREHOUSE_PENDING','orders'),fetchPagedList('/api/orders?status=WAREHOUSE_PREPARING','orders'),api('/api/warehouse/history?from=2000-01-01&to='+today()+'&orderType=STORE')]));
       const incRows=((inc&&inc.orders)||[]).filter(o=>o.orderType==='STORE');
@@ -418,7 +419,7 @@ function wh38Shell(phase){
   c.innerHTML=`<section class="wh38-shell">${deliveryTabs}<div id="wh38Body"></div></section>`;
   c.onclick=async e=>{
     const st=e.target.closest('[data-wh38-store-tab]');
-    if(st){ app.wh38.storeTab=['incoming','preparing','history'].includes(st.dataset.wh38StoreTab)?st.dataset.wh38StoreTab:'incoming'; wh38Paint('stores'); return; }
+    if(st){ app.wh38.storeTab=['incoming','preparing','history','transfers'].includes(st.dataset.wh38StoreTab)?st.dataset.wh38StoreTab:'incoming'; wh38Paint('stores'); return; }
     const t=e.target.closest('[data-wh38-tab]');
     if(t){ app.wh38.phase=t.dataset.wh38Tab; app.sub.warehouse=app.wh38.phase; renderNav(); wh38Shell(app.wh38.phase); return; }
     if(e.target.closest('[data-wh-document-edits-refresh]')){void whDocumentEditsPaint($('#wh38Body'));return;}

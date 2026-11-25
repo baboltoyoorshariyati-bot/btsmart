@@ -50,8 +50,8 @@ test('کارتابل ترابری سفارش‌های «ورودی» را از �
   // سربرگ‌ها و شمارش‌ها در رندر واقعی صفحه
   assert.match(source, /data-tp="plan-tab" data-tab="\$\{key\}"/);
   assert.match(source, /\['incoming','ورودی'/);
-  assert.match(source, /\['assigned','تخصیص‌یافته'/);
-  assert.match(source, /dsp\.planTab=b\.dataset\.tab==='assigned'\?'assigned':'incoming'/);
+  assert.match(source, /\['assigned','تخصیص‌یافته \(سوابق\)'/);
+  assert.match(source, /dsp\.planTab=\['assigned','active'\]\.includes\(b\.dataset\.tab\)\?b\.dataset\.tab:'incoming'/);
   assert.match(source, /#tpPlanPanel|tpPlanPanel/);
 });
 
@@ -123,7 +123,7 @@ test('جزئیات سابقهٔ سفارش انبار همهٔ بخش‌ها و 
   assert.match(ui, /whh-order-timeline/);
   assert.match(ui, /whh-event-details/);
   // وضعیت‌ها و رویدادها باید فارسی نمایش داده شوند، نه کد خام.
-  assert.match(ui, /WH_VISIT_EVENT_LABELS\[/);
+  assert.match(ui, /BTAuditFa\.label\(event\.action\)/);
   assert.match(ui, /whVisitTypeLabel/);
   assert.match(read('public/ui2.js'), /اطلاعات کامل مشتری/);
 });

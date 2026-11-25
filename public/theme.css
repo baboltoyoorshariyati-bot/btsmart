@@ -2058,3 +2058,12 @@ body{background:var(--bt-bg)!important;color:var(--bt-ink);font-size:var(--bt-fs
 .sales-history-items td small{display:block;color:var(--bt-muted);margin-top:3px}
 @media(max-width:768px){.sales-history-info-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.sales-history-info-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Readable, read-only audit details (technical JSON remains optional). */
+.audit-fa-details{display:grid;gap:5px;min-width:0;margin:9px 0;padding:10px;border:1px solid var(--bt-line);border-radius:8px;background:var(--bt-panel-2);direction:rtl;text-align:right}
+.audit-fa-details>div{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;min-width:0;margin-inline-start:calc(var(--audit-depth, 0)*12px);overflow-wrap:anywhere;line-height:1.7}
+.audit-fa-details dt{font-weight:800;color:var(--bt-muted)}
+.audit-fa-details dd{margin:0;min-width:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.audit-technical{margin-top:8px}.audit-technical>summary{font-size:11px;cursor:pointer;color:var(--bt-muted)}
+.audit-technical pre{direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto}
+.adm-report-table td{white-space:pre-wrap;overflow-wrap:anywhere}

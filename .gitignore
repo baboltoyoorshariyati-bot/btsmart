@@ -19,3 +19,6 @@ data-preview/
 # Encrypted backup exports and interrupted private publications
 *.bte
 .bt-encrypted-*.partial
+
+# Local release staging and caches
+.cache/

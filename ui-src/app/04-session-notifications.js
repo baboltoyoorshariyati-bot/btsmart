@@ -99,6 +99,7 @@ async function bootstrap(){
     if(a==='resubmit-order'){e.stopPropagation();return resubmitOrder(el.dataset.id);}
     if(a==='edit-returned-order')return openReturnedOrderEditor(el.dataset.id);
     if(a==='customer-addition')return openCustomerAddition(el.dataset.id);
+    if(a==='store-request-addition')return openStoreAddition(el.dataset.id);
     if(a==='returned-add-line')return addReturnedLine();
     if(a==='returned-delete-line')return deleteReturnedLine(Number(el.dataset.index));
     if(a==='pick-return-product')return pickReturnedProduct(Number(el.dataset.index),el.dataset.productId,el.dataset.label);
@@ -125,7 +126,7 @@ async function bootstrap(){
     const adminHome=e.target.closest('[data-admin-home]');
     if(adminHome){e.preventDefault();app.adminActiveRole=null;await go('dashboard');return;}
     const cartableBtn=e.target.closest('[data-cartable]');
-    if(cartableBtn){e.preventDefault();const key=cartableBtn.dataset.cartable,p=cartableBtn.dataset.rolePage;app.sub[p]=key;renderNav();if(['sales','warehouse','drivers'].includes(p)&&key==='transport-resources'){await go('transport-resources');return;}if(p==='drivers'&&key==='transport-fleet'){await go('transport-fleet');return;}if(p==='sales'&&key==='customers'){await go('customers');return;}if(p==='warehouse'&&key==='returns'){await go('returns');return;}if(key==='dashboard'||key==='reports'){app.cartableDashView=key;await go(p,key)}else if(p==='gate'&&(key==='dispatch'||key==='dispatch-leaving')){app.gateDispatchTab='leaving';await go('gate','dispatch')}else if(p==='warehouse'){if(key==='history')await go('warehouse','history');else{if(app.wh38)app.wh38.phase=key;await go('warehouse',key)}}else if(p==='drivers'&&(normalizeRole(app.user?.roleCode)==='dispatch'||app.adminActiveRole==='dispatch')){if(key==='dashboard'||key==='reports'){await go('drivers',key)}else{adm.tab=key==='drivers'?'drivers':'dispatch';if(key==='orders')dsp.tab='pending';await go('drivers',key)}}else if(p==='store'&&['delivery','registered','create','partial'].includes(key)){app.storePortalTab=key;await go('store',key)}else await go(p,key);return;}
+    if(cartableBtn){e.preventDefault();const key=cartableBtn.dataset.cartable,p=cartableBtn.dataset.rolePage;if(cartableBtn.dataset.dashDeliveryTab)app.storeDeliveryTab=cartableBtn.dataset.dashDeliveryTab;if(cartableBtn.dataset.dashPlanTab)dsp.planTab=cartableBtn.dataset.dashPlanTab;if(p==='store'&&key==='registered'){app.storeRegisteredPending=cartableBtn.dataset.dashCountKey==='store';app.storeRegisteredOffset=0;}app.sub[p]=key;renderNav();if(['sales','warehouse','drivers'].includes(p)&&key==='transport-resources'){await go('transport-resources');return;}if(p==='drivers'&&key==='transport-fleet'){await go('transport-fleet');return;}if(p==='sales'&&key==='customers'){await go('customers');return;}if(p==='warehouse'&&key==='returns'){await go('returns');return;}if(key==='dashboard'||key==='reports'){app.cartableDashView=key;await go(p,key)}else if(p==='gate'&&(key==='dispatch'||key==='dispatch-leaving')){app.gateDispatchTab='leaving';await go('gate','dispatch')}else if(p==='warehouse'){if(key==='history')await go('warehouse','history');else{if(app.wh38)app.wh38.phase=key;await go('warehouse',key)}}else if(p==='drivers'&&(normalizeRole(app.user?.roleCode)==='dispatch'||app.adminActiveRole==='dispatch')){if(key==='dashboard'||key==='reports'){await go('drivers',key)}else{adm.tab=key==='drivers'?'drivers':'dispatch';if(key==='orders')dsp.tab='pending';await go('drivers',key)}}else if(p==='store'&&['delivery','registered','create','partial'].includes(key)){app.storePortalTab=key;await go('store',key)}else await go(p,key);return;}
     const pageBtn=e.target.closest('[data-page]');
     if(pageBtn && !pageBtn.closest('#content')){e.preventDefault();await go(pageBtn.dataset.page);return;}
     const actionEl=e.target.closest('[data-action]');
@@ -241,6 +242,7 @@ const NOTIF_ROUTES={
   ORDER_CLOSED:{page:'gate',sub:'dispatch'}
 };
 function notifRoute(type,targetRole){
+  if(type.startsWith('STORE_TRANSFER_')) return targetRole==='store'?{page:'store',sub:'transfers'}:targetRole==='warehouse'?{page:'warehouse',sub:'stores'}:{page:'sales',sub:'stores'};
   if(type==='STORE_ORDER_APPROVED') return targetRole==='warehouse'?{page:'warehouse'}:{page:'sales',sub:'stores'};
   if(type==='TRANSPORT_ASSIGNED') return targetRole==='warehouse'?{page:'warehouse'}:{page:'sales',sub:'flow'};
   if(type==='TRANSPORT_WAREHOUSE_HANDOVER') return targetRole==='dispatch'?{page:'drivers',sub:'orders'}:{page:'sales',sub:'settlement'};
@@ -445,6 +447,24 @@ async function openNotificationTarget(id,type,role,entityType,entityId){
     if(type==='ONSITE_CANCELLATION_EXIT'&&entityType==='visit'){
       await go('gate','exit');const el=document.querySelector(`[data-cancelled-visit="${CSS.escape(entityId)}"]`);
       if(focusNotificationElement(el))return finish(true);return toast('این خروج دیگر در صف نگهبانی نیست.');
+    }
+    if(entityType==='store_transfer'){
+      if(route.page==='store'){
+        const list=(await api('/api/store/transfers')).transfers||[],t=list.find(x=>x.id===entityId);
+        if(!t){await go('store','transfers');return toast('حواله دیگر در دسترس این فروشگاه نیست.');}
+        const info=await api('/api/store/transfer-branches');app.transferStoreTab=info.source?.id===t.sourceBranchId?'sent':'incoming';
+      }
+      if(route.page==='sales'){app.salesStoreTab='transfers';await fetchSalesCache(false);}
+      if(route.page==='warehouse')app.wh38.storeTab='transfers';
+      await go(route.page,route.sub);
+      // Sales and warehouse shells paint asynchronously; explicitly await the
+      // transfer panel before trying to focus the linked document.
+      if(route.page==='warehouse')await wh38Paint('stores');
+      const panel=document.querySelector('[data-transfer-panel]');
+      if(panel)await transferMount(panel,route.page==='store'?'store':route.page);
+      const button=document.querySelector(`[data-transfer-open="${CSS.escape(entityId)}"]`);
+      if(button){button.click();return finish(true);}
+      return toast('حواله دیگر در این کارتابل در دسترس نیست؛ فهرست را تازه‌سازی کنید.');
     }
     if(entityType==='visit'){
       const visits=(await api('/api/visits?id='+encodeURIComponent(entityId))).visits||[];
