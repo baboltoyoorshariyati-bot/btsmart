@@ -21,7 +21,7 @@ test('بازگشت از آماده‌سازی انبار، حفظ پیش‌نو�
   const page=await wh.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(base,{waitUntil:'networkidle'});await page.evaluate(()=>go('warehouse','preparing'));
   const open=()=>page.locator(`[data-action=wh38-start][data-id="${order.id}"]`).click();
   const back=page.locator('[data-action=wh38-back]'),first=page.locator('[data-wh38-weight]').first(),notes=page.locator('[data-wh38-note]');
-  await open();assert.equal(await back.isVisible(),true);assert.equal(await back.innerText(),'بازگشت');await back.click();await page.locator(`[data-action=wh38-start][data-id="${order.id}"]`).waitFor();
+  await open();await back.waitFor({state:'visible'});assert.equal(await back.innerText(),'بازگشت');await back.click();await page.locator(`[data-action=wh38-start][data-id="${order.id}"]`).waitFor();
   let current=(await (await wh.request.get(base+'/api/orders/'+order.id)).json()).order;assert.equal(current.status,'WAREHOUSE_PREPARING');assert.equal(current.warehouseCompletedAt||null,null);
   await open();await first.fill('7');await notes.first().fill('توضیح انبار');
   page.once('dialog',d=>{assert.match(d.message(),/ذخیره‌نشده/);d.dismiss();});await back.click();assert.equal(await first.inputValue(),'7');
