@@ -1053,7 +1053,12 @@ async function openReturnedOrderEditor(id){
 }
 function renderReturnedOrderEditor(o){
   const items=app.returnEdit?.items||[];
-  openModal('اصلاح سفارش برگشتی به فروش',`<div class="returned-editor"><div class="returned-editor-head"><div><span class="eyebrow">ORDER CORRECTION</span><h2>اصلاح سفارش ${esc(fa(o.orderNo||'—'))}</h2><p>${esc(storeAwareOrderName(o))} • ${esc(storeAwareOrderPhone(o))}</p></div><span class="badge orange">برگشتی از انبار</span></div>${warehouseReturnNoteHtml(o)}<div class="returned-editor-note">در این بخش می‌توانید محصول، مقدار، واحد و توضیحات هر ردیف را ویرایش کنید، ردیف جدید اضافه کنید یا ردیف موجود را حذف کنید. همه تغییرات با نام کاربر در سوابق فعالیت ثبت می‌شود.</div><div id="returnedEditLines" class="returned-edit-lines"></div><div class="returned-editor-bottom"><button class="btn btn-secondary btn-lg" data-action="returned-add-line">${icon('plus',17)} افزودن ردیف</button><span class="subtle">تعداد ردیف فعال: ${qty(items.length)}</div><div class="modal-actions"><button class="btn btn-secondary" data-action="close-modal">انصراف</button><button class="btn btn-primary btn-lg" data-action="save-returned-order" data-id="${esc(o.id)}">ذخیره اصلاحات</button></div></div>`);
+  const showMode=o.orderType==='REMOTE'&&o.transportWorkflow===1&&o.deliveryMode==='PICKUP'&&app.features?.experimentalTransport;
+  const modeLocked=!!(o.visitId||o.pickupRecipient||o.pickupCancellation||o.pickupHandover||o.warehouseCompletedAt||o.warehouseDocumentNo||o.warehouseHandover||o.dispatch||o.transportInvoice||o.transportDeparture||Object.keys(o.transportAssignments||{}).length||Object.keys(o.transportHandovers||{}).length);
+  const modeField=showMode?`<div class="form-grid section-space"><label>روش تحویل سفارش<select id="returnedDeliveryMode" ${modeLocked?'disabled':''}><option value="PICKUP">تحویل در انبار</option><option value="DELIVERY" ${o.deposit?'disabled':''}>ارسال توسط پخش</option></select><small>${modeLocked?'پس از ثبت مراجعه، تخصیص یا تحویل، تغییر روش مجاز نیست؛ وضعیت سفارش را بررسی کنید.':o.deposit?'سفارش بیعانه‌دار فقط تحویل در انبار است.':'پیش از مراجعه یا تحویل فیزیکی، می‌توانید روش را به ارسال توسط پخش تغییر دهید.'}</small></label><label id="returnedDispatchPlaceWrap" hidden>محل ارسال<input id="returnedDispatchPlace" maxlength="200" value="${esc(o.dispatchPlace||'')}" placeholder="آدرس یا محل ارسال"></label></div>`:'';
+  openModal('اصلاح سفارش برگشتی به فروش',`<div class="returned-editor"><div class="returned-editor-head"><div><span class="eyebrow">ORDER CORRECTION</span><h2>اصلاح سفارش ${esc(fa(o.orderNo||'—'))}</h2><p>${esc(storeAwareOrderName(o))} • ${esc(storeAwareOrderPhone(o))}</p></div><span class="badge orange">برگشتی از انبار</span></div>${warehouseReturnNoteHtml(o)}<div class="returned-editor-note">در این بخش می‌توانید محصول، مقدار، واحد و توضیحات هر ردیف را ویرایش کنید، ردیف جدید اضافه کنید یا ردیف موجود را حذف کنید. همه تغییرات با نام کاربر در سوابق فعالیت ثبت می‌شود.</div>${modeField}<div id="returnedEditLines" class="returned-edit-lines"></div><div class="returned-editor-bottom"><button class="btn btn-secondary btn-lg" data-action="returned-add-line">${icon('plus',17)} افزودن ردیف</button><span class="subtle">تعداد ردیف فعال: ${qty(items.length)}</div><div class="modal-actions"><button class="btn btn-secondary" data-action="close-modal">انصراف</button><button class="btn btn-primary btn-lg" data-action="save-returned-order" data-id="${esc(o.id)}">ذخیره اصلاحات</button></div></div>`);
+  const mode=$('#returnedDeliveryMode'),placeWrap=$('#returnedDispatchPlaceWrap'),place=$('#returnedDispatchPlace');
+  if(mode){const sync=()=>{const delivery=mode.value==='DELIVERY';placeWrap.hidden=!delivery;place.required=delivery;};mode.addEventListener('change',sync);sync();}
   const modalCard=$('.modal-card'); if(modalCard) modalCard.classList.add('returned-modal-card');
   renderReturnedEditLines(o);
 }
@@ -1938,7 +1943,12 @@ async function openNotificationTarget(id,type,role,entityType,entityId){
     if(type==='PICKUP_CANCELLATION_REQUESTED'&&route.page==='sales')await fetchSalesCache(true);
     await go(route.page,route.sub);
     if(type==='PICKUP_CANCELLATION_REQUESTED'&&route.page==='sales'){
-      const el=document.querySelector(`[data-action="pickup-approve"][data-id="${CSS.escape(entityId)}"]`);if(focusNotificationElement(el))return finish(true);return toast('این انصراف دیگر در انتظار بررسی نیست.');
+      let el=document.querySelector(`[data-action="pickup-approve"][data-id="${CSS.escape(entityId)}"]`);
+      if(!el&&route.sub==='future'&&order.pickupCancellation?.status==='PENDING_SALES'){
+        const details=document.querySelector(`[data-future-order-details][data-id="${CSS.escape(entityId)}"]`);
+        if(details){await openOrderDetails(entityId,{futureActions:true});el=document.querySelector('#modal [data-action="pickup-approve"]');}
+      }
+      if(focusNotificationElement(el))return finish(true);return toast('این انصراف دیگر در انتظار بررسی نیست.');
     }
     if(route.page==='gate'){
       if(order.pickupHandover&&app.features?.pickupStaging){const pickupEl=document.querySelector(`[data-pickup-exit="${CSS.escape(entityId)}"]`);if(focusNotificationElement(pickupEl))return finish(true);return toast('این خروج دیگر در صف نگهبانی نیست.');}
@@ -2461,6 +2471,7 @@ async function openOrderDetails(id,options={}){
   try{
     const d=await api('/api/orders/'+id); const o=d.order||{}; const items=o.items||[];
     const activeItems=items.filter(i=>i.itemStatus!=='CANCELLED');
+    const futureActions=!!options.futureActions&&app.page==='sales'&&can('sales')&&o.orderType==='REMOTE';
     const storeProcessing=options.storeProcessing&&app.page==='sales'&&can('sales')&&o.orderType==='STORE'&&['WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES'].includes(o.status);
     const customerAdditionPending=(o.customerAdditionRequests||[]).some(r=>r.status==='PENDING_WAREHOUSE');
     const canRequestCustomerAddition=app.page==='sales'&&can('sales')&&['ONSITE','REMOTE'].includes(o.orderType)&&['WAREHOUSE_PENDING','WAREHOUSE_PREPARING'].includes(o.status)&&!o.warehouseCompletedAt&&!o.warehouseDocumentNo&&!o.warehouseHandover&&!o.pickupHandover&&!o.pickupCancellation&&!o.transportHandovers?.['0']&&!o.transportInvoice&&!o.payment&&!o.dispatch;
@@ -2497,8 +2508,12 @@ async function openOrderDetails(id,options={}){
       ${o.notes?`<div class="detail-note"><span>${icon('info',16)}</span><div><b>یادداشت سفارش</b><p>${esc(o.notes)}</p></div></div>`:''}
       <div class="table-wrap section-space" ${showSavedWeights?`data-sales-live-order="${esc(o.id)}"${storeSavedWeights?' data-sales-store-live="true"':''}`:""}>${showSavedWeights?`<p data-live-weight-status>${storeSavedWeights?'جمع وزن ذخیره‌شدهٔ سرویس‌ها؛ به معنی تحویل نهایی نیست.':'بر اساس آخرین وزن ذخیره‌شدهٔ انبار؛ پیش‌نویس تحویل نهایی نیست.'}</p>`:''}<table class="table v21-detail-table"><thead><tr><th>#</th><th>محصول</th><th>مقدار درخواستی</th><th>واحد</th><th>توضیحات</th>${showRunCols?'<th>وزن سرویس اول</th><th>وزن سرویس دوم</th>':''}${showSavedWeights?'<th>ذخیره‌شده</th>':''}<th>وزن تحویلی</th><th>وضعیت</th></tr></thead><tbody>${items.map((i,k)=>`<tr class="${i.itemStatus==='CANCELLED'?'row-cancelled':''}"><td>${fa(String(k+1))}</td><td><strong>${esc(i.product?.name||'—')}</strong></td><td>${qty(i.requestedQty)}</td><td>${esc(i.requestedUnit||'—')}</td><td>${esc(i.description||'—')}</td>${showRunCols?`<td data-store-run1-item="${esc(i.id)}">${runView[i.id]&&n(runView[i.id].r1Kg)>0?qty(runView[i.id].r1Kg)+' کیلوگرم':'—'}</td><td data-store-run2-item="${esc(i.id)}">${runView[i.id]&&n(runView[i.id].r2Kg)>0?qty(runView[i.id].r2Kg)+' کیلوگرم':'—'}</td>`:''}${showSavedWeights?(storeSavedWeights?`<td data-label="ذخیره‌شده" data-store-saved-item="${esc(i.id)}">${salesStoreSavedWeight(i,runView[i.id])}</td>`:`<td data-label="ذخیره‌شده" data-draft-saved-item="${esc(i.id)}">${salesDraftSavedWeight(i,draftView.get(String(i.id)))}</td>`):''}<td>${i.deliveredKg==null?'—':qty(i.deliveredKg)+' کیلوگرم'}</td><td>${badge(i.itemStatus)}</td></tr>`).join('')}</tbody></table></div>
       ${orderPendingAdditionsSection(o)}
-      <div class="sticky-actions"><span class="subtle">تمام تغییرات و ارجاع‌ها در سوابق مدیریتی ثبت می‌شوند.</span><div class="toolbar"><button class="btn btn-secondary" data-action="close-modal">بستن</button>${app.page==='warehouse'&&o.status==='WAREHOUSE_PENDING'?`<button class="btn btn-primary" data-wh-accept-order>تأیید دریافت و ورود به آماده‌سازی</button>`:''}${app.page==='warehouse'&&o.status==='WAREHOUSE_PREPARING'?`<button class="btn btn-primary" data-wh-start-order>شروع آماده‌سازی</button>`:''}${app.page==='warehouse'&&app.features?.pickupStaging&&o.visit?.status==='PICKUP_PRESENT'&&!o.pickupCancellation?`<button class="btn btn-secondary" data-wh-pickup-cancel>ثبت انصراف بدون تحویل</button>`:''}${o.status==='RETURNED_TO_SALES'&&!storeProcessing?`<button class="btn btn-secondary" data-action="edit-returned-order" data-id="${o.id}">${icon('edit',16)} اصلاح سفارش</button><button class="btn btn-primary" data-action="resubmit-order" data-id="${o.id}">${icon('send',16)} ارسال مجدد به انبار</button>`:''}${canRequestCustomerAddition?`<button type="button" class="btn btn-secondary" data-action="customer-addition" data-id="${esc(o.id)}" ${customerAdditionPending?'disabled title="در انتظار تأیید انبار"':''}>${icon('plus',16)} افزودن محصول</button>${customerAdditionPending?'<span class="subtle">درخواست قبلی در انتظار تأیید انبار است.</span>':''}`:''}${storeProcessing?salesStoreProcessingDetailActions(o):''}${app.page==='sales'&&can('sales')&&o.orderType==='STORE'&&o.status==='STORE_PENDING_SALES'?`<button class="btn btn-secondary" data-action="sales-edit-store-order" data-id="${esc(o.id)}">${icon('edit',16)} ویرایش سفارش</button><button class="btn btn-secondary" data-action="store-approve-v25" data-id="${esc(o.id)}">${icon('calendar',16)} ارسال با زمان‌بندی</button><button class="btn btn-primary" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',16)} ارسال سریع</button>`:''}</div></div>
+      <div class="sticky-actions"><span class="subtle">تمام تغییرات و ارجاع‌ها در سوابق مدیریتی ثبت می‌شوند.</span><div class="toolbar"><button class="btn btn-secondary" data-action="close-modal">بستن</button>${app.page==='warehouse'&&o.status==='WAREHOUSE_PENDING'?`<button class="btn btn-primary" data-wh-accept-order>تأیید دریافت و ورود به آماده‌سازی</button>`:''}${app.page==='warehouse'&&o.status==='WAREHOUSE_PREPARING'?`<button class="btn btn-primary" data-wh-start-order>شروع آماده‌سازی</button>`:''}${app.page==='warehouse'&&app.features?.pickupStaging&&o.visit?.status==='PICKUP_PRESENT'&&!o.pickupCancellation?`<button class="btn btn-secondary" data-wh-pickup-cancel>ثبت انصراف بدون تحویل</button>`:''}${o.status==='RETURNED_TO_SALES'&&!storeProcessing?`<button class="btn btn-secondary" data-action="edit-returned-order" data-id="${o.id}">${icon('edit',16)} اصلاح سفارش</button><button class="btn btn-primary" data-action="resubmit-order" data-id="${o.id}">${icon('send',16)} ارسال مجدد به انبار</button>`:''}${futureActions&&canSalesEditRemote(o)&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button type="button" class="btn btn-secondary" data-future-detail="edit">${icon('edit',16)} ویرایش سفارش</button>`:''}${futureActions&&canSalesCancelRemote(o)?`<button type="button" class="btn btn-secondary danger-text" data-future-detail="cancel">${icon('trash',16)} لغو سفارش</button>`:''}${futureActions?pickupSalesActions(o):''}${canRequestCustomerAddition?`<button type="button" class="btn btn-secondary" data-action="customer-addition" data-id="${esc(o.id)}" ${customerAdditionPending?'disabled title="در انتظار تأیید انبار"':''}>${icon('plus',16)} افزودن محصول</button>${customerAdditionPending?'<span class="subtle">درخواست قبلی در انتظار تأیید انبار است.</span>':''}`:''}${storeProcessing?salesStoreProcessingDetailActions(o):''}${app.page==='sales'&&can('sales')&&o.orderType==='STORE'&&o.status==='STORE_PENDING_SALES'?`<button class="btn btn-secondary" data-action="sales-edit-store-order" data-id="${esc(o.id)}">${icon('edit',16)} ویرایش سفارش</button><button class="btn btn-secondary" data-action="store-approve-v25" data-id="${esc(o.id)}">${icon('calendar',16)} ارسال با زمان‌بندی</button><button class="btn btn-primary" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',16)} ارسال سریع</button>`:''}</div></div>
     </div>`)
+    const futureEdit=$('#modal [data-future-detail="edit"]');if(futureEdit)futureEdit.onclick=()=>editFutureV25(o.id);
+    const futureCancel=$('#modal [data-future-detail="cancel"]');if(futureCancel)futureCancel.onclick=()=>cancelFutureV25(o.id,{order:o,closeDetails:true});
+    const futurePickupDate=futureActions&&$('#modal [data-action="pickup-date"]');if(futurePickupDate)futurePickupDate.onclick=()=>pickupChangeDate(o.id);
+    const futurePickupApprove=futureActions&&$('#modal [data-action="pickup-approve"]');if(futurePickupApprove)futurePickupApprove.onclick=()=>pickupApprove(o.id,futurePickupApprove,{closeDetails:true});
     const reviewCancel=$('#modal [data-store-cancel-review]');if(reviewCancel)reviewCancel.onclick=async()=>{
       const resolution=prompt('نتیجه بررسی، اقدامات انجام‌شده یا اقدامات لازم را بنویسید. این ثبت، سفارش یا اسناد را خودکار لغو نمی‌کند:');if(!resolution?.trim())return;
       if(!confirm('نتیجه بررسی به فروشگاه اطلاع داده شود؟'))return;reviewCancel.disabled=true;
@@ -2826,12 +2841,13 @@ async function editFutureV25(id){
   }catch(err){error.textContent=err.message;button.disabled=false;}};
  }catch(e){toast(e.message);}
 }
-async function cancelFutureV25(id){
- const order=(app.salesCache?.orders||[]).find(o=>o.id===id),tab=app.sub.sales==='remote'?'remote':'future';
+async function cancelFutureV25(id,options={}){
+ const order=options.order||(app.salesCache?.orders||[]).find(o=>o.id===id),tab=app.sub.sales==='remote'?'remote':'future';
  const prompt='سفارش لغو شود؟ تأیید می‌کنم هیچ کالایی تحویل نشده است.'+(order?.deposit?' بیعانه خودکار بازگردانده نمی‌شود؛ استرداد دستی را در بخش سفارش‌های آتی ثبت کنید.':'')+(['WAREHOUSE_PENDING','WAREHOUSE_PREPARING'].includes(order?.status)?' انبار از لغو مطلع می‌شود.':'');
  if(!confirm(prompt))return;
  try{
   const result=await api('/api/orders/'+encodeURIComponent(id)+'/cancel-remote',{method:'POST',body:JSON.stringify({reason:'لغو توسط فروش',confirmedNoGoods:true})});
+  if(options.closeDetails)closeModal();
   toast(result.order?.deposit?.status==='REFUND_REQUIRED'?'سفارش لغو شد؛ استرداد دستی بیعانه را در بخش سفارش‌های آتی پیگیری کنید.':'سفارش لغو شد.');
   try{const data=await fetchSalesCache(true);if(app.page==='sales'&&app.sub.sales===tab)paintSalesPaneV29(tab,data);await refreshDepositRefunds();await refreshIndicators();}
   catch(_){if(app.page==='sales'&&app.sub.sales===tab)salesRefreshWarning(tab,true);toast('سفارش لغو شد، اما نوسازی فهرست ناموفق بود؛ صفحه را بازخوانی کنید.');}
@@ -2885,6 +2901,11 @@ async function saveReturnedOrder(id){
   if(items.some(item=>!item.productId||n(item.requestedQty)<=0))return toast('برای همه ردیف‌ها محصول و مقدار معتبر وارد کنید.');
   try{
     const payload={items:items.map(item=>({id:item.id||null,productId:item.productId,requestedQty:n(item.requestedQty),requestedUnit:item.requestedUnit,description:String(item.description||'').trim()}))};
+    const mode=$('#returnedDeliveryMode');
+    if(mode&&!mode.disabled&&mode.value==='DELIVERY'){
+      const place=$('#returnedDispatchPlace').value.trim();if(!place)return toast('محل ارسال را وارد کنید.');
+      Object.assign(payload,{deliveryMode:'DELIVERY',expectedDeliveryMode:'PICKUP',dispatchPlace:place});
+    }
     await api('/api/orders/'+id+'/returned-edit',{method:'PUT',body:JSON.stringify(payload)});
     toast('اصلاحات سفارش ثبت شد و در سوابق فعالیت ذخیره گردید.');
     const isStore=app.returnEdit?.orderType==='STORE'; closeModal(); app.returnEdit=null; if(app.salesCache)app.salesCache.fetchedAt=0; if(isStore)app.salesStoreTab='processing'; await renderSales(isStore?'stores':'flow');
@@ -3632,7 +3653,7 @@ async function salesV29ClickHandler(e){
     if(a==='open-order')return openOrder(el.dataset.id);
     if(a==='back-order-intake'){app.orderDraft=[];return renderSales('onsite');}
     if(a==='submit-order')return submitOrder(el.dataset.id);
-    if(a==='order-details')return openOrderDetails(el.dataset.id);
+    if(a==='order-details')return openOrderDetails(el.dataset.id,{futureActions:el.hasAttribute('data-future-order-details')});
     if(a==='pickup-date')return pickupChangeDate(el.dataset.id);
     if(a==='pickup-approve')return pickupApprove(el.dataset.id,el);
     if(a==='edit-returned-order')return openReturnedOrderEditor(el.dataset.id);

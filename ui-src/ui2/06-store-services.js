@@ -213,7 +213,7 @@ function stRegisteredRow(o){
 }
 function stRegisteredTable(rows){
  if(!rows.length)return '';
- return `<div class="bt-table-wrap"><table class="bt-table st-registered-table"><caption class="bt-caption">سفارش‌های ثبت‌شده فروشگاه</caption><thead><tr><th scope="col">فروشگاه</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ ثبت</th><th scope="col">وضعیت</th><th scope="col">اقلام</th><th scope="col">پیگیری</th><th scope="col">عملیات</th></tr></thead><tbody>${rows.map(stRegisteredRow).join('')}</tbody></table></div>`;
+ return `<div class="bt-table-wrap" tabindex="0" role="region" aria-label="جدول سفارش‌های ثبت‌شده فروشگاه"><table class="bt-table st-registered-table"><caption class="bt-caption">سفارش‌های ثبت‌شده فروشگاه</caption><thead><tr><th scope="col">فروشگاه</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ ثبت</th><th scope="col">وضعیت</th><th scope="col">اقلام</th><th scope="col">پیگیری</th><th scope="col">عملیات</th></tr></thead><tbody>${rows.map(stRegisteredRow).join('')}</tbody></table></div>`;
 }
 
 function storeScopeQuery(){return app.user.roleCode==='admin'&&app.storeBranchNo?'&branchNo='+encodeURIComponent(app.storeBranchNo):'';}

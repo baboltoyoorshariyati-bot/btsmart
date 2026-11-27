@@ -27,7 +27,7 @@ test('لغو آتی و غیرحضوری از فروش با حفظ بیعانه �
   for(const o of [delivered,present])assert.equal((await request(sales,'POST',`/api/orders/${o.id}/cancel-remote`,{confirmedNoGoods:true})).status,409);
   assert.equal((await request(wh,'POST',`/api/orders/${pending.id}/cancel-remote`,{confirmedNoGoods:true})).status,403);
   const page=await sales.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(base,{waitUntil:'networkidle'});await page.evaluate(()=>go('sales','future'));
-  const f=page.locator(`#futureOrderListV25 [data-action=future-cancel][data-id="${future.id}"]`);await f.waitFor();page.once('dialog',d=>{assert.match(d.message(),/بیعانه/);d.accept();});await f.click();
+  const f=page.locator(`#futureOrderListV25 [data-action=order-details][data-id="${future.id}"]`);await f.click();await page.locator('#modal [data-future-detail=cancel]').waitFor();page.once('dialog',d=>{assert.match(d.message(),/بیعانه/);d.accept();});await page.locator('#modal [data-future-detail=cancel]').click();
   await page.locator(`#depositRefundList [data-id="${future.id}"]`).waitFor();assert.equal((await ok(sales,'GET',`/api/orders/${future.id}`)).order.deposit.status,'REFUND_REQUIRED');
   await page.evaluate(()=>go('sales','remote'));await page.locator(`#phoneOrderFormV25`).waitFor();await page.locator('#phoneOrderFormV25 [name=name]').fill('متن محفوظ');
   for(const order of [pending,preparing]){

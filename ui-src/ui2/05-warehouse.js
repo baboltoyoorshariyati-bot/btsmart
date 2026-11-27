@@ -456,7 +456,8 @@ function wh38Shell(phase){
       else if(a==='wh38-order-details'){ await openOrderDetails(id); }
       else if(a==='wh38-start'){ el.disabled=true; const r=await api('/api/orders/'+id+'/warehouse/start-preparing',{method:'POST',body:'{}'}); toast('آماده‌سازی سفارش ثبت شد.'); if(r.order&&r.order.storeRun&&r.order.storeRun.enabled) sr38Sheet(r.order); else wh38Sheet(r.order); }
       else if(a==='wh-weight-details'){whOpenWeighing(el.closest('tr[data-wh38-item],tr[data-sr318-row],article')?.querySelector('[data-wh38-weight],[data-sr38-weight]'));}
-      else if(a==='wh38-save-draft'){ el.disabled=true;try{await wh38SaveDraft(id);}finally{el.disabled=false;} }
+      else if(a==='wh38-back'){ const body=$('#wh38Body');if(body?.dataset.saving==='1')return toast('ابتدا ذخیره وزن‌ها به پایان برسد.');if(body?.dataset.dirty==='1'&&!confirm('تغییرات ذخیره‌نشده از بین می‌روند. به فهرست تحویل و آماده‌سازی بازگردید؟'))return;app.sub.warehouse='preparing';renderNav();wh38Shell('preparing'); }
+      else if(a==='wh38-save-draft'){ el.disabled=true;const body=$('#wh38Body');body.dataset.saving='1';try{await wh38SaveDraft(id);}finally{delete body.dataset.saving;el.disabled=false;} }
       else if(a==='wh38-finalize'){ await wh38Finalize(id); }
       else if(a==='wh38-return'){ const reason=prompt('دلیل ارجاع به فروش را وارد کنید:','اصلاح سفارش / اصلاح وزن')||''; if(!reason)return; await api('/api/orders/'+id+'/return-sales',{method:'POST',body:JSON.stringify({reason})}); toast('سفارش به فروش ارجاع شد.'); await refreshIndicators(); if(app.wh38.phase==='stores'){app.wh38.storeTab='preparing'; wh38Shell('stores');}else wh38Shell('preparing'); }
       else if(a==='sr38-handover-document'){ await whStoreDocumentDetails(id,Number(el.dataset.run)); }
@@ -533,6 +534,7 @@ function whOpenWeighing(input){
 function wh38Sheet(o){
   const body=$('#wh38Body'); if(!body)return;
   body.dataset.sheet='1';
+  body.dataset.dirty='0';
   app.wh38.sheetOrder=o;
   const items=activeItemsOf(o);
   body.innerHTML=`<section class="wh38-sheet">
@@ -549,7 +551,7 @@ function wh38Sheet(o){
       <td data-label="توضیح انبار برای فروش"><div class="wh38-note-box"><textarea id="wh38-note-${esc(it.id)}" rows="2" maxlength="300" autocomplete="off" dir="auto" placeholder="اختیاری — مثلاً: دو کارتن نمدار بود" aria-label="توضیح انبار برای فروش دربارهٔ ${esc(it.product?.name||'محصول')}" data-wh38-note="${esc(it.id)}">${esc(it.warehouseNote||'')}</textarea><span class="wh38-note-count" data-wh38-note-count aria-hidden="true"></span></div></td>
     </tr>`).join('')||'<tr><td colspan="7">قلمی برای آماده‌سازی نیست.</td></tr>'}</tbody></table></div>
     <label><input type="checkbox" data-wh38-merge> ادغام محصولات هم‌نام در سند چاپی (وزن هر ردیف جدا ثبت می‌شود)</label><div class="wh38-sheet-foot"><div><span>جمع وزن نهایی</span><strong id="wh38Total">۰ کیلوگرم</strong><small data-wh38-draft-status aria-live="polite">${o.warehouseWeightDraft?.revision?'وزن‌ها ذخیره شده‌اند.':'تغییرات هنوز ذخیره نشده است.'}</small></div>
-      <div class="toolbar"><button type="button" class="btn btn-secondary btn-lg" data-action="wh38-save-draft" data-id="${o.id}">ذخیره وزن‌ها</button><button type="button" class="btn btn-secondary btn-lg" data-action="wh38-return" data-id="${o.id}">${icon('arrow',16)} ارجاع به فروش</button><button type="button" class="btn btn-primary btn-lg" data-action="wh38-finalize" data-id="${o.id}">${icon('send',17)} ${app.features?.pickupStaging&&o.deliveryMode==='PICKUP'&&o.orderType==='REMOTE'?'ثبت وزن و تحویل واقعی و چاپ':'ثبت وزن، تحویل و چاپ سند'}</button></div></div>
+      <div class="toolbar"><button type="button" class="btn btn-secondary btn-lg" data-action="wh38-back">بازگشت</button><button type="button" class="btn btn-secondary btn-lg" data-action="wh38-save-draft" data-id="${o.id}">ذخیره وزن‌ها</button><button type="button" class="btn btn-secondary btn-lg" data-action="wh38-return" data-id="${o.id}">${icon('arrow',16)} ارجاع به فروش</button><button type="button" class="btn btn-primary btn-lg" data-action="wh38-finalize" data-id="${o.id}">${icon('send',17)} ${app.features?.pickupStaging&&o.deliveryMode==='PICKUP'&&o.orderType==='REMOTE'?'ثبت وزن و تحویل واقعی و چاپ':'ثبت وزن، تحویل و چاپ سند'}</button></div></div>
   </section>`;
   const saved=new Map((o.warehouseWeightDraft?.items||[]).map(x=>[x.itemId,x]));
   $$('#wh38Body [data-wh38-weight]').forEach(el=>{
@@ -559,12 +561,15 @@ function wh38Sheet(o){
   $$('#wh38Body [data-wh38-note]').forEach(el=>{
     const row=saved.get(el.dataset.wh38Note);
     if(row&&typeof row.note==='string')el.value=row.note;
+    el.dataset.savedNote=el.value;
     const count=el.parentElement.querySelector('[data-wh38-note-count]');
     const paint=()=>{if(count)count.textContent=el.value.trim()?fa(String(el.value.trim().length)):'';};
     paint();
     el.addEventListener('input',()=>{paint();const status=$('#wh38Body [data-wh38-draft-status]');if(status)status.textContent='تغییرات جدید هنوز ذخیره نشده است.';});
   });
   $$('#wh38Body [data-wh38-oos]').forEach(ch=>ch.addEventListener('change',()=>{ const w=$(`#wh38Body [data-wh38-weight="${ch.dataset.wh38Oos}"]`); if(w){w.disabled=ch.checked; if(ch.checked){w.value='';w.readOnly=false;whWeighingDrafts.delete(w);}} wh38Total();const status=$('#wh38Body [data-wh38-draft-status]');if(status)status.textContent='تغییرات جدید هنوز ذخیره نشده است.'; }));
+  body.querySelectorAll('[data-wh38-weight], [data-wh38-note]').forEach(el=>el.addEventListener('input',()=>{body.dataset.dirty='1';}));
+  body.querySelectorAll('[data-wh38-oos], [data-wh38-merge]').forEach(el=>el.addEventListener('change',()=>{body.dataset.dirty='1';}));
   wh38Total();
 }
 async function wh38SaveDraft(id){
@@ -578,7 +583,14 @@ async function wh38SaveDraft(id){
   });
   const items=collect();
   if(items.some(x=>!x.outOfStock&&(!Number.isFinite(x.deliveredKg)||x.deliveredKg<=0)))return toast('وزن‌های واردشده باید معتبر و مثبت باشند.');
-  try{const {draft}=await api('/api/orders/'+encodeURIComponent(id)+'/warehouse/draft',{method:'POST',body:JSON.stringify({revision:selected.warehouseWeightDraft?.revision||0,items})});selected.warehouseWeightDraft=draft;const status=$('#wh38Body [data-wh38-draft-status]');if(status)status.textContent=JSON.stringify(collect())===JSON.stringify(items)?'وزن آماده‌سازی ذخیره شده است.':'تغییرات جدید هنوز ذخیره نشده است.';toast('وزن‌ها ذخیره شد؛ تحویل کالا هنوز ثبت نشده است.');}
+  const body=$('#wh38Body');
+  const snapshot=()=>JSON.stringify({items:collect(),notes:$$('#wh38Body [data-wh38-note]').map(n=>n.value),merge:$('#wh38Body [data-wh38-merge]')?.checked});
+  const before=snapshot();
+  try{const {draft}=await api('/api/orders/'+encodeURIComponent(id)+'/warehouse/draft',{method:'POST',body:JSON.stringify({revision:selected.warehouseWeightDraft?.revision||0,items})});selected.warehouseWeightDraft=draft;
+    for(const item of items){const note=$(`#wh38Body [data-wh38-note="${item.itemId}"]`);if(note)note.dataset.savedNote=item.note;}
+    const unchanged=before===snapshot(),pendingNotes=$$('#wh38Body [data-wh38-note]').some(n=>n.value!==n.dataset.savedNote);
+    body.dataset.dirty=unchanged&&!pendingNotes&&!$('#wh38Body [data-wh38-merge]')?.checked?'0':'1';
+    const status=$('#wh38Body [data-wh38-draft-status]');if(status)status.textContent=body.dataset.dirty==='0'?'وزن آماده‌سازی ذخیره شده است.':'بعضی تغییرات هنوز ذخیره نشده است.';toast('وزن‌ها ذخیره شد؛ تحویل کالا هنوز ثبت نشده است.');}
   catch(e){toast(e.message);}
 }
 function wh38Total(){ const total=$$('#wh38Body [data-wh38-weight]').reduce((s,e)=>s+(e.disabled?0:whWeightNet(e)),0); const el=$('#wh38Total'); if(el)el.textContent=Number.isFinite(total)?qty(total)+' کیلوگرم':'وزن نامعتبر'; }

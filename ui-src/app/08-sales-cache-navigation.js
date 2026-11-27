@@ -310,7 +310,7 @@ async function salesV29ClickHandler(e){
     if(a==='open-order')return openOrder(el.dataset.id);
     if(a==='back-order-intake'){app.orderDraft=[];return renderSales('onsite');}
     if(a==='submit-order')return submitOrder(el.dataset.id);
-    if(a==='order-details')return openOrderDetails(el.dataset.id);
+    if(a==='order-details')return openOrderDetails(el.dataset.id,{futureActions:el.hasAttribute('data-future-order-details')});
     if(a==='pickup-date')return pickupChangeDate(el.dataset.id);
     if(a==='pickup-approve')return pickupApprove(el.dataset.id,el);
     if(a==='edit-returned-order')return openReturnedOrderEditor(el.dataset.id);

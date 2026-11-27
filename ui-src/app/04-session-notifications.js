@@ -551,7 +551,12 @@ async function openNotificationTarget(id,type,role,entityType,entityId){
     if(type==='PICKUP_CANCELLATION_REQUESTED'&&route.page==='sales')await fetchSalesCache(true);
     await go(route.page,route.sub);
     if(type==='PICKUP_CANCELLATION_REQUESTED'&&route.page==='sales'){
-      const el=document.querySelector(`[data-action="pickup-approve"][data-id="${CSS.escape(entityId)}"]`);if(focusNotificationElement(el))return finish(true);return toast('این انصراف دیگر در انتظار بررسی نیست.');
+      let el=document.querySelector(`[data-action="pickup-approve"][data-id="${CSS.escape(entityId)}"]`);
+      if(!el&&route.sub==='future'&&order.pickupCancellation?.status==='PENDING_SALES'){
+        const details=document.querySelector(`[data-future-order-details][data-id="${CSS.escape(entityId)}"]`);
+        if(details){await openOrderDetails(entityId,{futureActions:true});el=document.querySelector('#modal [data-action="pickup-approve"]');}
+      }
+      if(focusNotificationElement(el))return finish(true);return toast('این انصراف دیگر در انتظار بررسی نیست.');
     }
     if(route.page==='gate'){
       if(order.pickupHandover&&app.features?.pickupStaging){const pickupEl=document.querySelector(`[data-pickup-exit="${CSS.escape(entityId)}"]`);if(focusNotificationElement(pickupEl))return finish(true);return toast('این خروج دیگر در صف نگهبانی نیست.');}

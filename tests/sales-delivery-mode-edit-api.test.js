@@ -46,6 +46,24 @@ test('ویرایش روش تحویل: محدودیت‌ها، صف‌ها و ح�
   const visit=await create();await ok('POST',`/api/pickup/${visit.id}/entry`,{name:'نماینده',phone:'09121112255',noVehicle:true},gate);assert.equal((await change(visit.id,{deliveryMode:'DELIVERY',dispatchPlace:'بابل'})).status,409);
   const deposit=await create({deposit:{amount:100,type:'CASH'}});assert.equal((await change(deposit.id,{deliveryMode:'DELIVERY',dispatchPlace:'بابل'})).status,409);assert.equal((await ok('GET',`/api/orders/${deposit.id}`,null,sales)).order.deposit.amount,100);
   const accepted=await create();await ok('POST',`/api/orders/${accepted.id}/warehouse/accept`,{},warehouse);assert.equal((await change(accepted.id,{deliveryMode:'DELIVERY',dispatchPlace:'بابل'})).status,409);
+  // A saved warehouse draft is not a handover. After return, sales may change
+  // pickup to distribution atomically, without changing the existing return policy.
+  const returned=await create();await ok('POST',`/api/orders/${returned.id}/warehouse/accept`,{},warehouse);await ok('POST',`/api/orders/${returned.id}/warehouse/start-preparing`,{},warehouse);
+  await ok('POST',`/api/orders/${returned.id}/warehouse/draft`,{revision:0,items:[{itemId:returned.items[0].id,deliveredKg:1}]},warehouse);
+  const afterReturn=(await ok('POST',`/api/orders/${returned.id}/return-sales`,{reason:'تغییر روش تحویل'},warehouse)).order;assert.equal(afterReturn.warehouseWeightDraft.items.length,0);
+  const items=[{id:returned.items[0].id,productId:'p01',requestedQty:2,requestedUnit:'کیلوگرم'}],url=`/api/orders/${returned.id}/returned-edit`,edit={items,deliveryMode:'DELIVERY',expectedDeliveryMode:'PICKUP',dispatchPlace:'بابل مرکز'};
+  assert.equal((await call('PUT',url,edit,gate)).status,403);assert.equal((await call('PUT',url,{...edit,dispatchPlace:''},sales)).status,400);assert.equal((await call('PUT',url,{...edit,expectedDeliveryMode:'DELIVERY'},sales)).status,409);
+  let current=(await ok('GET',`/api/orders/${returned.id}`,null,sales)).order;assert.equal(current.deliveryMode,'PICKUP');assert.equal(current.items[0].requestedQty,1);
+  const changed=(await ok('PUT',url,edit,sales)).order;assert.equal(changed.deliveryMode,'DELIVERY');assert.equal(changed.pickupWorkflow,null);assert.equal(changed.dispatchPlace,'بابل مرکز');assert.equal(changed.status,'RETURNED_TO_SALES');assert.equal(changed.items[0].requestedQty,2);assert.equal(changed.warehouseWeightDraft.items.length,0);
+  assert(!(await inPlans(returned.id)));assert.equal((await call('PUT',url,edit,sales)).status,409);
+  const resub=(await ok('POST',`/api/orders/${returned.id}/resubmit-sales`,{},sales)).order;assert.equal(resub.status,'WAREHOUSE_PENDING');assert(await inPlans(returned.id));assert(!(await ok('GET','/api/pickup/orders?q='+encodeURIComponent(returned.orderNo),null,gate)).orders.some(o=>o.id===returned.id));
+  assert((await ok('GET','/api/notifications',null,dispatch)).notifications.some(n=>n.entityId===returned.id&&n.type==='TRANSPORT_ORDER_READY'));
+  const changeAudit=await ok('GET','/api/admin/audit?action=UPDATE_REMOTE_ORDER&entityId='+returned.id,null,admin);assert(changeAudit.audit.some(a=>a.details.before.deliveryMode==='PICKUP'&&a.details.after.deliveryMode==='DELIVERY'&&a.details.after.dispatchPlace==='بابل مرکز'));
+  await ok('POST',`/api/transport/plans/${returned.id}/assign`,{driverId:driver.id,vehicleId:vehicle.id},dispatch);await ok('POST',`/api/orders/${returned.id}/warehouse/accept`,{},warehouse);await ok('POST',`/api/orders/${returned.id}/warehouse`,{draftRevision:2,items:[{itemId:returned.items[0].id,deliveredKg:2}]},warehouse);assert.equal((await ok('GET',`/api/warehouse/delivered/${returned.id}`,null,warehouse)).order.driverName,'راننده');
+  const locked=async(o,visit=false)=>{await ok('POST',`/api/orders/${o.id}/warehouse/accept`,{},warehouse);if(visit)await ok('POST',`/api/pickup/${o.id}/entry`,{name:'مراجعه کننده',phone:'09121112255',noVehicle:true},gate);await ok('POST',`/api/orders/${o.id}/return-sales`,{reason:'بررسی'},warehouse);const input={items:[{id:o.items[0].id,productId:'p01',requestedQty:3,requestedUnit:'کیلوگرم'}],deliveryMode:'DELIVERY',expectedDeliveryMode:'PICKUP',dispatchPlace:'بابل'};assert.equal((await call('PUT',`/api/orders/${o.id}/returned-edit`,input,sales)).status,409);const fresh=(await ok('GET',`/api/orders/${o.id}`,null,sales)).order;assert.equal(fresh.deliveryMode,'PICKUP');assert.equal(fresh.items[0].requestedQty,1);};
+  await locked(await create({deposit:{amount:100,type:'CASH'}}));await locked(await create(),true);
+  assert.equal((await call('POST',`/api/orders/${pickupFlow.id}/return-sales`,{reason:'تحویل شده'},warehouse)).status,409);
+
  }finally{if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });
 
