@@ -25,5 +25,5 @@ test('پایان کار انبار خودکار است و دکمه دستی نم
 test('سفارش پایان‌یافتهٔ انبار در فهرست و شمارندهٔ آماده‌سازی فروشگاه نمی‌ماند', () => {
   const paint = ui.slice(ui.indexOf("if(phase==='stores')"), ui.indexOf('const status=phase==='));
   assert.match(paint, /o\.orderType==='STORE'&&!\(o\.storeRunOps&&o\.storeRunOps\.finalizedAt\)/);
-  assert.match(core, /WAREHOUSE_PREPARING' && !\(o\.storeRunOps && o\.storeRunOps\.finalizedAt\)/);
+  assert.match(fs.readFileSync('lib/workload-queues.js','utf8'), /WAREHOUSE_PREPARING'&&!o\.storeRunOps\?\.finalizedAt/);
 });

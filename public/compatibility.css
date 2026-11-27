@@ -609,8 +609,8 @@
 .whd35-list .whd23-box b{font-size:12.5px}
 .whd35-detail .modal-actions{margin-top:2px}
 
-/* ===== v37.36.0 — سربرگ سوم فروشگاه‌های انبار: «سوابق و گزارشات» ===== */
-#appView[data-cartable-page="warehouse"] .wh38-store-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* فروشگاه‌های انبار: چهار سربرگ هم‌اندازه، از جمله جابجایی، در یک ردیف. */
+#appView[data-cartable-page="warehouse"] .wh38-store-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:560px){
   #appView[data-cartable-page="warehouse"] .wh38-store-tabs{gap:4px}
   #appView[data-cartable-page="warehouse"] .wh38-store-tabs button{padding:2px 3px}
@@ -1088,9 +1088,9 @@
 #appView .sales-history-pages{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px}
 @media(max-width:900px){#appView .adm-orders-list{overflow-x:auto}}
 /* سربرگ‌های «ورودی / تخصیص‌یافته» در صفحهٔ سفارشات ترابری:
-   دو دکمهٔ مستقل و کنار هم (افقی) در همهٔ عرض‌ها؛ هرگز زیر هم نمی‌روند. */
+   سه دکمهٔ مستقل و کنار هم (افقی) در همهٔ عرض‌ها؛ هرگز زیر هم نمی‌روند. */
 #appView #content #transportPlans .tp-plan-tabs{
-  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
   grid-auto-flow:column!important;grid-auto-columns:minmax(0,1fr)!important;
   align-items:stretch!important;gap:8px!important;margin:12px 0!important;
   overflow:visible!important;min-width:0!important;max-width:100%!important;
@@ -1105,9 +1105,9 @@
 #appView #content #transportPlans .tp-plan-tabs .sd-tab-copy strong{white-space:normal!important;overflow-wrap:anywhere!important;font-size:13px!important}
 #appView #content #transportPlans .tp-plan-tabs .sd-tab-copy small{white-space:normal!important;line-height:1.5!important;overflow-wrap:anywhere!important}
 #appView #content #transportPlans .tp-plan-tabs .sd-tab-count{min-width:24px!important;display:inline-grid!important;flex:0 0 auto!important}
-/* روی صفحهٔ باریک، توضیح هر سربرگ پنهان می‌شود تا خود دو سربرگ کنار هم بمانند. */
+/* روی صفحهٔ باریک، توضیح هر سربرگ پنهان می‌شود تا سه سربرگ کنار هم بمانند. */
 @media(max-width:700px){
-  #appView #content #transportPlans .tp-plan-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-flow:column!important;gap:6px!important}
+  #appView #content #transportPlans .tp-plan-tabs{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-auto-flow:column!important;gap:6px!important}
   #appView #content #transportPlans .tp-plan-tabs .sd-tab{padding:7px 8px!important;min-height:44px!important;gap:6px!important}
   #appView #content #transportPlans .tp-plan-tabs .sd-tab-copy small{display:none!important}
   #appView #content #transportPlans .tp-plan-tabs .sd-tab-copy strong{font-size:12.5px!important}
@@ -1428,9 +1428,9 @@
 #appView #content .settlement-invoice-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12px;min-width:0!important}
 #appView #content .settlement-invoice-table :is(th,td){padding:10px 6px;border:1px solid var(--border,#ddd);white-space:normal!important;overflow-wrap:anywhere;vertical-align:top;text-align:right}
 #appView #content .settlement-invoice-table th{background:var(--surface-alt,#f3f5f7);position:sticky;top:0;z-index:1}
-#appView #content .settlement-invoice-table td:nth-child(6){white-space:nowrap!important;overflow:hidden}
-#appView #content .settlement-invoice-table td:nth-child(6) .badge{display:inline-flex!important;vertical-align:middle;max-width:65%;min-width:0;margin:0!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
-#appView #content .settlement-invoice-table td:nth-child(6) small{display:inline-block!important;vertical-align:middle;max-width:34%;margin:0 4px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap!important}
+#appView #content .settlement-invoice-table td:nth-child(6){white-space:normal!important;overflow:visible}
+#appView #content .settlement-invoice-table td:nth-child(6) .badge{display:inline-flex!important;vertical-align:middle;max-width:100%;min-width:0;margin:2px!important;white-space:normal!important;overflow-wrap:anywhere}
+#appView #content .settlement-invoice-table td:nth-child(6) small{display:inline-block!important;vertical-align:middle;max-width:100%;margin:2px 4px!important;white-space:normal!important}
 #appView #content .settlement-invoice-table :is(.toolbar,.badge){display:flex;flex-wrap:wrap;min-width:0;white-space:normal!important}
 #appView #content .settlement-invoice-table .btn{min-width:0!important;white-space:normal!important;padding:5px!important}
 #appView #content #phoneOrderFormV25 .transport-delivery-choice,#appView #content #phoneOrderFormV25 [data-sales-dispatch-place]{order:0!important;grid-column:auto!important}
@@ -1438,31 +1438,24 @@
 /* Readable compact invoice grid: reserve room for one-line operations. */
 #appView #content .settlement-invoice-table{font-size:14px;font-weight:700}
 #appView #content .settlement-invoice-table :is(th,td){text-align:center!important;vertical-align:middle;padding:8px 4px;font-weight:700}
-#appView #content .settlement-invoice-table :is(th,td):nth-child(1){width:15%}
+#appView #content .settlement-invoice-table :is(th,td):nth-child(1){width:14%}
 #appView #content .settlement-invoice-table :is(th,td):nth-child(2){width:10%}
 #appView #content .settlement-invoice-table :is(th,td):nth-child(3),#appView #content .settlement-invoice-table :is(th,td):nth-child(4){width:7%}
 #appView #content .settlement-invoice-table :is(th,td):nth-child(5){width:12%}
-#appView #content .settlement-invoice-table :is(th,td):nth-child(6){width:24%}
-#appView #content .settlement-invoice-table :is(th,td):nth-child(7){width:25%}
+#appView #content .settlement-invoice-table :is(th,td):nth-child(6){width:16%}
+#appView #content .settlement-invoice-table :is(th,td):nth-child(7){width:34%}
 #appView #content .settlement-invoice-table td .badge{justify-content:center;font-size:13px;font-weight:700}
 #appView #content .settlement-invoice-table td .toolbar{display:flex!important;flex-wrap:nowrap!important;justify-content:center;align-items:center;gap:4px}
 #appView #content .settlement-invoice-table .btn{font-size:13px;font-weight:700;flex:0 1 auto;line-height:1.5}
 @media(max-width:900px){
- #appView #content .settlement-invoice-table td .toolbar{overflow-x:auto;justify-content:flex-start;padding-bottom:4px}
- #appView #content .settlement-invoice-table td .toolbar .btn{flex:0 0 auto;white-space:nowrap!important}
- #appView #content .settlement-invoice-table :is(th,td):nth-child(1){width:14%}
- #appView #content .settlement-invoice-table :is(th,td):nth-child(2){width:8%}
- #appView #content .settlement-invoice-table :is(th,td):nth-child(3){width:6%}
- #appView #content .settlement-invoice-table :is(th,td):nth-child(4){width:7%}
- #appView #content .settlement-invoice-table :is(th,td):nth-child(5){width:11%}
- #appView #content .settlement-invoice-table :is(th,td):nth-child(6){width:29%}
- #appView #content .settlement-invoice-table :is(th,td):nth-child(7){width:25%}
- #appView #content .settlement-invoice-table td:nth-child(6) .badge{max-width:54%;padding-inline:3px!important;font-size:9px!important}
- #appView #content .settlement-invoice-table td:nth-child(6) small{max-width:42%;margin-inline:2px!important;font-size:8px!important}
+ #appView #content .settlement-invoice-table :is(th,td):nth-child(6){width:18%}
+ #appView #content .settlement-invoice-table :is(th,td):nth-child(7){width:32%}
 }
 @media(min-width:601px){
- #appView #content .settlement-invoice-table td .toolbar{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));overflow:visible!important;justify-content:stretch;align-items:center;gap:4px}
- #appView #content .settlement-invoice-table td .toolbar .btn{width:100%;max-width:100%;min-width:0!important;flex:none!important;white-space:nowrap!important;padding:4px 2px!important;gap:3px!important;font-size:12px!important;line-height:1.4}
+ /* Use the natural button widths instead of reserving 108px for every action.
+    On narrower screens they can wrap without hiding or clipping a control. */
+ #appView #content .settlement-invoice-table td .toolbar{display:flex!important;flex-wrap:wrap!important;overflow:visible!important;justify-content:center;align-items:center;gap:4px}
+ #appView #content .settlement-invoice-table td .toolbar .btn{width:auto;max-width:100%;min-width:0!important;flex:0 0 auto!important;white-space:nowrap!important;padding:4px 6px!important;gap:3px!important;font-size:12px!important;line-height:1.4}
 }
 /* Phone layout: issued invoices become readable, labeled cards instead of seven narrow columns. */
 @media(max-width:600px){
@@ -1699,3 +1692,39 @@
 #appView .price-group-filter{display:flex;align-items:center;gap:8px;margin:12px 20px;flex-wrap:wrap}#appView .price-group-filter select{width:auto;min-width:150px;max-width:100%}
 #modal .price-group-preview .bt-table-wrap{max-width:100%;overflow-x:auto}#modal .price-group-preview td{overflow-wrap:anywhere}
 @media(max-width:600px){#appView .price-groups{margin:12px;padding:12px}#appView .price-group-filter{margin:12px}#appView .price-group-controls .btn{width:100%}}
+
+/* Gate order picker is a separate workspace, retaining the entry form in place. */
+#appView #content :is(.gt-entry-panel,.gt-pickup-list-page)[hidden]{display:none!important}
+#appView #content .gt-pickup-list-body{padding:18px;display:grid;gap:12px;min-width:0}
+#appView #content .gt-pickup-list-body label{font-weight:700}
+#appView #content .gt-pickup-list-body input{width:100%;max-width:420px;min-width:0}
+#appView #content .gt-pickup-list-pages{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+@media(max-width:600px){#appView #content .gt-pickup-list-page .sd-head{gap:10px;flex-wrap:wrap}#appView #content .gt-pickup-list-body{padding:12px}}
+
+/* Store transfer desk: reuse the store order panel and field language. */
+#appView .transfer-workspace{display:grid;gap:16px}
+#appView .transfer-panel{overflow:visible}
+#appView .transfer-tabs{padding:16px 20px 0}
+#appView .transfer-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#appView .transfer-lines-wrap{margin-bottom:12px}
+#appView .transfer-lines-table :is([data-kg],[data-price]){text-align:right}
+#appView .transfer-lines-table th:nth-child(1){width:6%}
+#appView .transfer-lines-table th:nth-child(2){width:29%}
+#appView .transfer-lines-table th:nth-child(3){width:16%}
+#appView .transfer-lines-table th:nth-child(4){width:16%}
+#appView .transfer-lines-table th:nth-child(5){width:25%}
+#appView .transfer-lines-table th:nth-child(6){width:8%}
+#appView .transfer-product .product-suggest{position:absolute;top:calc(100% + 4px);inset-inline:0;z-index:30}
+#appView .transfer-help{display:block;color:#9a521a;margin-top:6px;line-height:1.7}
+#appView .transfer-notes{margin-top:18px}
+#appView .transfer-notes textarea{width:100%}
+#appView .transfer-panel .sd-submit-bar small{display:block}
+@media(max-width:700px){
+ #appView .transfer-meta{grid-template-columns:1fr}
+}
+
+@media(max-width:900px){#appView .transfer-lines-table td::before{width:94px;white-space:normal}#appView .transfer-lines-table .sd-line-cell{min-width:0;flex:1}}
+
+/* Keep all store subtabs on one row at all widths; long labels wrap inside each tab. */
+#appView[data-cartable-page="warehouse"] .wh38-store-tabs,#appView[data-cartable-page="sales"] .sales-store-tabs-v43{min-width:0;max-width:100%}
+#appView[data-cartable-page="warehouse"] .wh38-store-tab span,#appView[data-cartable-page="sales"] .sales-store-tab-v43 span{min-width:0;overflow-wrap:anywhere}

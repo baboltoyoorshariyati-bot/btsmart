@@ -23,7 +23,7 @@ test('فرم مالی پخش در عرض‌های مختلف و گردش واق�
   await post(wh,`/api/orders/${order.id}/warehouse/accept`,{});await post(wh,`/api/orders/${order.id}/warehouse`,{items:[{itemId:order.items[0].id,deliveredKg:2}]});
   await post(transport,`/api/transport/plans/${order.id}/assign`,{driverId:driver.id,vehicleId:vehicle.id});
   const doc=(await get(wh,`/api/warehouse/delivered/${order.id}`)).order;await post(wh,`/api/warehouse/transport-handovers/${order.id}`,{signedPaperConfirmed:true,handoverToken:doc.handoverToken});
-  await sales.addInitScript(()=>{if(window!==window.top)window.print=()=>{const body=window.parent.document.body;body.dataset.prints=String(Number(body.dataset.prints||0)+1);setTimeout(()=>window.dispatchEvent(new Event('afterprint')),0);};});
+  await sales.addInitScript(()=>{if(window!==window.top)window.print=()=>{const body=window.parent.document.body;body.dataset.prints=String(Number(body.dataset.prints||0)+1);/* test releases afterprint explicitly */};});
   const page=await sales.newPage();const errors=[],dialogs=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>{dialogs.push(d.message());d.dismiss();});await page.goto(base+'/',{waitUntil:'networkidle'});await page.evaluate(()=>go('sales','settlement'));
   const queue=page.locator(`[data-stl=select][data-id="${order.id}"]`);await queue.waitFor();
   // A failed order request must leave a visible, retryable error instead of a blank panel.
@@ -41,16 +41,28 @@ test('فرم مالی پخش در عرض‌های مختلف و گردش واق�
  await page.locator('[name=discountAmount]').fill('100000');await page.locator('[name=additionsAmount]').fill('10000');
  assert.match(await page.locator('[data-ti-summary]').innerText(),/۲٬۴۶۹٬۱۳۴/);assert.match(await page.locator('[data-ti-summary]').innerText(),/۲٬۳۷۹٬۱۳۴/);
  await price.fill('12x');await page.locator('[data-ti-form] button[type=submit]').click();assert.equal((await get(sales,`/api/orders/${order.id}`)).order.transportInvoice,undefined);await price.fill('1234567');
- await page.locator('[data-ti-form] button[type=submit]').click();await page.locator('[data-ti-shipment-print]').waitFor();assert.equal(await page.locator('[data-ti-preview]').count(),0);
+ // A second sales tab may still have this settlement form open when another
+ // workstation records the invoice. Its stale form must not remain usable.
+ const other=await sales.newPage();await other.goto(base+'/',{waitUntil:'networkidle'});await other.evaluate(()=>go('sales','settlement'));await other.locator(`[data-stl=select][data-id="${order.id}"]`).click();await other.locator('#stlMain [data-ti-form]').waitFor();
+ await page.locator('[data-ti-form] button[type=submit]').click();
+ // The actual shipment note is automatically opened, before navigation.
+ const shipmentFrame=page.frameLocator('iframe[title="سند آماده چاپ"]'),shipment=shipmentFrame.locator('.tr-shipment-note');await shipment.waitFor();await page.locator('body[data-prints="1"]').waitFor();
+ assert.equal(await page.evaluate(()=>app.sub.sales),'settlement');
  const prepared=(await get(sales,`/api/orders/${order.id}`)).order.transportInvoice;assert.equal(prepared.priceLines[0].unitPrice,1234567);assert.equal(prepared.totalAmount,2379134);
- // Issuing the invoice removes its preview action. Print the shipment note instead.
- await page.locator('[data-ti-shipment-print]').click();const shipmentFrame=page.frameLocator('iframe[title="سند آماده چاپ"]'),shipment=shipmentFrame.locator('.tr-shipment-note');await shipment.waitFor();
- const shipmentText=await shipment.innerText(),faDigits=value=>String(value).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);assert.match(shipmentText,/برگه ارسال/);assert.ok(shipmentText.includes(faDigits(order.orderNo)));assert.ok(shipmentText.includes(faDigits(prepared.invoiceNumber)));
- // برگهٔ ارسال پخش هم‌شکل فاکتور تحویل است: قیمت هر کیلو، مبلغ و جمع‌بندی مالی چاپ می‌شود.
+ const shipmentText=await shipment.innerText(),faDigits=value=>String(value).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);assert.match(shipmentText,/راننده تحویل/);assert.ok(shipmentText.includes(faDigits(order.orderNo)));assert.ok(shipmentText.includes(faDigits(prepared.invoiceNumber)));
  assert.match(shipmentText,/قیمت هر کیلو/);assert.match(shipmentText,/۱٬۲۳۴٬۵۶۷/);assert.match(shipmentText,/۲٬۴۶۹٬۱۳۴/);assert.match(shipmentText,/۲٬۳۷۹٬۱۳۴/);assert.match(shipmentText,/اینجانب/);
- assert.equal(await page.evaluate(()=>app.sub.sales),'settlement');await page.locator('body[data-prints="1"]').waitFor();await page.locator('iframe[title="سند آماده چاپ"]').waitFor({state:'detached'});
+ await other.evaluate(async()=>paintSalesPaneV29('settlement',await fetchSalesCache(true)));
+ assert.equal(await other.locator('#stlMain .tr-invoice-panel').count(),0);assert.equal(await other.evaluate(()=>stl.orderId),null);
+ await other.evaluate(id=>stlOpen(id),order.id);assert.equal(await other.locator('#stlMain .tr-invoice-panel').count(),0);await other.close();
+ // Even if the queue refresh fails, closing the print dialog must navigate to
+ // delivery rather than leaving an issued invoice panel in settlement.
+ await page.route(/\/api\/orders\?/,route=>route.abort());
+ await page.locator('iframe[title="سند آماده چاپ"]').evaluate(f=>f.contentWindow.dispatchEvent(new Event('afterprint')));
+ await page.waitForFunction(()=>app.sub.sales==='delivery');assert.equal(await page.locator('#stlMain .tr-invoice-panel').count(),0);
+ await page.unroute(/\/api\/orders\?/);await page.evaluate(async()=>{const fresh=await fetchSalesCache(true);paintSalesPaneV29('delivery',fresh)});
+ const deliveryRow=page.locator(`[data-delivery-section=assigned] [data-delivery-order="${order.id}"]`);await deliveryRow.waitFor();
  await page.evaluate(()=>go('sales','settlement'));await page.locator('.stl-queue-list').waitFor();await page.waitForFunction(id=>![...document.querySelectorAll('[data-stl=select]')].some(el=>el.dataset.id===id),order.id);assert.equal(await page.locator(`[data-stl=select][data-id="${order.id}"]`).count(),0);await page.evaluate(()=>go('sales','delivery'));
- const deliveryRow=page.locator(`[data-delivery-order="${order.id}"]`);await deliveryRow.locator('[data-action=sales-delivery-details]').click();assert.match(await page.locator('#modal').innerText(),/ثبت پرداختی/);await page.locator('#modal [data-action=transport-sales-work]').click();await page.locator('#transportDeliveryWork').waitFor();
+ await deliveryRow.locator('[data-action=sales-delivery-details]').click();assert.match(await page.locator('#modal').innerText(),/بررسی فاکتور و چاپ/);await page.locator('#modal [data-action=transport-sales-work]').click();await page.locator('#transportDeliveryWork').waitFor();
  assert.equal(await page.locator('#transportDeliveryWork [data-ti-preview]').count(),0);assert.equal(await page.locator('#transportDeliveryWork [data-ts-close]').count(),0);assert.equal(await page.evaluate(()=>app.sub.sales),'delivery');
  await page.locator('#modal [data-action=close-modal]').first().click();const gp=await gate.newPage(),gateDialogs=[];gp.on('dialog',d=>{gateDialogs.push(d.message());d.dismiss();});await gp.goto(base,{waitUntil:'networkidle'});await gp.evaluate(()=>go('gate','dispatch'));const gateRow=gp.locator(`[data-gate=transport-exit][data-id="${order.id}"]`);await gateRow.waitFor();assert.doesNotMatch(await gateRow.locator('xpath=ancestor::tr').innerText(),/قیمت|مبلغ|۲٬۳۷۹/);assert.match(await gateRow.innerText(),/ثبت خروج پخش/);await gateRow.locator('xpath=ancestor::tr').locator('[data-gate=details]').click();assert.doesNotMatch(await gp.locator('#modal.open').innerText(),/مبلغ|قیمت|فی/);await gp.locator('#modal .modal-close').click();const exited=gp.waitForResponse(r=>r.url().endsWith(`/api/gate/transport-shipments/${order.id}/depart`));await gateRow.click();assert.equal((await exited).status(),200);assert.deepEqual(gateDialogs,[]);await gateRow.waitFor({state:'detached'});assert.equal((await get(sales,`/api/orders/${order.id}`)).order.payments.length,0);await gp.close();
  await page.evaluate(async()=>{const fresh=await fetchSalesCache(true);paintSalesPaneV29('delivery',fresh)});await page.locator('[data-delivery-tab=inTransit]').click();await page.locator(`[data-delivery-section=inTransit] [data-delivery-order="${order.id}"] [data-action=sales-delivery-details]`).click();await page.route('**/api/payment-devices',route=>route.fulfill({status:503,json:{error:'فهرست پوز در دسترس نیست'}}));await page.locator('#modal [data-action=transport-sales-work]').click();await page.locator('#transportDeliveryWork [data-ts-close]').waitFor();assert.equal(await page.evaluate(()=>app.sub.sales),'delivery');
@@ -62,6 +74,15 @@ test('فرم مالی پخش در عرض‌های مختلف و گردش واق�
  await row.locator('[data-ts-type]').selectOption('CASH');await row.locator('[data-ts-amount]').fill('۱٬۷۶۱٬۸۴۹');await page.locator('[data-ts-close] button[type=submit]').click();assert.match(await page.locator('[data-ts-error]').innerText(),/جمع روش/);assert.equal((await get(sales,`/api/orders/${order.id}`)).order.transportInvoice.status,'PREPARED');
  await row.locator('[data-ts-amount]').fill('۱٬۷۶۱٬۸۵۰');await page.locator('[data-ts-close] button[type=submit]').click();await page.locator('[data-ts-close]').waitFor({state:'detached'});
  const closed=(await get(sales,`/api/orders/${order.id}`)).order;assert.equal(closed.transportInvoice.status,'CLOSED');assert.equal(closed.transportInvoice.totalAfterReturns,1761850);assert.equal(closed.payments[0].settlementMethods[0].amount,1761850);
+ // If the print frame is unavailable, keep the invoice and offer retry from delivery, not a second POST.
+ const retry=(await post(sales,'/api/orders/remote',{name:'مشتری چاپ ناموفق',phone:'09121112244',dispatchPlace:'بابل',scheduledDate:date,scheduledAt:date+'T00:00',deliveryMode:'DELIVERY',items:[{productId:'p01',requestedQty:4,requestedUnit:'کیلوگرم'}]})).order;
+ await post(wh,`/api/orders/${retry.id}/warehouse/accept`,{});await post(wh,`/api/orders/${retry.id}/warehouse`,{items:[{itemId:retry.items[0].id,deliveredKg:2}]});await post(transport,`/api/transport/plans/${retry.id}/assign`,{driverId:driver.id,vehicleId:vehicle.id});
+ const retryDoc=(await get(wh,`/api/warehouse/delivered/${retry.id}`)).order;await post(wh,`/api/warehouse/transport-handovers/${retry.id}`,{signedPaperConfirmed:true,handoverToken:retryDoc.handoverToken});
+ await page.evaluate(()=>go('sales','settlement'));await page.locator(`[data-stl=select][data-id="${retry.id}"]`).click();await page.locator('[data-ti-price]').waitFor();await page.locator('[data-ti-price]').fill('1000');
+ await page.evaluate(()=>{window.__originalPrintHtml=BTPrintFrame.html;BTPrintFrame.html=()=>false;});let submissions=0;page.on('request',r=>{if(r.method()==='POST'&&r.url().endsWith(`/api/sales/transport-invoices/${retry.id}`))submissions++;});
+ await page.locator('[data-ti-form] button[type=submit]').click();await page.waitForFunction(()=>app.sub.sales==='delivery');await page.locator(`[data-delivery-section=assigned] [data-delivery-order="${retry.id}"]`).waitFor();
+ const saved=(await get(sales,`/api/orders/${retry.id}`)).order;assert.equal(submissions,1);assert.equal(saved.transportInvoice.status,'PREPARED');assert.equal(saved.payments.length,0);assert.equal(saved.transportDeparture,undefined);
+ await page.evaluate(()=>{BTPrintFrame.html=window.__originalPrintHtml;});await page.locator(`[data-delivery-order="${retry.id}"] [data-action=sales-delivery-details]`).click();await page.locator('#modal [data-action=transport-sales-work]').click();await page.locator('#transportDeliveryWork [data-ti-shipment-print]').waitFor();
  assert.deepEqual(errors,[]);assert.deepEqual(dialogs,[]);
  }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
 });

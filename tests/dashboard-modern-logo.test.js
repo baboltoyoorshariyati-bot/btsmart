@@ -73,10 +73,10 @@ test('unit dashboards render soft icon cards with a relative progress bar',()=>{
   assert.match(app,/role-dash-live/);
   assert.match(app,/role-dash-bar/);
   assert.match(app,/dashMax=Math\.max\(1,\.\.\.cards/);
-  assert.match(app,/'ورودی حضوری',w\.salesIntake\|\|0,'onsite','user','red'/);
-  assert.match(app,/'سفارش‌های ورودی',w\.warehouseIncoming\|\|0,'incoming','inbox','red'/);
-  assert.match(app,/'رانندگان فعال',w\.activeDrivers\|\|0,'transport-resources','driver','blue'/);
-  assert.match(app,/'در انتظار بررسی',w\.store\|\|0,'registered','clipboard','red'/);
+  assert.match(app,/'ورودی حضوری',w\.salesIntake\?\?null,'onsite','user','red'/);
+  assert.match(app,/'سفارش‌های ورودی',w\.warehouseIncomingRegular\?\?null,'incoming','inbox','red'/);
+  assert.match(app,/'رانندگان فعال',w\.activeDrivers\?\?null,'transport-resources','driver','blue'/);
+  assert.match(app,/'در انتظار بررسی',w\.store\?\?null,'registered','clipboard','red'/);
 });
 
 test('management dashboard is branded and lively without data changes',()=>{
@@ -90,5 +90,5 @@ test('management dashboard is branded and lively without data changes',()=>{
   assert.match(css,/prefers-reduced-motion:reduce\)\{[^}]*btDashIn|prefers-reduced-motion/);
   assert.match(html,/app\.js\?v=37\.50\.0/);
   assert.match(html,/ui2\.js\?v=37\.50\.0/);
-  assert.match(html,/theme\.css\?v=37\.48\.0/);
+  assert.match(html,/theme\.css\?v=37\.48\.2/);
 });

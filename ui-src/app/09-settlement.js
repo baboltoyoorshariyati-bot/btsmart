@@ -245,6 +245,13 @@ async function stlOpen(id){
     const d=await api('/api/orders/'+encodeURIComponent(id));
     if(!current())return;
     const o=d.order;
+    // A different workstation may already have issued this invoice, even if
+    // this browser still shows a stale settlement row or selected order.
+    if(o&&salesTransportInvoiceIssued(o)&&o.transportInvoice?.status==='PREPARED'){
+      stlClose();toast('فاکتور ثبت شده است؛ برای بررسی و چاپ به کارتابل پخش مراجعه کنید.');
+      if(app.page==='sales'&&app.sub.sales==='settlement')void fetchSalesCache(true).then(data=>{if(app.page==='sales'&&app.sub.sales==='settlement')paintSalesPaneV29('settlement',data);}).catch(()=>salesRefreshWarning('settlement',true));
+      return false;
+    }
     if(!o || o.status!=='SETTLEMENT_PENDING'){
       stlReset();host.innerHTML=stlEmptyHtml();toast('این سفارش دیگر در مرحله تسویه نیست.');
       if(app.page==='sales'&&app.sub.sales==='settlement')await renderSales('settlement');

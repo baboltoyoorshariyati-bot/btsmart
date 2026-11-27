@@ -26,7 +26,8 @@
         "ui-src/ui2/05-warehouse.js",
         "ui-src/ui2/06-store-services.js",
         "ui-src/ui2/07-dashboard-reports.js",
-        "ui-src/ui2/08-transport-invoices.js"
+        "ui-src/ui2/08-transport-invoices.js",
+        "ui-src/ui2/09-store-transfers.js"
       ]
     }
   ]

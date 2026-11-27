@@ -61,16 +61,25 @@ test('مرورگر: چیدمان نگهبانی و فرم‌های فروش در
    }
    assert.equal(firstCell.align,'center',JSON.stringify(firstCell));
    const statusDate=await p.locator('.settlement-invoice-table tbody tr td:nth-child(6)').evaluate(td=>{
-    const badge=td.querySelector('.badge').getBoundingClientRect(),date=td.querySelector('small').getBoundingClientRect();
-    return{badge:badge.toJSON(),date:date.toJSON(),badgeDisplay:getComputedStyle(td.querySelector('.badge')).display,dateDisplay:getComputedStyle(td.querySelector('small')).display,statusWidth:td.getBoundingClientRect().width,operationWidth:td.parentElement.children[6].getBoundingClientRect().width,tableWidth:td.closest('table').clientWidth};
+    const badge=td.querySelector('.badge'),date=td.querySelector('small');
+    return{badge:badge.getBoundingClientRect().toJSON(),date:date.getBoundingClientRect().toJSON(),badgeScroll:badge.scrollWidth,badgeClient:badge.clientWidth,dateScroll:date.scrollWidth,dateClient:date.clientWidth,statusWidth:td.getBoundingClientRect().width,operationWidth:td.parentElement.children[6].getBoundingClientRect().width,tableWidth:td.closest('table').clientWidth};
    });
-   assert(statusDate.badge.top<statusDate.date.bottom&&statusDate.badge.bottom>statusDate.date.top,`status/date share one line ${JSON.stringify(statusDate)}`);
-   assert.equal(statusDate.badgeDisplay,'inline-flex');assert.equal(statusDate.dateDisplay,'inline-block');
-   assert(statusDate.operationWidth>statusDate.tableWidth*.23&&statusDate.operationWidth<statusDate.tableWidth*.27,`operations column expanded ${JSON.stringify(statusDate)}`);
-   assert(statusDate.statusWidth<(width<=900 ? .31 : .26)*statusDate.tableWidth,`status column compacted ${JSON.stringify(statusDate)}`);
-   const ops=await p.locator('.settlement-invoice-table .toolbar').evaluate(e=>({display:getComputedStyle(e).display,wrap:getComputedStyle(e).flexWrap,buttons:[...e.children].map(b=>({text:b.innerText,whiteSpace:getComputedStyle(b).whiteSpace,scroll:b.scrollWidth,client:b.clientWidth})),scroll:e.scrollWidth,client:e.clientWidth}));
-   assert(ops.buttons.length>=2,JSON.stringify({width,ops}));assert(ops.buttons.every(b=>b.whiteSpace==='nowrap'),JSON.stringify({width,ops}));
-   assert.equal(ops.display,'grid');assert(ops.buttons.every(b=>b.scroll<=b.client+1),JSON.stringify({width,ops}));assert(ops.scroll<=ops.client+1,JSON.stringify({width,ops}));
+   assert(statusDate.operationWidth>statusDate.statusWidth,`operations receive more space ${JSON.stringify(statusDate)}`);
+   assert(statusDate.operationWidth>statusDate.tableWidth*.30,`operations column expanded ${JSON.stringify(statusDate)}`);
+   assert(statusDate.statusWidth<statusDate.tableWidth*.20,`status column compacted ${JSON.stringify(statusDate)}`);
+   assert(statusDate.badgeScroll<=statusDate.badgeClient+1&&statusDate.dateScroll<=statusDate.dateClient+1,`status and date remain visible ${JSON.stringify(statusDate)}`);
+   const ops=await p.locator('.settlement-invoice-table .toolbar').evaluate(e=>({display:getComputedStyle(e).display,buttons:[...e.children].map(b=>({text:b.innerText,whiteSpace:getComputedStyle(b).whiteSpace,scroll:b.scrollWidth,client:b.clientWidth,box:b.getBoundingClientRect().toJSON()})),scroll:e.scrollWidth,client:e.clientWidth}));
+   assert.equal(ops.buttons.length,4,JSON.stringify({width,ops}));assert(ops.buttons.every(b=>b.whiteSpace==='nowrap'),JSON.stringify({width,ops}));
+   assert.equal(ops.display,'flex');assert(ops.buttons.every(b=>b.scroll<=b.client+1),JSON.stringify({width,ops}));assert(ops.scroll<=ops.client+1,JSON.stringify({width,ops}));
+   if(width>=1280)assert(ops.buttons.every(b=>Math.abs(b.box.top-ops.buttons[0].box.top)<2),`all four actions share one row ${width}: ${JSON.stringify(ops)}`);
+  }
+  // An invoice may have two status badges; neither they nor the date may be
+  // clipped when the status column is narrowed to make room for actions.
+  await p.evaluate(()=>{const o={id:'review-test',orderType:'REMOTE',transportWorkflow:1,status:'CLOSED',orderNo:'000001',customer:{name:'تست',phone:'09111136936'},payment:{id:'p',invoiceNumber:'000001',totalAmount:147700000,verifiedAt:new Date().toISOString(),settlementReviewRequired:true},items:[]};o.payments=[o.payment];document.querySelector('#content').innerHTML=renderSalesSettlementV25([o]);});
+  for(const width of [1600,1280,768,390]){
+   await p.setViewportSize({width,height:900});
+   const state=await p.locator('.settlement-invoice-table tbody tr td:nth-child(6)').evaluate(td=>({text:td.innerText,badges:[...td.querySelectorAll('.badge')].map(el=>({scroll:el.scrollWidth,client:el.clientWidth})),date:td.querySelector('small').innerText,page:document.documentElement.scrollWidth,viewport:innerWidth}));
+   assert.match(state.text,/فاکتور بسته شد/);assert.match(state.text,/نیازمند بازبینی فروش/);assert(state.date.trim());assert.equal(state.badges.length,2);assert(state.badges.every(b=>b.scroll<=b.client+1),JSON.stringify(state));assert(state.page<=state.viewport+1,JSON.stringify(state));
   }
   assert.deepEqual(errors,[]);await admin.close();await gate.close();await sales.close();
  }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}

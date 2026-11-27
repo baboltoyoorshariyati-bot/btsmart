@@ -1,0 +1,19 @@
+'use strict';
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const {spawn,spawnSync}=require('node:child_process'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),net=require('node:net');
+const exe=process.env.BT_CHROMIUM_PATH;
+test('manager reviews both profiles and financial information before explicit merge', {skip:!exe,timeout:90000},async()=>{
+ const {chromium}=require('playwright-core'),port=await new Promise(r=>{const s=net.createServer().listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>r(p));});}),dir=fs.mkdtempSync(path.join(os.tmpdir(),'bt-merge-ui-')),cwd=path.join(__dirname,'..'),env={...process.env,HOST:'127.0.0.1',PORT:String(port),DATA_DIR:dir,ADMIN_INITIAL_PASSWORD:'Initial!2345'},base=`http://127.0.0.1:${port}`;
+ const proc=spawn(process.execPath,['server.js'],{cwd,env,stdio:['ignore','pipe','pipe']});let browser;
+ try{
+  await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(Error('startup')),15000);proc.stdout.on('data',d=>{if(String(d).includes('"listening"')){clearTimeout(t);resolve();}});proc.once('exit',c=>reject(Error('exit '+c)));});
+  browser=await chromium.launch({executablePath:exe,args:['--no-sandbox','--disable-dev-shm-usage']});const ctx=await browser.newContext();
+  for(const [url,data] of [['/api/login',{username:'admin',password:'Initial!2345'}],['/api/account/password',{currentPassword:'Initial!2345',newPassword:'Changed!2345'}]]){const r=await ctx.request.post(base+url,{data});assert(r.ok(),await r.text());}
+  const seed=spawnSync(process.execPath,['-e',`const s=require('./lib/store');s.sql.init();require('./lib/transport-transaction')(()=>{let d=s.get();d.customers.push({id:'a',code:'80001',name:'علی رضایی',phone:'09121112233',address:'خانه یک'},{id:'b',code:'80002',name:'علی رضا',phone:'+989121112233',notes:'یادداشت محفوظ'});d.orders.push({id:'o',customerId:'b',orderNo:'123',orderType:'REMOTE',status:'DONE'});d.payments.push({id:'p',orderId:'o',invoiceNumber:'456',totalAmount:2000,debtAccount:{customerId:'b',initial:2000,receipts:[]}});s.save()});`],{cwd,env,encoding:'utf8'});assert.equal(seed.status,0,seed.stderr);
+  const page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());await page.goto(base,{waitUntil:'networkidle'});await page.evaluate(()=>renderCustomers());
+  await page.locator('[data-action=cust-open][data-id=a]').last().click();await page.locator('#modal [data-cust-merge]').click();await page.locator('#custMergeForm').waitFor();await page.locator('[data-merge-preview]').click();await page.locator('[data-merge-submit]').waitFor();
+  const preview=page.locator('#custMergePreview');assert.match(await preview.innerText(),/بدهکاری/);await preview.locator('summary').first().click();assert.match(await preview.innerText(),/خانه یک/);await preview.locator('summary').filter({hasText:'مشخصات همه پرونده‌های این گروه'}).nth(1).click();assert.match(await preview.innerText(),/یادداشت محفوظ/);
+  await page.locator('[data-merge-submit]').click();assert.match(await page.locator('#custMergeMsg').innerText(),/ابتدا تأیید/);await page.locator('[data-merge-confirm]').check();
+  const done=page.waitForResponse(r=>r.url().endsWith('/api/customers/merge')&&r.request().method()==='POST');await page.locator('[data-merge-submit]').click();assert.equal((await done).status(),200);await page.locator('#modal summary').filter({hasText:'مشخصات پرونده‌های پیشین'}).click();assert.match(await page.locator('#modal').innerText(),/یادداشت محفوظ/);assert.equal(await page.locator('#custList [data-action=cust-open][data-id=b]').count(),0);assert.deepEqual(errors,[]);
+ }finally{if(browser)await browser.close();if(proc.exitCode===null&&proc.signalCode===null){const done=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await done;}fs.rmSync(dir,{recursive:true,force:true});}
+});

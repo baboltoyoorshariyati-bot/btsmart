@@ -51,13 +51,13 @@ test('UI: داشبورد انبار بخش سفارشات ورودی امروز 
   assert.match(app,/whDashLiveHtml\(whToday\)/);
   assert.match(app,/سفارشات ورودی امروز/);
   assert.match(app,/refreshWhDashToday/);
-  assert.match(app,/setInterval\(\(\)=>\{if\(!\$\('#whDashLiveBody'\)\)/,'داشبورد پس از خروج از صفحه دیگر تازه‌سازی نشود');
+  assert.match(app,/if\(!host\.isConnected\)\{clearInterval\(timer\)/,'داشبورد پس از خروج از صفحه دیگر تازه‌سازی نشود');
   assert.match(app,/data-cartable="incoming" data-role-page="warehouse"/);
   assert.match(css,/\.wh-dash-live\{/);
   assert.match(css,/\.wh-dash-prod\{/);
   assert.match(css,/#modal \.wh-dash-table\{/, 'جدول همهٔ محصولات در مودال نیز سبک ثابت دارد');
   assert.match(html,/app\.js\?v=37\.50\.0/);
-  assert.match(html,/theme\.css\?v=37\.48\.0/);
+  assert.match(html,/theme\.css\?v=37\.48\.2/);
 });
 
 test('API: آمار امروز انبار — ورودی امروز با هر وضعیت نهایی، به تفکیک محصول و واحد؛ لغوشده‌ها حذف',async()=>{

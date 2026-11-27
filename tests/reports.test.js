@@ -38,8 +38,20 @@ test('query: منبع و ستون نامعتبر خطای ۴۰۰ می‌دهد',
   assert.throws(() => reports.query(db, { source: 'visits', fields: ['x'] }), (e) => e.status === 400);
 });
 
-test('query: فعالیت‌ها با جزئیات JSON', () => {
+test('query: فعالیت‌ها با جزئیات فارسی و امکان انتخاب اطلاعات فنی', () => {
   const r = reports.query(db, { source: 'activity', fields: ['username', 'action', 'details'] });
   assert.equal(r.total, 1);
-  assert.match(r.rows[0].details, /plate/);
+  assert.equal(r.rows[0].action, 'ثبت مراجعه');
+  assert.match(r.rows[0].details, /پلاک : x/);
+  const raw=reports.query(db,{source:'activity',fields:['actionCode','detailsRaw']});
+  assert.equal(raw.rows[0].actionCode,'CREATE_VISIT');assert.match(raw.rows[0].detailsRaw,/plate/);
+});
+
+
+test('customer report aggregates merged profiles and legacy visit-linked orders once',()=>{
+ const data={customers:[{id:'a',name:'اصلی',lastVisitAt:'2026-01-01'},{id:'b',name:'قدیمی',mergedInto:'a',lastVisitAt:'2026-02-01'},{id:'c',name:'دیگری'}],
+ visits:[{id:'v1',customerId:'a'},{id:'v2',customerId:'b'},{id:'v3',customerId:'c'}],
+ orders:[{id:'o1',customerId:'b',visitId:'v3'},{id:'o2',visitId:'v2'},{id:'o3',customerId:'c'},{id:'o4',customerId:'unknown',visitId:'v1'}]};
+ const rows=reports.query(data,{source:'customers',fields:['name','visitCount','orderCount','lastVisitAt']}).rows;
+ assert.deepEqual(rows,[{name:'اصلی',visitCount:2,orderCount:2,lastVisitAt:'2026-02-01'},{name:'دیگری',visitCount:1,orderCount:1,lastVisitAt:''}]);
 });
