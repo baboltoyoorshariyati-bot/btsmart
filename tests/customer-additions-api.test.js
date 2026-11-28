@@ -25,14 +25,14 @@ test('customer additions require warehouse decision and preserve separate weighi
    assert((await ok('GET','/api/notifications',null,wh)).notifications.some(n=>n.type==='CUSTOMER_ADDITION_REQUESTED'&&n.entityId===order.id));
    await ok('POST',`/api/orders/${order.id}/warehouse/accept`,{},wh);
    assert.equal((await call('POST',final,{items:[{itemId:order.items[0].id,deliveredKg:2}]},wh)).status,409);
-   const draft=(await ok('POST',`/api/orders/${order.id}/warehouse/draft`,{revision:0,items:[{itemId:order.items[0].id,deliveredKg:2}]},wh)).draft;
+   const draft=(await ok('POST',`/api/orders/${order.id}/warehouse/draft`,{revision:0,items:[{itemId:order.items[0].id,deliveredKg:2}],hasSeals:true,sealNumbers:['OS-001']},wh)).draft;
    assert.equal(draft.revision,1);
    const result=await ok('POST',review,{requestId:req.id,decision:'APPROVE'},wh);assert.equal(result.order.items.length,2);assert.notEqual(result.order.items[0].id,result.order.items[1].id);
-   assert.equal(result.order.warehouseWeightDraft.revision,2);assert.equal(result.order.warehouseWeightDraft.items[0].deliveredKg,2);
+   assert.equal(result.order.warehouseWeightDraft.revision,2);assert.equal(result.order.warehouseWeightDraft.items[0].deliveredKg,2);assert.deepEqual(result.order.warehouseWeightDraft.sealNumbers,['OS-001']);
    assert.equal((await call('POST',review,{requestId:req.id,decision:'APPROVE'},wh)).status,409);
    assert.equal((await call('POST',final,{draftRevision:1,items:result.order.items.map(i=>({itemId:i.id,deliveredKg:2}))},wh)).status,409);
    const document=(await ok('POST',final,{draftRevision:2,items:result.order.items.map((i,k)=>({itemId:i.id,deliveredKg:k?3:2}))},wh)).order;
-   assert.equal(document.items.length,2);assert.deepEqual(document.items.map(x=>x.deliveredKg),[2,3]);
+   assert.equal(document.items.length,2);assert.deepEqual(document.items.map(x=>x.deliveredKg),[2,3]);assert.deepEqual((await ok('GET',`/api/warehouse/delivered/${order.id}`,null,wh)).order.sealNumbers,['OS-001']);
    assert.equal((await call('POST',url,{items:[line]},sales)).status,409);
    assert((await ok('GET','/api/notifications',null,sales)).notifications.some(n=>n.type==='CUSTOMER_ADDITION_RESULT'&&n.entityId===order.id));
   }

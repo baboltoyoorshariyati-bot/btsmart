@@ -6,11 +6,12 @@ function fragment(start,end){return source.slice(source.indexOf(start),source.in
 const escape=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 test('سند انبار پخش فقط امضای راننده دارد و سند مشتری مستقل می‌ماند',()=>{
  const ctx=vm.createContext({esc:escape,fa:x=>x,qty:x=>x,formatDateTime24:()=> 'تاریخ'});
- vm.runInContext(fragment('function whDocumentTares(line){','async function whDeliveredDetails(id){'),ctx);
+ vm.runInContext(fragment('function whSealDocument(numbers){','function wh38Sheet(o){'),ctx);vm.runInContext(fragment('function whDocumentTares(line){','async function whDeliveredDetails(id){'),ctx);
  const base={orderNo:'001',warehouseDocumentNo:'W-000001',customerName:'مشتری',customerPhone:'09',items:[]};
  const html=ctx.whDeliveredDocument({...base,deliveryMode:'DELIVERY',driverName:'<راننده>',driverPhone:'0912'});
  assert.doesNotMatch(html,/امضاء مشتری/);assert.match(html,/امضاء راننده پخش هنگام دریافت از انبار/);assert.match(html,/&lt;راننده&gt;/);assert.doesNotMatch(html,/امانت/);
- const old=ctx.whDeliveredDocument(base);assert.doesNotMatch(old,/راننده/);assert.match(old,/نام و امضاء مشتری/);
+ const sealed=ctx.whDeliveredDocument({...base,sealNumbers:['001','<script>']});assert.match(sealed,/001/);assert.match(sealed,/&lt;script&gt;/);assert.doesNotMatch(sealed,/<script>/);
+ const old=ctx.whDeliveredDocument(base);assert.doesNotMatch(old,/شماره پلمپ/);assert.doesNotMatch(old,/راننده/);assert.match(old,/نام و امضاء مشتری/);
 });
 test('قیمت فاکتور پیش‌ازخروج از فهرست امروز بر اساس محصول همان قلم پیش‌فرض می‌شود',()=>{
  const fa=s=>String(s).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
@@ -100,7 +101,7 @@ test('ورود مبلغ پخش ارقام فارسی، انگلیسی و عرب�
 });
 
 test('نام صاحب سفارش در اقرار تحویل تکرار نمی‌شود و نام‌ها بدون پرانتز بولد و زیرخط‌دار هستند',()=>{
- const ctx=vm.createContext({esc:escape,fa:x=>x,qty:x=>x,formatDateTime24:()=>''});vm.runInContext(fragment('function whDocumentTares(line){','async function whDeliveredDetails(id){'),ctx);
+ const ctx=vm.createContext({esc:escape,fa:x=>x,qty:x=>x,formatDateTime24:()=>''});vm.runInContext(fragment('function whSealDocument(numbers){','function wh38Sheet(o){'),ctx);vm.runInContext(fragment('function whDocumentTares(line){','async function whDeliveredDetails(id){'),ctx);
  const base={deliveryMode:'PICKUP',customerName:'مالک',customerPhone:'0912',recipient:{name:'مالک',phone:'0912'},items:[]};
  const declaration=ctx.whDeliveredDocument(base,true).match(/class="whd-declaration">(.*?)<\/p>/)[1];assert.equal((declaration.match(/مالک/g)||[]).length,1);assert.match(declaration,/<strong style="text-decoration:underline/);assert.doesNotMatch(declaration,/[()]/);
  const otherHtml=ctx.whDeliveredDocument({...base,orderType:'REMOTE',recipient:{name:'نماینده',phone:'0913'}},true),other=otherHtml.match(/class="whd-declaration">(.*?)<\/p>/)[1];assert.match(other,/نماینده/);assert.doesNotMatch(other,/مالک/);assert.match(otherHtml,/مالک/);assert.match(other,/اقلام فوق را صحیح و سالم تحویل گرفته و اقلام تحویلی به صورت امانت تا زمان پرداخت مبلغی ریالی آن نزد اینجانب می‌باشد/);

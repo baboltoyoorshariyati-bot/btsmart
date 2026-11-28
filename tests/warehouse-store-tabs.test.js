@@ -60,7 +60,7 @@ test('فهرست ورودی و آماده‌سازی فروشگاه‌ها جد�
   const sheet=ui.slice(ui.indexOf('function sr38Sheet(o)'),ui.indexOf('async function sr38Post'));
   assert.match(sheet,/wh38-store-sheet-head">\$\{wh38StoreHeader\(o\)\}/);
   assert.doesNotMatch(sheet,/orderCustomerStripHtml\(o\)/);
-  assert.match(ui,/a==='sr38-back'\)\{ if\(app\.wh38\.phase==='stores'\)\{app\.wh38\.storeTab='preparing'; wh38Shell\('stores'\);\}else wh38Shell\('preparing'\); \}/);
+  assert.match(ui,/a==='sr38-back'\)\{[^\n]*if\(app\.wh38\.phase==='stores'\)\{app\.wh38\.storeTab='preparing'; wh38Shell\('stores'\);\}else wh38Shell\('preparing'\); \}/);
   const accept=ui.slice(ui.indexOf("if(a==='wh38-accept')"),ui.indexOf("else if(a==='wh38-start')"));
   assert.match(accept,/app\.wh38\.phase==='incoming'\)wh38Shell\('incoming'\)/);
   assert.match(accept,/app\.wh38\.phase==='stores'\)wh38Paint\('stores'\)/);

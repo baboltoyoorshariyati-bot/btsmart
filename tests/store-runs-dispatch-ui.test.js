@@ -19,7 +19,7 @@ test('anbar sheet: دکمهٔ ارسال هر سرویس با شرط آماده�
  const sent=c.sr38SendBtn({...order,storeRunOps:{r1Shipment:{status:'PENDING_SALES'}}},1,items);
  assert(sent.includes('به فروش ارسال شد'),'پس از ارسال چیپ وضعیت');
  assert(ui.includes('data-action="sr38-send-run"'),'دیسپچر دکمه موجود است');
- assert(ui.includes("sr38Post(id,'send-run',{run,physicalHandoverConfirmed:true})"),'فراخوان مسیر صحیح');
+ assert(ui.includes("sr38Post(id,'send-run',{run,...seals,sealRevision,physicalHandoverConfirmed:true})"),'فراخوان مسیر صحیح');
 });
 
 test('سرصفحهٔ چیپ‌ها مرحلهٔ تحویل هر سرویس را نشان می‌دهد',()=>{

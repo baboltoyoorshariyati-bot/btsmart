@@ -1706,6 +1706,7 @@
 #appView .transfer-panel{overflow:visible}
 #appView .transfer-tabs{padding:16px 20px 0}
 #appView .transfer-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#appView .transfer-meta [hidden]{display:none!important}
 #appView .transfer-lines-wrap{margin-bottom:12px}
 #appView .transfer-lines-table :is([data-kg],[data-price]){text-align:right}
 #appView .transfer-lines-table th:nth-child(1){width:6%}
@@ -1728,3 +1729,11 @@
 /* Keep all store subtabs on one row at all widths; long labels wrap inside each tab. */
 #appView[data-cartable-page="warehouse"] .wh38-store-tabs,#appView[data-cartable-page="sales"] .sales-store-tabs-v43{min-width:0;max-width:100%}
 #appView[data-cartable-page="warehouse"] .wh38-store-tab span,#appView[data-cartable-page="sales"] .sales-store-tab-v43 span{min-width:0;overflow-wrap:anywhere}
+
+/* Seal identifiers on warehouse preparation; no print or stock side effects. */
+#appView .wh-seal-control{border:1px solid #d5dfe6;border-radius:8px;padding:10px;margin:12px 0;min-width:0}
+#appView .wh-seal-control legend{font-weight:700;padding:0 5px}
+#appView .wh-seal-control [hidden]{display:none!important}
+#appView .wh-seal-control small{display:block;margin-top:5px;color:#52616d}
+#appView .wh-seal-row{display:flex;gap:8px;align-items:center;margin:6px 0;max-width:420px}
+#appView .wh-seal-row input{min-width:0;flex:1}

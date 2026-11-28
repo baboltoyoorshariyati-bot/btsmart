@@ -178,7 +178,7 @@ async function openStoreOrderDetails(id){
   const progress=new Map((o.storeRun?.items||[]).map(v=>[v.itemId,v]));
   const salesStatus=o.status==='CANCELLED'?'لغو شده':o.approvalStatus==='APPROVED'?'تأیید شده':'در انتظار تأیید فروش';
   // Mirror the server's store-addition guard; never make a pending request twice.
-  const canAdd=o.orderType==='STORE'&&o.storeOrderKind==='PARTIAL'&&['SCHEDULED_REMOTE','WAREHOUSE_PENDING','WAREHOUSE_PREPARING'].includes(o.status)&&!o.warehouseCompletedAt&&!o.storeRunOps?.finalizedAt&&!o.storeRunOps?.r1Shipment&&!o.storeWarehouseDocumentNos?.['1']&&!o.transportHandovers?.['1'];
+  const canAdd=o.orderType==='STORE'&&['SCHEDULED_REMOTE','WAREHOUSE_PENDING','WAREHOUSE_PREPARING'].includes(o.status)&&!o.warehouseCompletedAt&&!o.storeRunOps?.finalizedAt&&(o.storeOrderKind==='PARTIAL'?(!o.storeRunOps?.r1Shipment&&!o.storeWarehouseDocumentNos?.['1']&&!o.transportHandovers?.['1']):(!o.storeAdditionClosedAt&&!o.storeRunOps?.r2Shipment&&!o.storeWarehouseDocumentNos?.['2']&&!o.transportHandovers?.['2']&&!o.transportStoreTrips?.['2']));
   const addition=(o.storeAdditionRequests||[]).find(r=>['PENDING_SALES','PENDING_WAREHOUSE'].includes(r.status));
   openModal('جزئیات سفارش فروشگاه',`<div class="store-detail-modal">
     <div class="detail-modal-hero"><div><span class="eyebrow">STORE ORDER</span><h2>${esc(fa(o.orderNo||'—'))}</h2><p>${esc(storeAwareOrderName(o))} · ${o.storeOrderKind==='PARTIAL'?'سفارش جزئی':'سفارش روزانه'}${o.storeOrderKind==='PARTIAL'?(o.storePurpose==='STOCK'?' · تأمین تکمیلی':' · مشتری: '+esc(o.customer?.name||'—')):''}</p></div>${badge(o.status)}</div>

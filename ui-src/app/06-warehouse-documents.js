@@ -503,9 +503,9 @@ async function saveReturnedOrder(id){
   try{
     const payload={items:items.map(item=>({id:item.id||null,productId:item.productId,requestedQty:n(item.requestedQty),requestedUnit:item.requestedUnit,description:String(item.description||'').trim()}))};
     const mode=$('#returnedDeliveryMode');
-    if(mode&&!mode.disabled&&mode.value==='DELIVERY'){
-      const place=$('#returnedDispatchPlace').value.trim();if(!place)return toast('محل ارسال را وارد کنید.');
-      Object.assign(payload,{deliveryMode:'DELIVERY',expectedDeliveryMode:'PICKUP',dispatchPlace:place});
+    if(mode&&!mode.disabled&&mode.value!==app.returnEdit.deliveryMode){
+      const place=$('#returnedDispatchPlace').value.trim();if(mode.value==='DELIVERY'&&!place)return toast('محل ارسال را وارد کنید.');
+      Object.assign(payload,{deliveryMode:mode.value,expectedDeliveryMode:app.returnEdit.deliveryMode,dispatchPlace:place});
     }
     await api('/api/orders/'+id+'/returned-edit',{method:'PUT',body:JSON.stringify(payload)});
     toast('اصلاحات سفارش ثبت شد و در سوابق فعالیت ذخیره گردید.');
