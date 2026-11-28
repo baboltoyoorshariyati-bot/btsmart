@@ -2,9 +2,9 @@
 140cfcfb7c0df73812316f8915a5d58279261f52366f80bc7922472f6d46858f  ./.github/workflows/ci.yml
 1bd57d4d8e439aca6eb9d360b9e3ef036c1494ad8f936fbd5e10b919fedf8778  ./.github/workflows/release.yml
 211d7fcf21c8596fe06a327159d4acb67047e84d55c79762965fbdc46e896f5c  ./.gitignore
-51992b4ad820c112fd5d9ea7f0d14344134bf01a13dc8fa8a21e76030c2462ec  ./CHANGELOG.md
+a8412400eed4e42470a14d5a09ca39e69d1f763d6c44ac21b437b1235e30b4d2  ./CHANGELOG.md
 cf5db6b7c699488e4f4fbb243af67205f640173bce553f01a8d9d20414eff31b  ./NOTICE.txt
-28aa78abab75f5f104219f884ae8a4b496e8979e558eec53986063fbb2af8fe1  ./README.md
+5f557757ff32c98f1263bcbed9efaa1d5c77b9aa49b6dc6207d5377531cca040  ./README.md
 3e1ee924f1c80a1a1ebcd4f7ad4bebd26a86f8834cf65d953690b7a115d8513e  ./RELEASE-1.0.0-fa.md
 043fe19a948a99d9cbd3b7ef7074cb528a25a7a8cb28fdda2676192d0bd4c148  ./RELEASE-1.0.1-fa.md
 8b1385415f4119942927c0393b66106c62922d216c887f45d9bd2f7b969326a0  ./RELEASE-1.0.10-fa.md
@@ -126,6 +126,7 @@ eb61134fac13422b1e9356ec4f53b9e944b4a5714fcaaa5e9299aef59c7a913a  ./RELEASE-1.1.
 f8c1c48bf864e2c1c534d0908d7278337725672cd2be808813dd7df60b599092  ./RELEASE-1.1.24-fa.md
 deb36a4bc4bb0d2c570f9acc559dd774713eb32e9751dd79be1659ecef0c4d46  ./RELEASE-1.1.25-fa.md
 dbc8cd2fd1c02bae49d899adeb130b89d9904fd2ff0c5e95efb8a93901653cff  ./RELEASE-1.1.26-fa.md
+57c54137c5e2d817af44acafdc639e98513a7e1d43f5e936e2c180005550dc0b  ./RELEASE-1.1.27-fa.md
 d045df16bb26a2feb54555fda1b39f4745f44c10a635d544cbc2950b89ec32af  ./RELEASE-1.1.3-fa.md
 6b202c8dc5bf26452044e7db5bf407b58c4a551ebcfe5c5354a646790955f41f  ./RELEASE-1.1.4-fa.md
 ca4a372186b5663a2e91ddf88003492688ea84924ccbc913aec0e9a6e39a3b5b  ./RELEASE-1.1.5-fa.md
@@ -140,7 +141,7 @@ bf6a1b4ae7b0451778c8817376b1d886ba47f882b827b3ccfe6908443504d805  ./RELEASE-37.4
 e1a7535cfce4dd681e262af8ba6d7e4b572ecf2b4c34b3e3f6b1f89d70fb1833  ./RELEASE-37.41.0-fa.md
 c9fbfc2417b4f91a648473156f59f3a138e4dc8a275b74ab13b684ae18e18b38  ./RELEASE-37.42.0-fa.md
 802d5dae281431a49948203c149bf51205c428b5f0b8ebe9d31b0079a5018e0e  ./RELEASE-37.43.0-fa.md
-f788eb0c60930fd7a6c76243fbf7a5acb4cd6d336de36d493818b9e438bfdc94  ./RELEASE_VERSION.txt
+3d901930de0e241026725466cc51b31b51951b7c18e55360047c8dcb459d9332  ./RELEASE_VERSION.txt
 6e5a006e078f48892f1622c0fb8370e143c6cb6ce7f17aef2d1941a6a90b2829  ./VERSION.txt
 a0bd3b3fd14e7b3ef311543c910bfeb861346022e258f3d65474aec2a5b5b4f3  ./assets/logo.png
 d28e23ea143a33ba18508b14074a693639b5abdfffa67b0b903632c47fd8a053  ./deliverables/store-transfer-proposal.xlsx
@@ -150,7 +151,7 @@ aff7d2fe3987732d29072543ee37bb76e110ab0b395dd3b597c7b128732cf387  ./docs/audit-p
 a7fbdcc059cd3857c3eb90b0e8deebf96bfb2a375564c865e625f8e10c52bba0  ./docs/customer-merge-fa.md
 6729e4d8c99563f1927066fd030808ef692fdb07fde4035c58b4346a8a491252  ./docs/customer-order-additions-fa.md
 d5369d338a135a5e0818fd49119ba2640e66ba0ad7ce14722ffc2985679fc779  ./docs/customer-phone-identity-fa.md
-769f915be41fcc9de09397dc039b3801c70b41286ae20f40778e4d69417cea29  ./docs/deployment-windows-server-2025.md
+a1254b00ddb0f3b749f402b495de130e4339b1f0a5b496473027ef8dd1493d6e  ./docs/deployment-windows-server-2025.md
 84ef2fcaff7e118259ca6e5572972e1d42ab0850f069959dbb8f3bf08df386e0  ./docs/domain-https-fa.md
 6791cb09b6006a317ee05d3ef8461ca1ae9749f44e2c250418d88e7fb5401e96  ./docs/hardening-rollout-fa.md
 e0d3790960c305db8eddee0db51013992ddd6ce47e6b3cf0db8f3ecf2f7f48c5  ./docs/order-details-additions-and-creator-fa.md
@@ -296,7 +297,7 @@ a99bed91325be915d84eafbe90dde945aa11610426ab11bf5bd3c39dd006965a  ./public/dispa
 17e355067c8284f47743a1ee3b1ef7ff684ff0601eda357f9353b10b3016ab31  ./public/fonts/OFL.txt
 4e3fa217d38fdafc1fea4414ceb58ca5e662cf0ab5fa735a8c8c20e8b42cad92  ./public/fonts/Vazirmatn-Variable.woff2
 a85456faaed8f29d884bfb2dc3148dffbf22d22ecff589176764cfe2679a1e3f  ./public/form-layout.css
-e23a148e52390fc850197f5b8d5ac6f68e18c01047503841b783d64746982cbe  ./public/index.html
+756028dcb72cf422c6ec7e6549122dd742d5d2b7bdbc2967ad839d8b1dd77f96  ./public/index.html
 2d6ec0c0a9f616a61a3fd5aa6e2860176b4d7eec26305e4b7339741af3a35ad1  ./public/invoice-compact.css
 796f89efa13c6f17d3f37feb3b5ffa79a50794c283ce3303dec499f5c37a75ff  ./public/invoice-print.html
 538d7d1fe00569ec69cac470798012076eeb5da5ac5b5c5c500022548196ae35  ./public/invoice-print.js
@@ -664,9 +665,9 @@ cbe0548f44f0278831f81de32b00453c7a47f5dd268a7b7b1f52432150c4efe9  ./vendor/acme/
 14fa0bd54ccc2d15bf3c4f1d6b64e63914503ada596cb8b5fc8f4bebcd6d89b8  ./vendor/acme/acme-client.cjs
 3545f8a45c37aca7222861006dc75175ae532944e88c087b49fbbb218ed47947  ./vendor/acme/package-lock.json
 93c58e2aa525b4850e390f62eb149aa0c49b385aaaf291b0c26d488f5dbb56f5  ./vendor/acme/package.json
-d92c78235b93f6c945ec5721013c558b3d6e2c2ed0617a3617ced01a57cbece1  ./windows-installer/BabolToyor-Setup.cmd
-0ecfa64069b6914dcaee4a838182dc0cc0d10282b233476c09f8e2c3eed41f02  ./windows-installer/INSTALL-STEPS-fa.html
-0a81ea3cb093b317d1e6467bfbb11747dcfe36e7253f7eb3e75f3120e2596979  ./windows-installer/INSTALL-STEPS-fa.md
-7de679412911bde381004c39bc40df0d32b6988a1abe0a5f73a57328b493ad02  ./windows-installer/Install-BabolToyor.ps1
+4ff7d2e97587cd6b1f17974a31d986d6d423e50c7b704715828133e941001a54  ./windows-installer/BabolToyor-Setup.cmd
+91dfe1727094b8e88aeb26278e228bd95c40623d90382d637a3f2ce4c6df78a8  ./windows-installer/INSTALL-STEPS-fa.html
+66313c858cb5cc037d069689ada8c2ca0a02b7bd9f90a785c975ba71cd56ed3c  ./windows-installer/INSTALL-STEPS-fa.md
+92910532ec423a21c8fb773a30cdd8563ae64f7c0d851d6a4451743414a7b147  ./windows-installer/Install-BabolToyor.ps1
 fb4dca85a668d5277fdc5a05f4dbbf5880a1b2662da29775c5720b219758494c  ./windows-installer/README-fa.md
 097a3fb0f5ca372039cc7e1ec8967affa42e1049fe3f46f6abd00c377ad437aa  ./windows-installer/build-single-file.js
