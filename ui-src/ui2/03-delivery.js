@@ -1,10 +1,17 @@
 function futureOrderRowsV25(orders){
- const rows=(orders||[]).map(o=>{
-  const actions=`<button class="btn btn-secondary btn-sm" data-action="order-details" data-id="${esc(o.id)}">${icon('eye',13)} جزئیات سفارش</button>`+(canSalesEditRemote(o)&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button class="btn btn-ghost btn-sm" data-action="future-edit" data-id="${esc(o.id)}">${icon('edit',13)} ویرایش سفارش</button>${o.visit?.status!=='PICKUP_PRESENT'?`<button class="btn btn-ghost btn-sm danger-text" data-action="future-cancel" data-id="${esc(o.id)}">${icon('trash',13)} لغو</button>`:''}`:'');
-  return `<tr class="fx-table-row" data-order="${esc(o.id)}"><td data-label="مشتری">${esc(storeAwareOrderName(o))}<small>${esc(storeAwareOrderPhone(o)||'—')}</small></td><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="تاریخ ثبت">${esc(formatDateTime24(o.createdAt))}</td><td data-label="وضعیت">${badge(o.status)} ${sdTypeBadge(o)}</td><td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td><td data-label="زمان‌بندی"><span>ورود به انبار: ${esc(dateLabel(o.scheduledDate))} ${esc(fa(time24(o.scheduledAt)))}</span><br><span>تاریخ تحویل: ${o.deliveryDate?esc(dateLabel(o.deliveryDate)):'ثبت نشده'}</span></td><td data-label="مقصد و بیعانه"><span>${esc(o.dispatchPlace||'ثبت نشده')}</span>${o.deposit?depositSummaryHtml(o.deposit):''}</td><td data-label="عملیات" class="bt-col-actions"><div class="fx-table-actions">${actions+pickupSalesActions(o)}</div></td></tr>`;
- }).join('');
- const empty=`<tr class="future-empty-row"><td colspan="8" class="future-empty-cell">${sdEmpty('calendar','سفارشی برای روزهای آینده برنامه‌ریزی نشده است','سفارش‌های آینده پس از ثبت در این تقویم قرار می‌گیرند.')}</td></tr>`;
- return `<div class="bt-table-wrap"><table class="bt-table future-order-table"><caption class="bt-caption">سفارش‌های آینده</caption><thead><tr><th scope="col">مشتری</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ ثبت</th><th scope="col">وضعیت</th><th scope="col">اقلام</th><th scope="col">زمان‌بندی</th><th scope="col">مقصد و بیعانه</th><th scope="col">عملیات</th></tr></thead><tbody>${rows||empty}</tbody></table></div>`;
+ const rows=(orders||[]).map(o=>`<tr class="fx-table-row" data-order="${esc(o.id)}">
+  <td data-label="مشتری"><div class="fx-customer"><span class="bt-cell-main" title="${esc(storeAwareOrderName(o))}">${esc(storeAwareOrderName(o))}</span><small class="bt-cell-sub" dir="ltr">${esc(storeAwareOrderPhone(o)||'—')}</small></div></td>
+  <td data-label="شماره سفارش"><span dir="ltr">${esc(fa(o.orderNo||'—'))}</span></td>
+  <td data-label="تاریخ ثبت">${esc(formatDateTime24(o.createdAt))}</td>
+  <td data-label="وضعیت"><div class="fx-status">${badge(o.status)} ${sdTypeBadge(o)}</div></td>
+  <td data-label="اقلام">${qty(activeItemsOf(o).length)} قلم</td>
+  <td data-label="تاریخ تحویل">${o.deliveryDate?esc(dateLabel(o.deliveryDate)):'ثبت نشده'}</td>
+  <td data-label="زمان ارسال"><div class="fx-schedule"><span>ورود به انبار:</span><span>${esc(dateLabel(o.scheduledDate))} ${esc(fa(time24(o.scheduledAt)))}</span></div></td>
+  <td data-label="مقصد">${esc(o.dispatchPlace||'ثبت نشده')}</td>
+  <td data-label="بیعانه">${o.deposit?esc(money(o.deposit.amount)):'—'}</td>
+  <td data-label="عملیات" class="bt-col-actions"><button type="button" class="btn btn-secondary btn-sm" data-action="order-details" data-future-order-details data-id="${esc(o.id)}">${icon('eye',13)} جزئیات سفارش</button></td></tr>`).join('');
+ const empty=`<tr class="future-empty-row"><td colspan="10" class="future-empty-cell">${sdEmpty('calendar','سفارشی برای روزهای آینده برنامه‌ریزی نشده است','سفارش‌های آینده پس از ثبت در این تقویم قرار می‌گیرند.')}</td></tr>`;
+ return `<div class="bt-table-wrap"><table class="bt-table future-order-table"><caption class="bt-caption">سفارش‌های آینده</caption><colgroup><col style="width:15%"><col style="width:8%"><col style="width:10%"><col style="width:11%"><col style="width:5%"><col style="width:9%"><col style="width:13%"><col style="width:8%"><col style="width:9%"><col style="width:12%"></colgroup><thead><tr><th scope="col">مشتری</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ ثبت</th><th scope="col">وضعیت</th><th scope="col">اقلام</th><th scope="col">تاریخ تحویل</th><th scope="col">زمان ارسال</th><th scope="col">مقصد</th><th scope="col">بیعانه</th><th scope="col">عملیات</th></tr></thead><tbody>${rows||empty}</tbody></table></div>`;
 }
 
 function futureFormV38(orders){
@@ -111,7 +118,7 @@ function transportSalesDetailsHtml(o){
  const s=o.transportService||{},store=o.orderType==='STORE',lines=Array.isArray(s.lines)?s.lines:[];
  const rows=lines.map((l,i)=>`<tr><td>${fa(String(i+1))}</td><td>${esc(l.productName||'—')}</td><td>${qty(l.deliveredKg)} کیلوگرم</td></tr>`).join('');
  const disabled=app.features?.experimentalTransport===false&&(store||s.section!=='history');
- const action=disabled?'':store?`<button type="button" class="btn btn-primary" data-action="order-details" data-id="${esc(o.id)}">بررسی وضعیت و مدارک سرویس</button>`:o.status==='SETTLEMENT_PENDING'?`<button type="button" class="btn btn-primary" data-action="transport-sales-work" data-id="${esc(o.id)}">ثبت پرداختی</button>`:o.status==='CLOSED'&&o.payment?`<button type="button" class="btn btn-primary" data-action="invoice" data-id="${esc(o.id)}">نمایش فاکتور بسته‌شده</button>`:'';
+ const action=disabled?'':store?`<button type="button" class="btn btn-primary" data-action="order-details" data-id="${esc(o.id)}">بررسی وضعیت و مدارک سرویس</button>`:o.status==='SETTLEMENT_PENDING'?`<button type="button" class="btn btn-primary" data-action="transport-sales-work" data-id="${esc(o.id)}">${o.transportDeparture?'ثبت پرداختی':'بررسی فاکتور و چاپ برگه ارسال'}</button>`:o.status==='CLOSED'&&o.payment?`<button type="button" class="btn btn-primary" data-action="invoice" data-id="${esc(o.id)}">نمایش فاکتور بسته‌شده</button>`:'';
  return `<article class="sd-panel sales-delivery-card"><header><span class="order-code">${esc(fa(o.orderNo||'—'))}</span><h3>${esc(storeAwareOrderName(o))}</h3><span class="badge blue">${esc(s.label||'—')}</span>${s.run?` <span>سرویس ${s.run===2?'دوم':'اول'} — بدون تسویه مالی</span>`:''}</header><div class="sales-delivery-meta"><span><small>راننده</small><b>${esc(s.driverName||'تعیین نشده')}</b></span><span><small>تماس</small><b>${esc(fa(s.driverPhone||'—'))}</b></span><span><small>خودرو و پلاک</small><b>${esc(s.vehicleType||'—')} ${esc(fa(s.vehiclePlate||''))}</b></span><span><small>سند انبار</small><b>${esc(fa(s.warehouseDocumentNo||'—'))}</b></span>${!store?`<span><small>فاکتور</small><b>${esc(fa(s.invoiceNumber||'ثبت نشده'))}</b></span>`:''}</div>${disabled?'<p role="alert">گردش آزمایشی غیرفعال است؛ اطلاعات فقط برای مشاهده نمایش داده می‌شود.</p>':''}<p>${s.section==='assigned'?'خروج ثبت نشده و هیچ تحویل یا امضای مشتری تأیید نشده است.':s.section==='inTransit'?'خروج ثبت شده؛ روش پرداخت و مرجوعی را در کارتابل فروش ثبت کنید.':s.outcome==='NOT_DELIVERED'?'این سفارش به مشتری تحویل نشده است.':''}</p><div class="table-wrap"><table class="table"><thead><tr><th>ردیف</th><th>محصول</th><th>وزن سند انبار</th></tr></thead><tbody>${rows||'<tr><td colspan="3">سند وزن این سرویس هنوز در دسترس نیست.</td></tr>'}</tbody></table></div><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">بستن</button>${action}</div></article>`;
 }
 function renderSalesDeliveryV38(data={}) {
@@ -224,12 +231,13 @@ window.salesV29RenderPane=function(tab,data){
 };
 
 /* ---------- به‌روزرسانی زنده (اصولِ یکسان با رندر اولیه) ---------- */
-function paintSalesPaneV29(tab,data){
+function paintSalesPaneV29(tab,data,refreshTransfers=true){
   const pane=app.salesV29.panes?.[tab]; if(!pane)return;
   if(pane.dataset.renderedV29!=='1'){
     pane.innerHTML=salesV29RenderPane(tab,data);
     pane.dataset.renderedV29='1';
     bindSalesPaneV29(tab);
+    if(tab==='stores'&&app.salesStoreTab==='transfers')ensureSalesTransferPanel(pane.querySelector('[data-transfer-panel]'),refreshTransfers);
     if(tab==='settlement' && stl.orderId) void stlOpen(stl.orderId);
     return;
   }
@@ -240,10 +248,11 @@ function paintSalesPaneV29(tab,data){
     const host=pane.querySelector('.phone-queue-list-v40'); if(host)host.innerHTML=live.html;
     const count=pane.querySelector('.phone-queue-panel-v40 .sales-section-count strong'); if(count)count.textContent=qty(live.queue.length);
   }else if(tab==='stores'){
-    pane.innerHTML=salesV29RenderPane(tab,data);
+    refreshSalesStorePane(pane,data,refreshTransfers);
   }else if(tab==='flow'){
     const list=pane.querySelector('.v26-flow-list'); if(list)list.innerHTML=salesFlowRowsV27(salesFlowOrders(data.orders||[]))||sdEmpty('truck','سفارشی در جریان نیست','هر سفارشی که به انبار ارسال شود در این فهرست قرار می‌گیرد.');
   }else if(tab==='settlement'){
+    clearIssuedTransportSettlement(data);
     const all=salesAllInSettlement(data.orders||[]);
     const p=pane.querySelector('.v26-settlement-list'); if(p)p.innerHTML=settlementPendingRowsV27(salesSettlementPendingOrders(all));
     const noGoods=pane.querySelector('.sales-no-goods-list'); if(noGoods)noGoods.innerHTML=salesNoGoodsRows(all);

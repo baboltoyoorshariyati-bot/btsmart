@@ -13,8 +13,9 @@
     const d=data.document,partial=d.storeOrderKind==='PARTIAL',label=partial?'سفارش جزئی':run===2?'دوم':'اول';document.title=partial?'برگه وزنی سفارش جزئی':'برگه سرویس '+label;
     if(partial)document.querySelector('#service-run').previousElementSibling.textContent='نوع سفارش';
     set('service-heading',partial?'برگه وزنی سفارش جزئی':'برگه وزنی سرویس '+label);set('service-order',fa(d.orderNo||'—'));set('service-store',d.storeName);set('service-sent',date(d.sentAt));set('service-destination',d.dispatchPlace);set('service-run',label);
+    if(Array.isArray(d.sealNumbers)&&d.sealNumbers.length){const seals=document.getElementById('service-seals');seals.textContent='شماره پلمپ: '+d.sealNumbers.map(fa).join('، ');seals.hidden=false;}
     const tbody=document.querySelector('.service-table tbody');
-    const lines=partial?groupStorePrintLines(d.lines):d.lines;
+    const lines=groupStorePrintLines(d.lines);
     for(const [i,x] of lines.entries()){
       const tr=document.createElement('tr');
       for(const value of [fa(i+1),x.productName||'—',...['deliveredKg','returnKg','shortageKg','netKg'].map(key=>x[key]==null?'—':qty(x[key]))]){const td=document.createElement('td');td.textContent=value;tr.append(td);}

@@ -58,12 +58,27 @@ function salesStoreProcessingDetailActions(o){
   const returns=o.transportWorkflow===1&&o.deliveryMode==='DELIVERY'&&app.features?.experimentalTransport?(o.storeOrderKind==='PARTIAL'?[1]:[1,2]).filter(run=>o.transportStoreTrips?.[String(run)]?.status==='RECEIPT_CONFIRMED').map(run=>`<button type="button" class="btn btn-primary btn-sm" data-store-transport-return="${run}">ثبت بازگشت مدارک ${o.storeOrderKind==='PARTIAL'?'محموله':'سرویس '+(run===1?'اول':'دوم')}</button>`).join(''):'';
   return returned+finalize+storeSalesReviewButtons(o)+storeSalesDocumentButtons(o,false,true)+returns;
 }
+// Pending addition requests are observational, not order lines or weights.
+function orderPendingAdditionRequests(o){return [...(o.customerAdditionRequests||[]),...(o.storeAdditionRequests||[])].filter(r=>['PENDING_SALES','PENDING_WAREHOUSE'].includes(r.status));}
+function orderPendingAdditionSignature(o){return JSON.stringify(orderPendingAdditionRequests(o).map(r=>[r.id,r.status]));}
+function orderPendingQuantity(value){const number=Number(value);return Number.isFinite(number)?new Intl.NumberFormat('fa-IR',{maximumFractionDigits:20}).format(number):'—';}
+function orderPendingAdditionsHtml(o){
+ const requests=orderPendingAdditionRequests(o);if(!requests.length)return '';
+ return requests.map(r=>`<section class="detail-note section-space pending-order-addition"><div><h3>محصولات درخواستی افزوده‌شده</h3><p><b>${r.status==='PENDING_SALES'?'در انتظار تأیید فروش':'در انتظار تأیید انبار'}</b> — این اقلام هنوز جزو اقلام قطعی سفارش، جمع یا وزن نیستند.</p><div class="bt-table-wrap"><table class="bt-table"><thead><tr><th>محصول</th><th>مقدار درخواستی</th><th>واحد</th><th>توضیحات</th></tr></thead><tbody>${(r.items||[]).map(i=>`<tr><td data-label="محصول">${esc(i.productName||'—')}</td><td data-label="مقدار درخواستی">${orderPendingQuantity(i.requestedQty)}</td><td data-label="واحد">${esc(i.requestedUnit||'—')}</td><td data-label="توضیحات">${esc(i.description||'—')}</td></tr>`).join('')}</tbody></table></div></div></section>`).join('');
+}
+function orderPendingAdditionsSection(o){return `<div data-pending-order-additions data-order-id="${esc(o.id||'')}" data-pending-signature="${esc(orderPendingAdditionSignature(o))}">${orderPendingAdditionsHtml(o)}</div>`;}
 async function openOrderDetails(id,options={}){
   const notices=captureEntityNotices('order',id);
   try{
     const d=await api('/api/orders/'+id); const o=d.order||{}; const items=o.items||[];
     const activeItems=items.filter(i=>i.itemStatus!=='CANCELLED');
+    const futureActions=!!options.futureActions&&app.page==='sales'&&can('sales')&&o.orderType==='REMOTE';
     const storeProcessing=options.storeProcessing&&app.page==='sales'&&can('sales')&&o.orderType==='STORE'&&['WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES'].includes(o.status);
+    const customerAdditionPending=(o.customerAdditionRequests||[]).some(r=>r.status==='PENDING_WAREHOUSE');
+    const canRequestCustomerAddition=app.page==='sales'&&can('sales')&&['ONSITE','REMOTE'].includes(o.orderType)&&['WAREHOUSE_PENDING','WAREHOUSE_PREPARING'].includes(o.status)&&!o.warehouseCompletedAt&&!o.warehouseDocumentNo&&!o.warehouseHandover&&!o.pickupHandover&&!o.pickupCancellation&&!o.transportHandovers?.['0']&&!o.transportInvoice&&!o.payment&&!o.dispatch;
+    const showSavedWeights=app.page==='sales'&&['WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES'].includes(o.status);
+    const storeSavedWeights=showSavedWeights&&o.orderType==='STORE';
+    const draftView=new Map((o.status==='WAREHOUSE_PREPARING'?o.warehouseWeightDraft?.items||[]:[]).map(v=>[String(v.itemId),v]));
     const totalRequested=activeItems.reduce((s,i)=>s+n(i.requestedQty),0);
     const totalDelivered=activeItems.reduce((s,i)=>s+n(i.deliveredKg||0),0);
     // v37.35.0 — وزن هر سرویس ستون جدا در همان فهرست اقلام است؛ «خلاصهٔ» چیپی بالای فرم حذف شد
@@ -79,6 +94,7 @@ async function openOrderDetails(id,options={}){
       <div class="detail-grid detail-grid-6">
         <div><span>نوع سفارش</span><b>${orderKindLabel(o)}</b></div>
         <div><span>زمان ثبت</span><b>${dt(o.createdAt)}</b></div>
+        <div><span>ثبت‌کنندهٔ سفارش</span><b>${esc(o.createdByName||'ثبت‌کننده نامشخص')}</b></div>
         <div><span>آخرین اقدام</span><b>${dt(o.updatedAt||o.createdAt)}</b></div>
         <div><span>تعداد اقلام</span><b>${qty(activeItems.length)} قلم</b></div>
         <div><span>مقدار درخواستی</span><b>${qty(totalRequested)}</b></div>
@@ -91,10 +107,14 @@ async function openOrderDetails(id,options={}){
       ${warehouseReturnNoteHtml(o)}
       ${app.page==='sales'&&o.orderType==='STORE'?(o.storeCancellationRequests||[]).map(r=>`<div class="detail-note"><div><b>درخواست لغو فروشگاه: ${r.status==='PENDING'?'در انتظار بررسی':'بررسی‌شده'}</b><p>${esc(r.reason)}</p>${r.resolution?`<p>نتیجه: ${esc(r.resolution)}</p>`:''}${r.status==='PENDING'?`<button type="button" class="btn btn-secondary" data-store-cancel-review="${esc(r.id)}">ثبت نتیجه بررسی</button>`:''}</div></div>`).join(''):''}
       ${o.notes?`<div class="detail-note"><span>${icon('info',16)}</span><div><b>یادداشت سفارش</b><p>${esc(o.notes)}</p></div></div>`:''}
-      ${app.page==='sales'&&['WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES'].includes(o.status)?`<section class="sales-live-weights" data-sales-live-order="${esc(o.id)}"><h3>وزن‌های ذخیره‌شدهٔ انبار</h3><p data-live-weight-status>بر اساس آخرین وزن ذخیره‌شدهٔ انبار؛ پیش‌نویس تحویل نهایی نیست.</p><div data-live-weight-rows>${salesLiveWeightsHtml(o)}</div></section>`:''}
-      <div class="table-wrap section-space"><table class="table v21-detail-table"><thead><tr><th>#</th><th>محصول</th><th>مقدار درخواستی</th><th>واحد</th><th>توضیحات</th>${showRunCols?'<th>وزن سرویس اول</th><th>وزن سرویس دوم</th>':''}<th>وزن تحویلی</th><th>وضعیت</th></tr></thead><tbody>${items.map((i,k)=>`<tr class="${i.itemStatus==='CANCELLED'?'row-cancelled':''}"><td>${fa(String(k+1))}</td><td><strong>${esc(i.product?.name||'—')}</strong></td><td>${qty(i.requestedQty)}</td><td>${esc(i.requestedUnit||'—')}</td><td>${esc(i.description||'—')}</td>${showRunCols?`<td>${runView[i.id]&&n(runView[i.id].r1Kg)>0?qty(runView[i.id].r1Kg)+' کیلوگرم':'—'}</td><td>${runView[i.id]&&n(runView[i.id].r2Kg)>0?qty(runView[i.id].r2Kg)+' کیلوگرم':'—'}</td>`:''}<td>${i.deliveredKg==null?'—':qty(i.deliveredKg)+' کیلوگرم'}</td><td>${badge(i.itemStatus)}</td></tr>`).join('')}</tbody></table></div>
-      <div class="sticky-actions"><span class="subtle">تمام تغییرات و ارجاع‌ها در سوابق مدیریتی ثبت می‌شوند.</span><div class="toolbar"><button class="btn btn-secondary" data-action="close-modal">بستن</button>${app.page==='warehouse'&&o.status==='WAREHOUSE_PENDING'?`<button class="btn btn-primary" data-wh-accept-order>تأیید دریافت و ورود به آماده‌سازی</button>`:''}${app.page==='warehouse'&&o.status==='WAREHOUSE_PREPARING'?`<button class="btn btn-primary" data-wh-start-order>شروع آماده‌سازی</button>`:''}${app.page==='warehouse'&&app.features?.pickupStaging&&o.visit?.status==='PICKUP_PRESENT'&&!o.pickupCancellation?`<button class="btn btn-secondary" data-wh-pickup-cancel>ثبت انصراف بدون تحویل</button>`:''}${o.status==='RETURNED_TO_SALES'&&!storeProcessing?`<button class="btn btn-secondary" data-action="edit-returned-order" data-id="${o.id}">${icon('edit',16)} اصلاح سفارش</button><button class="btn btn-primary" data-action="resubmit-order" data-id="${o.id}">${icon('send',16)} ارسال مجدد به انبار</button>`:''}${storeProcessing?salesStoreProcessingDetailActions(o):''}${app.page==='sales'&&can('sales')&&o.orderType==='STORE'&&o.status==='STORE_PENDING_SALES'?`<button class="btn btn-secondary" data-action="sales-edit-store-order" data-id="${esc(o.id)}">${icon('edit',16)} ویرایش سفارش</button><button class="btn btn-secondary" data-action="store-approve-v25" data-id="${esc(o.id)}">${icon('calendar',16)} ارسال با زمان‌بندی</button><button class="btn btn-primary" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',16)} ارسال سریع</button>`:''}</div></div>
+      <div class="table-wrap section-space" ${showSavedWeights?`data-sales-live-order="${esc(o.id)}"${storeSavedWeights?' data-sales-store-live="true"':''}`:""}>${showSavedWeights?`<p data-live-weight-status>${storeSavedWeights?'جمع وزن ذخیره‌شدهٔ سرویس‌ها؛ به معنی تحویل نهایی نیست.':'بر اساس آخرین وزن ذخیره‌شدهٔ انبار؛ پیش‌نویس تحویل نهایی نیست.'}</p>`:''}<table class="table v21-detail-table"><thead><tr><th>#</th><th>محصول</th><th>مقدار درخواستی</th><th>واحد</th><th>توضیحات</th>${showRunCols?'<th>وزن سرویس اول</th><th>وزن سرویس دوم</th>':''}${showSavedWeights?'<th>ذخیره‌شده</th>':''}<th>وزن تحویلی</th><th>وضعیت</th></tr></thead><tbody>${items.map((i,k)=>`<tr class="${i.itemStatus==='CANCELLED'?'row-cancelled':''}"><td>${fa(String(k+1))}</td><td><strong>${esc(i.product?.name||'—')}</strong></td><td>${qty(i.requestedQty)}</td><td>${esc(i.requestedUnit||'—')}</td><td>${esc(i.description||'—')}</td>${showRunCols?`<td data-store-run1-item="${esc(i.id)}">${runView[i.id]&&n(runView[i.id].r1Kg)>0?qty(runView[i.id].r1Kg)+' کیلوگرم':'—'}</td><td data-store-run2-item="${esc(i.id)}">${runView[i.id]&&n(runView[i.id].r2Kg)>0?qty(runView[i.id].r2Kg)+' کیلوگرم':'—'}</td>`:''}${showSavedWeights?(storeSavedWeights?`<td data-label="ذخیره‌شده" data-store-saved-item="${esc(i.id)}">${salesStoreSavedWeight(i,runView[i.id])}</td>`:`<td data-label="ذخیره‌شده" data-draft-saved-item="${esc(i.id)}">${salesDraftSavedWeight(i,draftView.get(String(i.id)))}</td>`):''}<td>${i.deliveredKg==null?'—':qty(i.deliveredKg)+' کیلوگرم'}</td><td>${badge(i.itemStatus)}</td></tr>`).join('')}</tbody></table></div>
+      ${orderPendingAdditionsSection(o)}
+      <div class="sticky-actions"><span class="subtle">تمام تغییرات و ارجاع‌ها در سوابق مدیریتی ثبت می‌شوند.</span><div class="toolbar"><button class="btn btn-secondary" data-action="close-modal">بستن</button>${app.page==='warehouse'&&o.status==='WAREHOUSE_PENDING'?`<button class="btn btn-primary" data-wh-accept-order>تأیید دریافت و ورود به آماده‌سازی</button>`:''}${app.page==='warehouse'&&o.status==='WAREHOUSE_PREPARING'?`<button class="btn btn-primary" data-wh-start-order>شروع آماده‌سازی</button>`:''}${app.page==='warehouse'&&app.features?.pickupStaging&&o.visit?.status==='PICKUP_PRESENT'&&!o.pickupCancellation?`<button class="btn btn-secondary" data-wh-pickup-cancel>ثبت انصراف بدون تحویل</button>`:''}${o.status==='RETURNED_TO_SALES'&&!storeProcessing?`<button class="btn btn-secondary" data-action="edit-returned-order" data-id="${o.id}">${icon('edit',16)} اصلاح سفارش</button><button class="btn btn-primary" data-action="resubmit-order" data-id="${o.id}">${icon('send',16)} ارسال مجدد به انبار</button>`:''}${futureActions&&canSalesEditRemote(o)&&o.pickupCancellation?.status!=='PENDING_SALES'?`<button type="button" class="btn btn-secondary" data-future-detail="edit">${icon('edit',16)} ویرایش سفارش</button>`:''}${futureActions&&canSalesCancelRemote(o)?`<button type="button" class="btn btn-secondary danger-text" data-future-detail="cancel">${icon('trash',16)} لغو سفارش</button>`:''}${futureActions?pickupSalesActions(o):''}${canRequestCustomerAddition?`<button type="button" class="btn btn-secondary" data-action="customer-addition" data-id="${esc(o.id)}" ${customerAdditionPending?'disabled title="در انتظار تأیید انبار"':''}>${icon('plus',16)} افزودن محصول</button>${customerAdditionPending?'<span class="subtle">درخواست قبلی در انتظار تأیید انبار است.</span>':''}`:''}${storeProcessing?salesStoreProcessingDetailActions(o):''}${app.page==='sales'&&can('sales')&&o.orderType==='STORE'&&o.status==='STORE_PENDING_SALES'?`<button class="btn btn-secondary" data-action="sales-edit-store-order" data-id="${esc(o.id)}">${icon('edit',16)} ویرایش سفارش</button><button class="btn btn-secondary" data-action="store-approve-v25" data-id="${esc(o.id)}">${icon('calendar',16)} ارسال با زمان‌بندی</button><button class="btn btn-primary" data-action="store-quick-send-v40" data-id="${esc(o.id)}">${icon('send',16)} ارسال سریع</button>`:''}</div></div>
     </div>`)
+    const futureEdit=$('#modal [data-future-detail="edit"]');if(futureEdit)futureEdit.onclick=()=>editFutureV25(o.id);
+    const futureCancel=$('#modal [data-future-detail="cancel"]');if(futureCancel)futureCancel.onclick=()=>cancelFutureV25(o.id,{order:o,closeDetails:true});
+    const futurePickupDate=futureActions&&$('#modal [data-action="pickup-date"]');if(futurePickupDate)futurePickupDate.onclick=()=>pickupChangeDate(o.id);
+    const futurePickupApprove=futureActions&&$('#modal [data-action="pickup-approve"]');if(futurePickupApprove)futurePickupApprove.onclick=()=>pickupApprove(o.id,futurePickupApprove,{closeDetails:true});
     const reviewCancel=$('#modal [data-store-cancel-review]');if(reviewCancel)reviewCancel.onclick=async()=>{
       const resolution=prompt('نتیجه بررسی، اقدامات انجام‌شده یا اقدامات لازم را بنویسید. این ثبت، سفارش یا اسناد را خودکار لغو نمی‌کند:');if(!resolution?.trim())return;
       if(!confirm('نتیجه بررسی به فروشگاه اطلاع داده شود؟'))return;reviewCancel.disabled=true;
@@ -230,8 +250,7 @@ function salesFutureOrders(orders){
   const todayIso=today();
   return orders.filter(o=>o.orderType==='REMOTE'&&o.status==='SCHEDULED_REMOTE'&&String(o.scheduledDate||'')>=todayIso).sort((a,b)=>String(a.scheduledAt||'').localeCompare(String(b.scheduledAt||'')));
 }
-// v37.6.1 — سفارش پخش پس از صدور فاکتور از این مجموعه حذف نمی‌شود؛ تا چاپ برگهٔ ارسال در
-// صف تسویه می‌ماند و بعد از آن در فهرست «فاکتورهای صادرشده» نمایش داده می‌شود.
+// این مجموعه برای صف و سوابق تسویه مصرف می‌شود؛ رندر هر بخش سفارش پخش باز را جداگانه پالایش می‌کند.
 function salesAllInSettlement(orders){return orders.filter(o=>o.orderType!=='STORE'&&((['SETTLEMENT_PENDING','SETTLED','EXITED'].includes(o.status)&&!['DELIVERED','SALES_FINALIZED','CLOSED'].includes(o.dispatch?.status))||((o.payments||[]).length>0&&!['SETTLEMENT_PENDING','SETTLED','EXITED'].includes(o.status)))).sort((a,b)=>String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||'')))} // v37.6.0 // v37.5.0 — فاکتورهای هر سرویس سفارش فروشگاه بسته‌شده هم دیده می‌شوند
 
 
@@ -423,7 +442,18 @@ async function editFutureV25(id){
   }catch(err){error.textContent=err.message;button.disabled=false;}};
  }catch(e){toast(e.message);}
 }
-async function cancelFutureV25(id){const order=(app.salesCache?.orders||[]).find(o=>o.id===id);if(!confirm(order?.deposit?'سفارش لغو شود؟ بیعانه به‌صورت خودکار بازگردانده نمی‌شود و باید دستی استرداد و ثبت شود.':'این سفارش آینده لغو شود؟'))return;try{const result=await api('/api/orders/'+id+'/cancel-remote',{method:'POST',body:JSON.stringify({reason:'لغو توسط فروش'})});toast(result.order?.deposit?'سفارش لغو شد؛ استرداد دستی بیعانه را پیگیری کنید.':'سفارش آینده لغو شد.');await renderSales('future');await refreshDepositRefunds();}catch(e){toast(e.message)}}
+async function cancelFutureV25(id,options={}){
+ const order=options.order||(app.salesCache?.orders||[]).find(o=>o.id===id),tab=app.sub.sales==='remote'?'remote':'future';
+ const prompt='سفارش لغو شود؟ تأیید می‌کنم هیچ کالایی تحویل نشده است.'+(order?.deposit?' بیعانه خودکار بازگردانده نمی‌شود؛ استرداد دستی را در بخش سفارش‌های آتی ثبت کنید.':'')+(['WAREHOUSE_PENDING','WAREHOUSE_PREPARING'].includes(order?.status)?' انبار از لغو مطلع می‌شود.':'');
+ if(!confirm(prompt))return;
+ try{
+  const result=await api('/api/orders/'+encodeURIComponent(id)+'/cancel-remote',{method:'POST',body:JSON.stringify({reason:'لغو توسط فروش',confirmedNoGoods:true})});
+  if(options.closeDetails)closeModal();
+  toast(result.order?.deposit?.status==='REFUND_REQUIRED'?'سفارش لغو شد؛ استرداد دستی بیعانه را در بخش سفارش‌های آتی پیگیری کنید.':'سفارش لغو شد.');
+  try{const data=await fetchSalesCache(true);if(app.page==='sales'&&app.sub.sales===tab)paintSalesPaneV29(tab,data);await refreshDepositRefunds();await refreshIndicators();}
+  catch(_){if(app.page==='sales'&&app.sub.sales===tab)salesRefreshWarning(tab,true);toast('سفارش لغو شد، اما نوسازی فهرست ناموفق بود؛ صفحه را بازخوانی کنید.');}
+ }catch(e){toast(e.message)}
+}
 
 
 
@@ -472,6 +502,11 @@ async function saveReturnedOrder(id){
   if(items.some(item=>!item.productId||n(item.requestedQty)<=0))return toast('برای همه ردیف‌ها محصول و مقدار معتبر وارد کنید.');
   try{
     const payload={items:items.map(item=>({id:item.id||null,productId:item.productId,requestedQty:n(item.requestedQty),requestedUnit:item.requestedUnit,description:String(item.description||'').trim()}))};
+    const mode=$('#returnedDeliveryMode');
+    if(mode&&!mode.disabled&&mode.value!==app.returnEdit.deliveryMode){
+      const place=$('#returnedDispatchPlace').value.trim();if(mode.value==='DELIVERY'&&!place)return toast('محل ارسال را وارد کنید.');
+      Object.assign(payload,{deliveryMode:mode.value,expectedDeliveryMode:app.returnEdit.deliveryMode,dispatchPlace:place});
+    }
     await api('/api/orders/'+id+'/returned-edit',{method:'PUT',body:JSON.stringify(payload)});
     toast('اصلاحات سفارش ثبت شد و در سوابق فعالیت ذخیره گردید.');
     const isStore=app.returnEdit?.orderType==='STORE'; closeModal(); app.returnEdit=null; if(app.salesCache)app.salesCache.fetchedAt=0; if(isStore)app.salesStoreTab='processing'; await renderSales(isStore?'stores':'flow');

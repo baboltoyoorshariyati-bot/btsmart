@@ -320,17 +320,17 @@ function whhDocumentDetailsActions(r){
 }
 const WHH_EVENT_LABELS={CREATE_VISIT:'ثبت مراجعه',CREATE_ORDER:'ثبت سفارش حضوری',CREATE_REMOTE_ORDER:'ثبت سفارش غیرحضوری',CREATE_STORE_ORDER:'ثبت سفارش فروشگاه',UPDATE_STORE_ORDER:'ویرایش سفارش فروشگاه',SALES_EDIT_STORE_ORDER:'اصلاح سفارش فروشگاه توسط فروش',APPROVE_STORE_ORDER:'تأیید فروشگاه',QUICK_SEND_STORE_ORDER:'ارسال سریع به انبار',WAREHOUSE_ACCEPT_ORDER:'دریافت سفارش در انبار',WAREHOUSE_START_PREPARING:'شروع آماده‌سازی',WAREHOUSE_DRAFT_SAVED:'ذخیرهٔ پیش‌نویس وزن',WAREHOUSE_FINALIZE:'ثبت وزن نهایی انبار',WAREHOUSE_DOCUMENT_EDITED:'اصلاح سند انبار',WAREHOUSE_DOCUMENT_EDIT_REQUESTED:'درخواست اصلاح سند',REOPEN_WAREHOUSE_PREPARING:'بازگشایی آماده‌سازی',RETURN_TO_SALES:'ارجاع به فروش',RESUBMIT_TO_WAREHOUSE:'ارسال مجدد به انبار',WAREHOUSE_PHYSICAL_HANDOVER:'تحویل فیزیکی از انبار',TRANSPORT_WAREHOUSE_HANDOVER:'تحویل به راننده',TRANSPORT_PLAN_ASSIGNED:'تخصیص راننده',STORE_RUN_R1_WEIGHT:'ثبت وزن سرویس اول',STORE_RUN_R2_WEIGHT:'ثبت وزن سرویس دوم',STORE_RUN_R1_SEND:'ارسال سرویس اول',STORE_RUN_R2_SEND:'ارسال سرویس دوم',STORE_RUN_MOVE_R2:'انتقال قلم به سرویس دوم',STORE_RUN_ITEM_COMPLETED:'تکمیل قلم فروشگاه',STORE_RUN_OUT_OF_STOCK:'ثبت عدم موجودی',STORE_RUN_DAY_FINALIZED:'پایان عملیات انبار فروشگاه',STORE_ORDER_OUT_OF_STOCK:'ثبت ناموجودی سفارش فروشگاه',STORE_PARTIAL_OUT_OF_STOCK:'ثبت ناموجودی سفارش جزئی'};
 function whhActorName(user){return user?.name||user?.username||'ثبت‌کنندهٔ نامشخص';}
-function whhOrderEventDetailsHtml(event){
+function whhOrderEventDetailsHtml(event,items){
   const details=event.details||{};
   if(!Object.keys(details).length)return '';
-  return `<details class="whh-event-details"><summary>جزئیات ثبت‌شده</summary><pre dir="ltr">${esc(JSON.stringify(details,null,2))}</pre></details>`;
+  return `<details class="whh-event-details"><summary>جزئیات ثبت‌شده</summary>${auditDetailsHtml(details,{itemNames:auditItemNames(items)})}${auditRawDetails(details)}</details>`;
 }
 function whhHistoryItemsHtml(items){
   const rows=(items||[]).map(item=>{
-    const status=item.outOfStock?'ناموجود':(item.status==='DELIVERED'?'تحویل‌شده':item.status||'—');
+    const status=item.outOfStock?'ناموجود':BTAuditFa.scalar(item.status,'status');
     const logs=[...(item.runR1||[]).map(entry=>({...entry,runLabel:'سرویس اول'})),...(item.runR2||[]).map(entry=>({...entry,runLabel:'سرویس دوم'}))];
-    const weighing=item.weighings?`<details class="whh-event-details"><summary>جزئیات توزین</summary><pre dir="ltr">${esc(JSON.stringify(item.weighings,null,2))}</pre></details>`:'';
-    const runHistory=logs.map(entry=>`<div class="whh-weight-log"><b>${entry.runLabel}</b><span>${qty(entry.kg)} کیلوگرم</span><small>${esc(formatDateTime24(entry.at))} · ${esc(whhActorName(entry.user))}</small>${entry.note?`<small>${esc(entry.note)}</small>`:''}${entry.weighings?`<pre dir="ltr">${esc(JSON.stringify(entry.weighings,null,2))}</pre>`:''}</div>`).join('');
+    const weighing=item.weighings?`<details class="whh-event-details"><summary>جزئیات توزین</summary>${auditDetailsHtml({weighings:item.weighings})}</details>`:'';
+    const runHistory=logs.map(entry=>`<div class="whh-weight-log"><b>${entry.runLabel}</b><span>${qty(entry.kg)} کیلوگرم</span><small>${esc(formatDateTime24(entry.at))} · ${esc(whhActorName(entry.user))}</small>${entry.note?`<small>${esc(entry.note)}</small>`:''}${entry.weighings?`${auditDetailsHtml({weighings:entry.weighings})}`:''}</div>`).join('');
     return `<tr><td>${esc(item.productName||'—')}</td><td>${qty(item.requestedQty)} ${esc(item.requestedUnit||'')}</td><td>${item.outOfStock?'—':`${qty(item.deliveredKg)} کیلوگرم`}</td><td>${esc(status)}${item.description?`<small class="whh-item-description">${esc(item.description)}</small>`:''}${weighing}${runHistory?`<details class="whh-event-details"><summary>سوابق وزن‌کشی و ثبت‌کننده</summary>${runHistory}</details>`:''}</td></tr>`;
   }).join('');
   return `<div class="table-wrap"><table class="whh-table whh-order-items"><thead><tr><th>کالا</th><th>مقدار درخواستی</th><th>وزن نهایی</th><th>وضعیت و ریز توزین</th></tr></thead><tbody>${rows||'<tr><td colspan="4">قلمی در سفارش ثبت نشده است.</td></tr>'}</tbody></table></div>`;
@@ -358,7 +358,7 @@ async function openWarehouseHistoryOrder(id){
       detailCell('ثبت مراجعه',esc(formatDateTime24(visit.createdAt))),
     ].join('');
     const stages=(data.stages||[]).map(stage=>`<li><b>${esc(stage.label)}</b><small>${esc(formatDateTime24(stage.at))} · ثبت‌کننده: ${esc(whhActorName(stage.user))}</small></li>`).join('')||'<li>مرحلهٔ ثبت‌شده‌ای در دسترس نیست.</li>';
-    const events=(data.events||[]).map(event=>`<li><div class="whh-event-head"><b>${esc(WHH_EVENT_LABELS[event.action]||event.action||'اقدام')}</b><small>${esc(formatDateTime24(event.createdAt))} · ثبت‌کننده: ${esc(whhActorName(event.user))}</small></div>${whhOrderEventDetailsHtml(event)}</li>`).join('')||'<li>رویداد ممیزی برای این سفارش موجود نیست.</li>';
+    const events=(data.events||[]).map(event=>`<li><div class="whh-event-head"><b>${esc(BTAuditFa.label(event.action))}</b><small>${esc(formatDateTime24(event.createdAt))} · ثبت‌کننده: ${esc(whhActorName(event.user))}</small></div>${whhOrderEventDetailsHtml(event,data.items)}</li>`).join('')||'<li>رویداد ممیزی برای این سفارش موجود نیست.</li>';
     openModal(`جزئیات سفارش ${fa(o.orderNo||'')}`,`<div class="whh-order-detail">
       <section><h3>مشخصات سفارش</h3><div class="whh-detail-grid">${orderFields}</div><p class="whh-detail-actor"><b>ثبت‌کنندهٔ سفارش:</b> ${esc(whhActorName(o.createdBy))}</p></section>
       <section><h3>اطلاعات کامل مشتری</h3><div class="whh-detail-grid">${customerFields}</div></section>

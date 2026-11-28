@@ -12,7 +12,7 @@ test('right rail is the single role-specific navigation renderer and its cache i
  assert.equal((app.match(/function renderNav\(/g)||[]).length,1);
  assert.doesNotMatch(ui,/function renderNav\(/);
  assert.match(app,/gate:\[\['entry','ورود'/);assert.match(app,/\['exit','خروج'/);assert.match(app,/\['dispatch','پخش'/);assert.match(app,/\['history','سوابق'/);
- assert.match(html,/ui2\.js\?v=37\.50\.0/);assert.match(html,/theme\.css\?v=37\.48\.0/);
+ assert.match(html,/ui2\.js\?v=37\.50\.0/);assert.match(html,/theme\.css\?v=37\.48\.2/);
 });
 test('admin enters role-specific cartables and store delivery never retains order registration',()=>{
  assert.match(app,/data-admin-cartable/);assert.match(app,/data-admin-home/);assert.match(app,/app.adminActiveRole=role/);

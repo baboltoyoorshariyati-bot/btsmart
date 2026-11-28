@@ -26,7 +26,7 @@ function sr318Table(rows,empty='قلمی در این بخش نیست.'){
 }
 // Partial store orders are a single independent shipment, not the two daily services.
 function srPartialSheet(o){
- const body=$('#wh38Body');if(!body)return;body.dataset.sheet='1';app.wh38.sheetOrder=o;
+ const body=$('#wh38Body');if(!body)return;body.dataset.sheet='1';body.dataset.dirty='0';app.wh38.sheetOrder=o;
  const items=activeItemsOf(o),view=new Map((o.storeRun?.items||[]).map(v=>[v.itemId,v]));
  const pendingAddition=(o.storeAdditionRequests||[]).some(r=>['PENDING_SALES','PENDING_WAREHOUSE'].includes(r.status));
  const ready=items.every(i=>i.runCompleted||i.shortageClosed),hasWeight=items.some(i=>Number(view.get(i.id)?.totalKg)>0);
@@ -35,7 +35,7 @@ function srPartialSheet(o){
   const operations=closed?`${it.runCompleted&&!v.reopenRun?'<span>بازگشت از صفر ممکن نیست؛ وزن ارسال شده یا سرویس بسته است.</span>':''}${it.runCompleted&&v.reopenRun?`<button type="button" class="btn btn-secondary btn-sm" data-action="sr38-reopen" data-id="${esc(o.id)}" data-item="${esc(it.id)}">بازگشت به وزن‌کشی</button>`:''}`:`<div class="sr-table-ops"><div class="sr-table-weight"><input type="text" inputmode="decimal" autocomplete="off" placeholder="۰٫۰۰۰" aria-label="وزن خالص ${esc(it.product?.name||'محصول')}" data-sr38-weight="${esc(it.id)}"><b>کیلوگرم</b></div><button type="button" class="btn btn-secondary btn-sm" data-action="wh-weight-details">ناخالصی</button><button type="button" class="btn btn-primary btn-sm" data-action="sr38-weight" data-id="${esc(o.id)}" data-item="${esc(it.id)}" data-run="1">ذخیره وزن</button><button type="button" class="btn btn-secondary btn-sm" data-action="sr38-oos" data-id="${esc(o.id)}" data-item="${esc(it.id)}">عدم موجودی / کسری</button></div>`;
   return `<tr class="sr318-table-row" ${closed?'':'data-sr318-row="1"'}><td data-label="ردیف">${fa(k+1)}</td><td data-label="محصول"><strong class="sr318-product">${esc(it.product?.name||'—')}</strong></td><td data-label="وضعیت">${closed?(it.runCompleted?'تکمیل‌شده':'عدم موجودی / کسری'):'در حال آماده‌سازی'}</td><td data-label="درخواست">${qty(it.requestedQty)} ${esc(it.requestedUnit||'')}</td><td data-label="وزن و سوابق">وزن ثبت‌شده: ${qty(weight)} کیلوگرم ${history}</td><td data-label="عملیات" class="bt-col-actions">${operations}</td></tr>`;
  }).join('');
- body.innerHTML=`<section class="wh38-sheet st-run-sheet"><div class="wh38-sheet-head wh38-sheet-head-compact">${wh38StoreHeader(o)}</div><h3>آماده‌سازی سفارش جزئی</h3>${pendingAddition?'<p class="notice">درخواست افزودن کالا در انتظار تأیید است؛ صدور سند تا تعیین تکلیف متوقف است. برای بررسی به فهرست سفارش‌ها بازگردید.</p>':''}<p>هر محصول پس از ثبت وزن تعیین تکلیف می‌شود؛ ثبت وزن یا عدم موجودی، کار همان ردیف را تمام می‌کند. ذخیره وزن به معنی تحویل به راننده نیست.</p>${sr318Table(rows)}<div class="wh38-sheet-foot"><div>پس از تعیین تکلیف همه اقلام، محموله را آماده ارسال کنید.</div><div class="toolbar"><button type="button" class="btn btn-secondary" data-action="sr38-back" data-id="${esc(o.id)}">بازگشت</button><button type="button" class="btn btn-secondary" data-action="wh38-return" data-id="${esc(o.id)}">ارجاع به فروش</button><button type="button" class="btn btn-primary" data-action="sr38-send-run" data-id="${esc(o.id)}" data-run="1" ${!pendingAddition&&ready&&hasWeight&&(o.transportWorkflow!==1||o.transportAssignments?.['1']?.driverId)?'':'disabled'}>آماده ارسال محموله</button>${sr38WarehouseDocuments(o)}</div></div></section>`;
+ body.innerHTML=`<section class="wh38-sheet st-run-sheet"><div class="wh38-sheet-head wh38-sheet-head-compact">${wh38StoreHeader(o)}</div><h3>آماده‌سازی سفارش جزئی</h3>${pendingAddition?'<p class="notice">درخواست افزودن کالا در انتظار تأیید است؛ صدور سند تا تعیین تکلیف متوقف است. برای بررسی به فهرست سفارش‌ها بازگردید.</p>':''}<p>هر محصول پس از ثبت وزن تعیین تکلیف می‌شود؛ ثبت وزن یا عدم موجودی، کار همان ردیف را تمام می‌کند. ذخیره وزن به معنی تحویل به راننده نیست.</p>${sr318Table(rows)}${whSealControl(1,o.storeRunOps?.r1Shipment?.sealNumbers||o.storeSealDrafts?.['1']?.sealNumbers||[],!!o.storeRunOps?.r1Shipment,true)}<div class="wh38-sheet-foot"><div>پس از تعیین تکلیف همه اقلام، محموله را آماده ارسال کنید.</div><div class="toolbar"><button type="button" class="btn btn-secondary" data-action="sr38-back" data-id="${esc(o.id)}">بازگشت</button><button type="button" class="btn btn-secondary" data-action="wh38-return" data-id="${esc(o.id)}">ارجاع به فروش</button><button type="button" class="btn btn-primary" data-action="sr38-send-run" data-id="${esc(o.id)}" data-run="1" ${!pendingAddition&&ready&&hasWeight&&(o.transportWorkflow!==1||o.transportAssignments?.['1']?.driverId)?'':'disabled'}>آماده ارسال محموله</button>${sr38WarehouseDocuments(o)}</div></div></section>`;
 }
 // Expose the actual per-service handover document from the preparation sheet.
 function sr38WarehouseDocuments(o){
@@ -50,6 +50,7 @@ function sr38Sheet(o){
   if(o.storeOrderKind==='PARTIAL')return srPartialSheet(o);
   const body=$('#wh38Body'); if(!body)return;
   body.dataset.sheet='1';
+  body.dataset.dirty='0';
   app.wh38.sheetOrder=o;
   const sr=o.storeRun||{};
   const items=activeItemsOf(o);
@@ -69,9 +70,10 @@ function sr38Sheet(o){
   body.innerHTML=`<section class="wh38-sheet st-run-sheet st-run-sheet-v318">
     <div class="wh38-sheet-head wh38-sheet-head-compact wh38-store-sheet-head">${wh38StoreHeader(o)}</div>
     <div class="sr318-summary"><span>وضعیت کلی: <b>${esc(sr.overallLabel||'—')}</b></span><span>سرویس اول: <b>${esc(sr.r1StatusLabel||'—')}</b></span><span>سرویس دوم: <b>${esc(sr.r2StatusLabel||'—')}</b></span><span>جمع وزن ذخیره‌شده: <b>${qty(totalSent)} کیلوگرم</b></span><span>حل‌نشده: <b>${qty(unresolved.length)} قلم</b></span></div>
+    ${(o.storeAdditionRequests||[]).some(r=>['PENDING_SALES','PENDING_WAREHOUSE'].includes(r.status))?`<p class="notice">درخواست افزودن محصول در انتظار بررسی است؛ تا تعیین تکلیف، ${o.storeOrderKind==='PARTIAL'?'صدور سند و پایان سفارش':'عملیات آماده‌سازی و ارسال'} متوقف است.</p>`:''}
     <div class="sr318-sendnote">وزن هر قلم با «ذخیره وزن» برای سرویس مربوط در سامانه می‌ماند؛ هر ثبت، یک نوبت تازه به جمع همان سرویس اضافه می‌کند و به‌تنهایی ثبت تحویل نیست.</div><div class="sr318-sendline">${sr38SendBtn(o,1,sr.items)}${sr38SendBtn(o,2,sr.items)}${sr38WarehouseDocuments(o)}<span class="sr318-sendnote">سند (فاکتور) هر سرویس جدا و فقط با اقلام همان سرویس صادر می‌شود. با ثبت وزن: قلم کامل یا ناقص، به مقدار ثبت‌شده وارد فاکتور همان سرویس می‌شود؛ وزن صفر، قلم را به سرویس دوم می‌برد و ماندهٔ قلم ناقص هم با دکمهٔ «سرویس دوم» منتقل می‌شود؛ اگر بعد از ارسال یک سرویس، قلم تازه‌ای برای همان سرویس وزن شود، دکمهٔ «ارسال قلم جدید» آن را به همان محمولهٔ نزد فروش می‌افزاید.</span></div>
-    ${groupHtml(1,'اول','ثبت وزن و ارسال صبح')}
-    ${groupHtml(2,'دوم','ماندهٔ اقلام منتقل‌شده و ارسال ظهر')}
+    ${groupHtml(1,'اول','ثبت وزن و ارسال صبح')}${whSealControl(1,o.storeRunOps?.r1Shipment?.sealNumbers||o.storeSealDrafts?.['1']?.sealNumbers||[],!!o.storeRunOps?.r1Shipment,true)}
+    ${groupHtml(2,'دوم','ماندهٔ اقلام منتقل‌شده و ارسال ظهر')}${whSealControl(2,o.storeRunOps?.r2Shipment?.sealNumbers||o.storeSealDrafts?.['2']?.sealNumbers||[],!!o.storeRunOps?.r2Shipment,true)}
     ${closedRows.length?`<details class="sr318-done-box"><summary>اقلام تعیین‌تکلیف‌شده (${qty(closedRows.length)})</summary>${sr318Table(closedRows.join(''))}</details>`:''}
     <div class="wh38-sheet-foot sr318-foot"><div><span>اقلام حل‌نشده</span><strong>${qty(unresolved.length)} قلم</strong></div>
       <div class="toolbar sr38-sendbar"><button type="button" class="btn btn-secondary" data-action="sr38-back" data-id="${o.id}">${icon('arrow',15)} بازگشت به فهرست</button><button type="button" class="btn btn-secondary" data-action="wh38-return" data-id="${o.id}">${icon('arrow',15)} ارجاع به فروش</button>${sr38SendBtn(o,1,sr.items)}${sr38SendBtn(o,2,sr.items)}</div></div>
@@ -79,9 +81,10 @@ function sr38Sheet(o){
 }
 async function sr38Post(id,ep,payload){
  // Repainting a saved row must not discard other rows the operator is still editing.
+ const seals=whSealSnapshot();
  const pending=$$('#wh38Body [data-sr38-weight]').filter(w=>w.value.trim()&&w.dataset.sr38Weight!==(payload.itemId||payload.items?.[0]?.itemId)).map(w=>({id:w.dataset.sr38Weight,value:w.value,rows:whWeighingDrafts.get(w)}));
  const restore=()=>pending.forEach(x=>{const w=$$('#wh38Body [data-sr38-weight]').find(el=>el.dataset.sr38Weight===x.id);if(w){w.value=x.value;if(x.rows){whWeighingDrafts.set(w,x.rows);w.readOnly=true;}}});
- try{ const result=await api('/api/orders/'+id+'/store-run/'+ep,{method:'POST',body:JSON.stringify(payload)}); const fresh=result.order?result:await api('/api/orders/'+id); if(fresh.order&&fresh.order.storeRun&&fresh.order.storeRun.finalizedAt){ toast(fresh.order.status==='OUT_OF_STOCK'?'همه اقلام ناموجود بود؛ نتیجه برای فروشگاه و فروش ثبت شد.':'کار انبار این سفارش پایان یافت و سفارش به سوابق انبار رفت.'); await refreshIndicators(); if(app.wh38.phase==='stores'){app.wh38.storeTab='preparing'; wh38Shell('stores');}else wh38Shell('preparing'); return fresh.order||true; } if(fresh.order&&fresh.order.storeRun&&$('#wh38Body[data-sheet="1"]')){sr38Sheet(fresh.order);restore();} await refreshIndicators(); return fresh.order||true; }catch(e){ toast(e.message); try{ const fresh=await api('/api/orders/'+id); if(fresh.order&&fresh.order.storeRun&&$('#wh38Body[data-sheet="1"]')){sr38Sheet(fresh.order);restore();} }catch(_){} return false; } } // v37.33.0 — هنگام خطا هم برگه از سرور بازرندر می‌شود تا عدد ردشده روی صفحه نماند و «ثبت‌شده» به نظر نرسد
+ try{ const result=await api('/api/orders/'+id+'/store-run/'+ep,{method:'POST',body:JSON.stringify(payload)}); const fresh=result.order?result:await api('/api/orders/'+id); if(fresh.order&&fresh.order.storeRun&&fresh.order.storeRun.finalizedAt){ toast(fresh.order.status==='OUT_OF_STOCK'?'همه اقلام ناموجود بود؛ نتیجه برای فروشگاه و فروش ثبت شد.':'کار انبار این سفارش پایان یافت و سفارش به سوابق انبار رفت.'); await refreshIndicators(); if(app.wh38.phase==='stores'){app.wh38.storeTab='preparing'; wh38Shell('stores');}else wh38Shell('preparing'); return fresh.order||true; } if(fresh.order&&fresh.order.storeRun&&$('#wh38Body[data-sheet="1"]')){sr38Sheet(fresh.order);restore();whSealRestore(seals,['send-run','seals'].includes(ep)?Number(payload.run):undefined);if(whSealIsDirty(fresh.order))$('#wh38Body').dataset.dirty='1';} await refreshIndicators(); return fresh.order||true; }catch(e){ toast(e.message); try{ const fresh=await api('/api/orders/'+id); if(fresh.order&&fresh.order.storeRun&&$('#wh38Body[data-sheet="1"]')){sr38Sheet(fresh.order);restore();whSealRestore(seals);if(whSealIsDirty(fresh.order))$('#wh38Body').dataset.dirty='1';} }catch(_){} return false; } } // v37.33.0 — هنگام خطا هم برگه از سرور بازرندر می‌شود تا عدد ردشده روی صفحه نماند و «ثبت‌شده» به نظر نرسد
 // v37.35.0 — همین‌که سرور کار انبار را پایان‌یافته اعلام کند (ثبت وزن سرویس دوم و ارسال آن، یا آخرین «تکمیل محصول»)، برگه بسته و فهرست آماده‌سازی نشان داده می‌شود؛ سفارش دیگر آنجا نمی‌ماند.
 window.renderWarehouse=async function(){
   if(app.timer){clearInterval(app.timer);app.timer=null}
@@ -208,13 +211,12 @@ function stRegisteredRow(o){
   const service=(run)=>{const sr=o.storeRun||{},stage=run===1?sr.r1Stage:sr.r2Stage,full=run===1?sr.r1StageLabel:sr.r2StageLabel;const weights=(sr.items||[]).some(v=>Number(run===1?v.r1Kg:v.r2Kg)>0);const label=stage?(stageLabels[stage]||full||stage):(weights?'وزن‌کشی ثبت شده':'در انتظار');return `<span class="st-registered-service" title="${esc(full||label)}">سرویس ${run===1?'اول':'دوم'}: ${esc(label)}</span>`;};
   const extras=showProgress&&o.storeRun?.enabled?(o.storeOrderKind==='PARTIAL'?[{html:`سفارش جزئی · ${esc(stageLabels[o.storeRun.r1Stage]||ST_REGISTERED_LABELS[o.status]||'در حال پیگیری')}`}]:[{html:'سفارش روزانه'},{html:service(1)},{html:service(2)}]):[{html:o.storeOrderKind==='PARTIAL'?'سفارش جزئی':'سفارش روزانه'}];
   const addition=(o.storeAdditionRequests||[]).find(r=>['PENDING_SALES','PENDING_WAREHOUSE'].includes(r.status));
-  const canAdd=o.storeOrderKind==='PARTIAL'&&['SCHEDULED_REMOTE','WAREHOUSE_PENDING','WAREHOUSE_PREPARING'].includes(o.status)&&!o.storeRunOps?.r1Shipment&&!o.storeRunOps?.finalizedAt&&!o.warehouseCompletedAt&&!o.storeWarehouseDocumentNos?.['1'];
-  const actions=`<button type="button" class="btn btn-secondary btn-sm" data-action="store-order-details" data-id="${esc(o.id)}">${icon('eye',13)} جزئیات سفارش</button>${o.status==='STORE_PENDING_SALES'?`<button type="button" class="btn btn-secondary btn-sm" data-action="edit-store-order" data-id="${esc(o.id)}">${icon('edit',13)} ویرایش</button><button type="button" class="btn btn-ghost btn-sm danger-text" data-action="cancel-store-order" data-id="${esc(o.id)}">${icon('trash',13)} لغو</button>`:''}${canAdd&&!addition?`<button type="button" class="btn btn-primary btn-sm" data-action="store-request-addition" data-id="${esc(o.id)}">افزودن کالا</button>`:''}${addition?`<span class="badge orange">${addition.status==='PENDING_SALES'?'افزودن کالا در انتظار فروش':'افزودن کالا در انتظار انبار'}</span>`:''}`;
+  const actions=`<button type="button" class="btn btn-secondary btn-sm" data-action="store-order-details" data-id="${esc(o.id)}">${icon('eye',13)} جزئیات سفارش</button>${o.status==='STORE_PENDING_SALES'?`<button type="button" class="btn btn-secondary btn-sm" data-action="edit-store-order" data-id="${esc(o.id)}">${icon('edit',13)} ویرایش</button><button type="button" class="btn btn-ghost btn-sm danger-text" data-action="cancel-store-order" data-id="${esc(o.id)}">${icon('trash',13)} لغو</button>`:''}${addition?`<span class="badge orange">${addition.status==='PENDING_SALES'?'افزودن محصول در انتظار فروش':'افزودن محصول در انتظار انبار'}</span>`:''}`;
   return `<tr data-store-order-id="${esc(o.id)}" data-order="${esc(o.id)}"><td data-label="فروشگاه">${esc(storeAwareOrderName(o))}</td><td data-label="شماره سفارش">${esc(fa(o.orderNo||'—'))}</td><td data-label="تاریخ ثبت">${esc(formatDateTime24(o.createdAt))}</td><td data-label="وضعیت"><span class="badge ${o.status==='CANCELLED'?'gray':o.status==='CLOSED'?'green':'blue'}">${esc(status)}</span></td><td data-label="اقلام">${qty(items.length)} قلم</td><td data-label="پیگیری"><div class="st-table-progress">${extras.map(x=>x.html).join(' ')}</div></td><td data-label="عملیات" class="bt-col-actions"><div class="st-table-actions">${actions}</div></td></tr>`;
 }
 function stRegisteredTable(rows){
  if(!rows.length)return '';
- return `<div class="bt-table-wrap"><table class="bt-table st-registered-table"><caption class="bt-caption">سفارش‌های ثبت‌شده فروشگاه</caption><thead><tr><th scope="col">فروشگاه</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ ثبت</th><th scope="col">وضعیت</th><th scope="col">اقلام</th><th scope="col">پیگیری</th><th scope="col">عملیات</th></tr></thead><tbody>${rows.map(stRegisteredRow).join('')}</tbody></table></div>`;
+ return `<div class="bt-table-wrap" tabindex="0" role="region" aria-label="جدول سفارش‌های ثبت‌شده فروشگاه"><table class="bt-table st-registered-table"><caption class="bt-caption">سفارش‌های ثبت‌شده فروشگاه</caption><thead><tr><th scope="col">فروشگاه</th><th scope="col">شماره سفارش</th><th scope="col">تاریخ ثبت</th><th scope="col">وضعیت</th><th scope="col">اقلام</th><th scope="col">پیگیری</th><th scope="col">عملیات</th></tr></thead><tbody>${rows.map(stRegisteredRow).join('')}</tbody></table></div>`;
 }
 
 function storeScopeQuery(){return app.user.roleCode==='admin'&&app.storeBranchNo?'&branchNo='+encodeURIComponent(app.storeBranchNo):'';}
@@ -230,13 +232,13 @@ async function storeAllOrders(){
 async function renderStoreRegistered(){
   const root=$('#content'),limit=25,generation=app.storeRenderGeneration;
   let offset=Math.max(0,Math.floor(Number(app.storeRegisteredOffset)||0)),seq=0,signature='';
-  root.innerHTML=`<section class="sd-panel st-registered-panel"><header class="st-registered-head"><div><h2>سفارش‌های ثبت‌شده</h2><p class="st38-store-identity">${esc(app.user.roleCode==='admin'?(app.storeScope?.branches.find(b=>String(b.branchNo)===String(app.storeBranchNo))?.storeName||'همه شعبه‌های فروشگاه'):app.user.storeName||app.user.fullName||'فروشگاه')}</p><p>از بررسی فروش تا آماده‌سازی انبار و تحویل؛ هر سفارش و سرویس‌های آن را اینجا پیگیری کنید.</p></div><span class="st-registered-live" role="status">در حال دریافت اطلاعات…</span></header><p class="st-registered-scroll-hint">برای دیدن تمام ستون‌ها در صفحهٔ کوچک، فهرست را افقی جابه‌جا کنید.</p><div class="st-registered-scroll" tabindex="0" role="region" aria-label="فهرست افقی سفارش‌ها"><div id="storeRegisteredList" class="st-registered-list"><div class="empty">در حال دریافت سفارش‌ها…</div></div></div><div id="storeRegisteredPages" class="st-registered-pages"></div></section>`;
+  root.innerHTML=`<section class="sd-panel st-registered-panel"><header class="st-registered-head"><div><h2>${app.storeRegisteredPending?'در انتظار بررسی فروش':'سفارش‌های ثبت‌شده'}</h2>${app.storeRegisteredPending?'<button type="button" class="btn btn-secondary btn-sm" data-store-registered-all>نمایش همه سفارش‌ها</button>':''}<p class="st38-store-identity">${esc(app.user.roleCode==='admin'?(app.storeScope?.branches.find(b=>String(b.branchNo)===String(app.storeBranchNo))?.storeName||'همه شعبه‌های فروشگاه'):app.user.storeName||app.user.fullName||'فروشگاه')}</p><p>از بررسی فروش تا آماده‌سازی انبار و تحویل؛ هر سفارش و سرویس‌های آن را اینجا پیگیری کنید.</p></div><span class="st-registered-live" role="status">در حال دریافت اطلاعات…</span></header><p class="st-registered-scroll-hint">برای دیدن تمام ستون‌ها در صفحهٔ کوچک، فهرست را افقی جابه‌جا کنید.</p><div class="st-registered-scroll" tabindex="0" role="region" aria-label="فهرست افقی سفارش‌ها"><div id="storeRegisteredList" class="st-registered-list"><div class="empty">در حال دریافت سفارش‌ها…</div></div></div><div id="storeRegisteredPages" class="st-registered-pages"></div></section>`;
   root.insertAdjacentHTML('afterbegin',storeScopeHeader());bindStoreScope();
   const current=()=>generation===app.storeRenderGeneration&&root.isConnected && app.page==='store' && app.sub.store==='registered';
   async function refresh(force=false){
     const request=++seq;
     try{
-      const data=await api(`/api/store/orders?offset=${offset}&limit=${limit}${storeScopeQuery()}`);
+      const data=await api(`/api/store/orders?offset=${offset}&limit=${limit}${app.storeRegisteredPending?'&status=STORE_PENDING_SALES':''}${storeScopeQuery()}`);
       if(!current()||request!==seq)return;
       if(offset>0&&offset>=data.total){offset=data.total?Math.floor((data.total-1)/limit)*limit:0;app.storeRegisteredOffset=offset;return refresh(true);}
       const nextSignature=JSON.stringify([data.orders,data.total,offset]);
@@ -254,12 +256,12 @@ async function renderStoreRegistered(){
     }catch(e){if(current()&&request===seq){root.querySelector('.st-registered-live').textContent='به‌روزرسانی ناموفق؛ تلاش مجدد خودکار';if(!signature)$('#storeRegisteredList').innerHTML=`<div class="empty">دریافت سفارش‌ها ناموفق بود: ${esc(e.message)}</div>`;}}
   }
   root.onclick=async e=>{
+    if(e.target.closest('[data-store-registered-all]')){app.storeRegisteredPending=false;app.storeRegisteredOffset=0;return renderStoreRegistered();}
     const page=e.target.closest('[data-registered-page]');
     if(page){offset=Math.max(0,offset+(page.dataset.registeredPage==='next'?limit:-limit));app.storeRegisteredOffset=offset;signature='';await refresh(true);return;}
     const el=e.target.closest('[data-action]');if(!el)return;
     if(el.dataset.action==='store-order-details')return openStoreOrderDetails(el.dataset.id);
     if(el.dataset.action==='edit-store-order')return openStoreOrderEdit(el.dataset.id);
-    if(el.dataset.action==='store-request-addition')return openStoreAddition(el.dataset.id);
     if(el.dataset.action==='cancel-store-order'&&confirm('این سفارش لغو شود؟')){el.disabled=true;try{await api('/api/store/orders/'+encodeURIComponent(el.dataset.id)+'/cancel',{method:'POST',body:JSON.stringify({reason:'لغو توسط فروشگاه'})});toast('سفارش لغو شد.');el.blur();await refresh(true);}catch(err){el.disabled=false;toast(err.message);}}
   };
   await refresh(true);
@@ -270,6 +272,7 @@ async function renderStorePortal(){
   app.storeRenderGeneration=(app.storeRenderGeneration||0)+1;
   if(app.timer){clearInterval(app.timer);app.timer=null}
   if(app.user.roleCode==='admin')app.storeScope=await api('/api/store/scope');
+  if(app.sub.store==='transfers')return renderStoreTransfers();
   if(app.sub.store==='registered')return renderStoreRegistered();
   const d=await storeAllOrders(); const orders=d.orders||[];const isPartial=app.sub.store==='partial';const isDeliveryView=app.sub.store==='delivery';app.storePortalTab=isDeliveryView?'delivery':'create';app.storeDeliveryTab=app.storeDeliveryTab==='delivered'?'delivered':'inProgress';
   const deliveredViews=orders.flatMap((o)=>st38ViewsOf(o)).filter((v)=>v.dispatch&&['DELIVERED','SALES_FINALIZED','CLOSED'].includes(v.dispatch.status)).sort((a,b)=>String(b.dispatch.deliveredAt||'').localeCompare(String(a.dispatch.deliveredAt||''))); // v37.5.0 — هر محموله کارت جدا
@@ -326,7 +329,6 @@ async function renderStorePortal(){
     else if(a==='store-order-details'){return openStoreOrderDetails(el.dataset.id)}
     else if(a==='store-delivery-details'){return openStoreDeliveryDetails(el.dataset.id,Number(el.dataset.run)||0)}
     else if(a==='edit-store-order'){return openStoreOrderEdit(el.dataset.id)}
-    else if(a==='store-request-addition'){return openStoreAddition(el.dataset.id)}
     else if(a==='store-confirm-delivery'){return confirmStoreDelivery(el)}
     else if(a==='cancel-store-order'){if(confirm('این سفارش لغو شود؟')){try{await api('/api/store/orders/'+el.dataset.id+'/cancel',{method:'POST',body:JSON.stringify({reason:'لغو توسط فروشگاه'})});toast('سفارش لغو شد.');await renderStorePortal()}catch(err){toast(err.message)}}}
   };
@@ -349,7 +351,7 @@ async function openStoreAddition(id){
  try{
   const o=(await api('/api/store/orders/'+encodeURIComponent(id))).order;
   app.storeAdditionDraft=[defaultOrderLine()];
-  openModal('افزودن کالا به سفارش '+fa(o.orderNo||''),`<form id="storeAdditionForm"><p>کالاهای جدید برای تأیید به فروش و سپس انبار ارسال می‌شوند. محصول تکراری با واحد یکسان به ردیف موجود اضافه می‌شود؛ واحد متفاوت ردیف مستقل دارد. وزن‌کشی همه ردیف‌ها به کیلوگرم است.</p><div id="store-addition-lines"></div><button type="button" class="btn btn-secondary" id="storeAdditionAdd">افزودن ردیف</button><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button class="btn btn-primary" type="submit">ارسال به فروش</button></div></form>`);
+  openModal('افزودن محصول به سفارش '+fa(o.orderNo||''),`<form id="storeAdditionForm"><p>کالاهای جدید برای تأیید به فروش و سپس انبار ارسال می‌شوند. ${o.storeOrderKind==='PARTIAL'?'محصول تکراری با واحد یکسان به ردیف موجود اضافه می‌شود؛ واحد متفاوت ردیف مستقل دارد.':'محصول افزوده‌شده ردیف مستقل دارد؛ پس از ارسال سرویس اول، به سرویس دوم می‌رود. پس از پایان کار انبار یا ارسال سرویس دوم، افزودن ممکن نیست.'} وزن‌کشی همه ردیف‌ها به کیلوگرم است.</p><div id="store-addition-lines"></div><button type="button" class="btn btn-secondary" id="storeAdditionAdd">افزودن ردیف</button><div class="modal-actions"><button type="button" class="btn btn-secondary" data-action="close-modal">انصراف</button><button class="btn btn-primary" type="submit">ارسال به فروش</button></div></form>`);
   const paint=()=>{const el=$('#store-addition-lines');if(el){el.innerHTML=renderDraftLinesTable(app.storeAdditionDraft.map((x,i)=>renderProductPickerLine(x,i,'storeaddition')));bindOperationLines('storeaddition','storeAdditionDraft')}};paint();
   $('#storeAdditionAdd').onclick=()=>{app.storeAdditionDraft.push(defaultOrderLine());paint()};
   $('#storeAdditionForm').addEventListener('click',e=>{const p=e.target.closest('[data-action=op-pick-product]');if(p){pickOperationProduct(+p.dataset.index,p.dataset.productId,p.dataset.label,p.dataset.quick,'storeaddition','storeAdditionDraft');return;}const x=e.target.closest('[data-action=op-remove-line]');if(x){app.storeAdditionDraft.splice(+x.dataset.index,1);if(!app.storeAdditionDraft.length)app.storeAdditionDraft.push(defaultOrderLine());paint();}});

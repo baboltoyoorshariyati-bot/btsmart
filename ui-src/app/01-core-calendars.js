@@ -15,6 +15,8 @@ function settlementMethodLabel(method){
  return type==='POS'?['پوز',m.deviceSnapshot?.bank,m.deviceSnapshot?.terminalNumber].filter(Boolean).join(' '):(labels[type]||type||'نامشخص');
 }
 function canSalesEditRemote(o){return o?.orderType==='REMOTE'&&['SCHEDULED_REMOTE','WAREHOUSE_PENDING'].includes(o.status)&&!o.warehouseAcceptedAt&&!o.pickupHandover&&!Object.keys(o.transportHandovers||{}).length;}
+// The server rechecks delivery and financial history under its write lock.
+function canSalesCancelRemote(o){return o?.orderType==='REMOTE'&&['SCHEDULED_REMOTE','WAREHOUSE_PENDING','WAREHOUSE_PREPARING','RETURNED_TO_SALES'].includes(o.status)&&!o.visitId&&o.visit?.status!=='PICKUP_PRESENT'&&!o.pickupCancellation&&!o.pickupHandover&&!o.warehouseCompletedAt&&!o.warehouseDocumentNo&&!o.warehouseHandover&&!o.transportInvoice&&!o.transportDeparture&&!o.dispatch&&!Object.keys(o.transportHandovers||{}).length&&!o.payment&&!(o.payments||[]).length&&!(o.items||[]).some(i=>i.itemStatus==='DELIVERED'||i.warehouseStatus==='DELIVERED'||(i.deliveredKg!=null&&(!Number.isFinite(Number(i.deliveredKg))||Number(i.deliveredKg)!==0)));}
 // Shared compact order row. Callers supply only trusted markup for status and actions;
 // customer data and labels are escaped here. A store service remains a separate row.
 function orderSummaryRow(o,opts={}){
@@ -142,15 +144,15 @@ async function syncServerTime(){try{const t0=Date.now();const r=await fetch('/ap
 function today(){const d=serverNow();return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`}
 /* v37.3 — قالب یکدست تاریخ شمسی (ICU مرورگرها ترتیب و جداکنندهٔ ناهماهنگ «۱۴۰۵ مهر ۲۱, سه‌شنبه» تولید می‌کند) */
 function faDateParts(d,opts){const o={};try{new Intl.DateTimeFormat('fa-IR-u-ca-persian-nu-arabext',opts).formatToParts(d).forEach(p=>{if(p.type!=='literal')o[p.type]=p.value})}catch(e){}return o}
-function todayText(){const p=faDateParts(serverNow(),{weekday:'long',day:'numeric',month:'long',year:'numeric'});return [p.weekday,p.day,p.month,p.year].filter(Boolean).join(' ')}
+function todayText(){const p=faDateParts(serverNow(),{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});return p.year&&p.month&&p.day?`${p.weekday||''} ${p.year}/${p.month}/${p.day}`.trim():''}
 /* v37.3.3 — ساعت و تاریخ ستون کناری (زیر لوگو). هر دقیقه دقیقاً سر دقیقه به‌روز می‌شود. */
 function railClockTick(){
   const d=serverNow();
-  const p=faDateParts(d,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const p=faDateParts(d,{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
   const t=document.getElementById('railTime'); if(t) t.textContent=fa(`${pad2(d.getHours())}:${pad2(d.getMinutes())}`);
   const w=document.getElementById('railWeekday'); if(w) w.textContent=p.weekday||'';
   const c=document.getElementById('currentDate');
-  if(c){ if(p.day&&p.month&&p.year) c.innerHTML=`<span class="rc-dm">${esc(p.day+' '+p.month)}</span> <span class="rc-y">${esc(p.year)}</span>`; else c.textContent=todayText(); }
+  if(c){ if(p.day&&p.month&&p.year) c.textContent=`${p.year}/${p.month}/${p.day}`; else c.textContent=todayText(); }
 }
 function startRailClock(){
   railClockTick();
@@ -183,7 +185,6 @@ function bindJalaliDates(root=document){
 function jalaliInput(label,target,isoValue=today(),required=true){const j=isoToJalali(isoValue);return `<div class=\"field jalali-field\"><label>${esc(label)}</label><div class=\"input-shell op-input jalali-shell\"><span>${icon('calendar',17)}</span><input class=\"jalali-date-input\" aria-label=\"${esc(label)}\" data-target=\"${esc(target)}\" value=\"${esc(j)}\" placeholder=\"۱۴۰۵/۰۷/۱۴\" inputmode=\"numeric\" autocomplete=\"off\" ${required?'required':''}><button type=\"button\" class=\"date-today-btn\" data-date-today=\"${esc(target)}\">امروز</button></div><input type=\"hidden\" name=\"${esc(target)}\" value=\"${esc(isoValue)}\" ${required?'required':''}></div>`}
 
 /* ---------- تقویم جلالی تعاملی و انتخاب‌گر ساعت ---------- */
-const JALALI_MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
 const JALALI_WEEKDAYS=['ش','ی','د','س','چ','پ','ج'];
 function isJalaliLeap(jy){
   const [gy1,gm1,gd1]=jalaliToGregorian(jy,1,1);
@@ -230,7 +231,6 @@ function renderJalaliCalendar(jy,jm,selectedIso){
   const todayJ=getJalaliToday();
   const monthLen=jalaliMonthLen(jy,jm);
   const firstWD=jalaliWeekday(jy,jm,1);
-  const monthName=JALALI_MONTHS[jm-1]||'';
   let selectedJ=null;
   if(selectedIso && /^\d{4}-\d{2}-\d{2}$/.test(selectedIso)){
     const [sy,sm,sd]=selectedIso.split('-').map(Number);
@@ -239,7 +239,7 @@ function renderJalaliCalendar(jy,jm,selectedIso){
   }
   let h=`<div class="jalali-cal-head">`;
   h+=`<div class="jalali-cal-nav"><button type="button" data-cal="prev" aria-label="ماه قبل">${icon('arrow',16)}</button></div>`;
-  h+=`<div class="jalali-cal-title">${esc(monthName)} ${fa(jy)}</div>`;
+  h+=`<div class="jalali-cal-title">${fa(jy)}/${fa(pad2(jm))}</div>`;
   h+=`<div class="jalali-cal-nav"><button type="button" data-cal="next" class="is-next" aria-label="ماه بعد">${icon('arrow',16)}</button></div></div>`;
   // weekdays header - note icon arrow rotated? we swap prev/next for RTL
   h+=`<div class="jalali-cal-weekdays">`+JALALI_WEEKDAYS.map((w,i)=>`<span class="${i===6?'is-fri':''}">${w}</span>`).join('')+`</div>`;
@@ -527,7 +527,6 @@ function renderDateTimePopover(jy,jm,hour,minute,selectedIso){
   const todayJ=getJalaliToday();
   const monthLen=jalaliMonthLen(jy,jm);
   const firstWD=jalaliWeekday(jy,jm,1);
-  const monthName=JALALI_MONTHS[jm-1]||'';
   let selectedJ=null;
   if(selectedIso && /^\d{4}-\d{2}-\d{2}$/.test(selectedIso)){
     const [sy,sm,sd]=selectedIso.split('-').map(Number);
@@ -535,7 +534,7 @@ function renderDateTimePopover(jy,jm,hour,minute,selectedIso){
     selectedJ=[sj,smj,sdj];
   }
   let h=`<div class="datetime-popover-inner"><div class="dt-body"><div class="dt-cal">`;
-  h+=`<div class="jalali-cal-head"><div class="jalali-cal-nav"><button type="button" data-dt="prev" aria-label="ماه قبل">${icon('arrow',16)}</button></div><div class="jalali-cal-title">${esc(monthName)} ${fa(jy)}</div><div class="jalali-cal-nav"><button type="button" data-dt="next" class="is-next" aria-label="ماه بعد">${icon('arrow',16)}</button></div></div>`;
+  h+=`<div class="jalali-cal-head"><div class="jalali-cal-nav"><button type="button" data-dt="prev" aria-label="ماه قبل">${icon('arrow',16)}</button></div><div class="jalali-cal-title">${fa(jy)}/${fa(pad2(jm))}</div><div class="jalali-cal-nav"><button type="button" data-dt="next" class="is-next" aria-label="ماه بعد">${icon('arrow',16)}</button></div></div>`;
   h+=`<div class="jalali-cal-weekdays">`+JALALI_WEEKDAYS.map((w,i)=>`<span class="${i===6?'is-fri':''}">${w}</span>`).join('')+`</div>`;
   h+=`<div class="jalali-cal-grid">`;
   for(let i=0;i<firstWD;i++) h+=`<span class="jalali-cal-day is-other" style="visibility:hidden"></span>`;

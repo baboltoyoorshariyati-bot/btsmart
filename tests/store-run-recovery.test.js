@@ -6,7 +6,7 @@ test('ترمیم محدود پایان زودهنگام فقط برای سفار
  const db={orders:[mk('a'),mk('closed','CLOSED'),mk('assigned','WAREHOUSE_PREPARING',{status:'ASSIGNED'}),mk('good')],orderItems:[]};
  for(const o of db.orders)db.orderItems.push({id:o.id+'i',orderId:o.id,itemStatus:'DELIVERED',runR2:[{kg:15}],sentRun2:o.id==='good'?{at:'t'}:null});
  const changes=[];assert.equal(recoverUnsentStoreRuns(db,(o,details)=>changes.push({id:o.id,details})),1);
- assert.equal(db.orders[0].storeRunOps.finalizedAt,null);assert.equal(db.orders[0].warehouseCompletedAt,null);
+ assert.equal(db.orders[0].storeRunOps.finalizedAt,null);assert.equal(db.orders[0].warehouseCompletedAt,null);assert.equal(db.orders[0].storeAdditionClosedAt,'t');assert.equal(require('../lib/store-order-additions').canAdd(db.orders[0]),false);
  assert.equal(changes[0].details.previous.finalizedAt,'t');assert.equal(changes[0].details.unsent[0].itemId,'ai');
  for(const o of db.orders.slice(1))assert.equal(o.storeRunOps.finalizedAt,'t');
  assert.equal(recoverUnsentStoreRuns(db,()=>assert.fail()),0);

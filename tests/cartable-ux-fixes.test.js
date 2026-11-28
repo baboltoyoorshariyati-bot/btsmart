@@ -98,13 +98,13 @@ test('کارتابل‌ها فقط «محل ارسال» را نشان می‌د
  assert.match(ui2,/<textarea id="wh38-note-\$\{esc\(it\.id\)\}" rows="2" maxlength="300"[^>]*data-wh38-note=/);
  assert.match(css,/\.wh38-note-box textarea[^{]*\{[^}]*min-height:52px/);
  assert.match(css,/\.wh38-note-box textarea[^{]*\{[^}]*resize:vertical/);
- // ۶) دو تب کارتابل ترابری کنار هم و افقی‌اند، نه روی هم.
+ // ۶) سه تب کارتابل ترابری کنار هم و افقی‌اند، نه روی هم.
  const tabStart=css.indexOf('#transportPlans .tp-plan-tabs'),tabEnd=css.indexOf('/* جزئیات ترابری');
  assert(tabStart>0&&tabEnd>tabStart,'بلوک تب‌های کارتابل ترابری پیدا شود');
  const tabs=css.slice(tabStart,tabEnd);
- assert.match(tabs,/#transportPlans \.tp-plan-tabs\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important/);
+ assert.match(tabs,/#transportPlans \.tp-plan-tabs\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
  assert.match(tabs,/#transportPlans \.tp-plan-tabs\{[^}]*grid-auto-flow:column/);
- assert.match(tabs,/@media\(max-width:700px\)\{[^@]*#transportPlans \.tp-plan-tabs\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)!important/,'تب‌ها در صفحهٔ باریک هم دو ستونی می‌مانند');
+ assert.match(tabs,/@media\(max-width:700px\)\{[^@]*#transportPlans \.tp-plan-tabs\{grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/,'تب‌ها در صفحهٔ باریک هم سه ستونی می‌مانند');
  assert.doesNotMatch(tabs,/grid-template-columns:minmax\(0,1fr\)/,'تب‌ها تک‌ستونی نمی‌شوند');
  assert.doesNotMatch(tabs,/grid-template-columns:repeat\(1,/,'تب‌ها تک‌ستونی نمی‌شوند');
  // ۴) نامهٔ سازگاری نام: ی/ك عربی، نیم‌فاصله و پسوند نام، همان شخص حساب می‌شود.

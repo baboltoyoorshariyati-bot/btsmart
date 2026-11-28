@@ -152,7 +152,7 @@ test('سفارش فروشگاه فقط در تب فروشگاه‌ها و روز
   assert.match(ui, /function renderSalesStoresV41\(orders,deliveries=\{\}\)[\s\S]*?filter\(o=>o&&o\.orderType==='STORE'/);
   assert.match(ui, /renderStoreRunShipmentsPanel/);
   assert.match(app, /function salesFutureOrders\(orders\)\{[\s\S]*?o\.orderType==='REMOTE'&&o\.status==='SCHEDULED_REMOTE'/);
-  assert.match(core, /const futureScheduled = count\(\(o\) => o\.orderType === 'REMOTE' && o\.status === 'SCHEDULED_REMOTE'\)/);
+  assert.match(core, /const futureScheduled = count\(\(o\) => o\.orderType === 'REMOTE' && o\.status === 'SCHEDULED_REMOTE' && String\(o\.scheduledDate\|\|''\) >= today\(\)\)/);
   assert.match(core, /const storeScheduled = count\(\(o\) => o\.orderType === 'STORE' && o\.status === 'SCHEDULED_REMOTE'\)/);
   assert.match(css, /\.sd-sales-tabs\{grid-template-columns:repeat\(7,minmax\(0,1fr\)\)\}/);
 });

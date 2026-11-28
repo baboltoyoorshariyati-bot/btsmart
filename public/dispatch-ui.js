@@ -492,7 +492,7 @@ function startGateDispatchLive() {
     busy=true;const tab=app.sub.gate;
     try{
       const historyQ=tab==='history'?(app.gateHistoryQ||''):'';
-      const [dispatch,rows,pickup,cancelled]=await Promise.all([api('/api/gate/dispatch'),tab==='exit'?fetchPagedList('/api/orders?status=SETTLED','orders'):api('/api/visits'+(historyQ?'?q='+encodeURIComponent(historyQ):'')),tab==='exit'&&app.features?.pickupStaging?fetchPagedList('/api/pickup/active','orders'):Promise.resolve({orders:[]}),tab==='exit'?fetchPagedList('/api/visits?status=CANCELLED_EXIT_PENDING','visits'):Promise.resolve({visits:[]})]);
+      const [dispatch,rows,pickup,cancelled]=await Promise.all([api('/api/gate/dispatch'),tab==='exit'?fetchPagedList('/api/orders?status=SETTLED','orders'):tab==='waiting'?fetchPagedList('/api/visits?status=WAITING_SALES','visits'):api('/api/visits'+(historyQ?'?q='+encodeURIComponent(historyQ):'')),tab==='exit'&&app.features?.pickupStaging?fetchPagedList('/api/pickup/active','orders'):Promise.resolve({orders:[]}),tab==='exit'?fetchPagedList('/api/visits?status=CANCELLED_EXIT_PENDING','visits'):Promise.resolve({visits:[]})]);
       if(app.page!=='gate'||app.gateRenderSeq!==seq||app.sub.gate!==tab||(tab==='history'&&historyQ!==(app.gateHistoryQ||'')))return;
       const sig=JSON.stringify(dispatch);if(sig!==dsp.sigs.gate){dsp.sigs.gate=sig;updateGateDispatchInCartable(dispatch);}
       const rowSig=JSON.stringify(tab==='exit'?[rows,pickup,cancelled]:rows);
@@ -597,7 +597,7 @@ function paintReturns(data) {
    «تخصیص‌یافته» = سرویسی که راننده و خودروی آن مشخص شده است.
    داده، شمارش و اقدام‌ها بدون تغییر مانده‌اند؛ فقط گروه‌بندی قابل تشخیص شد. */
 function transportPlanRows(orders,tab){
- const views=transportPlanViews(orders).filter(view=>tab?view.assigned===(tab==='assigned'):true);
+ const views=transportPlanViews(orders).filter(view=>tab==='incoming'?(!view.assigned&&view.service.actionable!==false):tab==='assigned'?view.assigned:tab==='active'?view.service.active!==false:true);
  return views.map(({order:o,service:s,assigned})=>{
   const a=s.assignment,label=o.storeOrderKind==='PARTIAL'?'سفارش جزئی':s.run?`سرویس ${s.run===1?'اول':'دوم'}`:'سفارش مشتری';
   const driver=a?`راننده: ${a.driverName||'—'}`:'راننده: تعیین نشده';
@@ -630,9 +630,9 @@ async function renderTransportPlanQueue(){
   const capability=await api('/api/transport/capabilities');if($('#transportPlans')!==host||!capability.experimentalWorkflow)return;
   const [data,resources]=await Promise.all([api('/api/transport/plans'),api('/api/transport/resources')]);if($('#transportPlans')!==host)return;
   const orders=data.orders||[];
-  if(!['incoming','assigned'].includes(dsp.planTab))dsp.planTab='incoming';
-  const views=transportPlanViews(orders),counts={incoming:views.filter(v=>!v.assigned).length,assigned:views.filter(v=>v.assigned).length};
-  const tabs=[['incoming','ورودی','سفارش‌های بدون راننده؛ آمادهٔ تخصیص'],['assigned','تخصیص‌یافته','سرویس‌هایی که راننده و خودروی آن‌ها مشخص شده است']];
+  if(!['incoming','assigned','active'].includes(dsp.planTab))dsp.planTab='incoming';
+  const views=transportPlanViews(orders),counts={incoming:views.filter(v=>!v.assigned&&v.service.actionable!==false).length,assigned:views.filter(v=>v.assigned).length,active:views.filter(v=>v.service.active!==false).length};
+  const tabs=[['incoming','ورودی','سفارش‌های بدون راننده؛ آمادهٔ تخصیص'],['assigned','تخصیص‌یافته (سوابق)','سرویس‌هایی که راننده و خودروی آن‌ها مشخص شده است'],['active','در برنامه','سرویس‌های فعال پیش از خروج']];
   const rows=transportPlanRows(orders,dsp.planTab);
   const empty=dsp.planTab==='assigned'?'سرویس تخصیص‌یافته‌ای نیست':'سفارش ورودی بدون راننده‌ای نیست';
   host.innerHTML=`<section class="sd-panel sd-pad"><div class="stl-block-head"><h2>برنامه‌ریزی و خروج ترابری</h2><button type="button" class="btn btn-secondary btn-sm" data-tp="refresh">به‌روزرسانی</button></div><p>تخصیص هر سرویس مستقل است؛ خروج فروشگاه پس از بررسی فروش توسط نگهبانی تأیید می‌شود.</p>`
@@ -641,7 +641,7 @@ async function renderTransportPlanQueue(){
   host.onclick=e=>{
    const b=e.target.closest('[data-tp]');if(!b)return;
    if(b.dataset.tp==='refresh')return renderTransportPlanQueue();
-   if(b.dataset.tp==='plan-tab'){dsp.planTab=b.dataset.tab==='assigned'?'assigned':'incoming';return renderTransportPlanQueue();}
+   if(b.dataset.tp==='plan-tab'){dsp.planTab=['assigned','active'].includes(b.dataset.tab)?b.dataset.tab:'incoming';return renderTransportPlanQueue();}
    const order=orders.find(o=>o.id===b.dataset.id),service=order?.services?.find(s=>s.run===Number(b.dataset.run));
    if(order&&service)transportPlanDetails(order,service,resources);
   };
